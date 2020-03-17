@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, 
+    initial-scale=1.0, 
+    maximum-scale=1.0, 
+    user-scalable=no">
+    <title>Climate-Analysis</title>
+    <meta name="description" content="Klima Admin-App" />
+    <meta name="cache-control" content="no-cache, no-store">
+    <meta name="keywords" content="Climate Analysis, node.js, sqlite3, regression, cluster, pivot, GHCN-daily">
+    <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/klistyles.css" rel="stylesheet">
+
+    <!-- erst die libs laden, dann die js module -->
+    <!-- <script src="lib/jquery.min.js"></script> -->
+    <script src="lib/jquery-2.2.4.min.js"></script>
+    <script src="lib/jquery.backDetect.js"></script>
+    <script src="lib/jquery.cookie.min.js"></script>
+    <script type="text/javascript" src="/apps/re-frame/sysbase.js"></script>
+    <script type="text/javascript" src="/apps/re-frame/uihelper.js"></script>
+    <script type="text/javascript" src="/apps/re-klima/kla0201men.js"></script>
+</head>
+<body class="">
+    <div class="header">
+        <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
+        <span class="headerspan" style="color:red;font-weight:bold;">Climate-Analysis</span>
+        <noscript>
+            <div
+                style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+                <span style="color:blue">
+                    Your browser does not support scripts, you have to enable it to run this page
+                </span>
+            </div>
+        </noscript>
+    </div>
+    <div class="content">
+    </div>
+    <div class="footer">
+    </div>
+    <script>
+        $(window).off("resize");
+		$(window).resize(function () {
+            var hh = $(".header").outerHeight();
+            var fh = $(".footer").outerHeight();
+            var wh = $(window).height();
+            $(".content").height(wh - hh - fh - 1);
+           // $(".content").css("overflow", "auto");
+        });
+        $(document).ready(function () {
+            $('body').backDetect(function () {
+                alert("The back-button terminates the app (2)");
+            });
+            if (window.location.href.indexOf("localhost") >= 0) {
+                $("body").css({
+                    "background-color": "#77b2f511"
+                });
+            }
+            sysbase.navigateTo("kla0201men", [], function (ret) {
+                if (ret.error === true) {
+                    alert(ret.message);
+                }
+            });
+            
+        });
+    </script>
+</body>
+</html>

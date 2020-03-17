@@ -1,0 +1,33 @@
+{
+  "name": "re-klima",
+  "version": "1.0.0",
+  "description": "Climate Analysis based on GHCN-daily data",
+  "main": "server.js",
+  "scripts": {
+    "test": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/reckertz/re-klima.git"
+  },
+  "keywords": [
+    "climate",
+    "analysis",
+    "GHCN",
+    "temperature",
+    "climate-zones",
+    "global",
+    "warming"
+  ],
+  "author": "Rolf W. Eckertz",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/reckertz/re-klima/issues"
+  },
+  "homepage": "https://github.com/reckertz/re-klima#readme",
+  "dependencies": {
+    "async": "^3.2.0",
+    "express": "^4.17.1",
+    "sqlite3": "^4.1.1"
+  }
+}
