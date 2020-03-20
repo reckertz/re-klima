@@ -20,6 +20,9 @@
     var uihelper = require("re-frame/uihelper");
     var gblInfo = {};
 
+
+
+
     sys0000sys.getInfo = function () {
         return gblInfo;
     };
@@ -430,10 +433,11 @@
      * 2. ALTER TABLE für neue Felder, die noch nicht in der Feldbeschreibung enthalten sind,
      * vorhandene Felder werden abgefragt mit PRAGMA table_info(table-name);
      * diese Feldlisten können in einen globalen Cache genommen werden, um wieder verwendet zu werden
-     * @param db
-     * @param async
-     * @param req - hat selfields, updfields und table
-     * @param res
+     * @param db - SQLite3 Datenbank, zugewiesen
+     * @param async - Standardbibliothek
+     * @param req - hat selfields, updfields und table für Aufruf aus dem Client (über server.js etc)
+     * @param reqparm - hat selfields, updfields und table für Aufruf innerhalb des Servers
+     * @param res - response-Objekt, wird einfach durchgereicht in callback
      * @param callback returns res, ret
      */
     sys0000sys.setonerecord = function (db, async, req, reqparm, res, callbacksor) {
@@ -624,12 +628,120 @@
                          */
                         if (err) {
                             ret.message += " CREATE TABLE:" + err.message;
+                            callback210a("Error", res, ret);
+                            return;
                         } else {
                             ret.message += " " + ret.sorparms.table + " created";
+                            var indFields = "";
+                            for (var field in ret.sorparms.sel) {
+                                if (ret.sorparms.sel.hasOwnProperty(field)) {
+                                    if (indFields.length > 0) indFields += ", ";
+                                    indFields += field;
+                                }
+                            }
+                            if (indFields.length > 0) {
+                                var createInd = "CREATE INDEX IF NOT EXISTS ind1_" + ret.sorparms.table + " ON " + ret.sorparms.table + "(";
+                                createInd += indFields;
+                                createInd += ")";
+                                db.run(createInd, function (err) {
+                                    callback210a(null, res, ret);
+                                    return;
+                                });
+                            } else {
+                                callback210a(null, res, ret);
+                                return;
+                            }
                         }
-                        callback210a(null, res, ret);
-                        return;
                     });
+                },
+
+                function (res, ret, callback210c) {
+                    // check new fields - wenn Tabelle nicht neu ist
+                    var mycache = sys0000sys.getInfo();
+                    if (ret.createTable === true) {
+                        // cache immer aufbauen bei neuer Tabelle
+                        mycache.tables = {};
+                        var acttable = ret.sorparms.table;
+                        mycache.tables[acttable] = {};
+                        var allfields = Object.keys(ret.sorparms.allfields);
+                        for (var ifield = 0; ifield < allfields.length; ifield++) {
+                            var fieldname = allfields[ifield];
+                            var fieldtype = typeof ret.sorparms.allfields[fieldname];
+                            mycache.tables[acttable][fieldname] = fieldtype;
+                        }
+                        callback210c(null, ret, ret);
+                        return;
+                    } else {
+                        // hier wird es ernst                    
+                        if (typeof mycache.tables === "undefined") {
+                            mycache.tables = {};
+                        }
+                        var acttable = ret.sorparms.table;
+                        if (typeof mycache.tables[acttable] === "undefined") {
+                            mycache.tables[acttable] = {};
+                            db.all("PRAGMA table_info ('" + ret.sorparms.table + "')", function (err, fields) {
+                                if (err === null) {
+                                    for (var ifield = 0; ifield < fields.length; ifield++) {
+                                        var name = fields[ifield].name;
+                                        var type = fields[ifield].type;
+                                        mycache.tables[acttable][name] = type;
+                                    }
+                                }
+                                callback210c(null, ret, ret);
+                                return;
+                            });
+                        } else {
+                            callback210c(null, ret, ret);
+                            return;
+                        }
+                    }
+                },
+
+                function (res, ret, callback210d) {
+                    if (ret.createTable === true) {
+                        callback210d(null, res, ret);
+                        return;
+                    }
+                    var acttable = ret.sorparms.table;
+                    var mycache = sys0000sys.getInfo();
+                    var allfields = Object.keys(ret.sorparms.allfields);
+                    var alterstatements = [];
+                    for (var ifield = 0; ifield < allfields.length; ifield++) {
+                        var actfield = allfields[ifield];
+                        var actvalue = ret.sorparms.allfields[actfield];
+                        var acttype = "TEXT";
+                        if (typeof actvalue === "number") {
+                            acttype = "FLOAT";
+                        }
+                        if (typeof mycache.tables[acttable][actfield] === "undefined") {
+                            var alterstatement = "ALTER TABLE ";
+                            alterstatement += ret.sorparms.table;
+                            alterstatement += " ADD COLUMN " + actfield;
+                            alterstatement += " " + acttype;
+                            alterstatements.push(alterstatement);
+                            mycache.tables[acttable][actfield] = acttype;
+                        }
+                    }
+                    if (alterstatements.length > 0) {
+                        async.eachSeries(alterstatements, function (alterStmt, nextStmt) {
+                                db.run(alterStmt, function (err) {
+                                    if (err) {
+                                        ret.message += " ALTER-Error:" + err.message;
+                                    } else {
+                                        ret.message += " " + alterStmt + " executed";
+                                    }
+                                    nextStmt();
+                                    return;
+                                });
+                            },
+                            function (error) {
+                                callback210d(null, res, ret);
+                                return;
+                            });
+                    } else {
+                        callback210d(null, res, ret);
+                        return;
+                    }
                 },
                 function (res, ret, callback210i) {
                     // optional INSERT
@@ -677,7 +789,7 @@
                         if (err) {
                             ret.message += " INSERT-Error:" + err.message;
                         } else {
-                            ret.message += " " + ret.sorparms.table + " inserted";
+                            ret.message += " " + ret.sorparms.table + " ID:" + this.lastID + " inserted";
                         }
                         callback210i(null, res, ret);
                         return;
@@ -753,7 +865,7 @@
                         if (err) {
                             ret.message += " UPDATE:" + err.message;
                         } else {
-                            ret.message += " " + ret.sorparms.table + " updated";
+                            ret.message += " " + ret.sorparms.table + " updated:" + this.changes;
                         }
                         callback210u(null, res, ret);
                         return;

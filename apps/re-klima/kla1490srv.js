@@ -1,18 +1,20 @@
-/*jshint evil: true */ 
+/*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
 /*global sysbase,uihelper */
 (function () {
-    var kli9010srv = {};
+    var kla1490srv = {};
 
     var root = typeof self === 'object' && self.self === self && self ||
         typeof global === 'object' && global.global === global && global ||
         this;
 
     var crg = crg || require('country-reverse-geocoding').country_reverse_geocoding();
+    var path = path || require("path");
 
     var uihelper = null;
     var sys0000sys = null;
     var kla9020fun = null;
+    var LineByLineReader = null;
 
     var gbldb = null;
     var res = null;
@@ -27,13 +29,352 @@
     var sql3inserts = 0;
     var sql3errors = 0;
 
+
+
+    /**
+     * ghcndcomplete - GHCN daily-Aufbereitung
+     * Vorgabe ist fullname von ghcnd-stations.txt
+     * damit wird KLISTATIONS fortgeschrieben,
+     * anschliessend werden die entpackten Dateien bearbeitet:
+     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\
+     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\ghcnd-stations.txt
+     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\ => ghcnd_all.tar\ghcnd_all\ghcnd_all => *.dly-Files
+     * @param {*} gblInfo 
+     * @param {*} db 
+     * @param {*} fs 
+     * @param {*} path 
+     * @param {*} rootname 
+     * @param {*} async 
+     * @param {*} stream 
+     * @param {*} StreamZip 
+     * @param {*} readline 
+     * @param {*} sys0000sys 
+     * @param {*} req 
+     * @param {*} res 
+     * returns function (res, ret)
+     */
+    kla1490srv.ghcndcomplete = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, callback290) {
+        async.waterfall([
+                function (callback290a) {
+                    /** 
+                     * Dateinamen bereitstellen
+                     */
+                    var fullname = "";
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    var source = "";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    var selyears = "";
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+
+                    if (!fs.existsSync(fullname)) {
+                        callback290a("Error", res, {
+                            error: false,
+                            message: fullname + " nicht auf dem Server vorhanden"
+                        });
+                        return;
+                    }
+                    var ret = {};
+                    ret.fullname = fullname;
+                    ret.fullnamestations = fullname;
+                    ret.dirname = path.dirname(fullname);
+                    ret.source = source;
+                    ret.selyears = selyears;
+                    callback290a(null, res, ret);
+                    return;
+                },
+                function (res, ret, callback290b) {
+                    /**
+                     * KLICOUNTRIES neu aufbauen aus ghcnd-countries.txt
+                     */
+                    couschema = [{
+                            name: "countrycode", // "GM",
+                            von: "1",
+                            bis: "2",
+                            type: "String"
+                        },
+                        {
+                            name: "skip1", // Leerstelle
+                            von: "3",
+                            bis: "3",
+                            type: "String"
+                        },
+                        {
+                            name: "countryname", // "Germany"
+                            von: "4",
+                            bis: "53",
+                            type: "String"
+                        }
+                    ];
+                    var countryfilename = path.join(ret.dirname, "ghcnd-countries.txt");
+                    ret.countryfilename = countryfilename;
+                    if (!fs.existsSync(countryfilename)) {
+                        callback290b("Error", res, {
+                            error: true,
+                            message: "Datei nicht gefunden:" + countryfilename
+                        });
+                        return;
+                    }
+                    /**
+                     * Lesen ghcnd-countries.txt und Update KLICOUNTRIES
+                     */
+                    var counter = 0;
+                    var html = "";
+                    ret.countries = {};
+                    LineByLineReader = LineByLineReader || require('line-by-line');
+                    var rl = new LineByLineReader(ret.countryfilename);
+                    // event is emitted after each line
+                    rl.on('line', function (line) {
+                        var that = this;
+                        rl.pause();
+                        counter++;
+                        var courecord = {};
+                        for (var i = 0; i < couschema.length; i++) {
+                            var val1 = line.substring(couschema[i].von - 1, couschema[i].bis).trim();
+                            var fld1 = couschema[i].name;
+                            courecord[fld1] = val1;
+                        }
+                        ret.countries[courecord.countrycode] = courecord.countryname;
+                        var reqparm = {};
+                        reqparm.selfields = {
+                            countrycode: courecord.countrycode
+                        };
+                        reqparm.updfields = {};
+                        reqparm.updfields["$setOnInsert"] = {
+                            countryname: courecord.countryname
+                        };
+                        reqparm.updfields["$set"] = {};
+                        reqparm.table = "KLICOUNTRIES";
+                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                            rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                        });
+                    });
+                    // end - line-by-line davor war es close
+                    rl.on('end', function (line) {
+                        console.log('Total lines : ' + counter);
+                        ret.message += " KLICOUNTRIES:" + counter;
+                        callback290b(null, res, ret);
+                        return;
+                    });
+                },
+                function (res, ret, callback290d) {
+                    /**
+                     * Lesen ghncd-stations.txt und Update KLISTATIONS
+                     */
+                    var invschema = [{
+                            name: "stationid", // "GM000003319",
+                            von: "1",
+                            bis: "11",
+                            type: "String"
+                        },
+                        {
+                            name: "latitude", //  "  52.4639" - Berlin 
+                            von: "13",
+                            bis: "20",
+                            type: "String"
+                        },
+                        {
+                            name: "longitude", //  "   13.3017" Berlin
+                            von: "22",
+                            bis: "30",
+                            type: "String"
+                        },
+                        {
+                            name: "height", //  "   51.0" Berlin
+                            von: "32",
+                            bis: "37",
+                            type: "String"
+                        },
+                        {
+                            name: "state", //  "    " Berlin
+                            von: "39",
+                            bis: "40",
+                            type: "String"
+                        },
+                        {
+                            name: "stationname", //  "    " Berlin
+                            von: "42",
+                            bis: "71",
+                            type: "String"
+                        },
+                        {
+                            name: "GSN", //  Flas
+                            von: "73",
+                            bis: "75",
+                            type: "String"
+                        },
+                        {
+                            name: "HCN_CRN", //  Flag
+                            von: "77",
+                            bis: "79",
+                            type: "String"
+                        },
+                        {
+                            name: "WMO_ID", //  Flag
+                            von: "81",
+                            bis: "85",
+                            type: "String"
+                        }
+                    ];
+
+                    var counter = 0;
+                    var html = "";
+                    ret.stations = {};
+                    var rl = new LineByLineReader(ret.fullnamestations);
+                    var stationnr = 0;
+                    // event is emitted after each line
+                    rl.on('line', function (line) {
+                        var that = this;
+                        rl.pause();
+                        counter++;
+                        var invrecord = {};
+                        for (var i = 0; i < invschema.length; i++) {
+                            var val1 = line.substring(invschema[i].von - 1, invschema[i].bis).trim();
+                            var fld1 = invschema[i].name;
+                            invrecord[fld1] = val1;
+                        }
+                        var lat = invrecord.latitude;
+                        var latobj = kla9020fun.getlatfieldsp(lat);
+                        invrecord.latn = latobj.latn;
+                        invrecord.lats = latobj.lats;
+                        ret.stations[invrecord.stationid] = invrecord;
+                        /**
+                         * contry festellen und Datenkomplettierung
+                         */
+                        if (crg === null) {
+                            crg = require('country-reverse-geocoding').country_reverse_geocoding();
+                        }
+                        var country = crg.get_country(parseFloat(invrecord.latitude), parseFloat(invrecord.longitude));
+                        if (typeof country !== "undefined" && country !== null) {
+                            invrecord.alpha3 = country.code;
+                            invrecord.countryname = country.name;
+                            var countrydata = ret.countries[country.code];
+                            if (typeof countrydata !== "undefined" && countrydata !== null) {
+                                stationnr++;
+                                delete countrydata.history;
+                                delete countrydata.tsserverupd;
+                                delete countrydata._id;
+                                invrecord = Object.assign(invrecord, countrydata);
+                            }
+                        }
+                        /**
+                         * Klimazone bestimmen
+                         */
+                        var vgllat = parseFloat(invrecord.latitude);
+                        if (vgllat > 60) {
+                            invrecord.climatezone = "N0-North Cold 60-90";
+                        } else if (vgllat > 40) {
+                            invrecord.climatezone = "N1-North Moderate 40-60";
+                        } else if (vgllat > 23.5) {
+                            invrecord.climatezone = "N2-North Subtrop 23,5-40";
+                        } else if (vgllat > 0) {
+                            invrecord.climatezone = "N3-North Tropic 0-23,5";
+                        } else if (vgllat < -60) {
+                            invrecord.climatezone = "S0-South Cold 60-90";
+                        } else if (vgllat < -40) {
+                            invrecord.climatezone = "S1-South Moderate 40-60";
+                        } else if (vgllat < -23.5) {
+                            invrecord.climatezone = "S2-South Subtrop 23,5-40";
+                        } else {
+                            invrecord.climatezone = "S3-South Tropic 0-23,5";
+                        }
+                        var reqparm = {};
+                        reqparm.selfields = {
+                            source: ret.source,
+                            stationid: invrecord.stationid
+                        };
+                        reqparm.updfields = {};
+                        reqparm.updfields["$setOnInsert"] = {
+                            source: ret.source,
+                            stationid: invrecord.stationid
+                        };
+                        //delete invrecord.source;
+                        //delete invrecord.stationid;
+                        delete invrecord.history;
+                        reqparm.updfields["$set"] = invrecord;
+                        reqparm.table = "KLISTATIONS";
+                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret) {
+                            if (counter % 100 === 0) {
+                                var logmsg = counter + "/" + stationnr + " " + invrecord.name;
+                                if (typeof country !== "undefined" && country !== null) {
+                                    logmsg += "=>" + country.code || "" + " " + country.name || "" + "=>" + countrydata.region || "";
+                                    // console.log(logmsg);
+                                } else {
+                                    logmsg += "=>Keine Region-Data";
+                                    console.log(logmsg);
+                                }
+                            }
+                            rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                        });
+                    });
+                    // end - line-by-line davor war es close
+                    rl.on('end', function (line) {
+                        console.log('Total lines : ' + counter);
+                        ret.message += " KLISTATION:" + counter;
+                        callback290d("Finish", res, ret);
+                        return;
+                    });
+                },
+                function (res, ret, callback290g) {
+                    /**
+                     * KLICOUNTRIES laden
+                     */
+                    var reqparm = {};
+                    reqparm.table = "KLICOUNTRIES";
+                    reqparm.sel = {};
+                    reqparm.projection = {};
+                    sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+                        if (ret1.error === true) {
+                            ret.message += " keine KLICOUNTRIES:" + err;
+                            ret.countries = {};
+                            callback290g(null, res, ret);
+                            return;
+                        } else {
+                            if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                                ret.countries = {};
+                                for (var recordind in ret1.records) {
+                                    var record = ret1.records[recordind];
+                                    var alpha3 = record.alpha3;
+                                    delete record.history;
+                                    var countryname = record.name;
+                                    delete record.name;
+                                    record.countryname = countryname;
+                                    ret.countries[alpha3] = record;
+                                }
+                                callback290g(null, res, ret);
+                                return;
+                            } else {
+                                ret.message += " keine KLICOUNTRIES";
+                                ret.countries = {};
+                                callback290g(null, res, ret);
+                                return;
+                            }
+                        }
+                    });
+                }
+            ],
+            function (error, res, ret) {
+
+                callback290(res, ret);
+                return;
+
+
+            });
+
+    };
+
     /** 
      * fullname = zui-Datei mit den Daten zu einer Variablen
      * basiert auf vorhandenen Sourcen, die umgebaut werden
      * ghc1030dta.showallzips
      * callback45 mit function (res, ret)
      */
-    kli9010srv.ecadcomplete = function (gblInfo, gbldbx, fs, path, rootname, async, stream, StreamZip, readline, sys0000sysx, kla9020funx, req, resx, callback45) {
+    kla1490srv.ecadcomplete = function (gblInfo, gbldbx, fs, path, rootname, async, stream, StreamZip, readline, sys0000sysx, kla9020funx, req, resx, callback45) {
         /*
         forcedata: forcedata,
         fullname: fullname,
@@ -177,9 +518,9 @@
                         console.log('Entries read: ' + zip.entriesCount);
                         var files = zip.entries();
 
-                        kli9010srv.getSourcesTxtData(zip, "elements.txt", varfldtable, varstatable);
-                        kli9010srv.getSourcesTxtData(zip, "sources.txt", srcfldtable, srcsoutable);
-                        kli9010srv.getSourcesTxtData(zip, "stations.txt", stafldtable, srcstatable);
+                        kla1490srv.getSourcesTxtData(zip, "elements.txt", varfldtable, varstatable);
+                        kla1490srv.getSourcesTxtData(zip, "sources.txt", srcfldtable, srcsoutable);
+                        kla1490srv.getSourcesTxtData(zip, "stations.txt", stafldtable, srcstatable);
 
                         // for (var file in files) {
                         try {
@@ -194,7 +535,7 @@
                                         // hier die Daten aufbereiten!!!
                                         var filname = fileobj.name;
                                         vglsouid = "";
-                                        kli9010srv.getFileTxtData(zip, filname, StreamZip, function (ret) {
+                                        kla1490srv.getFileTxtData(zip, filname, StreamZip, function (ret) {
                                             /** 
                                              * für KLISTATIONS
                                              * years: years,
@@ -202,7 +543,7 @@
                                              * targetelem: targetelem,
                                              * targetvar: targetvar
                                              */
-                                            kli9010srv.putecaddata(srcstatable, srcsoutable, ret.years, ret.fldtable, ret.targetvar, ret.targetelem, async, function (ret) {
+                                            kla1490srv.putecaddata(srcstatable, srcsoutable, ret.years, ret.fldtable, ret.targetvar, ret.targetelem, async, function (ret) {
                                                 nextfile();
                                                 return;
                                             });
@@ -247,7 +588,7 @@
      * Ausgabe in <variablename>.<"years">.<jahreszahl>.array der werte
      * fldtable - wird hier nicht ausgewertet
      */
-    kli9010srv.putecaddata = function (statable, soutable, years, fldtable, targetvar, targetelem, async, callback47) {
+    kla1490srv.putecaddata = function (statable, soutable, years, fldtable, targetvar, targetelem, async, callback47) {
         var souids = Object.keys(years);
         async.eachSeries(souids, function (souid, nextsouid) {
                 /** 
@@ -436,7 +777,7 @@
     /**
      * Perlschnüre im Detail aufbereiten
      */
-    kli9010srv.getFileTxtData = function (zip, filname, StreamZip, callback46) {
+    kla1490srv.getFileTxtData = function (zip, filname, StreamZip, callback46) {
         console.log("getFileTxtData:" + filname);
         var fldtable = [];
         var laststr = "";
@@ -519,7 +860,7 @@
                             }
                         }
                         if (dmode === 1 && skip === false) {
-                            var data = kli9010srv.getLocFieldFormat(line);
+                            var data = kla1490srv.getLocFieldFormat(line);
                             if (data.error === true && fldtable.length > 0) {
                                 skip = true;
                                 dmode = 20;
@@ -552,7 +893,7 @@
                                 // console.log("empty record skipped");
                                 continue;
                             }
-                            var data1 = kli9010srv.getFieldData(fldtable, line);
+                            var data1 = kla1490srv.getFieldData(fldtable, line);
                             for (var key1 in data1) {
                                 if (typeof data1[key1] === "string") {
                                     data1[key1] = data1[key1].trim();
@@ -656,11 +997,11 @@
 
 
     /** 
-     * kli9010srv.getSourcesTxtData = function (zip, filename, fldtable, statable) {
+     * kla1490srv.getSourcesTxtData = function (zip, filename, fldtable, statable) {
      * übernommen aus ghc1030dta.getSourcesTxtData(zip, "elements.txt", varfldtable, varstatable);
      */
 
-    kli9010srv.getSourcesTxtData = function (zip, filename, fldtable, statable) {
+    kla1490srv.getSourcesTxtData = function (zip, filename, fldtable, statable) {
         /**
          * csv auseinandernehmen
          * https://stackoverflow.com/questions/39705209/node-js-read-a-file-in-a-zip-without-unzipping-it
@@ -705,7 +1046,7 @@
                         if (line.length < 2) {
                             break;
                         }
-                        var data = kli9010srv.getLocFieldFormat(line);
+                        var data = kla1490srv.getLocFieldFormat(line);
                         if (firstfieldname.length === 0) {
                             firstfieldname = data.name;
                         }
@@ -754,7 +1095,7 @@
                     if (line.trim().length < 2) {
                         break;
                     }
-                    var data1 = kli9010srv.getFieldData(fldtable, line);
+                    var data1 = kla1490srv.getFieldData(fldtable, line);
                     for (var key1 in data1) {
                         if (typeof data1[key1] === "string") {
                             data1[key1] = data1[key1].trim();
@@ -777,7 +1118,7 @@
      *  * 01- 05 STAID  : Station identifier
      * (\d+) ... https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_match_regexp2 
      */
-    kli9010srv.getLocFieldFormat = function (line) {
+    kla1490srv.getLocFieldFormat = function (line) {
         //var res = line.match(/([0-9]*)(-)(\s)([0-9]*)(\s)([a-zA-Z_0-9]*)(\s*)([:]*)(\s*)(.*)/);
         var res = line.match(/([0-9]*)(-)(\s*)([0-9]*)(\s*)([a-zA-Z_0-9]*)(\s*)([:]*)(\s*)(.*)/);
         if (res === null) {
@@ -821,7 +1162,7 @@
      * aber hier nicht regex, sondern fest formatiert!
      * https://texthandler.com/info/remove-line-breaks-javascript/
      */
-    kli9010srv.getFieldData = function (fldtable, line) {
+    kla1490srv.getFieldData = function (fldtable, line) {
         var result = {};
         line = line.replace(/(\r\n|\n|\r)/gm, " ");
         for (var ifld = 0; ifld < fldtable.length; ifld++) {
@@ -839,7 +1180,7 @@
         return result;
     };
 
- 
+
 
     /**
      * getallclimatedata -Wrapper um getallrecords für KLISTATIONS
@@ -850,7 +1191,7 @@
      * @param  {} res - Response aus AJAX
      * @param  {} callbackcd returns (res, ret)
      */
-    kli9010srv.getallclimatedata = function (gbldb, async, sys0000sys, kla9020fun, uihelper, req, reqparm, res, callbackcd) {
+    kla1490srv.getallclimatedata = function (gbldb, async, sys0000sys, kla9020fun, uihelper, req, reqparm, res, callbackcd) {
 
         var sel = {};
         var selfunction = "";
@@ -1112,7 +1453,7 @@
     var latprofile = {};
     var yearlats = {};
     var linereader = null;
-    kli9010srv.ghcninv2stations = function (gblInfo, gbldb, fs, async, stream, readline, sys0000sys, kla9020fun, req, res, supercallback1) {
+    kla1490srv.ghcninv2stations = function (gblInfo, gbldb, fs, async, stream, readline, sys0000sys, kla9020fun, req, res, supercallback1) {
         latprofile = {};
         yearlats = {};
         console.log("ghcninv2stations gestartet");
@@ -1324,7 +1665,7 @@
      * crutem4complete - macht alles für CRUTEM4
      * returns function (res, ret)
      */
-    kli9010srv.crutem4complete = function (gblInfo, gbldb, fs, path, rootname, async, stream, readline, sys0000sys, kla9020fun, req, res, supercallback) {
+    kla1490srv.crutem4complete = function (gblInfo, gbldb, fs, path, rootname, async, stream, readline, sys0000sys, kla9020fun, req, res, supercallback) {
 
         async.waterfall([
                 function (callbackcc) {
@@ -1531,7 +1872,7 @@
                                             */
                                         }
                                         starec = {};
-                                        kli9010srv.crutem4staline(ret, line, starec, kla9020fun);
+                                        kla1490srv.crutem4staline(ret, line, starec, kla9020fun);
                                         // rl.resume(); // holt den nächsten Satz, auch aus waterfall
                                         // return;
                                         cb(true);
@@ -1540,7 +1881,7 @@
                                 } else {
 
                                     starec = {};
-                                    kli9010srv.crutem4staline(ret, line, starec, kla9020fun);
+                                    kla1490srv.crutem4staline(ret, line, starec, kla9020fun);
                                     //rl.resume(); // holt den nächsten Satz, auch aus waterfall
                                     cb(true);
                                     return;
@@ -1625,7 +1966,7 @@
     };
 
 
-    kli9010srv.crutem4staline = function (ret, line, starec, kla9020fun) {
+    kla1490srv.crutem4staline = function (ret, line, starec, kla9020fun) {
         /**
          * hier wird die neue Station angelegt
          */
@@ -1714,7 +2055,7 @@
      * ghcncomplete - macht alles
      * returns function (res, ret)
      */
-    kli9010srv.ghcncomplete = function (gblInfo, gbldb, fs, path, rootname, async, stream, readline, sys0000sys, kla9020fun, req, res, supercallback) {
+    kla1490srv.ghcncomplete = function (gblInfo, gbldb, fs, path, rootname, async, stream, readline, sys0000sys, kla9020fun, req, res, supercallback) {
 
         async.waterfall([
                 function (callbackgc) {
@@ -1962,7 +2303,7 @@
                      * Daten lesen und in KLISTATIONS integrieren mit years-Object
                      * ret.fullnamemin, ret.fullnamemax, ret.fullnameavg
                      * ausgelagert, bisherige Mimik anpassen
-                       kli9010srv.ghcndat2obj(fullfilename, selyears, variablename, ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
+                       kla1490srv.ghcndat2obj(fullfilename, selyears, variablename, ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
                           callback2(null, res, ret1);
                           return;
                        });
@@ -1970,7 +2311,7 @@
                      * ghcndat2all aufrufen
                      * 
                      */
-                    kli9010srv.ghcndat2all(ret.fullnametmin, ret.selyears, "tmin", ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
+                    kla1490srv.ghcndat2all(ret.fullnametmin, ret.selyears, "tmin", ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
                         callbackgc(null, res, ret1);
                         return;
                     });
@@ -1979,7 +2320,7 @@
                     /**
                      * ghcndat2all aufrufen - tmax
                      */
-                    kli9010srv.ghcndat2all(ret.fullnametmax, ret.selyears, "tmax", ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
+                    kla1490srv.ghcndat2all(ret.fullnametmax, ret.selyears, "tmax", ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
                         callbackgc(null, res, ret1);
                         return;
                     });
@@ -1988,7 +2329,7 @@
                     /**
                      * ghcndat2all aufrufen - tavg
                      */
-                    kli9010srv.ghcndat2all(ret.fullnametavg, ret.selyears, "tavg", ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
+                    kla1490srv.ghcndat2all(ret.fullnametavg, ret.selyears, "tavg", ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
                         callbackgc(null, res, ret1);
                         return;
                     });
@@ -2006,7 +2347,7 @@
      * lesen eine dat-Datei mit Auswertung fullfilename und variablename auf tmin oder tmax
      * returns res, ret
      */
-    kli9010srv.ghcndat2obj = function (fullfilename, selyears, variablename, ret1, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, callback3) {
+    kla1490srv.ghcndat2obj = function (fullfilename, selyears, variablename, ret1, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, callback3) {
         var ret = ret1;
         var sels = selyears.split(",");
         var counter = 0;
@@ -2238,7 +2579,7 @@
                         yearlats[year][lats].months[mon].traws += "," + value;
                     }
                     // tavg - nicht gerade performancefreundlich, aber sicher
-                    yearlats[year][lats].months[mon].tavg = kli9010srv.getavg(yearlats[year][lats].months[mon].traws);
+                    yearlats[year][lats].months[mon].tavg = kla1490srv.getavg(yearlats[year][lats].months[mon].traws);
                 }
             }
             that.resume(); // holt den nächsten Satz, auch aus waterfall
@@ -2361,7 +2702,7 @@
      * fullname wird entsprechend variiert
      * returns res, ret mit latprofile
      */
-    kli9010srv.crutem42latitudes = function (gblInfo, gbldb, fs, path, rootname, async, stream, readline, sys0000sys, kla9020fun, uihelper, req, res, supercallback2) {
+    kla1490srv.crutem42latitudes = function (gblInfo, gbldb, fs, path, rootname, async, stream, readline, sys0000sys, kla9020fun, uihelper, req, res, supercallback2) {
         latprofile = {};
         yearlats = {};
         console.log("crutem42latitudes gestartet");
@@ -2492,7 +2833,7 @@
                 function (res, ret, callback2) {
                     var fullfilename = ret.fullname;
                     var variablename = "tavg";
-                    kli9010srv.crutem42obj(fullfilename, selyears, variablename, ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, kla9020fun, uihelper, req, res, function (res, ret1) {
+                    kla1490srv.crutem42obj(fullfilename, selyears, variablename, ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, kla9020fun, uihelper, req, res, function (res, ret1) {
                         callback2(null, res, ret1);
                         return;
                     });
@@ -2575,7 +2916,7 @@
 
 
 
-  
+
 
 
 
@@ -2584,7 +2925,7 @@
      * getstationdata - KLISTATIONS - holen country und Daten aus KLICOUNTRIES
      * function (res, ret)
      */
-    kli9010srv.getstationdata = function (gblInfo, gbldb, fs, async, stream, readline, crg, sys0000sys, kla9020fun, req, res, callbacktd) {
+    kla1490srv.getstationdata = function (gblInfo, gbldb, fs, async, stream, readline, crg, sys0000sys, kla9020fun, req, res, callbacktd) {
         var countries = {}; // countrycode und alle Daten dazu
         async.waterfall([
                 function (callbacktd0) {
@@ -2740,7 +3081,7 @@
      * Wildcard * ist erlaubt
      * und es kommen von-bis Angaben mit - dazu
      */
-    kli9010srv.hasyear = function (year, selyears) {
+    kla1490srv.hasyear = function (year, selyears) {
         var sels = selyears.split(",");
         var ifound = false;
         for (var isel = 0; isel < sels.length; isel++) {
@@ -2790,7 +3131,7 @@
      * genau so wird auch das Ergebnis geliefert
      * return tavg
      */
-    kli9010srv.getavg = function (traws) {
+    kla1490srv.getavg = function (traws) {
         var tvals = traws.split(",");
         if (tvals.length === 1) return traws;
         var sum = 0;
@@ -2805,7 +3146,7 @@
 
 
     /**
-     * kli9010srv.convecad2sql - Konvertieren ECAD aus MongoDB
+     * kla1490srv.convecad2sql - Konvertieren ECAD aus MongoDB
      * nach SQLite mit Zeitkonsolidierung
      * @param {*} gbldb 
      * @param {*} async 
@@ -2815,7 +3156,7 @@
      * @param {*} res
      * @param {*} callback64 mit res, ret als retun-Variablen
      */
-    kli9010srv.convecad2sql = function (gbldb, async, sqlite3, db, uihelper, sys0000sys, req, res, callback64) {
+    kla1490srv.convecad2sql = function (gbldb, async, sqlite3, db, uihelper, sys0000sys, req, res, callback64) {
         fs = fs || require("fs");
         sql3inserts = 0;
         sql3errors = 0;
@@ -2978,7 +3319,7 @@
                                         }
                                     } // for
                                     // Konsolidierung und Ausgabe der Daten
-                                    newrecords = kli9010srv.konsecad(starecords, db, async, function (ret) {
+                                    newrecords = kla1490srv.konsecad(starecords, db, async, function (ret) {
                                         nextstation();
                                         return;
                                     });
@@ -3004,14 +3345,14 @@
     };
 
     /**
-     * kli9010srv.konsecad - Konvertieren im Speicher
+     * kla1490srv.konsecad - Konvertieren im Speicher
      * für SQLite mit Zeitkonsolidierung
      * inserts sqlite3-records!!! - async/callback65
      * Existent der table wird geprüft und create bei Bedarf
      * @param {*} starecords - Object mit starecord-Instanzen
      * returns newrecords - Objekt mit den Sätzen für SQLite3
      */
-    kli9010srv.konsecad = function (starecords, db, async, callback65) {
+    kla1490srv.konsecad = function (starecords, db, async, callback65) {
         /*
         station, substation und die normalen Felder, years hat die years
         years(object){
@@ -3196,7 +3537,7 @@
                             // console.log("Insert Statement: " + insStmt.length);
                             db.run(insStmt, function (err) {
                                 if (err !== null) {
-                                    sql3errors ++;
+                                    sql3errors++;
                                     var imsg = "***** source:" + baserecord.source;
                                     imsg += " station:" + baserecord.station;
                                     imsg += " varname:" + baserecord.variablename;
@@ -3217,7 +3558,7 @@
                                     });
                                 } else {
                                     // hier erfolgreich geschrieben
-                                    sql3inserts ++;
+                                    sql3inserts++;
                                     var imsg = "source:" + baserecord.source;
                                     imsg += " station:" + baserecord.station;
                                     imsg += " varname:" + baserecord.variablename;
@@ -3253,14 +3594,14 @@
      */
     if (typeof module === 'object' && module.exports) {
         // Node.js
-        module.exports = kli9010srv;
+        module.exports = kla1490srv;
     } else if (typeof define === 'function' && define.amd) {
         // AMD / RequireJS
         define([], function () {
-            return kli9010srv;
+            return kla1490srv;
         });
     } else {
         // included directly via <script> tag
-        root.kli9010srv = kli9010srv;
+        root.kla1490srv = kla1490srv;
     }
 }());

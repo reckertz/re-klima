@@ -25,7 +25,9 @@ var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('klidata.db3');
 
 var sys0000sys = require("re-frame/sys0000sys.js");
-var kli9020fun = require("re-klima/kli9020fun.js");
+var kla9020fun = require("re-klima/kla9020fun.js");
+var kla1490srv = require("re-klima/kla1490srv.js");
+ 
 
 var gblInfo = sys0000sys.getInfo();
 
@@ -352,7 +354,7 @@ app.get('/ghcndcomplete', function (req, res) {
         req.setTimeout(parseInt(timeout));
     }
     var rootname = __dirname;  
-    kli9010srv.ghcndcomplete(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kli9020fun, req, res, function (res, ret) {
+    kla1490srv.ghcndcomplete(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
         res.writeHead(200, {
