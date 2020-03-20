@@ -6,7 +6,7 @@
     initial-scale=1.0, 
     maximum-scale=1.0, 
     user-scalable=no">
-    <title>klima100 Admin</title>
+    <title>Climate Sub-Analysis</title>
     <meta name="description" content="Klima Admin-App" />
     <meta name="cache-control" content="no-cache, no-store">
     <meta name="keywords" content="Node.js, JavaScript, AWS EC2, MongoDB, PWA, SPA">
@@ -36,7 +36,7 @@
     <script src="maps/germany.js" charset="utf-8"></script>
     <script src="maps/world.js" charset="utf-8"></script>
     <!-- script src="lib/regression.js" charset="utf-8"></script -->
-    <script src="lib/jerzybrowser.js" charset="utf-8"></script>
+    <!-- script src="lib/jerzybrowser.js" charset="utf-8"></script -->
 
     
     <script src="lib/jquery-ui.min.js"></script>
@@ -116,7 +116,8 @@
             $('body').backDetect(function () {
                 alert("The back-button terminates the app (2)");
             });
-            
+            var myinfo = uihelper.getSysInfo();
+            myinfo.dbsystem = "sqlite3";
             if (window.location.href.indexOf("localhost") >= 0) {
                 $("body").css({
                     "background-color": "#5ff80611"

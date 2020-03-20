@@ -46,12 +46,12 @@
 
 
     var kliparameters = {};
-    
+
     sysbase.getkliparameters = function () {
         return kliparameters;
     };
 
-    
+
     sysbase.initFooter = function () {
         /**
          * Unterscheidung normal oder im iframe
@@ -97,6 +97,19 @@
                         float: "left",
                         width: "5%",
                         display: "none"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        //<div class="content" pageid="uisql3" id="uisql3" style="height: 751px;">
+                        var actPageId = $(".content").attr("id");
+                        if (typeof actPageId !== "undefined" && actPageId !== null) {
+                            var funcname5 = "" + actPageId + ".goprevious";
+                            var functest5 = "typeof " + funcname5;
+                            var funcexec5 = functest5 + "()";
+                            if (eval(functest5) === 'function') {
+                                eval(funcexec5);
+                            }
+                        }
                     }
                 })
                 .append($("<img/>", {
@@ -168,18 +181,34 @@
                         float: "left",
                         width: "5%",
                         display: "none"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        //<div class="content" pageid="uisql3" id="uisql3" style="height: 751px;">
+                        var actPageId = $(".content").attr("id");
+                        if (typeof actPageId !== "undefined" && actPageId !== null) {
+                            var funcname5 = "" + actPageId + ".gonext";
+                            var functest5 = "typeof " + funcname5;
+                            var funcexec5 = functest5 + "()";
+                            if (eval(functest5) === 'function') {
+                                eval(funcexec5);
+                            }
+                        }
                     }
                 })
                 .append($("<img/>", {
                     "src": '/images/icons-png/arrow-r-black.png',
                 }))
             );
+
+
+
+
         var hh = $(".header").outerHeight();
         var fh = $(".footer").outerHeight();
         var wh = $(window).height();
         $(".content").height(wh - hh - fh - 1);
     };
-
 
     sysbase.confirmCookie = function (callback) {
         try {
@@ -379,7 +408,7 @@
                 }
             }
         }
-        
+
         //sysbase.putMessage(origin + "=>" + targetpage);
         if (typeof parameters === "undefined") parameters = [];
 
@@ -953,7 +982,7 @@
         p += "/" + htmlpage;
         // p += "/inframe.html";
         var trenn = "?";
-      
+
         if (htmlpage.indexOf("?") >= 0) {
             trenn = "&";
         }
@@ -980,12 +1009,12 @@
                     overflow: "none"
                 }))
             );
-            if(typeof callback !== "undefined") {
-                callback({
-                    error: false,
-                    message: "ok"
-                });
-            }
+        if (typeof callback !== "undefined") {
+            callback({
+                error: false,
+                message: "ok"
+            });
+        }
     };
 
 
@@ -1072,8 +1101,8 @@
     sysbase.checkSessionLogin = function (ret) {
         /** 
          * Dummy-Funktion, bleibt erst mal formal erhalten
-        */
-       return; 
+         */
+        return;
     };
 
     sysbase.putHeaderRight = function () {

@@ -37,10 +37,17 @@
         /**
          * uisql3 - generische Kontrolle Tabellen und JSON-Inhalte
          */
-        $(".headertitle").html("Database-Control");
+        
         var tsdate = new Date();
         myisoday = new Date(tsdate - tsdate.getTimezoneOffset() * 60 * 1000).toISOString().substr(0, 10);
         $(".content").empty();
+        $(".headertitle").html("Database-Control (SQLite3)");
+        $(".headertitle").attr("title", "uisql3");
+        $(".content").attr("pageid", "uisql3");
+        $(".content").attr("id", "uisql3");
+
+
+
         $(".content")
             .append($('<div/>', {
                 id: "uisql3",
@@ -247,9 +254,10 @@
              */
             uihelper.getAllTables("getsql3tables", function (ret) {
                 if (ret.error === true) {
+                    ret.message = ret.message || "";
                     $(target)
                         .append($('<li/>', {
-                            html: "Keine Collections gefunden:" + ret.message,
+                            html: "Keine Tabellen gefunden " + ret.message,
                             class: "uielist",
                             css: {
                                 "white-space": "normal",
@@ -257,20 +265,20 @@
                             }
                         }));
                     callback({
-                        error: "Keine Collections gefunden",
+                        error: "Keine Tabellen gefunden",
                         message: "ok"
                     });
                 } else if (typeof ret.records === "undefined" || ret.records === null) {
                     $(target)
                         .append($('<li/>', {
-                            html: "Keine Collections gefunden",
+                            html: "Keine Tabellen gefunden",
                             class: "uielist",
                             css: {
                                 "white-space": "normal"
                             }
                         }));
                     callback({
-                        error: "Keine Collections gefunden",
+                        error: "Keine Tabellen gefunden",
                         message: "ok"
                     });
                 } else {
@@ -429,6 +437,8 @@
                     }
                     uisql3.parms.skip = skip - uisql3.parms.limit;
                 }
+                $(".goprev").show();
+                $(".gonext").show();
                 callback({
                     error: false,
                     message: msg1,

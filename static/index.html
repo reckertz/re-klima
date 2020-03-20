@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, 
@@ -23,13 +24,13 @@
     <script type="text/javascript" src="/apps/re-frame/uihelper.js"></script>
     <script type="text/javascript" src="/apps/re-klima/kla0201men.js"></script>
 </head>
+
 <body class="">
     <div class="header">
         <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
         <span class="headerspan" style="color:red;font-weight:bold;">Climate-Analysis</span>
         <noscript>
-            <div
-                style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
                 <span style="color:blue">
                     Your browser does not support scripts, you have to enable it to run this page
                 </span>
@@ -42,12 +43,12 @@
     </div>
     <script>
         $(window).off("resize");
-		$(window).resize(function () {
+        $(window).resize(function () {
             var hh = $(".header").outerHeight();
             var fh = $(".footer").outerHeight();
             var wh = $(window).height();
             $(".content").height(wh - hh - fh - 1);
-           // $(".content").css("overflow", "auto");
+            // $(".content").css("overflow", "auto");
         });
         $(document).ready(function () {
             $('body').backDetect(function () {
@@ -58,13 +59,26 @@
                     "background-color": "#77b2f511"
                 });
             }
+            var myinfo = uihelper.getSysInfo();
+            myinfo.dbsystem = "sqlite3";
+            var registerdata = {
+                username: "Climate-Expert",
+                lastname: "Expert",
+                firstname: "Climate",
+                email: "*none"
+            }
+            // Anmeldung wurde bestätigt, Cookie wird geschrieben
+            $.cookie('registerCookieNotice', JSON.stringify(registerdata), {
+                expires: 360
+            });
             sysbase.navigateTo("kla0201men", [], function (ret) {
                 if (ret.error === true) {
                     alert(ret.message);
                 }
             });
-            
+
         });
     </script>
 </body>
+
 </html>

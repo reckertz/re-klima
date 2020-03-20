@@ -1,17 +1,41 @@
+var path = require("path");
+require('app-module-path/register');
+require('app-module-path').addPath(path.join(__dirname, "apps"));
 var express = require('express');
 var app = express();
-var path = require("path");
 var fs = require("fs");
 var async = require("async");
 
 var express = require("express");
 var bodyParser = require("body-parser");
 var path = require("path");
-var app = express();
+
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
+var cookieParser = require("cookie-parser");
+var compression = require("compression");
+
+var readline = require("readline");
+var stream = require("stream");
+// gblInfo 
+var StreamZip = require("node-stream-zip");
 
 // DB expressions
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('klidata.db3');
+
+var sys0000sys = require("re-frame/sys0000sys.js");
+var kli9020fun = require("re-klima/kli9020fun.js");
+
+var gblInfo = sys0000sys.getInfo();
+
+
+var app = express();
+app.use(compression({
+    threshold: 64000
+}));
+var sess;
+
 
 app.use(bodyParser.json({
     limit: '50mb'
@@ -23,7 +47,325 @@ app.use(bodyParser.urlencoded({
     parameterLimit: 50000
 }));
 
+/**
+ * Security Layer
+ */
+app.set("trust proxy", 1);
+app.use(session({
+    name: "server-session-cookie-id",
+    secret: 'keyboard cat',
+    resave: true,
+    httpOnly: false,
+    saveUninitialized: false
+}));
+
+function checkSession(req, res) {
+    sess = req.session;
+    /**
+     * server-session-cookie-id
+     * wenn die Session noch nicht aktiv ist, dann muss
+     * der Login erzwungen werden - serverseitig
+     */
+    var username = "Climate-Expert";
+    var pass = "";
+    // Dummy Prüfung des API auf Security Level administrator
+    var ischecked = true;
+    console.log("GET-session:" + sess.username);
+    return false;
+
+}
+
+app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'static'))); // __dirname is always root verzeichnis #denglisch
+
+/** 
+ * getsql3tables - API über uihelper.getalltables aufgerufen, 
+ * gleiche Rückgabestruktur - wird spannend
+ */
+
+app.get('/getsql3tables', function (req, res) {
+    if (checkSession(req, res)) return;
+    // var cousername = req.query.username;
+    try {
+        var sqlStmt = "SELECT name";
+        sqlStmt += " FROM sqlite_master";
+        sqlStmt += " WHERE type ='table'";
+        sqlStmt += " AND name NOT LIKE 'sqlite_%'";
+        db.serialize(function () {
+            db.all(sqlStmt, function (err, rows) {
+                var ret = {};
+                if (err) {
+                    ret.error = true;
+                    ret.message = err;
+                } else {
+                    ret.error = false;
+                    ret.message = "Tabellen gefunden:" + rows.length;
+                    ret.records = rows;
+                    var smsg = JSON.stringify(ret);
+                    res.writeHead(200, {
+                        'Content-Type': 'application/text',
+                        "Access-Control-Allow-Origin": "*"
+                    });
+                    res.end(smsg);
+                    return;
+                }
+            });
+        });
+    } catch (err) {
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: err.message,
+            records: null
+        }));
+        return;
+    }
+
+});
+
+
+/**
+ * getdirectoryfiles  - generische Funktion
+ */
+app.get('/getdirectoryfiles', function (req, res) {
+    if (checkSession(req, res)) return;
+    var rootdir = path.dirname(require.main.filename);
+    sys0000sys.getdirectoryfiles(db, rootdir, fs, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+/**
+ * getfilecontent: fullname, fromline, frombyte
+ * line by line, chunks nach lines oder bytes, wenn lines zu lange sind
+ * Blättern kann noch holprig sein
+ */
+app.get('/getfilecontent', function (req, res) {
+    if (checkSession(req, res)) return;
+    var rootdir = path.dirname(require.main.filename);
+    var fullname = "";
+    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+        fullname = req.query.fullname;
+    }
+    var fromline = 0;
+    if (req.query && typeof req.query.fromline !== "undefined" && req.query.fromline.length > 0) {
+        fromline = parseInt(req.query.fromline) || 0;
+    }
+    var frombyte = 0;
+    if (req.query && typeof req.query.frombyte !== "undefined" && req.query.frombyte.length > 0) {
+        frombyte = parseInt(req.query.frombyte) || 0;
+    }
+    var checklinelength = true;
+    if (req.query && typeof req.query.checklinelength !== "undefined" && req.query.checklinelength.length > 0) {
+        checklinelength = req.query.checklinelength;
+    }
+    var aktline = 0;
+    var aktbyte = 0;
+    var newline = 0;
+    var newbyte = 0;
+    var nextchunk = "";
+    var ret = {};
+    ret.error = false;
+    var smsg = "";
+    if (!fs.existsSync(fullname)) {
+        smsg = JSON.stringify({
+            error: true,
+            message: "NOT FOUND:" + fullname,
+            fullname: fullname
+        });
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    }
+
+
+    var readInterface = readline.createInterface({
+        input: fs.createReadStream(fullname),
+        console: false
+    });
+    readInterface.on('line', function (line) {
+        //console.log(line);
+        if (line.length > 10000 && checklinelength === true) {
+            line = line.substr(0, 10000);
+            aktline++;
+            aktbyte += line.length;
+            newline++;
+            newbyte += line.length;
+            nextchunk += line + "<br>";
+            ret.error = true;
+            ret.message = "lines zu lang";
+            readInterface.close();
+            //readInterface.removeAllListeners();
+            return false;
+        } else {
+            aktline++;
+            aktbyte += line.length;
+            if (aktline > fromline || aktbyte > frombyte) {
+                newline++;
+                newbyte += line.length;
+                nextchunk += line + "<br>";
+                if (checklinelength === true && (newline > 100 || newbyte > 10000)) {
+                    readInterface.close();
+                    return false;
+                } else {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+    });
+    readInterface.on('close', function (err) {
+        // do something on finish here
+        var smsg = "";
+        if (ret.error === true) {
+            smsg = JSON.stringify({
+                error: true,
+                message: ret.message,
+                fullname: fullname,
+                nextchunk: nextchunk,
+                fromline: aktline,
+                frombyte: aktbyte
+            });
+
+        } else {
+            smsg = JSON.stringify({
+                error: false,
+                message: "next chunk",
+                fullname: fullname,
+                nextchunk: nextchunk,
+                fromline: aktline,
+                frombyte: aktbyte
+            });
+        }
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
+
+
+/**
+ * getallrecords - generische Funktion wird  umgelenkt auf getallsqlrecords
+ */
+app.get('/getallrecords', function (req, res) {
+    if (checkSession(req, res)) return;
+    var rootdir = path.dirname(require.main.filename);
+    sys0000sys.getallsqlrecords(db, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+/**
+ * getallsqlrecords - generische Funktion
+ */
+app.get('/getallsqlrecords', function (req, res) {
+    if (checkSession(req, res)) return;
+    sys0000sys.getallsqlrecords(db, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+/**
+ * getonerecord - generische Funktion wird  umgelenkt auf getallsqlrecords
+ * und entsprechend angepasst
+ */
+app.get('/getonerecord', function (req, res) {
+    if (checkSession(req, res)) return;
+    sys0000sys.getonerecord(db, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+/** 
+ * setonerecord - API wie bei MongoDB, inter Umsetzung sqlite3
+ * komfortabel mit SELECT, CREATE TABLE, INSERT oder UPDATE
+*/
+app.post('/setonerecord', function (req, res) {
+    if (checkSession(req, res)) return;
+    sys0000sys.setonerecord(db, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
+/**
+ * ghcndcomplete- ghcnd-stations.txt und unterunterverzeichnis mit den Dateien dazu
+ */
+app.get('/ghcndcomplete', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;  
+    kli9010srv.ghcndcomplete(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kli9020fun, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
 
 
 
@@ -67,8 +409,8 @@ app.get('/', function (req, res) {
     return;
 });
 
-app.listen(3000, function () {
-    console.log('Example app listening on port 3000!');
+app.listen(3001, function () {
+    console.log('Example app listening on port 3001!');
 });
 
 /**

@@ -43,9 +43,12 @@
         sysbase.tabcreateiframe("SQLite3", "", "re-frame", "uisql3");
         sysbase.tabcreateiframe("Schlüsselverz", "", "re-frame", "syspool");
         
-        var idc = sysbase.tabcreateiframe("Klimadaten", "", "re-klima", "kli1400raw");
+        var idc = sysbase.tabcreateiframe("SQLite3", "", "re-frame", "uisql3");
         window.parent.$(".tablinks[idhash='#" + idc + "']").click();
-
+                
+        var idc1 = sysbase.tabcreateiframe("Klima-Rohdaten", "", "re-klima", "kla1400raw");
+        window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
+        
         /* sysbase.initFooter(); */
         // uientry.init();
 
@@ -73,6 +76,7 @@
     var sysmenu = {
 
         all: [
+            /*
             {
                 id: "admin0002",
                 text: "RAW-Data-Admin",
@@ -91,6 +95,7 @@
                 app: "re-klima",
                 module: "kli1300net"
             },
+            */
             {
                 id: "admin0030",
                 text: "Codes and Keys",

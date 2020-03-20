@@ -27,210 +27,13 @@
     var gblHelpers = {
 
     };
-    uihelper.initAll = function () {
-        var myInfo = uisystem.getsysInfo();
 
-        if (myInfo.appMode !== 'undefined' && myInfo.appMode === false) {
-            if (typeof nta1010login !== "undefined") nta1010login.init();
-            if (typeof uilogger !== "undefined") uilogger.init();
-        } else {
-            if (typeof uilogger !== "undefined") uilogger.init();
-            if (typeof nta1010login !== "undefined") nta1010login.init();
-        }
+    var gblsysteminfo = {};
 
-        if (typeof uientry !== "undefined") uientry.init();
-
-
-        if (typeof nta1000men !== "undefined") nta1000men.init();
-        if (typeof kassenber1 !== "undefined") kassenber1.init();
-        if (typeof kassenber1cal !== "undefined") kassenber1cal.init();
-
-        if (typeof nta3005mit !== "undefined") nta3005mit.init();
-        if (typeof kassenBericht !== "undefined") kassenBericht.init();
-
-        if (typeof cfeTables !== "undefined") cfeTables.init();
-        if (typeof cfeConfiguration !== "undefined") cfeConfiguration.init();
-        if (typeof cfeArticles !== "undefined") cfeArticles.init();
-        if (typeof cfeOrder01 !== "undefined") cfeOrder01.init();
-        if (typeof cfeOrder02 !== "undefined") cfeOrder02.init();
-        if (typeof cfeOrder03 !== "undefined") cfeOrder03.init();
-        if (typeof cfeOrder04 !== "undefined") cfeOrder04.init();
-        if (typeof cfeArticle01 !== "undefined") cfeArticle01.init();
-        if (typeof cfeBase01 !== "undefined") cfeBase01.init();
-
-        if (typeof uirawdata !== "undefined") uirawdata.init();
-        if (typeof uirawdatadetails !== "undefined") uirawdetails.init();
-        if (typeof uirawprompt !== "undefined") uirawprompt.init();
-        if (typeof uicamera !== "undefined") uicamera.init();
-        if (typeof kontoklass2 !== "undefined") kontoklass2.init();
-        if (typeof cfeDoc01 !== "undefined") cfeDoc01.init();
-        if (typeof kontoregelnliste !== "undefined") kontoregelnliste.init();
-        if (typeof speechtest !== "undefined") speechtest.init();
-
-        //nta3050users.init();
-        //uiloginControl.init();
-        //nta3010devlst.init();
-        //nta3001show.init();
-        //nta3007raw.init();
-        //nta3020uploader.init();
-        //nta3055user.init();
-
-        if (typeof nta3056reg !== "undefined") nta3056reg.init();
-        if (typeof nta3057regupd !== "undefined") nta3057regupd.init();
-        if (typeof nta3060invite !== "undefined") nta3060invite.init();
-        if (typeof uimessages !== "undefined") uimessages.init();
-        if (typeof uisysdata !== "undefined") uisysdata.init();
-        if (typeof uipuschclient !== "undefined") uipushclient.init();
-
-        if (myInfo.appMode && myInfo.appMode === true) {
-            if (typeof ntasyncpage !== "undefined") ntasyncpage.init();
-        }
-
-        if (myInfo.appMode && myInfo.appMode === true) {
-            //  $("loginpage").trigger("create");
-        } else {
-            // $.mobile.initializePage();
-        }
-
-
-
-
+    uihelper.getSysInfo = function () {
+        return gblsysteminfo;
     };
 
-    /**
-     * pagechange - Wrapper für pagecontainer mit change
-     * mit dynamischem Nachladen
-     */
-    uihelper.pagechange = function (target, parameters) {
-        /*
-        {
-            script: "js/kber2.js",
-            module: "kber2",
-            domref: "kber2"
-        }
-        */
-        if (typeof target === "undefined") return {
-            error: false,
-            message: "Kein target vorgegeben"
-        };
-        if (typeof target === "string") {
-            var t1 = target;
-            if (t1.startsWith("#")) t1 = t1.substring(1);
-            if (t1 === "loginpage") {
-                target = {
-                    script: "js/nta1010login.js",
-                    module: "nta1010login",
-                    domref: "#loginpage"
-                };
-            } else if (t1 === "userpage") {
-                target = {
-                    script: "js/nta3055user.js",
-                    module: "nta3055user",
-                    domref: "#userpage"
-                };
-            } else if (t1 === "caldata") {
-                target = {
-                    script: "js/kassenber1cal.js",
-                    module: "kassenber1cal",
-                    domref: "#caldata"
-                };
-            } else {
-                // Prüfen gegen ntamenu
-                var vgllink = target;
-                if (vgllink.startsWith("#")) vgllink = vgllink.substr(1);
-                var found = false;
-                for (var property in ntamenu) {
-                    if (ntamenu.hasOwnProperty(property)) {
-                        // do stuff
-                        var menu = ntamenu[property];
-                        for (var j = 0; j < menu.length; j++) {
-                            if (vgllink === menu[j].domref || vgllink === menu[j].module) {
-                                target = menu[j];
-                                found = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (found === true) break;
-                }
-                // da bleibt nur der Default-Versuch
-                if (found === false) {
-                    target = {
-                        script: "js/" + t1 + ".js",
-                        module: t1,
-                        domref: t1
-                    };
-                }
-            }
-        }
-        if (typeof target.module === "undefined") return {
-            error: false,
-            message: "Kein Modul vorgegeben"
-        };
-
-        if (target.domref === "undefined") {
-            target.domref = target.module;
-        }
-        if (target.script === "undefined") {
-            target.script = "js/" + target.module + ".js";
-        }
-        /**
-         * hier geht es richtig los
-         */
-        try {
-            var modulename = target.module;
-            var modulescript = target.script;
-            var domref = target.domref;
-            if (domref.startsWith("#")) {
-                domref = domref.substring(1);
-            }
-            var domhash = "#" + domref;
-            if (typeof window[modulename] === "undefined") {
-                var url = modulescript;
-                console.log("LOAD:" + url);
-                $.getScript(url, function (data, textStatus, jqxhr) {
-                    // console.log( data ); // Data returned
-                    // console.log( textStatus ); // Success
-                    // console.log( jqxhr.status ); // 200
-                    console.log("*****" + modulename + ".init() ");
-                    if (typeof window[modulename] === "undefined") {
-                        alert("Modul nicht gefunden:" + url);
-                        return {
-                            error: true,
-                            message: url + " nicht gefunden"
-                        };
-                    }
-                    if (typeof window[modulename].init === "undefined") {
-                        alert("init zu Modul nicht gefunden:" + url);
-                        return {
-                            error: true,
-                            message: url + " init nicht gefunden"
-                        };
-                    }
-                    window[modulename].init();
-                    // $('body').pagecontainer("change", domhash, {
-                    $.mobile.pageContainer.pagecontainer("change", domhash, parameters);
-                });
-            } else {
-                if (!$(domhash).length > 0) {
-                    console.log("*****" + modulename + ".init() " + " ");
-                    window[modulename].init();
-                }
-                console.log("*****" + modulename + " " + "vor change 2");
-                $.mobile.pageContainer.pagecontainer("change", domhash, parameters);
-            }
-            return ({
-                error: false,
-                message: "OK"
-            });
-        } catch (err) {
-            sysbase.putMessage(target.module + " kann nicht aufgerufen werden:" + err.message, 3);
-            return ({
-                error: true,
-                message: err.message
-            });
-        }
-    };
 
     /**
      * modulecheck - prüft modul
@@ -383,16 +186,11 @@
         }
     }
 
-
-
     /**
      * diverse Funktionen für spätere Analysen
      */
     var key;
     var value;
-  
-
-
     /**
      * Dummy
      */
@@ -1064,7 +862,7 @@
      */
 
     uihelper.getAllTables = function (api, callback) {
-        //var myInfo = uisystem.getsysInfo();
+        //var myInfo = uihelper.getSysInfo();
         try {
             var jqxhr = $.ajax({
                 method: "GET",
@@ -1144,7 +942,7 @@
      */
 
     uihelper.getOneRecord = function (sel, projection, api, table, callback) {
-        //var myInfo = uisystem.getsysInfo();
+        //var myInfo = uihelper.getSysInfo();
         //var url47 = uisystem.getActiveServer(api);
         // uihelper.getUsername(),
         var url47 = api;
@@ -1212,7 +1010,7 @@
      * @param callback - gibt ret-Struktur mit error, message, record zurück
      */
     uihelper.getAllRecords = function (sel, projection, sort, skip, limit, api, table, callback) {
-        var myInfo = {}; // uisystem.getsysInfo();
+        var myInfo = {}; // uihelper.getSysInfo();
         var url = api; // uisystem.getActiveServer(api);
         var selparm;
         if (typeof sel === "object") {
@@ -1293,7 +1091,7 @@
      * @param callback - gibt ret-Struktur mit error, message, record zurück
      */
     uihelper.setOneRecord = function (selfields, updfields, api, table, callback) {
-        // var myInfo = uisystem.getsysInfo();
+        // var myInfo = uihelper.getSysInfo();
         try {
             var jqxhr = $.ajax({
                 method: "POST",
@@ -1349,7 +1147,7 @@
      * es ist zu prüfen, ob records null ist, ein Satz oder ein Array von Sätzen
      */
     uihelper.setAllRecords = function (selfields, updfields, api, table, callback) {
-        var myInfo = uisystem.getsysInfo();
+        var myInfo = uihelper.getSysInfo();
         try {
             var jqxhr = $.ajax({
                 method: "POST",
@@ -1405,7 +1203,7 @@
      * @param callback - gibt ret-Struktur mit error, message, record zurück
      */
     uihelper.insOneRecord = function (selfields, updfields, api, table, callback) {
-        // var myInfo = uisystem.getsysInfo();
+        // var myInfo = uihelper.getSysInfo();
         try {
             var jqxhr = $.ajax({
                 method: "POST",
@@ -1462,7 +1260,7 @@
      */
 
     uihelper.delOneRecord = function (sel, api, table, record, callback) {
-        // var myInfo = uisystem.getsysInfo();
+        // var myInfo = uihelper.getSysInfo();
         try {
             var jqxhr = $.ajax({
                 method: "POST",
