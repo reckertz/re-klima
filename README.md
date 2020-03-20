@@ -20,8 +20,10 @@ Various Analysis functions:
 Special focus on timeshift functions to analyse astronomic "years"
 and lunar "months".
 
-##Status 
+## Status
+
 in preparation
 
-##Details 
+## Details 
+
 will follow
