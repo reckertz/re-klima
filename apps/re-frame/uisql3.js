@@ -1,9 +1,7 @@
-/*jslint es5:true, browser:true, devel:true, white:true, vars:true */
-/*jshint laxbreak:true */
-/*global $:false, intel:false, cordova:false, device:false */
-/*global ecsystem,console,devide,window,module,define,root,global,self */
+/*global $,uihelper,sysbase,dotize,console,root,global,self,document,uientry,define */
 /*global async */
 (function () {
+    "use strict";
     var uisql3 = {};
 
     var root = typeof self === 'object' && self.self === self && self ||
@@ -37,9 +35,9 @@
         /**
          * uisql3 - generische Kontrolle Tabellen und JSON-Inhalte
          */
-        
+
         var tsdate = new Date();
-        myisoday = new Date(tsdate - tsdate.getTimezoneOffset() * 60 * 1000).toISOString().substr(0, 10);
+        var myisoday = new Date(tsdate - tsdate.getTimezoneOffset() * 60 * 1000).toISOString().substr(0, 10);
         $(".content").empty();
         $(".headertitle").html("Database-Control (SQLite3)");
         $(".headertitle").attr("title", "uisql3");
@@ -113,8 +111,8 @@
                 //var imgmatrix =
                 click: function () {
                     uisql3.parms.sel = {};
-                    var selstring = "";  // WHERE-Bedingung
-                    
+                    var selstring = ""; // WHERE-Bedingung
+
                     $('#uisql3Table > tbody  > tr').each(function (ind, tr) {
                         var property = $(tr).find("[name='property']").html();
                         var typ = $(tr).find("[name='typ']").text();
@@ -129,29 +127,43 @@
                         // undefined
                         if (operator === "u") {
                             uisql3.parms.sel[property] = null;
-                            if (selstring.length > 0) selstring += " AND ";
+                            if (selstring.length > 0) {
+                                selstring += " AND ";
+                            }
                             selstring += " " + property + " = " + "null";
                         }
                         if (typ === "number") {
                             if (operator === "=" || operator === ">=" || operator === "<=") {
-                                if (selstring.length > 0) selstring += " AND ";
+                                if (selstring.length > 0) {
+                                    selstring += " AND ";
+                                }
                                 selstring += " " + property + " " + operator + " " + wert;
                             }
                         } else if (typ === "string") {
                             if (operator === "=") {
-                                if (selstring.length > 0) selstring += " AND ";
+                                if (selstring.length > 0) {
+                                    selstring += " AND ";
+                                }
                                 selstring += " " + property + " = '" + wert + "'";
                             } else if (operator === "*") {
-                                if (selstring.length > 0) selstring += " AND ";
+                                if (selstring.length > 0) {
+                                    selstring += " AND ";
+                                }
                                 selstring += " " + property + " LIKE '%" + wert + "%'";
                             }
                         } else if (typ === "boolean") {
                             if (operator === "=") {
                                 var bwert = null;
-                                if (wert === "true") bwert = true;
-                                if (wert === "false") bwert = false;
+                                if (wert === "true") {
+                                   bwert = true;
+                                }
+                                if (wert === "false") {
+                                    bwert = false;
+                                }
                                 if (bwert !== null) {
-                                    if (selstring.length > 0) selstring += " AND ";
+                                    if (selstring.length > 0) {
+                                        selstring += " AND ";
+                                    }
                                     selstring += " " + property + " = " + bwert;
                                 }
                             }
@@ -230,7 +242,9 @@
     uisql3.goprevious = function (event, ui, callback) {
         var username = uihelper.getUsername();
         uisql3.parms.skip -= 20;
-        if (uisql3.parms.skip < 0) uisql3.parms.skip = 0;
+        if (uisql3.parms.skip < 0) {
+            uisql3.parms.skip = 0;
+        }
         uisql3.showDetails(function (ret) {
             if (ret.error === true) {
                 sysbase.putMessage(ret.message, 3);
@@ -348,7 +362,7 @@
         if (where.length > 0) {
             sqlselect += " WHERE " + where;
         }
-        sqlselect += " ORDER BY tsserverupd";  // + " LIMIT 10 OFFSET 0";
+        sqlselect += " ORDER BY tsserverupd"; // + " LIMIT 10 OFFSET 0";
         // var sort = [];
         uihelper.getAllRecords(sqlselect, {}, sort, skip, limit, api, table, function (ret) {
             var irec = skip;
@@ -364,24 +378,24 @@
                         if (ifirst === true) {
                             ifirst = false;
                             $("#uisql3Liste").empty();
-                            firstrecord = $.extend({}, record);
+                            // firstrecord = $.extend({}, record);
                         }
                         irec++;
                         // do stuff
                         var msg = "<span style='background-color:yellow' width='100%'>Satz:" + irec + " " + table + "</span>";
-                        //msg += '<a data-mini="true" href="#" title="Satz l�schen" class="ui-btn ui--shadow ui-mini ui-corner-all ui-btn-icon-notext ui-icon-delete uisql3del" style="float: left;"></a>';
+                        //msg += '<a data-mini="true" href="#" title="Satz löschen" class="ui-btn ui--shadow ui-mini ui-corner-all ui-btn-icon-notext ui-icon-delete uisql3del" style="float: left;"></a>';
                         msg += '<a href="#" class="uisql3del">Löschen</a>';
-                        /** 
+                        /**
                          * Optimierung der Darstellung
                          */
-                        for (fieldname in record) {
+                        for (var fieldname in record) {
                             if (record.hasOwnProperty(fieldname)) {
                                 var fieldvalue = record[fieldname];
                                 if (typeof fieldvalue === "string" && fieldvalue.length > 50) {
                                     var feld = "";
                                     ifield++;
                                     feld += fieldvalue.substr(0, 50);
-                                    feld += "<a href='#' onclick=\" $('.toggleme" + ifield + "').toggle();\" class='toggleme"+ ifield + "'>mehr</a>";
+                                    feld += "<a href='#' onclick=\" $('.toggleme" + ifield + "').toggle();\" class='toggleme" + ifield + "'>mehr</a>";
                                     feld += "<a href='#' onclick=\" $('.toggleme" + ifield + "').toggle();\" class='toggleme" + ifield + "' style='display:none'>weniger</a>";
                                     feld += "<span class='toggleme" + ifield + "' style='display:none'>";
                                     feld += fieldvalue.substr(50);
@@ -393,7 +407,7 @@
                         msg += "<br/>" + uihelper.iterateJSON2pretty(record, "", "") + "<br><br>";
                         // msg += "<br/>" + uihelper.iterateJSON2HTML(record, "", "") + "<br><br>";
                         if (irec === 1) {
-                            // Feldanalyse 
+                            // Feldanalyse
                             myfields = [];
                             uisql3.getFields(record, myfields, 0, "");
                             console.log(JSON.stringify(myfields));

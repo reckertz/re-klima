@@ -1,4 +1,4 @@
-/*jshint evil: true */ 
+/*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
 /*global sysbase,uihelper */
 (function () {
@@ -285,11 +285,11 @@
 
 
 
-    /*  
+    /*
         netCDF-Aufbereitung
-        pearldata.header: globale Info als Text; 
-        pearldata.rows mit 
-        pearldata.rows[irow].rowheader: object der info-felder: filename, archive, attribute, firstyear, lastyear, period  
+        pearldata.header: globale Info als Text;
+        pearldata.rows mit
+        pearldata.rows[irow].rowheader: object der info-felder: filename, archive, attribute, firstyear, lastyear, period
         pearldata.rows[irow].pearls[] Array für Sparklines mit x und y wobei x die Periode ist, meist Jahr
     */
     var crossidcode = "";
@@ -399,7 +399,7 @@
                                 $("#kla1400raw_rightw").empty();
                                 $("#kla1400raw_rightw").height($("#kla1400raw_left").height());
                                 /**
-                                 * Pivotgierung KLISTATIONS 
+                                 * Pivotgierung KLISTATIONS
                                  */
 
                                 var sel = {};
@@ -771,7 +771,6 @@
                 }
 
             } else {
-                debugger;
                 sysbase.putMessage("Konfiguration nicht vorhanden");
                 kla1400raw.showfiles("list", url, "", "", function (ret) {
                     return;
@@ -1241,7 +1240,10 @@
                             click: function (evt) {
                                 evt.preventDefault();
                                 var actvariablename = "";
-                                if (kla1400raw.checkfragments(fullname, "IPCC GHCNM v3 .dat")) {
+                                if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily stations \.txt")) {
+                                    aktsource = "GHCND";
+                                    actvariablename = "tmax";
+                                } else if (kla1400raw.checkfragments(fullname, "IPCC GHCNM v3 .dat")) {
                                     aktsource = "GHCN";
                                     actvariablename = "tavg";
                                 } else if (kla1400raw.checkfragments(fullname, "IPCC GHCNM v4 .dat")) {
@@ -1262,8 +1264,9 @@
                                     actvariablename: actvariablename
                                 };
                                 window.parent.sysbase.setCache("selstations", selstations);
-                                var tourl = "kliheatmap.html" + "?" + "source=" + aktsource + "&variablename=" + actvariablename;
-                                var idc20 = window.parent.sysbase.tabcreateiframe("Stations", "", "re-klima", "kli1610sta", tourl);
+                                var tourl = "inframe.html" + "?" + "source=" + aktsource + "&variablename=" + actvariablename;
+                                tourl += "&fullname=" + aktfullname;
+                                var idc20 = window.parent.sysbase.tabcreateiframe("Stations", "", "re-klima", "kla1610sta", tourl);
                                 window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
                             }
                         }))
@@ -1692,7 +1695,7 @@
         return true;
         /*
         for (var ifrag = 0; ifrag < tfrags.length; ifrag++) {
-            if (trags[ifrag].startsWith(".")) 
+            if (trags[ifrag].startsWith("."))
             var such = new RegExp(tfrags[ifrag].trim(), "i");
             if (!such.test(teststring)) {
                 return false;
@@ -1977,7 +1980,7 @@
 
         $("#kla1400rawform").empty();
         if (node.li_attr.what === "directory") {
-            /** 
+            /**
              * Verzeichnisanalyse
              */
             async.waterfall([
@@ -2081,7 +2084,7 @@
                 }
             );
         } else {
-            /** 
+            /**
              * Dateianalyse
              */
             // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
@@ -2201,7 +2204,7 @@
                             }
                         });
                     });
-                
+
                 }
         }
     };
@@ -2276,7 +2279,7 @@
         }
     };
 
-    /** 
+    /**
      * ghcndstations - Einstieg in GHCN-Daily, erst stations laden, dann Daten
      * später!!!
      */
@@ -2416,7 +2419,7 @@
     };
 
 
-    /** 
+    /**
      * ecadfile ist Zip-Datei mit stations.txt und Daten
      * im Namen ist die Variable zu erkennen, z.B. tx = max temperature
      */
@@ -2555,7 +2558,7 @@
 
 
     /**
-     * ghcnv3file - Anzeige für Verarbeitung 
+     * ghcnv3file - Anzeige für Verarbeitung
      * (nicht die Verarbeitung selbst)
      */
     kla1400raw.ghcnv3file = function (seltype, selyears, fullname, callbackghcn) {
@@ -2693,7 +2696,7 @@
 
 
     /**
-     * crutem4file - Anzeige für Verarbeitung 
+     * crutem4file - Anzeige für Verarbeitung
      * (nicht die Verarbeitung selbst)
      */
     kla1400raw.crutem4file = function (seltype, selyears, fullname, callbackcrutem4) {

@@ -1,3 +1,4 @@
+"use strict";
 var path = require("path");
 require('app-module-path/register');
 require('app-module-path').addPath(path.join(__dirname, "apps"));
@@ -17,17 +18,42 @@ var compression = require("compression");
 
 var readline = require("readline");
 var stream = require("stream");
-// gblInfo 
+// gblInfo
 var StreamZip = require("node-stream-zip");
 
 // DB expressions
 var sqlite3 = require('sqlite3').verbose();
-var db = new sqlite3.Database('klidata.db3');
+// var db = new sqlite3.Database('klidata.db3');
+var db = new sqlite3.cached.Database('klidata.db3');   // Optimierungsversuch
+db.run("PRAGMA synchronous = OFF", function(err) {
+    console.log("synchronous = OFF:" + err);
+});
+db.run("PRAGMA journal_mode = MEMORY", function(err) {
+    console.log("journal_mode = MEMORY:" + err);
+});
+db.run("PRAGMA optimize", function(err) {
+    console.log("optimize:" + err);
+});
+db.get("PRAGMA page_size", function(err, page) {
+    console.log("page_size:" + JSON.stringify(page) + " " + err);
+});
+db.get("PRAGMA index_list('KLISTATIONS')", function(err, indexlist) {
+    console.log("index_list KLISTATIONS:" + JSON.stringify(indexlist) + " " + err);
+});
+db.all("PRAGMA table_info('KLISTATIONS')", function(err, felder) {
+    if (typeof felder === "undefined" || felder === null || felder.length === 0) {
+        console.log("Tabelle KLISTATIONS nicht vorhanden");
+    } else {
+        for (var ifeld = 0; ifeld < felder.length; ifeld++) {
+            console.log(JSON.stringify(felder[ifeld],null,""));
+        }
+    }
+});
 
 var sys0000sys = require("re-frame/sys0000sys.js");
 var kla9020fun = require("re-klima/kla9020fun.js");
 var kla1490srv = require("re-klima/kla1490srv.js");
- 
+
 
 var gblInfo = sys0000sys.getInfo();
 
@@ -81,8 +107,8 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'static'))); // __dirname is always root verzeichnis #denglisch
 
-/** 
- * getsql3tables - API über uihelper.getalltables aufgerufen, 
+/**
+ * getsql3tables - API über uihelper.getalltables aufgerufen,
  * gleiche Rückgabestruktur - wird spannend
  */
 
@@ -322,7 +348,7 @@ app.get('/getonerecord', function (req, res) {
     });
 });
 
-/** 
+/**
  * setonerecord - API wie bei MongoDB, inter Umsetzung sqlite3
  * komfortabel mit SELECT, CREATE TABLE, INSERT oder UPDATE
 */
@@ -353,8 +379,33 @@ app.get('/ghcndcomplete', function (req, res) {
         timeout = req.query.timeout;
         req.setTimeout(parseInt(timeout));
     }
-    var rootname = __dirname;  
+    var rootname = __dirname;
     kla1490srv.ghcndcomplete(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+/**
+ * ghcnddata - ghcnd *.dly Dateien aus dem Unterverzeichnis laden
+ */
+app.get('/ghcnddata', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.ghcnddata    (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
         res.writeHead(200, {
@@ -416,7 +467,7 @@ app.listen(3001, function () {
 });
 
 /**
- * dir2tree - Auflösung Verzeichnis 
+ * dir2tree - Auflösung Verzeichnis
  * @param {*} dir - Vorgabe des Verzeichnisses, das aufzulösen ist
  * @param {*} parobj - Objekt, das dem Verzeichnis entspricht, in diesem Objekt werden die children versorgt
  * @param {*} filetree - Gesamthafter Filetree für das UI, wird als return verwendet (s.u.)

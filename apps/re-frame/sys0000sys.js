@@ -2,6 +2,7 @@
 /*global $,window,module,define,root,global,self,this,document,alert */
 /*global sysbase,uihelper */
 (function () {
+    "use strict";
     var sys0000sys = {};
     // test
     var root = typeof self === 'object' && self.self === self && self ||
@@ -16,13 +17,14 @@
     var request = require("request");
     var htmlparser2 = require("htmlparser2");
     var download = require("download-file");
+    var csv = require("fast-csv");
     var kli9010srv = require("re-klima/kli9010srv");
     var uihelper = require("re-frame/uihelper");
+
     var gblInfo = {};
-
-
-
-
+    var sorcount = 0;
+    var perftimer = {};
+    perftimer.sor = {};
     sys0000sys.getInfo = function () {
         return gblInfo;
     };
@@ -78,7 +80,7 @@
     };
 
     /**
-     * getallsqlrecords - Holen alle records aus sql3-table mit sel als Filter 
+     * getallsqlrecords - Holen alle records aus sql3-table mit sel als Filter
      * @param {*} db - formal notwendig
      * @param {*} async - formal notwendig
      * @param {*} req - request vom Server, kann null sein, dann muss reqparm angegeben sein
@@ -99,6 +101,7 @@
         var skip = 0;
         var limit = 0;
         var selectmode = false;
+        var ret = {};
         if (typeof reqparm === "undefined" || reqparm === null) {
             if (req.query && typeof req.query.sel !== "undefined" && req.query.sel.length > 0) {
                 // sqlite3 - sel kann ein SELECT-String sein!
@@ -194,6 +197,7 @@
                     where += " = " + "'" + condval + "'";
                 } else {
                     // Dickes Problem!!!
+                    debugger;
                     ret.error = true;
                     ret.message = "WHERE zu komplex:" + JSON.stringify(sel);
                     callback(res, ret);
@@ -423,13 +427,13 @@
     /**
      * setonerecord - adaptive Datenfortschreibung mit JSON-Vorgaben in den Parametern
      * table, selfields und updfields, vorausgesetzt wird:
-     * selfieds hat name-value pairs, die in UND/=-Direktiven umgesetzt werden 
+     * selfieds hat name-value pairs, die in UND/=-Direktiven umgesetzt werden
      * updfields hat die Abschnitte $set für UPDATE oder INSERT und "setOnInsert" nur für INSERT
      * für name-value pairs, typeof object wird mit JSON.stringify in einen String konvertiert
      * die Funktion prüft zuerst, ob die Zieltabelle vorhanden ist und legt sie mit
      * CREATE TABLE an, wenn dies erforderlich ist.
-     * TODO: 
-     * 1. CREATE INDEX aus selfields ableiten und 
+     * TODO:
+     * 1. CREATE INDEX aus selfields ableiten und
      * 2. ALTER TABLE für neue Felder, die noch nicht in der Feldbeschreibung enthalten sind,
      * vorhandene Felder werden abgefragt mit PRAGMA table_info(table-name);
      * diese Feldlisten können in einen globalen Cache genommen werden, um wieder verwendet zu werden
@@ -445,6 +449,11 @@
          * Prüfen, welche Parameter vorliegen, dann zugreifen
          * username und firma sind auch verfügbar
          */
+        var ret = {};
+        sorcount++;
+        ret.sorcount = sorcount;
+        ret.startts = new Date();
+        perftimer.sor.start = new Date();
         var selfields = {};
         var updfields = {};
         var table = "";
@@ -478,11 +487,11 @@
         }
         // console.log("updfields-raw:" + JSON.stringify(updfields, null, " "));
 
-        var ret = {};
+
         //try {
         if (db === null) {
             ret.error = true;
-            ret.message = "setonerecord:" + "Keine Datenbank übergeben";
+            ret.message = "setonerecord ERROR:" + "Keine Datenbank übergeben";
             ret.record = null;
             callbacksor(res, ret);
             return;
@@ -498,7 +507,7 @@
 
         //console.log("SEL:" + JSON.stringify(selfields, null, " "));
         //console.log("UPD:" + JSON.stringify(updfields, null, " "));
-        /** 
+        /**
          * Erzeugen Update-Statement - upsert = true ist default und wird beachtet
          */
         var allfields = {};
@@ -512,6 +521,7 @@
             allfields: allfields
         };
         db.serialize(function () {
+            db.run("BEGIN");
             async.waterfall([
                 function (callback210) {
                     // Lesen des evtl. vorhandenen Satzes
@@ -520,6 +530,7 @@
                     ret.error = false;
                     ret.message = "";
                     ret.sorparms = sorparms;
+                    ret.sorcount = sorcount;
                     var sqlStmt = "";
                     var sel = sorparms.selfields;
                     var conds = Object.keys(sel);
@@ -548,6 +559,9 @@
                         sqlStmt += " WHERE " + where;
                     }
                     db.get(sqlStmt, function (err, row) {
+                        perftimer.sor.SELECT = new Date() - perftimer.sor.start;
+                        perftimer.sor.start = new Date();
+                        ret.alter = false;
                         if (err) {
                             // wenn Tabelle nicht vorhanden, dann CREATE TABLE
                             if (err.message.indexOf("SQLITE_ERROR: no such table:") >= 0) {
@@ -561,6 +575,7 @@
                             if (typeof row !== "undefined" && row !== null) {
                                 ret.insert = false;
                                 ret.update = true;
+                                ret.oldrecord = row;
                             } else {
                                 ret.insert = true;
                                 ret.update = false;
@@ -622,7 +637,9 @@
                     if (varlist.lastIndexOf(",") > 0) varlist = varlist.slice(0, -1);
                     if (vallist.lastIndexOf(",") > 0) vallist = vallist.slice(0, -1);
                     db.run(createStmt, function (err) {
-                        /** 
+                        perftimer.sor.CREATE = new Date() - perftimer.sor.start;
+                        perftimer.sor.start = new Date();
+                        /**
                          * TODO: Indices Anlegen wäre noch gut aus selfields und für tsserver
                          * CREATE INDEX IF NOT EXISTS ind1_KLISTATIONS ON KLISTATIONS(tsserverrupd)
                          */
@@ -633,17 +650,22 @@
                         } else {
                             ret.message += " " + ret.sorparms.table + " created";
                             var indFields = "";
-                            for (var field in ret.sorparms.sel) {
-                                if (ret.sorparms.sel.hasOwnProperty(field)) {
+                            for (var field in ret.sorparms.selfields) {
+                                if (ret.sorparms.selfields.hasOwnProperty(field)) {
                                     if (indFields.length > 0) indFields += ", ";
                                     indFields += field;
                                 }
                             }
                             if (indFields.length > 0) {
-                                var createInd = "CREATE INDEX IF NOT EXISTS ind1_" + ret.sorparms.table + " ON " + ret.sorparms.table + "(";
+                                var indrnd = "T" + Math.floor(Math.random() * 100000) + 1;
+                                var createInd = "CREATE INDEX IF NOT EXISTS ";
+                                createInd +=  " ind" + indrnd + "_" + ret.sorparms.table;
+                                createInd += " ON " + ret.sorparms.table + "(";
                                 createInd += indFields;
                                 createInd += ")";
                                 db.run(createInd, function (err) {
+                                    perftimer.sor.CREATEIND = new Date() - perftimer.sor.start;
+                                    perftimer.sor.start = new Date();
                                     callback210a(null, res, ret);
                                     return;
                                 });
@@ -672,7 +694,7 @@
                         callback210c(null, ret, ret);
                         return;
                     } else {
-                        // hier wird es ernst                    
+                        // hier wird es ernst
                         if (typeof mycache.tables === "undefined") {
                             mycache.tables = {};
                         }
@@ -680,6 +702,8 @@
                         if (typeof mycache.tables[acttable] === "undefined") {
                             mycache.tables[acttable] = {};
                             db.all("PRAGMA table_info ('" + ret.sorparms.table + "')", function (err, fields) {
+                                perftimer.sor.PRAGMATI = new Date() - perftimer.sor.start;
+                                perftimer.sor.start = new Date();
                                 if (err === null) {
                                     for (var ifield = 0; ifield < fields.length; ifield++) {
                                         var name = fields[ifield].name;
@@ -725,10 +749,13 @@
                     if (alterstatements.length > 0) {
                         async.eachSeries(alterstatements, function (alterStmt, nextStmt) {
                                 db.run(alterStmt, function (err) {
+                                    perftimer.sor.ALTER = new Date() - perftimer.sor.start;
+                                    perftimer.sor.start = new Date();
                                     if (err) {
                                         ret.message += " ALTER-Error:" + err.message;
                                     } else {
                                         ret.message += " " + alterStmt + " executed";
+                                        ret.alter = true;
                                     }
                                     nextStmt();
                                     return;
@@ -786,6 +813,8 @@
                     insStmt += vallist;
                     insStmt += ")";
                     db.run(insStmt, function (err) {
+                        perftimer.sor.INSERT = new Date() - perftimer.sor.start;
+                        perftimer.sor.start = new Date();
                         if (err) {
                             ret.message += " INSERT-Error:" + err.message;
                         } else {
@@ -801,12 +830,16 @@
                         callback210u(null, ret, ret);
                         return;
                     }
+                    /**
+                     * Ein Vergleich auf sifnifikante Updates kann hier vorgenommen werden
+                     */
+
                     /*
                         UPDATE table
                         SET column_1 = new_value_1,
                             column_2 = new_value_2
                         WHERE
-                            search_condition 
+                            search_condition
                         ORDER column_or_expression
                         LIMIT row_count OFFSET offset;
                     */
@@ -815,6 +848,28 @@
                     var set = "";
 
                     var baserecord = ret.sorparms.updfields["$set"];
+                    /**
+                     * Ein Vergleich auf sifnifikante Updates kann hier vorgenommen werden
+                     */
+                    var isigcount = 0;
+                    for (var property in baserecord) {
+                        if (baserecord.hasOwnProperty(property)) {
+                            var ptype = typeof baserecord[property];
+                            var pvalue = baserecord[property];
+                            if (property !== "tsserverupd") {
+                                if (ret.oldrecord[property] !== pvalue) {
+                                    isigcount++;
+                                } else {
+                                    delete baserecord[property];
+                                }
+                            }
+                        }
+                    }
+                    if (isigcount === 0) {
+                        ret.message += " " + ret.sorparms.table + " kein update notwendig";
+                        callback210u(null, res, ret);
+                        return;
+                    }
                     for (var property in baserecord) {
                         if (baserecord.hasOwnProperty(property)) {
                             var ptype = typeof baserecord[property];
@@ -862,6 +917,8 @@
                         updStmt += " WHERE " + where;
                     }
                     db.run(updStmt, function (err) {
+                        perftimer.sor.UPDATE = new Date() - perftimer.sor.start;
+                        perftimer.sor.start = new Date();
                         if (err) {
                             ret.message += " UPDATE:" + err.message;
                         } else {
@@ -873,15 +930,22 @@
                 }
             ], function (error, result) {
                 // hier geht es erst heraus
+                db.run("END");
                 result.message += " " + result.sorparms.table + " finished";
-                console.log(result.message);
+                ret.endts = new Date();
+                ret.timediff = ret.endts - ret.startts;
+                if (result.error === true) {
+                    console.log("#" + result.sorcount + ". " + result.message);
+                }
+                if (ret.sorcount % 100 === 0) {
+                    console.log("#" + ret.sorcount + ". last sor-Time:" + ret.timediff);
+                    console.log(JSON.stringify(perftimer.sor, null, ""));
+                }
+                perftimer.sor = {}; // Später müsste hier kumuliert werden
                 callbacksor(res, result);
                 return;
             }); // async.waterfall
         }); // db.serialize
-
-
-
     };
 
 
@@ -940,7 +1004,7 @@
             }
             /**
              * später erst den Protokollsatz Schreiben
-             * 
+             *
              */
             var saverec = {}; // $.extend({}, record);
             saverec.oldid = recid;
@@ -1017,7 +1081,7 @@
 
 
     /**
-     * getDirectories -. holt Verzeichnisse mit ausgewählten Dateien 
+     * getDirectories -. holt Verzeichnisse mit ausgewählten Dateien
      * log-Files, access.logfiles, root und web-root
      */
     sys0000sys.getDirectories = function (gblInfo, fs, async, res, supercallback) {
@@ -1346,7 +1410,7 @@
                                     dirinfo.tsfilecreated = filestats.ctime.toISOString();
                                     /*
                                     filecontrol[record.name] = {
-                                        oldtsfilecreated: record.tsfilecreated                                    
+                                        oldtsfilecreated: record.tsfilecreated
                                     };
                                     */
                                     dirinfo.dorefresh = false;
@@ -1465,10 +1529,80 @@
 
 
     /**
+     * importcsv2JSON - csv-Datei einlesen und unter dem keyname in JSON bereitstellen
+     * Feldnamen werden aus SQL-Konventionen geändert, "-"" entfällt
+     * @param {*} fullname - Pfad zur Datei
+     * @param {*} keyname - Feldname, der als Key verwendet wird
+     * @param {*} res - Response-Objekt, wird durchgewunken
+     * @param {*} callback244
+     * returns fullname - Dateiname; counter - Satzzähler; data - JSON-Struktur
+     */
+
+    sys0000sys.importcsv2JSON = function (fullname, keyname, res, callback244) {
+
+        var ret = {};
+
+        // erst mal den richtigen Namen bilden
+        var counter = 0;
+        var result = {};
+        if (fullname.length > 0) {
+            try {
+                fs.createReadStream(fullname)
+                    /*
+                    .pipe(iconv.decodeStream('iso-8859-15'))
+                    .pipe(iconv.encodeStream('utf8'))
+                    */
+                    .pipe(csv.parse({
+                        headers: true,
+                        delimiter: ',',
+                        ignoreEmpty: true
+                    }))
+                    .on("data", function (data) {
+                        var that = this;
+                        that.pause();
+                        counter++;
+                        if (counter === 1) {
+                            console.log(">>>start Vorlauf-Fields<<<");
+                            /*
+                            for (var key1 in data) {
+                                var attrName = key1;
+                                var attrValue = data[key1];
+                            }
+                            */
+                        }
+                        var key = data[keyname];
+                        result[key] = Object.assign({}, data);
+                        that.resume(); // holt den nächsten Satz, auch aus waterfall
+                    })
+                    .on("end", function () {
+                        console.log(">>>done Stream<<<");
+                        ret.error = false;
+                        ret.message = "Importiert";
+                        ret.fullname = fullname;
+                        ret.counter = counter;
+                        ret.data = result;
+                        callback244(res, ret);
+                    });
+            } catch (err) {
+                ret.error = true;
+                ret.message = "ERROR:" + err;
+                callback244(res, ret);
+            }
+        } else {
+            ret.error = true;
+            ret.message = "kein Dateiname vorgegeben, kein Import möglich";
+            callback244(res, ret);
+        }
+    };
+
+
+
+
+    /**
      * getlogstatistics filename
      * ":remote-addr :date[iso] :method :url :status :res[content-length] - :response-time ms";
      * returns JSON mit der Statistik
-     * 
+     *
      */
     sys0000sys.getlogstatistics = function (gblInfo, req, res, supercallback) {
 
@@ -1614,7 +1748,7 @@
 
 
     /**
-     * gethtmllinks url aufrufen und links extrahieren 
+     * gethtmllinks url aufrufen und links extrahieren
      * Übergabe in ret.linkliste als array
      */
     sys0000sys.gethtmllinks = function (gbldb, async, ObjectID, uihelper, req, res, supercallback1) {

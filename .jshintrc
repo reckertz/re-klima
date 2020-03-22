@@ -1,6 +1,6 @@
 {
 	// --------------------------------------------------------------------
-	// JSHint Nodeclipse Configuration v0.18 
+	// JSHint Nodeclipse Configuration v0.18
 	// Strict Edition with some relaxations and switch to Node.js, no `use strict`
 	// by Ory Band, Michael Haschke, Paul Verest
 	// https://github.com/Nodeclipse/nodeclipse-1/blob/master/org.nodeclipse.ui/templates/common-templates/.jshintrc
@@ -25,14 +25,14 @@
 	//
 	// @author http://michael.haschke.biz/
 	// @license http://unlicense.org/
-	 
+
 	// == Enforcing Options ===============================================
 	//
 	// These options tell JSHint to be more strict towards your code. Use
 	// them if you want to allow only a safe subset of JavaScript, very
 	// useful when your codebase is shared with a big number of developers
 	// with different skill levels. Was all true.
-	 
+
 	"bitwise" : true, // Prohibit bitwise operators (&, |, ^, etc.).
 	"curly" : false, // Require {} for every new block or scope.
 	"eqeqeq" : true, // Require triple equals i.e. `===`.
@@ -46,9 +46,9 @@
 	"plusplus" : false, // Prohibit use of `++` & `--`. //coding style related only
 	"regexp" : true, // Prohibit `.` and `[^...]` in regular expressions.
 	"undef" : true, // Require all non-global variables be declared before they are used.
-	"strict" : false, // Require `use strict` pragma in every file.
-	"trailing" : true, // Prohibit trailing whitespaces.
-	
+	"strict" : true, // Require `use strict` pragma in every file.
+	"trailing" : false, // Prohibit trailing whitespaces.
+
 	// == Relaxing Options ================================================
 	//
 	// These options allow you to suppress certain types of warnings. Use
@@ -75,17 +75,17 @@
 	"proto" : false, // Tolerate __proto__ property. This property is deprecated.
 	"regexdash" : false, // Tolerate unescaped last dash i.e. `[-...]`.
 	"scripturl" : false, // Tolerate script-targeted URLs.
-	"smarttabs" : false, // Tolerate mixed tabs and spaces when the latter are used for alignmnent only.
+	"smarttabs" : true, // Tolerate mixed tabs and spaces when the latter are used for alignmnent only.
 	"shadow" : false, // Allows re-define variables later in code e.g. `var x=1; x=2;`.
 	"sub" : true, // Tolerate all forms of subscript notation besides dot notation e.g. `dict['key']` instead of `dict.key`.
 	"supernew" : false, // Tolerate `new function () { ... };` and `new Object;`.
-	"validthis" : false, // Tolerate strict violations when the code is running in strict mode and you use this in a non-constructor function.
-	
+	"validthis" : true, // Tolerate strict violations when the code is running in strict mode and you use this in a non-constructor function.
+
 	// == Environments ====================================================
 	//
 	// These options pre-define global variables that are exposed by
 	// popular JavaScript libraries and runtime environments—such as
-	// browser or node.js. TODO JSHint Documentation has more, but it is not clear since what JSHint version they appeared 
+	// browser or node.js. TODO JSHint Documentation has more, but it is not clear since what JSHint version they appeared
 	"browser" : false, // Standard browser globals e.g. `window`, `document`.
 	"couch" : false, // Enable globals exposed by CouchDB.
 	"devel" : false, // Allow development statements e.g. `console.log();`.
@@ -100,7 +100,7 @@
 	"worker" : false, //?since version? This option defines globals available when your code is running inside of a Web Worker.
 	"wsh" : false, // Enable globals available when your code is running as a script for the Windows Script Host.
 	"yui" : false, //?since version? This option defines globals exposed by the YUI JavaScript framework.
-	
+
 	// == JSLint Legacy ===================================================
 	//
 	// These options are legacy from JSLint. Aside from bug fixes they will
@@ -109,12 +109,12 @@
 	"onevar" : false, // Allow only one `var` statement per function.
 	"passfail" : false, // Stop on first error.
 	"white" : false, // Check against strict whitespace and indentation rules.
-	
+
 	// == Undocumented Options ============================================
 	//
 	// While Michael have found these options in [example1][2] and [example2][3] (already gone 404)
 	// they are not described in the [JSHint Options documentation][4].
-	 
+
 	"predef" : [ // Extra globals.
 		//"exampleVar",
 		//"anotherCoolGlobal",
