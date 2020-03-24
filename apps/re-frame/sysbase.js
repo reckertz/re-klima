@@ -294,7 +294,7 @@
         });
 
         if (is_chrome) {
-            setTimeout(function () { // wait until all resources loaded 
+            setTimeout(function () { // wait until all resources loaded
                 mywindow.document.close(); // necessary for IE >= 10
                 mywindow.focus(); // necessary for IE >= 10
                 mywindow.print(); // change window to winPrint
@@ -342,7 +342,7 @@
                 }));
         }
         if ($(".message").length > 0) {
-            if (message.length > 100) {
+            if ($(".message").length > 100) {
                 $(".message").html(message.substr(0, 100) + "...");
             } else {
                 $(".message").html(message);
@@ -670,7 +670,7 @@
 
 
     /**
-     * swipeLeft und swipeRight zur Unterstützung der Navigation 
+     * swipeLeft und swipeRight zur Unterstützung der Navigation
      * bei Smartphone und Tablet - hier nicht im Vordergrund
      * swipeLeft auch bei Browser-Backbutton und Smartphone-Backbutton
      * origin: selbst, from: left, to: right
@@ -1099,7 +1099,7 @@
     };
 
     sysbase.checkSessionLogin = function (ret) {
-        /** 
+        /**
          * Dummy-Funktion, bleibt erst mal formal erhalten
          */
         return;
@@ -1187,7 +1187,7 @@
     };
 
     /**
-     * getServer - zunächst neutral, Aktivierung nur zum echten Test 
+     * getServer - zunächst neutral, Aktivierung nur zum echten Test
      * Ableitung aus der aktuellen URL im Client oder Test von Lokal zu Remote, geht auch
      */
     sysbase.getServer = function (url) {

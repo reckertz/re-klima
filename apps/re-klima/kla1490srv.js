@@ -752,7 +752,9 @@
                         var month = parseInt(rec.month);
                         if (rec.days.length < mdtable[month - 1]) {
                             // Inputtabelle zu kurz, wird aufgefüllt
-
+                            for (var inull = rec.days.length; inull < mdtable[month - 1]; inull++) {
+                                rec.days[inull] = "";
+                            }
                         }
                         var baseday = 0;
                         for (var imon = 0; imon < (month - 2); imon++) {
@@ -769,14 +771,64 @@
                     return;
                 },
                 function (res, ret, callback394g) {
-                    // Reserve
+                    // Berechnen der Randauszählungen, noch sind years in JSON
+                    for (var property in ret.outrecs) {
+                        if (ret.outrecs.hasOwnProperty(property)) {}
+                    }
                     callback394g(null, res, ret);
                     return;
                 },
                 function (res, ret, callback394u) {
                     var varkeys = Object.keys(ret.outrecs.variables);
                     async.eachSeries(varkeys, function (variable, nextrec) {
-
+                            // Hier die Qualitätsparameter berechnen
+                            var outrec = ret.outrecs.variables[variable];
+                            var firstyear = "";
+                            var firstyearok = "";
+                            var fromyear = "";
+                            var toyear = "";
+                            var anzyears = 0;
+                            var realyears = 0;
+                            var missing = 0;
+                            var imissing = 0;
+                            var ymissing = 0;
+                            var icount = 0;
+                            var goodyears = 0;
+                            var ys = Object.keys(outrec.years);
+                            // immer berechnen - speziell wenn source nicht gefunden wurde
+                            for (var iys = 0; iys < ys.length; iys++) {
+                                if (firstyear.length === 0) {
+                                    firstyear = ys[iys];
+                                    firstyearok = ys[iys];
+                                } else if (firstyear > ys[iys]) {
+                                    firstyear = ys[iys];
+                                    firstyearok = ys[iys];
+                                }
+                                if (toyear.length === 0) {
+                                    toyear = ys[iys];
+                                } else if (toyear < ys[iys]) {
+                                    toyear = ys[iys];
+                                }
+                                var ymissing = 0;
+                                for (var idy = 0; idy < outrec.years[ys[iys]].length; idy++) {
+                                    icount++;
+                                    var dval = outrec.years[ys[iys]][idy];
+                                    if (typeof dval === "undefined" || dval === null || dval === "") {
+                                        dval = null;
+                                        outrec.years[ys[iys]][idy] = dval;
+                                        imissing++;
+                                        ymissing++;
+                                    }
+                                }
+                                if ((ymissing / outrec.years[ys[iys]].length) < 20.0) {
+                                    goodyears++;
+                                }
+                            }
+                            fromyear = firstyear;
+                            anzyears = parseInt(toyear) - parseInt(fromyear) + 1;
+                            realyears = ys.length;
+                            missing = (imissing / icount).toFixed(2);
+                            goodyears = goodyears;
                             var reqparm = {};
                             reqparm.selfields = {
                                 source: ret.source,
@@ -787,16 +839,24 @@
                             reqparm.updfields["$setOnInsert"] = {
                                 source: ret.source,
                                 stationid: ret.outrecs.stationid,
-                                variable: variable,
+                                variable: variable
+                            };
+                            reqparm.updfields["$set"] = {
+                                firstyear: firstyear,
+                                firstyearok: firstyear,
+                                fromyear: firstyear,
+                                toyear: toyear,
+                                anzyears: anzyears,
+                                realyears: realyears,
+                                missing: missing,
+                                imissing: imissing,
+                                icount: icount,
+                                goodyears: goodyears,
                                 years: JSON.stringify(ret.outrecs.variables[variable].years)
                             };
-                            /**
-                             * Default-Felder zufügen, werden erst nach der Übernahme versorgt
-                             */
-                            reqparm.updfields["$set"] = {};
-                            reqparm.table = "KLIDATA";
+                           reqparm.table = "KLIDATA";
                             sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
-                                console.log("KLIDATA-setonerecord:" +  ret.outrecs.stationid);
+                                console.log("KLIDATA-setonerecord:" + ret.outrecs.stationid + " " + variable);
                                 nextrec();
                                 return;
                             });

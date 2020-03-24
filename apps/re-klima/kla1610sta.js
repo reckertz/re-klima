@@ -320,7 +320,7 @@
                     class: "uieform"
                 }))
                 .append($("<div/>", {
-                    id: "kli1620shmclock",
+                    id: "kla1610stalock",
                     css: {
                         float: "left",
                         width: "100%",
@@ -414,7 +414,7 @@
                                     return;
                                 } else {
                                     window.parent.sysbase.setCache("starecord", starecord);
-                                    var idc20 = window.parent.sysbase.tabcreateiframe("Stations-Map", "", "re-klima", "kli1630map", "kliworldmap.html");
+                                    var idc20 = window.parent.sysbase.tabcreateiframe("Stations-Map", "", "re-klima", "kla1630map", "klaworldmap.html");
                                     window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
                                 }
                             }
@@ -450,7 +450,7 @@
                                 } else {
                                     window.parent.sysbase.setCache("stationarray", stationarray);
                                     window.parent.sysbase.setCache("starecord", starecord);
-                                    var idc20 = window.parent.sysbase.tabcreateiframe("Stations-Map", "", "re-klima", "kli1630map", "kliworldmap.html");
+                                    var idc20 = window.parent.sysbase.tabcreateiframe("Stations-Map", "", "re-klima", "kla1630map", "klaworldmap.html");
                                     window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
                                 }
                             }
@@ -501,7 +501,7 @@
                                     evt.preventDefault();
                                     evt.stopPropagation();
                                     evt.stopImmediatePropagation();
-                                    var ghcnclock = kla1610sta.showclock("#kli1620shmclock");
+                                    var ghcnclock = kla1610sta.showclock("#kla1610stalock");
                                     var that = this;
                                     $(that).attr("disabled", true);
                                     var jqxhr = $.ajax({
@@ -556,6 +556,12 @@
         window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         */
         var source = $(this).closest("tr").find('td:first-child').text();
+        var str1 = $(this).closest("tr").find(':nth-child(2)').text();
+        var idis1 = str1.indexOf(" ");
+        var variablename = "";
+        if (idis1 > 10) {
+            variablename = str1.substr(idis1+1, 4);
+        }
         console.log("Station:" + stationid + " from:" + source);
         /*
          sysbase.navigateTo("kli1620shm", [{
@@ -575,9 +581,9 @@
                 variablename: selvariablename,
                 starecord: starecord
             }));
-            var tourl = "kliheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
+            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
-            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima", "kli1620shm", tourl);
+            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima", "kla1620shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         } else if (source === "ECAD") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
@@ -607,43 +613,18 @@
         var selfunction = "";
         var where = "";
         if (typeof starecord.source !== "undefined" && starecord.source.length > 0) {
-            sel.source = starecord.source;
             if (where.length > 0) where += " AND ";
-            where += " source ='" +  starecord.source + "'";
+            where += " KLISTATIONS.source ='" +  starecord.source + "'";
         }
         if (typeof starecord.stationid !== "undefined" && starecord.stationid.length > 0) {
-            sel.stationid = starecord.stationid;
             if (where.length > 0) where += " AND ";
-            where += " stationid ='" +  starecord.stationid + "'";
+            where += " KLISTATIONS.stationid ='" +  starecord.stationid + "'";
         }
         if (typeof starecord.name !== "undefined" && starecord.name.length > 0) {
-            sel.stationname = {
-                "$regex": starecord.name,
-                "$options": "i"
-            };
             if (where.length > 0) where += " AND ";
             where += " lower(stationname) LIKE '%" +  starecord.name.toLowerCase() + "%'";
         }
         if (typeof starecord.region !== "undefined" && starecord.region.length > 0) {
-            sel.$or = [{
-                    region: {
-                        "$regex": starecord.region,
-                        "$options": "i"
-                    }
-                },
-                {
-                    subregion: {
-                        "$regex": starecord.region,
-                        "$options": "i"
-                    }
-                },
-                {
-                    countryname: {
-                        "$regex": starecord.region,
-                        "$options": "i"
-                    }
-                }
-            ];
             if (where.length > 0) where += " AND ";
             where += "(";
             where += " lower(region) LIKE '%" +  starecord.region.toLowerCase() + "%'";
@@ -711,15 +692,21 @@
         var table = "KLISTATIONS";
         var sqlStmt = "";
         sqlStmt += "SELECT ";
-        sqlStmt += "source, stationid, stationname, ";
+        sqlStmt += "KLISTATIONS.source, KLISTATIONS.stationid, stationname, ";
         sqlStmt += "region, subregion, countryname, ";
-        sqlStmt += "lats, longitude, latitude, height ";
+        sqlStmt += "lats, longitude, latitude, height, ";
+        sqlStmt += "KLIDATA.variable, ";
+        sqlStmt += "KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear";
         // sqlStmt += "anzyears, realyears, fromyear, toyear";
         sqlStmt += " FROM " + table;
+
+        sqlStmt += " LEFT JOIN KLIDATA";
+        sqlStmt += " ON KLIDATA.source = KLISTATIONS.source";
+        sqlStmt += " AND KLIDATA.stationid = KLISTATIONS.stationid";
         if (where.length > 0){
             sqlStmt += " WHERE " + where;
         }
-        sqlStmt += " ORDER BY source, stationid";
+        sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
         var skip = 0;
         var limit = 0;
         var api = "getallrecords";
@@ -816,6 +803,7 @@
 
                     };
                     stationrecords = ret.records;
+                    //stationrecords.source = ret.rsource;
                     var htmltable = "<table class='tablesorter'>";
                     var irow = 0;
                     for (var property in ret.records) {
@@ -823,7 +811,9 @@
                             var record = ret.records[property];
                             delete record._id;
                             var rowid = record.stationid; // "key" + irow;
-                            record.station = record.stationid + "<br>" + record.stationname;
+                            record.station = record.stationid;
+                            record.station += " " + record.variable || "" + " ";
+                            record.station += "<br>" + record.stationname;
                             record.station += "<br>";
                             record.station += "<img src='/images/icons-png/arrow-u-black.png'";
                             record.station += " title='Upload *.dly'";
@@ -908,7 +898,7 @@
         evt.stopPropagation();
         var stationid = $(this).closest("tr").attr("rowid");
         var source = $(this).closest("tr").find('td:first-child').text();
-        var ghcnclock = kla1610sta.showclock("#kli1620shmclock");
+        var ghcnclock = kla1610sta.showclock("#kla1610stalock");
         var that = this;
         $(that).attr("disabled", true);
         var jqxhr = $.ajax({

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no">
+    <title>klaworldmap - Weltkarte</title>
+    <meta name="description" content="Klima Admin-App" />
+    <meta name="cache-control" content="no-cache, no-store">
+    <meta name="keywords" content="Node.js, JavaScript, AWS EC2, MongoDB, PWA, SPA">
+    <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/klistyles.css" rel="stylesheet">
+
+    <script src="lib/async.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.backDetect.js"></script>
+    <script src="lib/jquery.cookie.min.js"></script>
+    <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
+    <script src="lib/raphael.min.js" charset="utf-8"></script>
+    <script src="lib/jquery.mapael.js" charset="utf-8"></script>
+    <script src="maps/germany.js" charset="utf-8"></script>
+    <script src="maps/world.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="apps/re-frame/uihelper.js"></script>
+    <script type="text/javascript" src="apps/re-frame/sysbase.js"></script>
+    <script type="text/javascript" src="apps/re-klima/kla1560wma.js"></script>
+    <style>
+        .mapael .mapTooltip {
+            position: absolute;
+            background-color: #474c4b;
+            moz-opacity: 0.70;
+            opacity: 0.70;
+            filter: alpha(opacity=70);
+            border-radius: 10px;
+            padding: 10px;
+            z-index: 1000;
+            max-width: 200px;
+            display: none;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
+        <span class="headertitle" style="color:red;font-weight:bold;">kliworldmap - World-Map</span>
+        <noscript>
+            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+                <span style="color:blue">
+                    Your browser does not support scripts, you have to enable it to run this page
+                </span>
+            </div>
+        </noscript>
+    </div>
+    <div class="content">
+    </div>
+    <div class="footer">
+    </div>
+    <script>
+        $(window).off("resize");
+        $(window).resize(function () {
+            var hh = $(".header").outerHeight();
+            var fh = $(".footer").outerHeight();
+            var wh = $(window).height();
+            $(".content").height(wh - hh - fh - 1);
+            // $(".content").css("overflow", "auto");
+        });
+        $(document).ready(function () {
+            $('body').backDetect(function () {
+                alert("The back-button terminates the app (2)");
+            });
+            if (window.location.href.indexOf("localhost") >= 0) {
+                $("body").css({
+                    "background-color": "#5ff80611"
+                });
+            }
+
+            var app = "";
+            var target = "";
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                app = urlParams.get('app');
+                target = urlParams.get('target');
+            } catch (err) {
+
+            }
+            console.log("kliworldmap.html=>" + target);
+            sysbase.navigateTo(target, [], function (ret) {
+                if (ret.error === true) {
+                    alert(ret.message);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

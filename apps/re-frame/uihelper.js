@@ -125,14 +125,14 @@
 
 
     uihelper.setUsername = function (loginUsername) {
-        /** 
+        /**
          * Dummy
          */
         gblHelpers.username = loginUsername;
     };
 
     uihelper.getUsername = function () {
-        /** 
+        /**
          * Dummy
          */
         return "Climate-Expert";
@@ -301,7 +301,7 @@
     /**
      * konvertiert Datumsstring
      * von Deutsch TT.MM.JJ oder TT.MM.JJJJ zu ISO JJJJ-MM-TT
-     * @param {*} d 
+     * @param {*} d
      */
     uihelper.convertD2ISO = function (d) {
         if (typeof d === "undefined") return "";
@@ -338,7 +338,7 @@
     /**
      * Konvertiert UTC String nach lokaler Zeit mit deutscher Formatierung
      * Achtung: der Monat wird -1 gerechnet, weil er schon "richtig" erwartet wird
-     * @param {*} UTC 
+     * @param {*} UTC
      */
     uihelper.convertUTC2D = function (UTC) {
         if (typeof UTC === "undefined" || UTC.trim().length === 0) {
@@ -428,7 +428,7 @@
     };
 
     /**
-     * numerische Eingabe 
+     * numerische Eingabe
      * @param betrag - DOM-Input
      */
     function checkNumberInputX(betrag, optionalDecimals) {
@@ -478,7 +478,7 @@
 
     function convertD2USX(d) {
         /**
-         * konvertiert Zahlenstring 
+         * konvertiert Zahlenstring
          * von Deutsch Dezimalkomma und Tausenderpunkte zu US Dezimalpunkt und kein Tausenderkomma
          * mit Wegfall Währung etc.
          */
@@ -510,7 +510,7 @@
 
     function convertUS2D(d) {
         /**
-         * konvertiert Zahlenstring 
+         * konvertiert Zahlenstring
          * von Deutsch Dezimalkomma und Tausenderpunkte zu US Dezimalpunkt und kein Tausenderkomma
          * mit Wegfall Währung etc.
          */
@@ -535,13 +535,13 @@
     }
 
 
- 
+
 
 
     /**
      * checkeMailAddress prüft eine eMail-Adresse formal
      * Rückgabe true = korrekt oder false = fehlerhaft
-     * @param {*} email 
+     * @param {*} email
      */
     uihelper.checkeMailAddress = function (email) {
         var pattern = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
@@ -554,9 +554,9 @@
 
     /**
      * checkeMailAddressUI ist ein Wrapper für checkeMailAddress
-     * es wird ein DOM-Input-Feld für das Passwort übergeben und 
+     * es wird ein DOM-Input-Feld für das Passwort übergeben und
      * das DOM-Input-Feld entsprechend markiert
-     * @param {*} email 
+     * @param {*} email
      */
     uihelper.checkeMailAddressUI = function (email) {
         var emailinput = $(email).val();
@@ -577,7 +577,7 @@
 
     /**
      * IBAN Prüfziffer berechnen und UI Rückmelden
-     * @param {*} iban 
+     * @param {*} iban
      */
     uihelper.checkIbanUI = function (iban) {
         var ibaninput = $(iban).val();
@@ -593,7 +593,7 @@
     };
     /*
      * https://stackoverflow.com/questions/21928083/iban-validation-check
-     * deprecated: Returns 1 if the IBAN is valid 
+     * deprecated: Returns 1 if the IBAN is valid
      * Returns FALSE if the IBAN's length is not as should be (for CY the IBAN Should be 28 chars long starting with CY )
      * deprecated: Returns any other number (checksum) when the IBAN is invalid (check digits do not match)
      * Return TRUE, wenn alles ok ist
@@ -849,7 +849,7 @@
     };
 
 
-   
+
 
 
 
@@ -948,12 +948,19 @@
         var url47 = api;
         var user47 = "";
         // firma: uihelper.getUsername(),
+        var selparm;
+        if (typeof sel === "object") {
+            selparm = JSON.stringify(sel);
+        } else {
+            selparm = sel;
+        }
+
         var jqxhr = $.ajax({
             method: "GET",
             crossDomain: false,
             url: sysbase.getServer(url47),
             data: {
-                sel: JSON.stringify(sel),
+                sel: selparm,
                 projection: JSON.stringify(projection),
                 table: table,
                 username: user47
@@ -1046,12 +1053,14 @@
                             message: "Satz gefunden",
                             records: records
                         });
+                        return;
                     } else {
                         callback({
                             error: false,
                             message: "kein Satz gefunden",
                             records: null
                         });
+                        return;
                     }
                 } catch (err) {
                     callback({
@@ -1059,6 +1068,7 @@
                         message: "getAllRecords AJAX/DB-Error-3:" + err.message + " " + err.stack,
                         records: null
                     });
+                    return;
                 }
             }).fail(function (err) {
                 callback({
@@ -1066,6 +1076,7 @@
                     message: "AJAX ERROR:" + err.message,
                     records: null
                 });
+                return;
             }).always(function () {
                 // nope
             });
@@ -1075,6 +1086,7 @@
                 message: "AJAX ERROR:" + err.message,
                 record: null
             });
+            return;
         }
 
     };
@@ -1304,7 +1316,7 @@
     };
 
     /**
-     * Berechnen uuid gemäß RFC4122 
+     * Berechnen uuid gemäß RFC4122
      * https://gist.github.com/jcxplorer/823878
      */
     uihelper.uuid = function () {
@@ -1411,8 +1423,8 @@
                         } else {
                             res += ")";
                             /**
-                             * Einschränken der Rekursion 
-                             * 
+                             * Einschränken der Rekursion
+                             *
                              * && typeof obj[property] !== 'function'
                              */
                             if (dis.length <= 120 && typeof obj[property] !== 'function') {
@@ -1480,8 +1492,8 @@
                         }
                         res += ")";
                         /**
-                         * Einschränken der Rekursion 
-                         * 
+                         * Einschränken der Rekursion
+                         *
                          * && typeof obj[property] !== 'function'
                          */
                         // if (dis.length <= 36 && typeof obj[property] !== 'function') {
@@ -1533,10 +1545,10 @@
      *          obj - JSON-Struktur mit den Vorgabedaten einer Zeile
      *          count - hilfsvariable für die th-Aufbereitung, bei 0 wird der th ausgegeben,
      *                  entspricht also einem schlichten Satzzähler, der bei 0 beginnt
-     *          format - Angaben zur Druck-/Anzeigeaufbereitung, teilt sich in 
+     *          format - Angaben zur Druck-/Anzeigeaufbereitung, teilt sich in
      *                  format.attributes für allgemeine Vorgaben und
      *                  format.fields[] für feldspezifische Vorgaben
-     *                  wenn format.fields fehlt und somit die alte Formatierung vorliegt, dann 
+     *                  wenn format.fields fehlt und somit die alte Formatierung vorliegt, dann
      *                  wird format.fields daraus generiert, die Feldreihenfolge ist dann alphabetisch
      *          rowid - fakultativ, wird als tr-Attribut ausgegeben
      *          rowclass - fakultativ, wird als tr-Class ausgegeben
@@ -1661,7 +1673,7 @@
                 res += "<tbody>";
             }
             var rowattr = "";
-            if (typeof rowid !== "undefined" && rowid.length > 0) {
+            if (typeof rowid !== "undefined" && rowid !== null && rowid.length > 0) {
                 rowattr += " rowid='" + rowid + "'";
             }
             if (typeof rowclass !== "undefined" && rowclass.length > 0) {
@@ -1670,6 +1682,7 @@
             res += "<tr" + rowattr + ">" + line + "</tr>";
         } catch (err) {
             res += "***ERROR***" + err + " " + err.stack;
+            console.log (err + " " + err.stack);
         }
         return res;
     }
@@ -1743,7 +1756,7 @@
     /**
      * Download einer HTML-Tabelle
      * @param {*} jQhtmltable entweder mit # als Verweis auf HTML-Table oder String als HTML-Table
-     * @param {*} filename 
+     * @param {*} filename
      */
     uihelper.downloadHtmlTable = function (jQhtmltable, filename) {
 
@@ -1763,7 +1776,7 @@
         elHtml += "</table>";
         elHtml += "</body>";
         elHtml += "</html>";
-        if (navigator.msSaveBlob) { // IE 10+ 
+        if (navigator.msSaveBlob) { // IE 10+
             navigator.msSaveBlob(new Blob([elHtml], {
                 type: mimeType + ';charset=utf-8;'
             }), filename);
@@ -1815,7 +1828,7 @@
 
     /**
      * geolocation mit callback returns: latitude, longitude
-     * @param {*} country_code  - DEU für Deutschland! 
+     * @param {*} country_code  - DEU für Deutschland!
      * @param {*} postal_code   - Postleitzahl
      * @param {*} city          - Stadt
      * @param {*} street        - Strasse und Hausnummer
@@ -2039,7 +2052,7 @@
     };
 
 
-    /** 
+    /**
      * moonphase - berechnet aus dem Datum die Mondphase
      * https://gist.github.com/endel/dfe6bb2fbe679781948c
      * return phase, name
@@ -2074,7 +2087,7 @@
         };
     };
 
-    /** 
+    /**
      * Schaltjahr bzw. leapyear
      * Vorgabe djahr als numerich, return true/false
      */
@@ -2093,10 +2106,10 @@
      * confirmDialog - baut Popup auf und callback mit question und isConfirmed als true/false boolean
      * in sich geschlossen, eine Antwort wird erzwungen, nach der Anwort wird das popup entfernt
      * id wird random gebildet; callback mit question (text) und isconfirmed (boolean)
-     * @param {*} anchorHash 
-     * @param {*} title 
-     * @param {*} question 
-     * @param {*} comment 
+     * @param {*} anchorHash
+     * @param {*} title
+     * @param {*} question
+     * @param {*} comment
      */
     uihelper.confirmDialog = function (anchorHash, title, question, comment, callback) {
         // <a href="#popupDialog" data-rel="popup" data-position-to="window" data-transition="pop" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-icon-delete ui-btn-icon-left ui-btn-b">Delete page...</a>
@@ -2194,9 +2207,9 @@
         return output;
     };
 
-    /** 
+    /**
      * cloneObjectOnly - null und undefined werden NICHT kopiert
-     * 
+     *
      */
     uihelper.cloneObjectOnly = function copy(o) {
         if (o === null) return null;
