@@ -591,7 +591,7 @@
                             function (res, ret1, callback392b) {
                                 if (vglstationid !== dayrecord.stationid) {
                                     /**
-                                     * Ausgabe aller Tagesdaten der stationid aus stationdata
+                                     * Ausgabe aller monatsbezogenen Tagesdaten der stationid aus stationdata
                                      */
                                     if (vglstationid.length > 0) {
                                         kla1490srv.putstationdata(stationdata, db, async, sys0000sys, res, ret1, function (res, ret1) {
@@ -621,6 +621,7 @@
                                      *1922   -9  -17  -62  -37  -16   29   48   63   27   -2  -38  -26
                                      * Erkennungsregel: 4 Stellen numerisch vorne => Datensatz dat4schema
                                      */
+                                    // console.log(JSON.stringify(dayrecord));
                                     dayrecord.days = [];
                                     // Tage holen 8 = 5 + 1 + 1 + 1
                                     var ivon = 22 - 1;
@@ -628,8 +629,9 @@
                                         var idis = ivon + iday * 8; // startet mit 0!
                                         if ((idis + 8) <= line.length) {
                                             var value;
+                                            // console.log(line.substr(idis, 8).replace(/ /g,"."));
                                             value = line.substr(idis, 5).trim();
-                                            if (value === "999" || value === "-999") {
+                                            if (value === "9999" || value === "-9999") {
                                                 value = null;
                                             } else {
                                                 var len = value.length;
@@ -757,7 +759,7 @@
                             }
                         }
                         var baseday = 0;
-                        for (var imon = 0; imon < (month - 2); imon++) {
+                        for (var imon = 0; imon < (month - 1); imon++) {
                             baseday += mdtable[imon];
                         }
                         for (var iday = 0; iday < mdtable[month - 1]; iday++) {

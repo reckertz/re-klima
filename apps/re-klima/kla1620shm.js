@@ -1,6 +1,6 @@
-/*global window,module,define,root,global,self,var,this,sysbase,uihelper,kla9020fun */
+/*global $,this,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun */
 (function () {
-    'use strict'
+    'use strict';
     var kla1620shm = {};
 
     var root = typeof self === 'object' && self.self === self && self ||
@@ -33,6 +33,7 @@
     var heatmapparms = {};
     var stationrecord;
     var yearindexarray = {};
+    var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
 
     kla1620shm.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
@@ -149,7 +150,6 @@
                         float: "left"
                     }
                 })
-
                 .append($("<button/>", {
                     html: "Sparklines anzeigen",
                     css: {
@@ -159,7 +159,7 @@
                     click: function (evt) {
                         evt.preventDefault();
                         // stationrecord - heatworld
-                        kla1620shm.paintS(selvariablename, selsource, selstationid);
+                        kla1620shm.paintS(selvariablename, selsource, selstationid, matrix1);
                     }
                 }))
 
@@ -253,12 +253,12 @@
                                         "background-color": "yellow",
                                         height: h,
                                         width: w,
-                                        /* overflow: "auto" */
+                                        overflow: "auto"
                                     }
                                 }));
 
                             $("#kla1620shmcolormap").show();
-                            kli9020fun.getColorPaletteX1("kla1620shmcolormap");
+                            kla9020fun.getColorPaletteX1("kla1620shmcolormap");
                         }
                         return false;
                     }
@@ -444,7 +444,7 @@
                     var api = "getonerecord";
                     var table = "KLISTATIONS";
                     uihelper.getOneRecord(sqlStmt, projection, api, table, function (ret) {
-                    if (ret.error === false && ret.record !== null) {
+                        if (ret.error === false && ret.record !== null) {
                             /*
                             intern wird getallsqlrecords gerufen und EIN Satz in record zurückgegeben.
                             */
@@ -486,9 +486,16 @@
                         var years = JSON.parse(ret.record.years);
                         var dayyears = JSON.parse(ret.record.years); // ret.record[selvariablename].years;
 
+                        var mtitle = "";
+                        mtitle += (ret.record.variable || "").length > 0 ? " " + ret.record.variable : "";
+                        mtitle += " " + selstationid;
+                        mtitle += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
+                        mtitle += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
+                        mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
+
                         // Aufruf Heatmap mit Container und Matrix
-                        var matrix1 = {
-                            title: "Test",
+                        matrix1 = {
+                            title: mtitle,
                             colheaders: [],
                             rowheaders: [],
                             data: []
@@ -501,16 +508,25 @@
                                 // zum Test erst mal brutal die ersten 12 Werte
                                 matrix1.data[irow] = [];
                                 for (var icol = 0; icol < 365; icol++) {
-                                    matrix1.data[irow][icol] = rowvalues[icol];
+                                    if (rowvalues[icol] === "") {
+                                        matrix1.data[irow][icol] = null;
+                                    } else if (rowvalues[icol] === "-9999" || rowvalues[icol] === "-999.9") {
+                                        matrix1.data[irow][icol] = null;
+                                    } else {
+                                        matrix1.data[irow][icol] = rowvalues[icol];
+                                    }
                                 }
                                 irow++;
                             }
                         }
-                        var erg = kla9020fun.getHeatmap(cid, matrix1, function(ret) {
+                        // hier ist das Layout nochmal zu kontrollieren
+
+                        var erg = kla9020fun.getHeatmap(cid, matrix1, function (ret) {
                             sysbase.putMessage("Heatmap ausgegeben", 1);
                             callbackshm2(null, {
                                 error: false,
-                                message: "Heatmap ausgegeben"
+                                message: "Heatmap ausgegeben",
+                                matrix: matrix1
                             });
                             return;
                         });
@@ -526,7 +542,8 @@
                     }
                 },
                 function (ret, callbackshm2) {
-                    kla1620shm.paintS(selvariablename, selsource, selstationid);
+                    // hier muss die matrix1-Struktur übergeben werden
+                    kla1620shm.paintS(selvariablename, selsource, selstationid, ret.matrix);
                     callbackshm2("Finish", {
                         error: false,
                         message: "Heatmap ausgegeben"
@@ -544,18 +561,17 @@
      * paintS - Sparklines für Monate Gesamt = alle Jahre
      * - Randauszählung der Zuordnungen zu Grad Celsius je Jahr
      */
-    kla1620shm.paintS = function (selvariablename, selsource, selstationid) {
+    kla1620shm.paintS = function (selvariablename, selsource, selstationid, matrix) {
         /**
          * Aufbau des Rahmens für die Einzelgraphiken
          */
-
-        var years = stationrecord[selvariablename].years;
+        var years = matrix.data;
         var tarray = [];
         for (var year in years) {
             if (years.hasOwnProperty(year)) {
                 tarray.push({
-                    year: year,
-                    months: years[year]
+                    year: matrix1.rowheaders[year],
+                    values: years[year]
                 });
             }
         }
@@ -575,13 +591,18 @@
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
+        $("#kla1620shmwrapper").css({
+            overflow: "hidden",
+            height: h,
+            width: w
+        });
 
         $("#kla1620shmwrapper")
             .append($("<div/>", {
                     css: {
                         height: h,
                         width: w,
-                        /* overflow: "auto" */
+                        overflow: "auto"
                     }
                 })
                 .append($("<table/>", {
@@ -622,8 +643,10 @@
          * jeder Monat über alle Jahre eine Sparkline
          */
         var pcount = 0;
-        for (var imon = 0; imon < 12; imon++) {
-            var monindex = imon;
+        var lvalue = tarray[0].values.length;
+        if (lvalue > 365) lvalue = 365; // kleine Vereinfachung
+        for (var ivalue = 0; ivalue < lvalue; ivalue++) {
+            var monindex = ivalue;
             pcount++;
             var sparkid = '#spark' + pcount;
             var pearls = [];
@@ -631,11 +654,10 @@
             var miny = null;
             var maxy = null;
             for (var iarray = 0; iarray < tarray.length; iarray++) {
-                // Iterate Monate
+                // Iterate values
                 var x = parseInt(tarray[iarray].year);
                 var y;
-
-                var temperatur = tarray[iarray].months[imon];
+                var temperatur = tarray[iarray].values[ivalue];
                 if (temperatur === null) {
                     pearls.push(null);
                     y = null;
@@ -673,11 +695,18 @@
                 maxyv = maxyv.toFixed(2);
             }
             // Regression https://github.com/Tom-Alexander/regression-js
+            // rowtit noch verfeinern für spezielle Termine, wie Tag/Nachtgleiche etc.
+            var rowtit = "";
+            if (tarray.length <= 12) {
+                rowtit = 'M' + ("00" + (ivalue + 1)).slice(-2);
+            } else {
+                rowtit = 'D' + ("000" + (ivalue + 1)).slice(-3);
+            }
 
             $("#kla1620shmt1")
                 .append($("<tr/>")
                     .append($("<td/>", {
-                        html: 'M' + ("00" + (imon + 1)).slice(-2)
+                        html: rowtit
                     }))
                     .append($("<td/>")
                         .append($("<span/>", {
@@ -822,14 +851,15 @@
          */
         var years = stationrecord[selvariablename].years;
         var tarray = [];
-        for (var year in years) {
-            if (years.hasOwnProperty(year)) {
+        for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
+
                 tarray.push({
-                    year: year,
-                    months: years[year]
+                    year: matrix1.rowheaders[iyear],
+                    months: matrix.data[iyear]
                 });
-            }
+
         }
+
         tarray.sort(function (a, b) {
             if (a.year < b.year)
                 return -1;
@@ -916,16 +946,18 @@
          */
         var colorarray = ['#a6cee3', '#1f78b4', '#b2df8a', '#33a02c', '#fb9a99', '#e31a1c', '#fdbf6f', '#ff7f00', '#cab2d6', '#6a3d9a', '#ffff99', '#b15928'];
 
-        var years = stationrecord[selvariablename].years;
+        //var years = stationrecord[selvariablename].years;
+        var years = matrix1.data;
         var tarray = [];
-        for (var year in years) {
-            if (years.hasOwnProperty(year)) {
-                tarray.push({
-                    year: year,
-                    months: years[year]
-                });
-            }
+        for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
+
+            tarray.push({
+                year: matrix1.rowheaders[iyear],
+                values: matrix1.data[iyear]
+            });
+
         }
+
         tarray.sort(function (a, b) {
             if (a.year < b.year)
                 return -1;
@@ -940,19 +972,20 @@
         for (var ia = 0; ia < tarray.length; ia++) {
             var cvector = [];
             var iskip = false;
-            for (var imo = 0; imo < 12; imo++) {
-                if (tarray[ia].months[imo] === null) {
+            for (var imo = 0; imo < tarray[0].values.length; imo++) {
+                if (tarray[ia].values[imo] === null) {
                     //cvector.push(-9999);
                     iskip = true;
                     break;
                 } else {
-                    cvector.push(parseFloat(tarray[ia].months[imo]));
+                    cvector.push(parseFloat(tarray[ia].values[imo]));
                 }
             }
             if (iskip === true) continue;
             carray.push(cvector);
             var aktyear = tarray[ia].year;
             var md5pointer = md5(JSON.stringify(cvector));
+
             md5pointers[md5pointer] = aktyear;
             var objstring = cvector[cvector.length - 1].toString();
             objstrings[objstring] = aktyear;
@@ -1023,14 +1056,32 @@
             // year wird label, 12 Monate werden die Werte
             var datasets = [];
             var labels = [];
-            for (var imon = 0; imon < 12; imon++) {
-                labels.push("M" + ("00" + (imon + 1)).slice(-2));
+            var vlen = tarray[0].values.length;
+            if (vlen === 12) {
+                for (var imon = 0; imon < vlen; imon++) {
+                    labels.push("M" + ("00" + (imon + 1)).slice(-2));
+                }
+            } else {
+                for (var imon = 0; imon < vlen; imon++) {
+                    labels.push("T" + ("000" + (imon + 1)).slice(-3));
+                }
             }
+
             var rowvalues = [];
             for (var ielem = 0; ielem < clusters[icluster].length; ielem++) {
                 var md5pointer = md5(JSON.stringify(clusters[icluster][ielem]));
                 var rowlabel = md5pointers[md5pointer];
-                rowvalues = stationrecord[selvariablename].years[rowlabel];
+                // rowvalues = stationrecord[selvariablename].years[rowlabel];
+                // rowvalues = matrix1.data[rowlabel];
+                // rowvalues = stationrecord.years[rowlabel];  // wäre ein String
+                var year = rowlabel;
+                for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
+                    if (year === matrix1.rowheaders[iyear]) {
+                        rowvalues = matrix1.data[iyear];
+                        break;
+                    }
+                }
+
                 datasets.push({
                     label: rowlabel,
                     backgroundColor: '#00FFFF',
@@ -1067,7 +1118,7 @@
             var clusterheader = "Cluster:" + (icluster + 1);
             clusterheader += " " + selsource;
             clusterheader += " " + stationrecord.stationid;
-            clusterheader += " " + stationrecord.name;
+            clusterheader += " " + stationrecord.stationname;
             var config = {
                 type: 'line',
                 data: {
@@ -1105,31 +1156,45 @@
         var metacluster = []; // n cluster mit 12 Monatswerten
         datasets = [];
         labels = [];
-        for (var imon = 0; imon < 12; imon++) {
-            labels.push("M" + ("00" + (imon + 1)).slice(-2));
+        var vlen = tarray[0].values.length;
+        if (vlen === 12) {
+            for (var imon = 0; imon < vlen; imon++) {
+                labels.push("M" + ("00" + (imon + 1)).slice(-2));
+            }
+        } else {
+            for (var imon = 0; imon < vlen; imon++) {
+                labels.push("T" + ("000" + (imon + 1)).slice(-3));
+            }
         }
+
         var yearsounds = [];
         var clusteravgs = [];
-
         for (var icluster = 0; icluster < clusters.length; icluster++) {
-            var monsum = new Array(12).fill(0.0);
-            var moncount = new Array(12).fill(0);
+            var monsum = new Array(vlen).fill(0.0);
+            var moncount = new Array(vlen).fill(0);
             for (var ielem = 0; ielem < clusters[icluster].length; ielem++) {
                 var md5pointer = md5(JSON.stringify(clusters[icluster][ielem]));
                 var year = md5pointers[md5pointer];
-                var rowvalues = stationrecord[selvariablename].years[year];
+                var rowvalues = [];
+                for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
+                    if (year === matrix1.rowheaders[iyear]) {
+                        rowvalues = matrix1.data[iyear];
+                        break;
+                    }
+                }
                 yearsounds.push([year, icluster]);
-                for (var imon = 0; imon < 12; imon++) {
+                for (var imon = 0; imon < vlen; imon++) {
                     if (rowvalues[imon] !== null) {
                         monsum[imon] += parseFloat(rowvalues[imon]);
                         moncount[imon]++;
                     }
                 }
             }
-            var avgvalues = new Array(12).fill(0);
+
+            var avgvalues = new Array(vlen).fill(0);
             var avgsum = 0;
             var avgcount = 0;
-            for (var imo = 0; imo < 12; imo++) {
+            for (var imo = 0; imo < vlen; imo++) {
                 if (moncount[imo] > 0) {
                     avgvalues[imo] = monsum[imo] / moncount[imo];
                     avgsum += monsum[imo];
@@ -1194,8 +1259,9 @@
         // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
         var clusterheader = "Meta-Cluster ";
         clusterheader += " " + selsource;
+        clusterheader += " " + stationrecord.variable;
         clusterheader += " " + stationrecord.stationid;
-        clusterheader += " " + stationrecord.name;
+        clusterheader += " " + stationrecord.stationname;
         clusterheader += " " + stationrecord.anzyears;
         clusterheader += " von:" + stationrecord.fromyear;
         clusterheader += " bis:" + stationrecord.toyear;
@@ -1607,7 +1673,7 @@
         var bucketheader = "Buckets:";
         bucketheader += " " + selsource;
         bucketheader += " " + stationrecord.stationid;
-        bucketheader += " " + stationrecord.name;
+        bucketheader += " " + stationrecord.stationname;
         var config = {
             type: 'line',
             data: {
@@ -1817,17 +1883,17 @@
                     } else {
                         cfakt = (Math.abs(gradient)) / 5;
                     }
-                    gcolor = kli9020fun.percentagetohsl(cfakt * 1, 160, 200); // blue
+                    gcolor = kla9020fun.percentagetohsl(cfakt * 1, 160, 200); // blue
                 } else if (gradient >= -0.01 && gradient < 0.01) {
                     cfakt = (Math.abs(gradient + 0.01));
-                    gcolor = kli9020fun.percentagetohsl(cfakt, 90, 135); // green
+                    gcolor = kla9020fun.percentagetohsl(cfakt, 90, 135); // green
                 } else {
                     if (gradient > 5) {
                         cfakt = 1;
                     } else {
                         cfakt = (Math.abs(gradient)) / 5;
                     }
-                    gcolor = kli9020fun.percentagetohsl((1 - cfakt), 1, 80); // red mit Kehrwert
+                    gcolor = kla9020fun.percentagetohsl((1 - cfakt), 1, 80); // red mit Kehrwert
                 }
 
 
@@ -1986,17 +2052,17 @@
                 } else {
                     cfakt = (Math.abs(gradient)) / 5;
                 }
-                gcolor = kli9020fun.percentagetohsl(cfakt * 1, 160, 200); // blue
+                gcolor = kla9020fun.percentagetohsl(cfakt * 1, 160, 200); // blue
             } else if (gradient >= -0.01 && gradient < 0.01) {
                 cfakt = (Math.abs(gradient + 0.01));
-                gcolor = kli9020fun.percentagetohsl(cfakt, 90, 135); // green
+                gcolor = kla9020fun.percentagetohsl(cfakt, 90, 135); // green
             } else {
                 if (gradient > 5) {
                     cfakt = 1;
                 } else {
                     cfakt = (Math.abs(gradient)) / 5;
                 }
-                gcolor = kli9020fun.percentagetohsl((1 - cfakt), 1, 80); // red mit Kehrwert
+                gcolor = kla9020fun.percentagetohsl((1 - cfakt), 1, 80); // red mit Kehrwert
             }
 
             $("#" + tableid2)

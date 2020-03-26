@@ -561,6 +561,7 @@
         var variablename = "";
         if (idis1 > 10) {
             variablename = str1.substr(idis1+1, 4);
+            selvariablename = variablename;
         }
         console.log("Station:" + stationid + " from:" + source);
         /*

@@ -19,8 +19,15 @@
       * @param {*} hmatrix - Daten in der speziellen Matrix-Strukur
       */
      var heatmapparms = {};
+     /**
+      * getHeatmap - Heatmap aus Matrix erzeugen und nach Container ausgeben
+      * 1. Prüfen der Daten in Matrix und Default-Setzungen oder Abbruch
+      * 2. Dimensionsparameter auf 400*500-Matrix (maximal)
+      * @param {*} hcontainerid
+      * @param {*} hmatrix
+      * @param {*} callback901
+      */
     kla9020fun.getHeatmap = function (hcontainerid, hmatrix, callback901) {
-        debugger;
         if (typeof hmatrix.data === "undefined" || !Array.isArray(hmatrix.data)) {
             callback901({
                 error: true,
@@ -63,8 +70,6 @@
         }
         anzcols = hmatrix.colheaders.length;
         // Holen der wichtigen Eckparameter
-
-
         var c = document.getElementById(hcontainerid);
         var canvas = document.getElementById(hcontainerid);
         var ctx = c.getContext("2d");
@@ -76,7 +81,6 @@
             "max-width": "500px",
             "max-height": "400px"
         });
-
         canvas.width = 500;
         //canvas.height = 364; //580;
 
@@ -135,7 +139,6 @@
             // rowindexarray[thisyear] = rowindex;
             for (var icol = 0; icol < hmatrix.data[irow].length; icol++) {
                 var  colindex = icol;
-
                 var temperatur = hmatrix.data[irow][icol];
                 if (temperatur === null) continue;
                 ctx.fillStyle = kla9020fun.getcolorstring(temperatur);
