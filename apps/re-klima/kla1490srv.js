@@ -29,17 +29,13 @@
     var fs;
     var sql3inserts = 0;
     var sql3errors = 0;
-
+    var stationdata = [];
 
 
     /**
      * ghcndcomplete - GHCN daily-Aufbereitung
      * Vorgabe ist fullname von ghcnd-stations.txt
-     * damit wird KLISTATIONS fortgeschrieben,
-     * anschliessend werden die entpackten Dateien bearbeitet:
-     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\
-     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\ghcnd-stations.txt
-     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\ => ghcnd_all.tar\ghcnd_all\ghcnd_all => *.dly-Files
+     * damit wird KLISTATIONS fortgeschrieben, die +.dly-Files werden hier NICHT geladen
      * @param {*} gblInfo
      * @param {*} db
      * @param {*} fs
@@ -414,6 +410,87 @@
                 return;
             });
     };
+
+    /**
+     * für alle stationid's aus KLISTATIONS der source die Daten aufbereiten
+     */
+    kla1490srv.ghcndall = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, callback370) {
+        /**
+         * Dateinamen bereitstellen
+         */
+        var fullname = "";
+        if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+            fullname = req.query.fullname;
+        }
+        var source = "";
+        if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+            source = req.query.source;
+        }
+        actsource = source;
+        var stationid = "";
+        if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
+            stationid = req.query.stationid;
+        }
+        var stationids = "";
+        if (req.query && typeof req.query.stationids !== "undefined" && req.query.stationids.length > 0) {
+            stationids = req.query.stationids;
+        }
+        var selyears = "";
+        if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+            selyears = req.query.selyears;
+        }
+        var reqparm = {};
+        reqparm.table = "KLISTATIONS";
+        reqparm.sel = {
+            source: source
+        };
+        reqparm.projection = {
+            source: 1,
+            stationid: 1,
+            temperature: 1
+        };
+        reqparm.sort = [];
+        reqparm.sort.push(
+            ["source", "asc"], ["stationid", "asc"]
+        );
+        sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+            if (ret1.error === true) {
+                var ret = {};
+                ret.message += " keine KLICOUNTRIES:" + ret1.message;
+                ret.countries = {};
+                callback370(null, res, ret);
+                return;
+            } else {
+                if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                    var stationids = [];
+                    for (var irec = 0; irec < ret1.records.length; irec++) {
+                        if (typeof ret1.records[irec].temperature === "undefined" || ret1.records[irec].temperature === null || typeof ret1.records[irec].temperature === "string" && ret1.records[irec].temperature.length === 0) {
+                            stationids.push(ret1.records[irec].stationid);
+                        }
+                    }
+                    reqparm.fullname = fullname;
+                    reqparm.source = source;
+                    reqparm.stationid = stationid;
+                    reqparm.stationids = stationids;
+                    reqparm.years = selyears;
+                    kla1490srv.ghcnddata(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, null, reqparm, res, function (res, ret) {
+                        callback370(null, res, ret);
+                        return;
+                    });
+                } else {
+                    var ret = {};
+                    ret.message += " keine KLICOUNTRIES:" + ret1.message;
+                    ret.countries = {};
+                    callback370(null, res, ret);
+                    return;
+                }
+            }
+        });
+    };
+
+
+
+
     /**
      * get Daily Data for Stations GHCND
      */
@@ -491,10 +568,10 @@
 
     /**
      * ghcnddata - GHCN daily-Aufbereitung Tagesdaten
-     * Vorgabe ist fullname von ghcnd-stations.txt
-     * optional kann eine .dly-Datei vorgegeben sein,
-     * das kann auch abgeleitet werden aus stationid und Suffix .dly
-     * damit wird KLIDATA fortgeschrieben,
+     * Vorgabe ist fullname von ghcnd-stations.txt, ist dies nicht vorgegeben,
+     * dann wird die u.a. Verzeichnishierarchie genutzt für das finden der *.dly-Files
+     * *.dly-Files sind abgeleitet aus stationid und Suffix .dly
+     * Mit diesen Daten wird KLIDATA fortgeschrieben,
      * anschliessend werden die entpackten Dateien bearbeitet:
      * G:\Projekte\klimadaten\IPCC-GHCN-Daily\
      * G:\Projekte\klimadaten\IPCC-GHCN-Daily\ghcnd-stations.txt
@@ -513,158 +590,289 @@
      * @param {*} res
      * returns function (res, ret)
      */
-    kla1490srv.ghcnddata = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, callback390) {
+    var actsource = "";
+    kla1490srv.ghcnddata = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, reqparm, res, callback390) {
         var vglstationid = "";
-        var stationdata = [];
+        stationdata = [];
         async.waterfall([
             function (callback390a) {
                 /**
                  * Dateinamen bereitstellen
                  */
                 var fullname = "";
-                if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
-                    fullname = req.query.fullname;
-                }
                 var source = "";
-                if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
-                    source = req.query.source;
-                }
                 var stationid = "";
-                if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
-                    stationid = req.query.stationid;
-                }
+                var stationids = "";
                 var selyears = "";
-                if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
-                    selyears = req.query.selyears;
+                if (req !== null) {
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    actsource = source;
+                    if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
+                        stationid = req.query.stationid;
+                    }
+                    if (req.query && typeof req.query.stationids !== "undefined" && req.query.stationids.length > 0) {
+                        stationids = req.query.stationids;
+                    }
+
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+                } else {
+                    fullname = reqparm.fullname || "";
+                    source = reqparm.source || "";
+                    stationid = reqparm.stationid || "";
+                    stationids = reqparm.stationids || [];
+                    selyears = reqparm.selyears || "";
                 }
+
+
+
                 var ret = {};
                 ret.source = source;
                 ret.selyears = selyears;
                 ret.stationid = stationid;
-                ret.fullname = fullname;
-                ret.dirname = path.dirname(fullname);
+                ret.stationids = stationids;
+                if (typeof stationids === "undefined" ||
+                    typeof stationids === "string" && stationids.length === 0 ||
+                    Array.isArray(stationids) && stationids.length === 0) {
+                    ret.stationids = [];
+                    ret.stationids.push(stationid);
+                }
+                if (typeof fullname === "undefined" || fullname === null || fullname.length === 0) {
+                    fullname = path.join("G:", "Projekte");
+                    fullname = path.join(fullname, "klimadaten");
+                    fullname = path.join(fullname, "IPCC-GHCN-Daily");
+                    ret.fullname = fullname;
+                    ret.dirname = fullname;
+                } else {
+                    ret.fullname = fullname;
+                    ret.dirname = path.dirname(fullname);
+                }
+                /**
+                 * TODO: Verzeichnisexistenz prüfen, wenn nicht vorhanden,
+                 * dann Suchen in __dirname als root evtl. Daten mit
+                 * __dirname, data, IPCC-GHCN-Daily suchen
+                 */
                 callback390a(null, res, ret);
                 return;
             },
             function (res, ret, callback390d) {
-
+                /**
+                 * TODO: Suchverfahren für <stationid>.dly auf jeder Ebene und in ret.dirname als
+                 * root der hier erfolgenden Suchen
+                 */
+                console.log("Daten-Root:" + ret.dirname);
                 var datapath = path.join(ret.dirname, "ghcnd_all.tar", "ghcnd_all", "ghcnd_all");
-                datapath = path.join(datapath, ret.stationid + ".dly");
-                if (!fs.existsSync(datapath)) {
-                    callback390d("Error", res, {
-                        error: false,
-                        message: datapath + " nicht auf dem Server vorhanden"
-                    });
-                    return;
+                for (var istation = ret.stationids.length - 1; istation > 0; istation--) {
+                    if (ret.stationids[istation] === ret.stationids[istation - 1]) {
+                        ret.stationids.splice(istation, 1);
+                    }
                 }
-                var counter = 0;
-                var dayrecord = {};
-                var linestartts = new Date();
-                var lineendts = 0;
-                var html = "";
-                ret.stations = {};
-                var rl = new LineByLineReader(datapath);
-                var stationnr = 0;
-                // event is emitted after each line
-                rl.on('line', function (line) {
-                    var that = this;
-                    rl.pause();
-                    async.waterfall([
-                            function (callback392a) {
-                                counter++;
-                                dayrecord = {};
-                                // rootschema
-                                for (var i = 0; i < dayschema1.length; i++) {
-                                    var val1 = line.substring(dayschema1[i].von - 1, dayschema1[i].bis).trim();
-                                    var fld1 = dayschema1[i].name;
-                                    dayrecord[fld1] = val1;
-                                }
-                                var ret1 = {
-                                    error: false,
-                                    message: "OK",
-                                    line: line,
-                                    dayrecord: dayrecord
-                                };
-                                callback392a(null, res, ret1);
-                                return;
-                            },
-                            function (res, ret1, callback392b) {
-                                if (vglstationid !== dayrecord.stationid) {
-                                    /**
-                                     * Ausgabe aller monatsbezogenen Tagesdaten der stationid aus stationdata
-                                     */
-                                    if (vglstationid.length > 0) {
-                                        kla1490srv.putstationdata(stationdata, db, async, sys0000sys, res, ret1, function (res, ret1) {
-                                            stationdata = [];
-                                            callback392b(null, res, ret1);
+
+                /**
+                 * Start Loop über stationsid's
+                 */
+                var stationids = ret.stationids;
+                var rootpath = datapath;
+                async.eachSeries(stationids, function (station, nextstation) {
+                        ret.stationid = station;
+                        var datapath = path.join(rootpath, station + ".dly");
+                        console.log(datapath);
+                        async.waterfall([
+                                function (callback360) {
+                                    var found = true;
+                                    try {
+                                        if (!fs.existsSync(datapath)) {
+                                            found = false;
+                                            console.log("Keine Datei für:" + ret.stationid);
+                                            kla1490srv.markstation(ret.source, ret.stationid, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                                //nextstation();
+                                                callback360("Error");
+                                                return;
+                                            });
+                                        } else {
+                                            callback360(null);
+                                            return;
+                                        }
+                                    } catch (err) {
+                                        found = false;
+                                        console.log("Keine Datei für:" + ret.stationid + " " + err);
+                                        console.log(err.stack);
+                                        kla1490srv.markstation(ret.source, ret.stationid, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                            //nextstation();
+                                            callback360("Error");
                                             return;
                                         });
-                                    } else {
-                                        callback392b(null, res, ret1);
-                                        return;
                                     }
-                                } else {
-                                    callback392b(null, res, ret1);
-                                    return;
-                                }
-                            },
-                            function (res, ret1, callback392c) {
-                                vglstationid = dayrecord.stationid;
-                                if (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN") {
-                                    // ab 22 kommen 31 Felder für Tageswerte
-                                    var dayarray = [];
-                                    var lastbis = 0;
-                                    /**
-                                     * eigene Satzart für die Daten, wechselnd mit Stationsdaten
-                                     *  10010 709   87   10 Jan Mayen            NORWAY        19212011  541921    1  287
-                                     *1921  -44  -71  -68  -43   -8   22   47   58   27  -20  -21  -40
-                                     *1922   -9  -17  -62  -37  -16   29   48   63   27   -2  -38  -26
-                                     * Erkennungsregel: 4 Stellen numerisch vorne => Datensatz dat4schema
-                                     */
-                                    // console.log(JSON.stringify(dayrecord));
-                                    dayrecord.days = [];
-                                    // Tage holen 8 = 5 + 1 + 1 + 1
-                                    var ivon = 22 - 1;
-                                    for (var iday = 0; iday < 31; iday++) {
-                                        var idis = ivon + iday * 8; // startet mit 0!
-                                        if ((idis + 8) <= line.length) {
-                                            var value;
-                                            // console.log(line.substr(idis, 8).replace(/ /g,"."));
-                                            value = line.substr(idis, 5).trim();
-                                            if (value === "9999" || value === "-9999") {
-                                                value = null;
-                                            } else {
-                                                var len = value.length;
-                                                value = value.substr(0, len - 1) + "." + value.substr(len - 1, 1);
-                                            }
-                                            dayrecord.days[iday] = value;
+                                },
+                                function (callback361) {
+                                    console.log(" ist auf dem Server vorhanden");
+                                    var counter = 0;
+                                    var dayrecord = {};
+                                    var linestartts = new Date();
+                                    var lineendts = 0;
+                                    var html = "";
+                                    var rl;
+                                    try {
+                                        rl = new LineByLineReader(datapath);
+                                    } catch (err) {
+                                        console.log("Keine Datei für:" + ret.stationid);
+                                        kla1490srv.markstation(ret.source, ret.stationid, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                            //nextstation();
+                                            callback361("Error");
+                                            return;
+                                        });
+                                    }
+                                    var stationnr = 0;
+                                    // event is emitted after each line
+                                    rl.on('line', function (line) {
+                                        var that = this;
+                                        rl.pause();
+                                        async.waterfall([
+                                                function (callback392a) {
+                                                    counter++;
+                                                    dayrecord = {};
+                                                    // rootschema
+                                                    for (var i = 0; i < dayschema1.length; i++) {
+                                                        var val1 = line.substring(dayschema1[i].von - 1, dayschema1[i].bis).trim();
+                                                        var fld1 = dayschema1[i].name;
+                                                        dayrecord[fld1] = val1;
+                                                    }
+                                                    // Ergänzen Überlebenswerte
+                                                    dayrecord.source = actsource;
+                                                    var ret1 = {
+                                                        error: false,
+                                                        message: "OK",
+                                                        line: line,
+                                                        dayrecord: dayrecord
+                                                    };
+                                                    callback392a(null, res, ret1);
+                                                    return;
+                                                },
+                                                function (res, ret1, callback392b) {
+                                                    if (vglstationid !== dayrecord.stationid) {
+                                                        /**
+                                                         * Ausgabe aller monatsbezogenen Tagesdaten der stationid aus stationdata
+                                                         */
+                                                        if (vglstationid.length > 0 && stationdata.length > 0) {
+                                                            kla1490srv.putstationdata(stationdata, db, async, sys0000sys, res, ret1, function (res, ret1) {
+                                                                stationdata = [];
+                                                                callback392b(null, res, ret1);
+                                                                return;
+                                                            });
+                                                        } else {
+                                                            callback392b(null, res, ret1);
+                                                            return;
+                                                        }
+                                                    } else {
+                                                        callback392b(null, res, ret1);
+                                                        return;
+                                                    }
+                                                },
+                                                function (res, ret1, callback392c) {
+                                                    vglstationid = dayrecord.stationid;
+                                                    if (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN") {
+                                                        // ab 22 kommen 31 Felder für Tageswerte
+                                                        var dayarray = [];
+                                                        var lastbis = 0;
+                                                        /**
+                                                         * eigene Satzart für die Daten, wechselnd mit Stationsdaten
+                                                         *  10010 709   87   10 Jan Mayen            NORWAY        19212011  541921    1  287
+                                                         *1921  -44  -71  -68  -43   -8   22   47   58   27  -20  -21  -40
+                                                         *1922   -9  -17  -62  -37  -16   29   48   63   27   -2  -38  -26
+                                                         * Erkennungsregel: 4 Stellen numerisch vorne => Datensatz dat4schema
+                                                         */
+                                                        // console.log(JSON.stringify(dayrecord));
+                                                        dayrecord.days = [];
+                                                        // Tage holen 8 = 5 + 1 + 1 + 1
+                                                        var ivon = 22 - 1;
+                                                        for (var iday = 0; iday < 31; iday++) {
+                                                            var idis = ivon + iday * 8; // startet mit 0!
+                                                            if ((idis + 8) <= line.length) {
+                                                                var value;
+                                                                // console.log(line.substr(idis, 8).replace(/ /g,"."));
+                                                                value = line.substr(idis, 5).trim();
+                                                                if (value === "9999" || value === "-9999") {
+                                                                    value = null;
+                                                                } else {
+                                                                    var len = value.length;
+                                                                    value = value.substr(0, len - 1) + "." + value.substr(len - 1, 1);
+                                                                }
+                                                                dayrecord.days[iday] = value;
+                                                            }
+                                                        }
+                                                        stationdata.push(dayrecord);
+                                                    }
+                                                    // callback390d("Finish", res, ret);
+                                                    callback392c("Finish", res, ret);
+                                                    //rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                                                    return;
+                                                }
+                                            ],
+                                            function (error, res, ret) {
+                                                rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                                            });
+                                    });
+                                    // end - line-by-line davor war es close
+                                    rl.on('end', function (line) {
+                                        /**
+                                         * Letzter Gruppenwechsel
+                                         * Ausgabe aller Tagesdaten der stationid aus stationdata
+                                         */
+                                        if (stationdata.length > 0) {
+                                            kla1490srv.putstationdata(stationdata, db, async, sys0000sys, res, ret, function (res, ret1) {
+                                                console.log('Total lines : ' + counter);
+                                                var varcount = Object.keys(ret1.outrecs.variables).length;
+                                                if (varcount === 0) {
+                                                    ret.error = true;
+                                                    ret.message += " KLISTATION:" + ret1.outrecs.stationid + " hat kein TMIN und TMAX";
+                                                } else {
+                                                    ret.error = false;
+                                                    ret.message += " KLISTATION:" + counter;
+                                                }
+                                                stationdata = [];
+                                                callback361("Finish");
+                                                //nextstation();
+                                                return;
+                                            });
+                                        } else {
+                                            ret.error = true;
+                                            ret.message += " KLISTATION:" + station + " hat kein TMIN und TMAX";
+                                            console.log("KLISTATION:" + station + " hat kein TMIN und TMAX");
+                                            kla1490srv.markstation(actsource, station, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                                stationdata = [];
+                                                callback361("Error");
+                                                //nextstation();
+                                                return;
+                                            });
                                         }
-                                    }
-                                    stationdata.push(dayrecord);
+                                    });
                                 }
-                                // callback390d("Finish", res, ret);
-                                callback392c("Finish", res, ret);
-                                //rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                            ],
+                            function (error, result) {
+                                /**
+                                 * Ende Async über eine Datei
+                                 */
+                                nextstation();
                                 return;
                             }
-                        ],
-                        function (error, res, ret) {
-                            rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                        );
+                    },
+                    function (error) {
+                        /**
+                         * Ende Loop über stationsid's
+                         */
+                        callback390d("Finish", res, {
+                            error: false,
+                            message: "Alle stationids abgearbeitet"
                         });
-                });
-                // end - line-by-line davor war es close
-                rl.on('end', function (line) {
-                    /**
-                     * Letzter Gruppenwechsel
-                     * Ausgabe aller Tagesdaten der stationid aus stationdata
-                     */
-                    kla1490srv.putstationdata(stationdata, db, async, sys0000sys, res, ret, function (res, ret1) {
-                        console.log('Total lines : ' + counter);
-                        ret.message += " KLISTATION:" + counter;
-                        callback390d("Finish", res, ret1);
                         return;
                     });
-                });
             },
         ], function (error, res, ret) {
             callback390(res, ret);
@@ -728,8 +936,8 @@
                     var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
                     var outrecs = {};
                     outrecs.variables = {};
-                    outrecs.stationid = ret.stationid;
-                    outrecs.source = ret.source;
+                    outrecs.stationid = ret.stationdata[0].stationid;
+                    outrecs.source = ret.stationdata[0].source;
                     for (var irec = 0; irec < ret.stationdata.length; irec++) {
                         var rec = ret.stationdata[irec];
                         if (typeof outrecs.variables[rec.variable] === "undefined") {
@@ -782,6 +990,7 @@
                 },
                 function (res, ret, callback394u) {
                     var varkeys = Object.keys(ret.outrecs.variables);
+                    var actvariables = "";
                     async.eachSeries(varkeys, function (variable, nextrec) {
                             // Hier die Qualitätsparameter berechnen
                             var outrec = ret.outrecs.variables[variable];
@@ -837,6 +1046,8 @@
                                 stationid: ret.outrecs.stationid,
                                 variable: variable
                             };
+                            if (actvariables.length > 0) actvariables += ",";
+                            actvariables += variable;
                             reqparm.updfields = {};
                             reqparm.updfields["$setOnInsert"] = {
                                 source: ret.source,
@@ -856,7 +1067,7 @@
                                 goodyears: goodyears,
                                 years: JSON.stringify(ret.outrecs.variables[variable].years)
                             };
-                           reqparm.table = "KLIDATA";
+                            reqparm.table = "KLIDATA";
                             sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
                                 console.log("KLIDATA-setonerecord:" + ret.outrecs.stationid + " " + variable);
                                 nextrec();
@@ -864,8 +1075,20 @@
                             });
                         },
                         function (error) {
-                            callback394u("error", res, ret);
-                            return;
+                            var thissource = ret.source;
+                            var thisstationid = ret.outrecs.stationid;
+                            var thisvariables = Object.keys(ret.outrecs.variables).join(",");
+                            if (thisvariables.length <= 0) {
+                                thisvariables = "*NONE";
+                            }
+
+                            kla1490srv.markstation(thissource, thisstationid, thisvariables, db, async, sys0000sys, function (ret1) {
+                                callback394u("finish", res, ret);
+                                return;
+                            });
+
+
+
                         });
                 }
             ],
@@ -875,7 +1098,32 @@
             });
     };
 
-
+    /**
+     * markstation - temperature-Feld setzen nach Vorgaben mit tempts
+     * @param {*} msource
+     * @param {*} mstationid
+     * @param {*} mvariables
+     * @param {*} callback380
+     */
+    kla1490srv.markstation = function (msource, mstationid, mvariables, db, async, sys0000sys, callback380) {
+        var reqparm = {};
+        reqparm.selfields = {
+            source: msource,
+            stationid: mstationid
+        };
+        reqparm.updfields = {};
+        var date = new Date();
+        reqparm.updfields["$set"] = {
+            temperature: mvariables,
+            tempts: new Date(date - date.getTimezoneOffset() * 60 * 1000).toISOString()
+        };
+        reqparm.updfields["$setOnInsert"] = {};
+        reqparm.table = "KLISTATIONS";
+        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+            callback380(ret1);
+            return;
+        });
+    };
 
 
 

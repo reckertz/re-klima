@@ -95,12 +95,12 @@ function checkSession(req, res) {
      * der Login erzwungen werden - serverseitig
      */
     var username = "Climate-Expert";
+    sess.username = username;
     var pass = "";
     // Dummy Prüfung des API auf Security Level administrator
     var ischecked = true;
     console.log("GET-session:" + sess.username);
     return false;
-
 }
 
 app.use(cookieParser());
@@ -393,6 +393,33 @@ app.get('/ghcndcomplete', function (req, res) {
 });
 
 
+
+
+/**
+ * ghcndall - für alle stationid's aus KLISTATIONS die Daten auflösen
+ */
+app.get('/ghcndall', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 20 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.ghcndall    (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
 /**
  * ghcnddata - ghcnd *.dly Dateien aus dem Unterverzeichnis laden
  */
@@ -405,7 +432,7 @@ app.get('/ghcnddata', function (req, res) {
         req.setTimeout(parseInt(timeout));
     }
     var rootname = __dirname;
-    kla1490srv.ghcnddata    (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
+    kla1490srv.ghcnddata    (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, null, res, function (res, ret) {
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
         res.writeHead(200, {

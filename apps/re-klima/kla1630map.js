@@ -320,10 +320,10 @@
                                 variablename: starecord.variablename,
                                 starecord: starecord
                             }));
-                            var tourl = "kliheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
+                            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
                                 source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
                             var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima",
-                                "kli1620shm", tourl);
+                                "kla1620shm", tourl);
                             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
                         },
                         /*

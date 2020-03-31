@@ -521,7 +521,6 @@
             allfields: allfields
         };
         db.serialize(function () {
-            db.run("BEGIN");
             async.waterfall([
                 function (callback210) {
                     // Lesen des evtl. vorhandenen Satzes
@@ -930,7 +929,7 @@
                 }
             ], function (error, result) {
                 // hier geht es erst heraus
-                db.run("END");
+                // db.run("BEGIN");   db.run("END");
                 result.message += " " + result.sorparms.table + " finished";
                 ret.endts = new Date();
                 ret.timediff = ret.endts - ret.startts;

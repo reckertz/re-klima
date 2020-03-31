@@ -151,7 +151,7 @@
                     }
                 })
                 .append($("<button/>", {
-                    html: "Sparklines anzeigen",
+                    html: "Sparklines/Periode anzeigen",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -160,6 +160,19 @@
                         evt.preventDefault();
                         // stationrecord - heatworld
                         kla1620shm.paintS(selvariablename, selsource, selstationid, matrix1);
+                    }
+                }))
+
+                .append($("<button/>", {
+                    html: "Sparklines/Jahr anzeigen",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // stationrecord - heatworld
+                        kla1620shm.paintT(selvariablename, selsource, selstationid, matrix1);
                     }
                 }))
 
@@ -456,12 +469,32 @@
                             });
                             return;
                         } else {
-                            sysbase.putMessage("Keine Daten zur Station gefunden", 3);
-                            callbackshm1("Error", {
-                                error: true,
-                                message: "Keine Daten gefunden"
-                            });
-                            return;
+                            /**
+                             * Abfrage, ob Daten geladen werden sollen
+                             */
+                            var qmsg = "Für Station:" + selstationid + " aus " + selsource;
+                            qmsg += " und " + selvariablename;
+                            qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                            var check = window.confirm(qmsg);
+                            if (check === false) {
+                                sysbase.putMessage("Keine Daten zur Station gefunden", 3);
+                                callbackshm1("Error", {
+                                    error: true,
+                                    message: "Keine Daten gefunden",
+                                });
+                                return;
+                            } else {
+                                kla1620shm.loadstationdata(selstationid, selsource, sqlStmt, function (ret, record) {
+                                    sysbase.putMessage("Daten geladen und bereitgestellt", 1);
+                                    console.log("loadstationdata fertig:" + ret.message);
+                                    callbackshm1(null, {
+                                        error: ret.error,
+                                        message: ret.message,
+                                        record: ret.record
+                                    });
+                                    return;
+                                });
+                            }
                         }
                     });
                 },
@@ -543,7 +576,7 @@
                 },
                 function (ret, callbackshm2) {
                     // hier muss die matrix1-Struktur übergeben werden
-                    kla1620shm.paintS(selvariablename, selsource, selstationid, ret.matrix);
+                    kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
                     callbackshm2("Finish", {
                         error: false,
                         message: "Heatmap ausgegeben"
@@ -556,6 +589,94 @@
                 return;
             });
     };
+
+    /**
+     * loadstationdata - Laden der Rohdaten nach SQLite und Bereitstellen Datensatz
+     * @param {*} stationid  - identifiziert die Staion
+     * @param {*} source - Datenquelle zur Selektion
+     * @param {*} sqlStmt  - SQL-SELECT, um den geforderten Satz zu holen, wiederholt den Zugriff
+     * vor dem Laden der Daten
+     * returns callbackshm8 mit ret, record, wenn Record gefunden wurde nach dem Aufruf Laden
+     */
+    kla1620shm.loadstationdata = function (stationid, source, sqlStmt, callbackshm8) {
+
+        async.waterfall([
+                function (callbackshm8a) {
+                    var ghcnclock = kla1620shm.showclock("#kla1620shmclock");
+                    var that = this;
+                    $(that).attr("disabled", true);
+                    var jqxhr = $.ajax({
+                        method: "GET",
+                        crossDomain: false,
+                        url: sysbase.getServer("ghcnddata"),
+                        data: {
+                            timeout: 10 * 60 * 1000,
+                            source: source,
+                            stationid: stationid
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        clearInterval(ghcnclock);
+                        sysbase.checkSessionLogin(r1);
+                        var ret1 = JSON.parse(r1);
+                        sysbase.putMessage(ret1.message, 1);
+                        if (ret1.error === true) {
+                            callbackshm8a ("Error", {
+                                error: ret1.error,
+                                message: ret1.message
+                            });
+                            return;
+                        } else {
+                            callbackshm8a (null, {
+                                error: ret1.error,
+                                message: ret1.message
+                            });
+                            return;
+                        }
+                    }).fail(function (err) {
+                        clearInterval(ghcnclock);
+                        //$("#kli1400raw_rightwdata").empty();
+                        //document.getElementById("kli1400raw").style.cursor = "default";
+                        sysbase.putMessage("ghcnddata:" + err, 3);
+                        callbackshm8a ("Error", {
+                            error: true,
+                            message: err
+                        });
+                        return;
+                    }).always(function () {
+                        // nope
+                        $(that).attr("disabled", false);
+                    });
+                },
+                function (ret, callbackshm8b) {
+                    uihelper.getOneRecord(sqlStmt, "", "getonerecord", "KLIDATA", function (ret) {
+                        if (ret.error === false && ret.record !== null) {
+                            /*
+                            intern wird getallsqlrecords gerufen und EIN Satz in record zurückgegeben.
+                            */
+                            stationrecord = ret.record;
+                            callbackshm8b("Finish", {
+                                error: false,
+                                message: "Daten gefunden",
+                                record: ret.record
+                            });
+                            return;
+                        } else {
+                            callbackshm8b ("Error", {
+                                error: true,
+                                message: ret.message
+                            });
+                            return;
+                        }
+                    });
+                }
+            ],
+            function (error, result) {
+                callbackshm8 (result);
+                return;
+            });
+    };
+
+
 
     /**
      * paintS - Sparklines für Monate Gesamt = alle Jahre
@@ -582,11 +703,10 @@
                 return 1;
             return 0;
         });
+        var anzyears = tarray.length;
 
         $("#kla1620shmwrapper").empty();
         var h = $("#heatmap").height();
-
-        var anzyears = tarray.length;
         var w = $("#kla1620shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
@@ -841,6 +961,292 @@
     }; // ende paintS
 
 
+
+    /**
+     * paintT - Sparklines Matrix "as is" also per row
+     * - Randauszählung der Zuordnungen zu Grad Celsius je Jahr
+     * - Regressionsanalyse je Zeile
+     */
+    kla1620shm.paintT = function (selvariablename, selsource, selstationid, matrix) {
+        /**
+         * Aufbau des Rahmens für die Einzelgraphiken
+         * tarray[i] mit year und values[]
+         * colheaders direkt nutzbar
+         */
+        var years = matrix.data;
+        var tarray = [];
+        for (var year in years) {
+            if (years.hasOwnProperty(year)) {
+                tarray.push({
+                    year: matrix1.rowheaders[year],
+                    values: years[year]
+                });
+            }
+        }
+        tarray.sort(function (a, b) {
+            if (a.year < b.year)
+                return -1;
+            if (a.year > b.year)
+                return 1;
+            return 0;
+        });
+        var anzyears = tarray.length;
+
+        $("#kla1620shmwrapper").empty();
+        var h = $("#heatmap").height();
+        var w = $("#kla1620shm.content").width();
+        w -= $("#heatmap").position().left;
+        w -= $("#heatmap").width();
+        w -= 40;
+        $("#kla1620shmwrapper").css({
+            overflow: "hidden",
+            height: h,
+            width: w
+        });
+
+        $("#kla1620shmwrapper")
+            .append($("<div/>", {
+                    css: {
+                        height: h,
+                        width: w,
+                        overflow: "auto"
+                    }
+                })
+                .append($("<table/>", {
+                        class: "tablesorter",
+                        id: "kla1620shmt1",
+                        css: {
+                            "max-width": w + "px"
+                        }
+                    })
+                    .append($("<thead/>")
+                        .append($("<tr/>")
+                            .append($("<th/>", {
+                                html: "Mon"
+                            }))
+                            .append($("<th/>", {
+                                html: "Sparkline mit Regressionsgerade"
+                            }))
+                            .append($("<th/>", {
+                                html: "m"
+                            }))
+                            .append($("<th/>", {
+                                html: "c"
+                            })).append($("<th/>", {
+                                html: "r2"
+                            }))
+                            .append($("<th/>", {
+                                html: "min"
+                            }))
+                            .append($("<th/>", {
+                                html: "max"
+                            }))
+                        )
+                    )
+                    .append($("<tbody/>"))
+                )
+            );
+        /**
+         * jeder Monat über alle Jahre eine Sparkline
+         */
+        var pcount = 0;
+        var lvalue = tarray[0].values.length;
+        if (lvalue > 365) lvalue = 365; // kleine Vereinfachung
+        // Iteration über Zeilen = Jahre
+        for (var iarray = 0; iarray < tarray.length; iarray++) {
+
+            var monindex = ivalue;
+            pcount++;
+            var sparkid = '#spark' + pcount;
+            var pearls = [];
+            var regarray = [];
+            var miny = null;
+            var maxy = null;
+            // Iteration über Werte, je Monat/je Tag/ ...
+            for (var ivalue = 0; ivalue < lvalue; ivalue++) {
+                // Iterate values
+                var x = ivalue; // hier: laufende Periode im Jahr parseInt(tarray[iarray].year);
+                var y;
+                var temperatur = tarray[iarray].values[ivalue];
+                if (temperatur === null) {
+                    pearls.push(null);
+                    y = null;
+                } else {
+                    pearls.push(parseFloat(temperatur));
+                    y = parseFloat(temperatur);
+                    if (miny === null) {
+                        miny = y;
+                    } else if (y < miny) {
+                        miny = y;
+                    }
+                    if (maxy === null) {
+                        maxy = y;
+                    } else if (y > maxy) {
+                        maxy = y;
+                    }
+                }
+                // Transformation von x und y
+                //y = y + 273.15;  // Kelvin
+                // x = iarray + 1; // hier wird numeriert, nicht die Jahreszahl verwendet, oben ist das Jahr
+                regarray.push([x, y]);
+            }
+            var minyv = miny;
+            var maxyv = maxy;
+            var result = null;
+            var gradient = null;
+            var yIntercept = null;
+            var r2 = null;
+            if (miny !== null && maxy !== null) {
+                result = regression.linear(regarray);
+                gradient = result.equation[0].toFixed(2);
+                yIntercept = result.equation[1].toFixed(2);
+                r2 = result.r2.toFixed(2);
+                minyv = minyv.toFixed(2);
+                maxyv = maxyv.toFixed(2);
+            }
+            // Regression https://github.com/Tom-Alexander/regression-js
+            // rowtit noch verfeinern für spezielle Termine, wie Tag/Nachtgleiche etc.
+            var rowtit = tarray[iarray].year;
+
+            $("#kla1620shmt1")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: rowtit
+                    }))
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'spark' + pcount,
+                            css: {
+                                margin: "5px",
+                                float: "left"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'reg' + pcount,
+                            html: gradient,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'reg' + pcount,
+                            html: yIntercept,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'reg' + pcount,
+                            html: r2,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'min' + pcount,
+                            html: minyv,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+
+                    .append($("<td/>", {
+
+                        })
+                        .append($("<span/>", {
+                            id: 'max' + pcount,
+                            html: maxyv,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+
+
+                );
+
+            /**
+             * Regressionsgerade berechnen und einblenden
+             * return [m, c] aus y = mx + c; basierend auf regarray.push([x, y]);
+             */
+            var linarray = [];
+            var newpearls = [];
+            var isigvals = 0;
+            if (result !== null) {
+                for (var ilin = 0; ilin < regarray.length; ilin++) {
+                    var newx = regarray[ilin][0];
+                    var newp = result.predict(newx);
+                    var newy = newp[1].toFixed(2);
+                    var y = newp[1];
+                    if (miny === null && y !== null) {
+                        miny = y;
+                    } else if (y !== null && y < miny) {
+                        miny = y;
+                    }
+                    if (maxy === null && y !== null) {
+                        maxy = y;
+                    } else if (y !== null && y > maxy) {
+                        maxy = y;
+                    }
+                    linarray.push([newx, newy]);
+                    newpearls.push(newy);
+                }
+            }
+            // $(sparkid).sparkline(pearls);
+            var defaultpixel = 3;
+            if (pearls.length > 350) defaultpixel = 2;
+            $(sparkid).sparkline(pearls, {
+                type: 'line',
+                /* height: 60, */
+                fillColor: false,
+                defaultPixelsPerValue: defaultpixel,
+                chartRangeMin: miny,
+                chartRangeMax: maxy,
+                lineColor: "blue"
+                /* composite: true */
+            });
+            if (result !== null) {
+                $(sparkid).sparkline(newpearls, {
+                    type: 'line',
+                    /* height: 60, */
+                    fillColor: false,
+                    defaultPixelsPerValue: defaultpixel,
+                    chartRangeMin: miny,
+                    chartRangeMax: maxy,
+                    lineColor: "red",
+                    composite: true
+                });
+            }
+
+        }
+        $(".tablesorter").tablesorter({
+            theme: "blue",
+            /* widgets: ['filter'], */
+            widthFixed: false,
+            widgetOptions: {
+                filter_hideFilters: false,
+                filter_ignoreCase: true
+            }
+        }); // so funktioniert es
+
+    }; // ende paintS
+
+
     /**
      * paintChart - mit chartJS wird eine Gesamtgraphik ausgegeben
      * mit Skalierung etc.
@@ -853,10 +1259,10 @@
         var tarray = [];
         for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
 
-                tarray.push({
-                    year: matrix1.rowheaders[iyear],
-                    months: matrix.data[iyear]
-                });
+            tarray.push({
+                year: matrix1.rowheaders[iyear],
+                months: matrix.data[iyear]
+            });
 
         }
 

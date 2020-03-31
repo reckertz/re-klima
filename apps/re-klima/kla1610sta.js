@@ -388,6 +388,7 @@
                         }))
                         */
                         .append($("<button/>", {
+                            id: "kla1610staliste",
                             css: {
                                 float: "left",
                                 "margin": "10px"
@@ -455,6 +456,117 @@
                                 }
                             }
                         }))
+
+
+                        .append($("<button/>", {
+                            css: {
+                                float: "left",
+                                "margin": "10px"
+                            },
+                            html: "Übernahme (aus der Liste)",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
+                                var stationarray = [];
+                                var stationids = [];
+                                var test = $("#kla1610sta").find(".col2of2").find("tbody tr:visible");
+                                $("#kla1610sta").find(".col2of2").find("tbody tr:visible").each(function (index, row) {
+                                    var stationid = $(row).attr("rowid");
+                                    var sitename = $(row).find("td:nth-child(2)").html(); //
+                                    var longitude = $(row).find("td:nth-child(8)").text();
+                                    var latitude = $(row).find("td:nth-child(9)").text();
+                                    stationids.push(stationid);
+                                    stationarray.push({
+                                        stationid: stationid,
+                                        sitename: sitename,
+                                        longitude: parseFloat(longitude),
+                                        latitude: parseFloat(latitude)
+                                    });
+                                });
+                                if (stationarray.length === 0) {
+                                    sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
+                                    return;
+                                } else {
+                                    var source = $("#kla1610stasource").val();    //   $(this).closest("tr").find('td:first-child').text();
+                                    var ghcnclock = kla1610sta.showclock("#kla1610stalock");
+                                    var that = this;
+                                    $(that).attr("disabled", true);
+                                    var jqxhr = $.ajax({
+                                        method: "GET",
+                                        crossDomain: false,
+                                        url: sysbase.getServer("ghcnddata"),
+                                        data: {
+                                            timeout: 10 * 60 * 1000,
+                                            source: source,
+                                            stationids: stationids
+                                        }
+                                    }).done(function (r1, textStatus, jqXHR) {
+                                        clearInterval(ghcnclock);
+                                        sysbase.checkSessionLogin(r1);
+                                        var ret = JSON.parse(r1);
+                                        sysbase.putMessage(ret.message, 1);
+                                        $("#kla1610staliste").click();
+                                        return;
+                                    }).fail(function (err) {
+                                        clearInterval(ghcnclock);
+                                        //$("#kli1400raw_rightwdata").empty();
+                                        //document.getElementById("kli1400raw").style.cursor = "default";
+                                        sysbase.putMessage("ghcnddata:" + err, 3);
+                                        return;
+                                    }).always(function () {
+                                        // nope
+                                        $(that).attr("disabled", false);
+                                    });
+                                }
+                            }
+                        }))
+
+
+
+                        .append($("<button/>", {
+                            css: {
+                                float: "left",
+                                "margin": "10px"
+                            },
+                            html: "Übernahme (alle)",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                    var source = $("#kla1610stasource").val();    //   $(this).closest("tr").find('td:first-child').text();
+                                    var ghcnclock = kla1610sta.showclock("#kla1610stalock");
+                                    var that = this;
+                                    debugger;
+                                    $(that).attr("disabled", true);
+                                    var jqxhr = $.ajax({
+                                        method: "GET",
+                                        crossDomain: false,
+                                        url: sysbase.getServer("ghcndall"),
+                                        data: {
+                                            timeout: 10 * 60 * 1000,
+                                            source: source
+                                        }
+                                    }).done(function (r1, textStatus, jqXHR) {
+                                        clearInterval(ghcnclock);
+                                        sysbase.checkSessionLogin(r1);
+                                        var ret = JSON.parse(r1);
+                                        sysbase.putMessage(ret.message, 1);
+                                        $("#kla1610staliste").click();
+                                        return;
+                                    }).fail(function (err) {
+                                        clearInterval(ghcnclock);
+                                        //$("#kli1400raw_rightwdata").empty();
+                                        //document.getElementById("kli1400raw").style.cursor = "default";
+                                        sysbase.putMessage("ghcnddata:" + err, 3);
+                                        return;
+                                    }).always(function () {
+                                        // nope
+                                        $(that).attr("disabled", false);
+                                    });
+
+                            }
+                        }))
+
+
+
 
                         .append($("<button/>", {
                             html: "Batch-Analyse",
@@ -584,7 +696,8 @@
             }));
             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
-            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima", "kla1620shm", tourl);
+            var tabname =variablename + " " + stationname;
+            var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1620shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         } else if (source === "ECAD") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
@@ -695,6 +808,7 @@
         sqlStmt += "SELECT ";
         sqlStmt += "KLISTATIONS.source, KLISTATIONS.stationid, stationname, ";
         sqlStmt += "region, subregion, countryname, ";
+        sqlStmt += " temperature,";
         sqlStmt += "lats, longitude, latitude, height, ";
         sqlStmt += "KLIDATA.variable, ";
         sqlStmt += "KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear";
@@ -815,6 +929,11 @@
                             record.station = record.stationid;
                             record.station += " " + record.variable || "" + " ";
                             record.station += "<br>" + record.stationname;
+                            if (typeof record.temperature === "undefined" || record.temperature ===null) {
+                                record.station += "*unknown";
+                            } else {
+                                record.station += " " + record.temperature;
+                            }
                             record.station += "<br>";
                             record.station += "<img src='/images/icons-png/arrow-u-black.png'";
                             record.station += " title='Upload *.dly'";
@@ -917,6 +1036,9 @@
             sysbase.checkSessionLogin(r1);
             var ret = JSON.parse(r1);
             sysbase.putMessage(ret.message, 1);
+
+            $("#kla1610staliste").click();
+
             return;
         }).fail(function (err) {
             clearInterval(ghcnclock);
