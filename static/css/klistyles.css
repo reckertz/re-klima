@@ -1,8 +1,8 @@
 /*
- bei 600px gibt es einen Breakpoint, 
- der die Imagemap entweder als richtige Imagemap mit Klickflächen darstellen lässt 
- oder als Bild mit einer Beschreibungsliste. 
- Bei Betrachtung am Desktop und Verkleinerung des Browserfensters muss die Seite neu geladen werden, 
+ bei 600px gibt es einen Breakpoint,
+ der die Imagemap entweder als richtige Imagemap mit Klickflächen darstellen lässt
+ oder als Bild mit einer Beschreibungsliste.
+ Bei Betrachtung am Desktop und Verkleinerung des Browserfensters muss die Seite neu geladen werden,
  es findet kein neu initiieren durch einen resize/orientationchange Event statt.
  https://www.mediaevent.de/css/media-queries.html
 
@@ -319,7 +319,7 @@ span .uietext  {
     margin-bottom: 5px;
     display: inline;
     zoom: 1;
-    
+
     vertical-align: middle;
     margin-left: 20px;
     */
@@ -333,8 +333,13 @@ span .uietext  {
 
 
 
-.uieform .uiearea {
-    font-size: 1em;
+.uiearea {
+    font-size: large !important;
+    display: block;
+    margin-bottom: 0.8em;
+    margin-top: 0.5em;
+    border: 1px solid #000;
+    padding: 0.3em;
 }
 
 

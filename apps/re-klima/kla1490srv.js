@@ -1301,6 +1301,7 @@
                      */
                     var source = "GHCND";
                     var stationid = "";
+                    var stationids = [];
                     var variable = "TMAX,TMIN"; // Default
 
                     if (req.query && typeof req.query.source !== "undefined") {
@@ -1308,6 +1309,9 @@
                     }
                     if (req.query && typeof req.query.stationid !== "undefined") {
                         stationid = req.query.stationid;
+                    }
+                    if (req.query && typeof req.query.stationids !== "undefined") {
+                        stationids = req.query.stationids;
                     }
                     if (req.query && typeof req.query.variable !== "undefined") {
                         variable = req.query.variable;
@@ -1320,7 +1324,10 @@
                     selstmt += " source, stationid, variable";
                     selstmt += " FROM KLIDATA";
                     selstmt += " WHERE source = '" + source + "'";
-                    if (stationid.length > 0) {
+                    if (stationids.length > 0) {
+                        var sliste = stationids.length ? "'" + stationids.join("','") + "'" : "";
+                        selstmt += " AND stationid IN (" + sliste + ")";
+                    } else if (stationid.length > 0) {
                         selstmt += " AND stationid = '" + stationid + "'";
                     }
                     var keys = variable.split(",");
@@ -1486,7 +1493,7 @@
                     ret.erg.regtottmax = tmax;
                     ret.erg.regtottcount = tcount;
                     if (tcount === 0) tcount = 1;
-                    ret.erg.regtottavg = (tsum / tcount).toFixed(2);
+                    ret.erg.regtottavg = (tsum / tcount);
                     callbackb2(null, res, ret);
                     return;
                 },

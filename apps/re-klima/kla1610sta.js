@@ -534,7 +534,6 @@
                                     var source = $("#kla1610stasource").val();    //   $(this).closest("tr").find('td:first-child').text();
                                     var ghcnclock = kla1610sta.showclock("#kla1610stalock");
                                     var that = this;
-                                    debugger;
                                     $(that).attr("disabled", true);
                                     var jqxhr = $.ajax({
                                         method: "GET",
@@ -650,6 +649,83 @@
                                 });
                             }
                         }))
+
+
+                        .append($("<button/>", {
+                            css: {
+                                float: "left",
+                                "margin": "10px"
+                            },
+                            html: "Regression (aus der Liste)",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
+                                var stationarray = [];
+                                var stationids = [];
+                                var test = $("#kla1610sta").find(".col2of2").find("tbody tr:visible");
+                                $("#kla1610sta").find(".col2of2").find("tbody tr:visible").each(function (index, row) {
+                                    var stationid = $(row).attr("rowid");
+                                    var source = $(row).find("td:nth-child(1)").html(); //
+                                    var sitename = $(row).find("td:nth-child(2)").html(); //
+                                    var longitude = $(row).find("td:nth-child(8)").text();
+                                    var latitude = $(row).find("td:nth-child(9)").text();
+                                    stationids.push(stationid);
+                                    stationarray.push({
+                                        source: source,
+                                        stationid: stationid,
+                                        sitename: sitename
+                                    });
+                                });
+                                if (stationarray.length === 0) {
+                                    // nur stationid, wenn vorgegeben
+                                    var stationid = $("#kla1610stastationid").val();
+                                    var source = $("#kla1610stasource").val();
+                                    stationids.push(stationid);
+                                    stationarray.push({
+                                        source: source,
+                                        stationid: stationid
+                                    });
+
+                                }
+                                if (stationarray.length === 0) {
+                                    sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
+                                    return;
+                                } else {
+                                    var source = $("#kla1610stasource").val();    //   $(this).closest("tr").find('td:first-child').text();
+                                    var ghcnclock = kla1610sta.showclock("#kla1610stalock");
+                                    var that = this;
+                                    $(that).attr("disabled", true);
+                                    var jqxhr = $.ajax({
+                                        method: "GET",
+                                        crossDomain: false,
+                                        url: sysbase.getServer("batchreg"),
+                                        data: {
+                                            timeout: 10 * 60 * 1000,
+                                            source: source,
+                                            stationids: stationids
+                                        }
+                                    }).done(function (r1, textStatus, jqXHR) {
+                                        clearInterval(ghcnclock);
+                                        sysbase.checkSessionLogin(r1);
+                                        var ret = JSON.parse(r1);
+                                        sysbase.putMessage(ret.message, 1);
+                                        $("#kla1610staliste").click();
+                                        return;
+                                    }).fail(function (err) {
+                                        clearInterval(ghcnclock);
+                                        //$("#kli1400raw_rightwdata").empty();
+                                        //document.getElementById("kli1400raw").style.cursor = "default";
+                                        sysbase.putMessage("ghcnddata:" + err, 3);
+                                        return;
+                                    }).always(function () {
+                                        // nope
+                                        $(that).attr("disabled", false);
+                                    });
+                                }
+                            }
+                        }))
+
+
 
                     );
             }
@@ -810,7 +886,7 @@
         sqlStmt += "lats, longitude, latitude, height, ";
         sqlStmt += "KLIDATA.variable, ";
         sqlStmt += "KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear,";
-        sqlStmt += "KLIDATA.regtotm,KLIDATA.regtottmin, KLIDATA.regtottmax";
+        sqlStmt += "KLIDATA.regtotm,KLIDATA.regtottmin, KLIDATA.regtottmax, KLIDATA.regtottavg";
         // sqlStmt += "anzyears, realyears, fromyear, toyear";
         sqlStmt += " FROM " + table;
 
@@ -883,6 +959,7 @@
                             width: "8%",
                             align: "center"
                         },
+
                         longitude: {
                             title: "lon",
                             width: "8%",
@@ -904,17 +981,20 @@
                             align: "center"
                         },
                         minreg: {
-                            title: "min(m)",
+                            title: "min(t)",
                             width: "8%",
                             align: "center"
                         },
                         maxreg: {
-                            title: "max(m)",
+                            title: "max(t)",
+                            width: "8%",
+                            align: "center"
+                        },
+                        avgreg: {
+                            title: "avg(t)",
                             width: "8%",
                             align: "center"
                         }
-
-
                     };
                     stationrecords = ret.records;
                     //stationrecords.source = ret.rsource;
@@ -925,37 +1005,47 @@
                             var record = ret.records[property];
                             delete record._id;
                             var rowid = record.stationid; // "key" + irow;
-                            record.station = record.stationid;
-                            record.station += " " + record.variable || "" + " ";
-                            record.station += "<br>" + record.stationname;
+                            var reprecord = {};
+                            reprecord.source = record.source;
+                            reprecord.station = record.stationid;
+                            reprecord.station += " " + record.variable || "" + " ";
+                            reprecord.station += "<br>" + record.stationname;
                             if (typeof record.temperature === "undefined" || record.temperature ===null) {
-                                record.station += "*unknown";
+                                reprecord.station += "*unknown";
                             } else {
-                                record.station += " " + record.temperature;
+                                reprecord.station += " " + record.temperature;
                             }
-                            record.station += "<br>";
-                            record.station += "<img src='/images/icons-png/arrow-u-black.png'";
-                            record.station += " title='Upload *.dly'";
-                            record.station += " class='kla1610staupl'>";
+                            reprecord.station += "<br>";
+                            reprecord.station += "<img src='/images/icons-png/arrow-u-black.png'";
+                            reprecord.station += " title='Upload *.dly'";
+                            reprecord.station += " class='kla1610staupl'>";
                             stationarray[record.stationid] = record.stationname;
                             //delete record.stationid;
                             //delete record.name;
-                            record.region += "<br>";
-                            record.region += record.subregion;
-                            record.region += "<br>";
-                            record.region += record.countryname;
-                            delete record.subregion;
-                            delete record.countryname;
-                            delete record.lats;
-                            record.regtotm = "";
-                            record.regtotmin = "";
-                            record.regtotmax = "";
+                            reprecord.region += "<br>";
+                            reprecord.region += record.subregion;
+                            reprecord.region += "<br>";
+                            reprecord.region += record.countryname;
+
+                            reprecord.anzyears = record.anzyears;
+                            reprecord.realyears = record.realyears;
+                            reprecord.fromyear = record.fromyear;
+                            reprecord.toyear = record.toyear;
+                            reprecord.longitude = record.longitude;
+                            reprecord.latitude = record.latitude;
+                            reprecord.height = record.height;
+                            debugger;
+                            reprecord.regression = "";
+                            reprecord.regtottmin = "";
+                            reprecord.regtottmax = "";
+                            reprecord.regtottavg = "";
                             try {
-                                record.regression = record.regtotm || "";
-                                record.minreg = record.regtotmin || "";
-                                record.maxreg = record.regtotmax || "";
+                                reprecord.regression = record.regtotm || "";
+                                reprecord.minreg = record.regtottmin || "";
+                                reprecord.maxreg = record.regtottmax || "";
+                                reprecord.avgreg = record.regtottavg.toFixed(2) || "";
                             } catch (err) {}
-                            var line = uihelper.transformJSON2TableTR(record, irow, stationformat, rowid, "kla1610staid tablesorter-ignoreRow");
+                            var line = uihelper.transformJSON2TableTR(reprecord, irow, stationformat, rowid, "kla1610staid tablesorter-ignoreRow");
                             htmltable += line;
                             irow++;
                         }

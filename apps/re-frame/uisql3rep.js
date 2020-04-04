@@ -36,6 +36,15 @@
                         cols: 70,
                         default: "",
                         io: "i"
+                    },
+                    comment: {
+                        title: "Kommentar",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiearea",
+                        rows: 2,
+                        cols: 70,
+                        default: "",
+                        io: "i"
                     }
                 }
             }
@@ -216,6 +225,7 @@
                                 };
                                 updfields["$set"] = {
                                     sel: sel,
+                                    comment: selrecord.seldata.comment,
                                     username: uihelper.getUsername()
                                 };
                                 var selfields = {

@@ -595,7 +595,7 @@
                 function (res, ret, callback210a) {
                     // optional CREATE TABLE
                     if (ret.createTable === false) {
-                        callback210a(null, ret, ret);
+                        callback210a(null, res, ret);
                         return;
                     }
                     /*
@@ -691,7 +691,7 @@
                             var fieldtype = typeof ret.sorparms.allfields[fieldname];
                             mycache.tables[acttable][fieldname] = fieldtype;
                         }
-                        callback210c(null, ret, ret);
+                        callback210c(null, res, ret);
                         return;
                     } else {
                         // hier wird es ernst
@@ -711,11 +711,11 @@
                                         mycache.tables[acttable][name] = type;
                                     }
                                 }
-                                callback210c(null, ret, ret);
+                                callback210c(null, res, ret);
                                 return;
                             });
                         } else {
-                            callback210c(null, ret, ret);
+                            callback210c(null, res, ret);
                             return;
                         }
                     }
@@ -773,7 +773,7 @@
                 function (res, ret, callback210i) {
                     // optional INSERT
                     if (ret.insert === false) {
-                        callback210i(null, ret, ret);
+                        callback210i(null, res, ret);
                         return;
                     }
                     /*
@@ -827,7 +827,7 @@
                 function (res, ret, callback210u) {
                     // optional UPDATE
                     if (ret.update === false) {
-                        callback210u(null, ret, ret);
+                        callback210u(null, res, ret);
                         return;
                     }
                     /**
@@ -850,8 +850,11 @@
                     var baserecord = ret.sorparms.updfields["$set"];
                     /**
                      * Ein Vergleich auf sifnifikante Updates kann hier vorgenommen werden
+                     * alte Felder gegen neue und neue Felder an sich müssen Update auslösen
                      */
                     var isigcount = 0;
+                    var idelcount = 0;
+
                     for (var property in baserecord) {
                         if (baserecord.hasOwnProperty(property)) {
                             var ptype = typeof baserecord[property];
@@ -861,11 +864,15 @@
                                     isigcount++;
                                 } else {
                                     delete baserecord[property];
+                                    idelcount++;
                                 }
                             }
                         }
                     }
-                    if (isigcount === 0) {
+                    var newkeys = Object.keys(baserecord);
+                    // bisher isigcount === 0
+                    // Hinweis tsserverupd zählt nicht, daher < 2 ist zu wenig
+                    if (newkeys.length < 2) {
                         ret.message += " " + ret.sorparms.table + " kein update notwendig";
                         callback210u(null, res, ret);
                         return;
