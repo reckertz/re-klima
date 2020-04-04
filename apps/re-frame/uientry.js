@@ -250,7 +250,7 @@
 
 
         /**
-         * generisches Event für das Zufügen von Zeilen 
+         * generisches Event für das Zufügen von Zeilen
          */
         $(document).on("click", ".addUITableRow", function () {
 
@@ -375,7 +375,7 @@
      * Generierung des UI für ein JSON-Schema
      * @param {*} schema - JSON-Schema
      * @param {*} container - UI-Container im DOM
-     * returns ret mit superoptions 
+     * returns ret mit superoptions
      */
 
     uientry.getSchemaUI = function (bctype, schema, pageprefix, containerID, callback) {
@@ -478,7 +478,7 @@
                                 class: "ui-field-contain",
                                 width: "95%"
                             })
-                        
+
                      */
                     var uietype = "text";
                     if (epfield.customclasses.indexOf("password") >= 0) {
@@ -510,6 +510,8 @@
                         $("#" + pageprefix + epfield.name).attr("size", epfield.size);
                     }
                 } else if (epfield.type === "string" && epfield.class === "uiearea") {
+                    var rows = epfield.rows || 5;
+                    var cols = epfield.cols || 50;
                     $(containerHash)
                         .append($('<div/>', {
                                 class: "ui-field-contain",
@@ -525,6 +527,8 @@
                                 class: "uiearea" + " " + epfield.customclasses,
                                 bctype: bctype,
                                 type: epfield.type,
+                                rows: rows,
+                                cols: cols,
                                 "data-mini": true
                             }))
                         );
@@ -779,7 +783,7 @@
                                 .append($("<h3/>",{
                                     text: epfield.title
                                 }));
-                    
+
                             var w = $("#" + pageprefix + "tmp" + " h3:first").outerWidth();
                             */
                     if (typeof epfield.customclasses !== "undefined" && epfield.customclasses.indexOf("col1of1") >= 0 && epfield.customclasses.indexOf("separator") >= 0) {
@@ -945,7 +949,7 @@
     /**
      * Spezielle UI generierung für arrays mit/ohne Daten
      * die table an sich mit thead und tbody kommt oben
-     * es sind tr und th sowie tr und td zu ergänzen 
+     * es sind tr und th sowie tr und td zu ergänzen
      * strukturen sind in sich unproblematisch
      * schema bezieht sich auf die items
      * containerID bezieht sich auf table mit thead und tbody
@@ -1005,7 +1009,7 @@
                         value: "true"
                     }))
                 );
-            // id in td ist nicht unique bei mehreren tr, 
+            // id in td ist nicht unique bei mehreren tr,
             // daher: Verzicht und nur mit name arbeiten
             // und     id: pageprefix + epfieldname, entfernt
             var epfieldstruct = epfields[irow];
@@ -1384,11 +1388,11 @@
     };
 
     /**
-     * Die UI-Inhalte werden nach record übernommen, 
-     * schema wird "zur Sicherheit" schon mal mitgegeben, 
+     * Die UI-Inhalte werden nach record übernommen,
+     * schema wird "zur Sicherheit" schon mal mitgegeben,
      * aber noch nicht angewendet
-     * @param {*} containerID 
-     * @param {*} record 
+     * @param {*} containerID
+     * @param {*} record
      * returns record
      */
     uientry.fromUI2Record = function (xcontainerID, record, schema) {
@@ -1404,7 +1408,6 @@
         suchstr += containerID + " select,";
         suchstr += containerID + " span,";
         suchstr += containerID + " textarea";
-
         $(suchstr).each(function (key, value) {
             //console.log(this.tagName + "/" + this.type + ":" + this.name + " key:" + key +  "/" + this.value + " index:" + this.index);
             var msg = "";
@@ -1413,6 +1416,7 @@
             if (typeof this.name !== "undefined" && (this.tagName === "TEXTAREA" || this.tagName === "textarea")) {
                 msg += " type:" + this.type;
                 msg += " value:" + this.value;
+
                 found = true;
                 vektor.push({
                     name: this.name,
@@ -1560,8 +1564,8 @@
                 }
             }
         });
-        // Arrays säubern von null-Elementen - 
-        // Problem, dass eine Zeile gelöscht wird beim Füllen mit Mustersatz 
+        // Arrays säubern von null-Elementen -
+        // Problem, dass eine Zeile gelöscht wird beim Füllen mit Mustersatz
         // in der ersten Zeile
         record = cleanArrays(record);
         return record;
@@ -1571,7 +1575,7 @@
         /**
          * container bezieht sich auf DOM und ist jQuery-Objekt
          * record kann auch ein Ausschnitt sein, bei CFEPOOL ist das data
-         * schema - muss nicht unbedingt 
+         * schema - muss nicht unbedingt
          * je Array gibt es in html-table eine leerzeile, diese wird verwendet
          */
         resmsg = "";
@@ -1586,7 +1590,7 @@
     };
 
     function iterateJSON2DOM(container, obj, schema) {
-        // schema wird hier nicht wirklich genutzt, es müsste sonst rekursiv verfeinert werden, 
+        // schema wird hier nicht wirklich genutzt, es müsste sonst rekursiv verfeinert werden,
         // wie das auch für obj geschieht, es ist also auf das UI zuzugreifen
         // dort müssen alle Felder vom Prinzip schon definiert sein, daher auch
         // der Trick mit Zeile 0 als Musterzeile in Arrays
@@ -1787,7 +1791,7 @@
     }
 
     /**
-     * inputDialogX - baut Popup ohne jQuery Mobile auf und callback mit ret mit error, message und "record" 
+     * inputDialogX - baut Popup ohne jQuery Mobile auf und callback mit ret mit error, message und "record"
      * das input-form wird mit uientry gebildet, das Ergebnis als "record" zurückgegeben mit isConfirmed
      * zur Bestätigung oder Invalidierung
      * @param {*} container    - Container im Dom aus formalen Gründen
@@ -1796,7 +1800,7 @@
      * @param {*} schema        - schema für uientry
      * @param {*} record        - record für uientry, Ausgangswerte
      * @param {*} callback        - callback
-     * uientry.getSchemaUI("cfeKto120", schema, "cfeKto120", "cfeKto120entrypanel", function (ret) {                         
+     * uientry.getSchemaUI("cfeKto120", schema, "cfeKto120", "cfeKto120entrypanel", function (ret) {
      * uientry.fromRecord2UI($("#cfeKto120entrypanel"), record, schema);
      * outrec = uientry.fromUI2Record("#cfeAdr700entrypanel", outrec, schema);
      * callback gibt ret zurück mit error, message und record mit den Eingabeergebnissen

@@ -1,4 +1,4 @@
-/*jshint evil: true */ 
+/*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
 /*global sysbase,uihelper */
 (function () {
@@ -42,13 +42,13 @@
         $(".tabbodies").width("100%");
         sysbase.tabcreateiframe("SQLite3", "", "re-frame", "uisql3");
         sysbase.tabcreateiframe("Schlüsselverz", "", "re-frame", "syspool");
-        
-        var idc = sysbase.tabcreateiframe("SQLite3", "", "re-frame", "uisql3");
+
+        var idc = sysbase.tabcreateiframe("SQLite3-Rep", "", "re-frame", "uisql3rep");
         window.parent.$(".tablinks[idhash='#" + idc + "']").click();
-                
+
         var idc1 = sysbase.tabcreateiframe("Klima-Rohdaten", "", "re-klima", "kla1400raw");
-        window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
-        
+        //window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
+
         /* sysbase.initFooter(); */
         // uientry.init();
 
@@ -88,7 +88,7 @@
                 text: "Stationen",
                 app: "re-klima",
                 module: "kli1610sta"
-            }, 
+            },
             {
                 id: "admin0020",
                 text: "netCDF Albedo",
@@ -148,7 +148,7 @@
                     )
                 );
         }
-        
+
         for (var men in sysmenu) {
             if (sysmenu.hasOwnProperty(men)) {
                 var rolemenu = sysmenu[men];
@@ -183,7 +183,7 @@
                 } else {
                     eval(exec);
                 }
-                
+
             } else {
                 var idcode = sysbase.tabcreateiframe(title, "", app, module);
                 $(".tablinks[idhash='#" + idcode + "']").click();

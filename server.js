@@ -21,6 +21,11 @@ var stream = require("stream");
 // gblInfo
 var StreamZip = require("node-stream-zip");
 
+var csv = require("fast-csv");
+
+var regression = require("./static/lib/regression.js");
+var uihelper = require("re-frame/uihelper.js");
+
 // DB expressions
 var sqlite3 = require('sqlite3').verbose();
 // var db = new sqlite3.Database('klidata.db3');
@@ -39,7 +44,33 @@ db.get("PRAGMA page_size", function(err, page) {
 });
 db.get("PRAGMA index_list('KLISTATIONS')", function(err, indexlist) {
     console.log("index_list KLISTATIONS:" + JSON.stringify(indexlist) + " " + err);
+    if (typeof indexlist === "object") {
+        var indexname = indexlist.name;
+        db.all("PRAGMA index_info('" + indexname + "')", function(err, indexfields) {
+            console.log("index_info " + indexname + ":" + JSON.stringify(indexfields) + " " + err);
+        });
+    }
 });
+db.get("PRAGMA index_list('KLIDATA')", function(err, indexlist) {
+    console.log("index_list KLIDATA:" + JSON.stringify(indexlist) + " " + err);
+    if (typeof indexlist === "object") {
+        var indexname = indexlist.name;
+        db.all("PRAGMA index_info('" + indexname + "')", function(err, indexfields) {
+            console.log("index_info " + indexname + ":" + JSON.stringify(indexfields) + " " + err);
+        });
+    } else {
+        for (var i2 = 0; i2 < indexlist.length; i2++) {
+            var indexname = indexlist[i2].name;
+            db.get("PRAGMA index_info('" + indexname + "')", function(err, indexfields) {
+                console.log("index_info KLIDATA:" + JSON.stringify(indexfields) + " " + err);
+            });
+        }
+    }
+
+
+
+});
+/*
 db.all("PRAGMA table_info('KLISTATIONS')", function(err, felder) {
     if (typeof felder === "undefined" || felder === null || felder.length === 0) {
         console.log("Tabelle KLISTATIONS nicht vorhanden");
@@ -49,7 +80,7 @@ db.all("PRAGMA table_info('KLISTATIONS')", function(err, felder) {
         }
     }
 });
-
+*/
 var sys0000sys = require("re-frame/sys0000sys.js");
 var kla9020fun = require("re-klima/kla9020fun.js");
 var kla1490srv = require("re-klima/kla1490srv.js");
@@ -108,7 +139,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'static'))); // __dirname is always root verzeichnis #denglisch
 
 /**
- * getsql3tables - API über uihelper.getalltables aufgerufen,
+ * getsql3tables - API - Sammlung der Tabellen einer Datenbank,
  * gleiche Rückgabestruktur - wird spannend
  */
 
@@ -137,6 +168,108 @@ app.get('/getsql3tables', function (req, res) {
                     });
                     res.end(smsg);
                     return;
+                }
+            });
+        });
+    } catch (err) {
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: err.message,
+            records: null
+        }));
+        return;
+    }
+
+});
+
+
+
+/**
+ * getsql3tablesx - API - Sammlung der Tabellen und Felder einer Datenbank,
+ * gleiche Rückgabestruktur - wird spannend
+ */
+
+app.get('/getsql3tablesx', function (req, res) {
+    if (checkSession(req, res)) return;
+    // var cousername = req.query.username;
+    try {
+        var sqlStmt = "SELECT name";
+        sqlStmt += " FROM sqlite_master";
+        sqlStmt += " WHERE type ='table'";
+        sqlStmt += " AND name NOT LIKE 'sqlite_%'";
+        var tabletree = [];
+        var rootobj = {
+            text: "Tabellen",
+            state: {
+                selected: true,
+                opened: true
+            },
+            a_attr: {
+                tablename: "all"
+            },
+            children: []
+        };
+        db.serialize(function () {
+            db.all(sqlStmt, function (err, rows) {
+                var ret = {};
+                if (err) {
+                    ret.error = true;
+                    ret.message = err;
+                } else {
+                    ret.error = false;
+                    ret.message = "Tabellen gefunden:" + rows.length;
+                    ret.records = rows;
+                    async.eachSeries(rows, function (row, nextrow) {
+                        var newobj = {
+                            text: row.name,
+                            state: {
+                                selected: false
+                            },
+                            a_attr: {
+                                tablename: row.name
+                            },
+                            children: []
+                        };
+                        // Satzbeschreibung holen
+                        db.all("PRAGMA table_info('" + row.name + "')", function(err, felder) {
+                            if (typeof felder === "undefined" || felder === null || felder.length === 0) {
+                                console.log("Tabelle " + row.name + " nicht vorhanden");
+                            } else {
+                                for (var ifeld = 0; ifeld < felder.length; ifeld++) {
+                                    var feld = felder[ifeld];
+                                    var newfld = {
+                                        text: feld.name + "(" + feld.type + ")",
+                                        state: {
+                                            selected: false
+                                        },
+                                        a_attr: {
+                                            name: feld.name,
+                                            type: feld.type
+                                        },
+                                        "icon":"jstree-file"
+                                    };
+                                    newobj.children.push(newfld);
+                                }
+                                rootobj.children.push(newobj);
+                                nextrow();
+                            }
+                        });
+                    },
+                    function (error) {
+                        tabletree.push(rootobj);
+                        ret.tabletree = tabletree;
+                        var smsg = JSON.stringify(ret);
+                        res.writeHead(200, {
+                            'Content-Type': 'application/text',
+                            "Access-Control-Allow-Origin": "*"
+                        });
+                        res.end(smsg);
+                        return;
+                    });
                 }
             });
         });
@@ -409,7 +542,33 @@ app.get('/ghcndall', function (req, res) {
     var rootname = __dirname;
     kla1490srv.ghcndall    (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
         // in ret liegen error, message und record
-        var smsg = JSON.stringify(ret);
+        var smsg = "";
+        try {
+            smsg = JSON.stringify(ret);
+        } catch(err) {
+            console.log(err);
+            console.log(err.stack);
+            var keys = Object.keys(ret);
+            var newret = {};
+            newret.message = "";
+            for (var ikey = 0; ikey < keys.length; ikey++) {
+                if (typeof ret[keys[ikey]] === "undefined") {
+
+                } else if (typeof ret[keys[ikey]] !== "object") {
+                    newret[keys[ikey]] = ret[keys[ikey]];
+                } else if (ret[keys[ikey]] === null) {
+                    newret[keys[ikey]] = null;
+                } else {
+                    // kann kritisches Objekt sein
+                    newret[keys[ikey]] = null;
+                    newret.message += " Object:" + keys[ikey] + " evtl. rekursiv";
+                    newret.error = true;
+                }
+            }
+            console.log(JSON.stringify(newret));
+            smsg = JSON.stringify(newret);
+        }
+
         res.writeHead(200, {
             'Content-Type': 'application/text',
             "Access-Control-Allow-Origin": "*"
@@ -446,8 +605,146 @@ app.get('/ghcnddata', function (req, res) {
 
 
 
+/**
+ * batchreg - Regressionsanalyse im Batch mit Filter auf die Stations, wie vorgegeben
+ * in starecord
+ */
+app.get('/batchreg', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default, kann sehr lange dauern, je nach Filtert
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.batchreg(gblInfo, db, async, regression, sys0000sys, uihelper, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
 
 
+
+/**
+ * loadcsvdata csv-Datei nach MongoDB laden gemäß Vorgabe
+ * fullname, filetype, targettable
+ */
+app.post('/loadcsvdata', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var fullname = "";
+    if (req.body && typeof req.body.fullname !== "undefined" && req.body.fullname.length > 0) {
+        fullname = req.body.fullname;
+    }
+
+    var filetype = "";
+    if (req.body && typeof req.body.filetype !== "undefined" && req.body.filetype.length > 0) {
+        filetype = req.body.filetype;
+    }
+
+    var separator = "";
+    if (req.body && typeof req.body.separator !== "undefined" && req.body.separator.length > 0) {
+        separator = req.body.separator;
+        if (separator === "Tab") separator = "\t";
+    }
+
+    var targettable = "";
+    if (req.body && typeof req.body.targettable !== "undefined" && req.body.targettable.length > 0) {
+        targettable = req.body.targettable;
+    }
+
+    var primarykey = "";
+    if (req.body && typeof req.body.primarykey !== "undefined" && req.body.primarykey.length > 0) {
+        primarykey = req.body.primarykey;
+    }
+
+    //var dir = gblInfo.gblUpdatePath;
+    var dir = fullname;
+
+    console.log("loadcsvdata:" + dir);
+    if (!fs.existsSync(dir)) {
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: "Datei nicht gefunden:" + dir
+        }));
+        return;
+    }
+    var counter = 0;
+    if (filetype === "csv mit Header") {
+        var fileschema = "";
+        var fieldarray = [];
+        try {
+            fs.createReadStream(dir)
+                /*
+                .pipe(iconv.decodeStream('iso-8859-15'))
+                .pipe(iconv.encodeStream('utf8'))
+                */
+                .pipe(csv.parse({
+                    headers: true,
+                    delimiter: separator,
+                    /* '\t',  */
+                    ignoreEmpty: true
+                }))
+                .on("data", function (data) {
+                    var that = this;
+                    that.pause();
+                    // data ist ein array der Felder, hier kein Header!!!
+                    counter++;
+                    var record = uihelper.cloneObject(data);
+                    var reqparm = {};
+                    reqparm.selfields = {};
+                    reqparm.selfields[primarykey] = record[primarykey];
+
+                    reqparm.updfields = {};
+                    reqparm.updfields["$setOnInsert"] = {};
+                    reqparm.updfields["$setOnInsert"][primarykey] = record[primarykey];
+
+                    delete record[primarykey];
+                    reqparm.updfields["$set"] = record;
+                    reqparm.table = targettable;
+                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret) {
+                        //console.log("setonerecord-returned:" + JSON.stringify(ret));
+                        that.resume(); // holt den nächsten Satz, auch aus waterfall
+                    });
+                })
+                .on("end", function () {
+                    console.log(">>>done Stream<<<");
+                    var ret = {};
+                    ret.error = false;
+                    ret.message = "Importiert";
+                    ret.filename = dir;
+                    ret.counter = counter;
+                    res.writeHead(200, {
+                        'Content-Type': 'application/text',
+                        "Access-Control-Allow-Origin": "*"
+                    });
+                    res.end(JSON.stringify(ret));
+                    return;
+                });
+        } catch (err) {
+            res.writeHead(200, {
+                'Content-Type': 'application/text',
+                "Access-Control-Allow-Origin": "*"
+            });
+            res.end(JSON.stringify({
+                error: true,
+                message: "Error:" + dir + " " + err
+            }));
+            return;
+        }
+    }
+});
 
 
 

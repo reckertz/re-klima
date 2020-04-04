@@ -195,7 +195,7 @@
      * Dummy
      */
     uihelper.checkSessionLogin = function (ret) {
-            return;
+        return;
     };
 
 
@@ -296,7 +296,7 @@
         } else {
             return iso;
         }
-    }
+    };
 
     /**
      * konvertiert Datumsstring
@@ -1556,24 +1556,80 @@
      *                   die aufrufende Anwendung muss dies aufbereiten
      */
     uihelper.transformJSON2TableTR = function (obj, count, format, rowid, rowclass) {
+        if ($.isEmptyObject(format)) {
+            // Berechnung Default-Format
+            format = {};
+            var keys = Object.keys(obj);
+            for (var ikey = 0; ikey < keys.length; ikey++) {
+                var feldname = keys[ikey];
+                var feldtype = typeof obj[feldname];
+                if (feldname === "number") {
+                    format[feldname] = {
+                        title: feldname,
+                        align: "right"
+                    };
+                } else if (feldname === "boolean") {
+                    format[feldname] = {
+                        title: feldname,
+                        align: "center"
+                    };
+                } else {
+                    format[feldname] = {
+                        title: feldname,
+                        align: "left"
+                    };
+                }
+            }
+        }
+
         if (typeof format.attributes === "undefined") format.attributes = {};
         var objfields = Object.keys(obj);
         var saveattributes = uihelper.cloneObject(format.attributes);
-        delete format.attributes;
+        // delete format.attributes;
         var formatfields = [];
         if (typeof format !== "undefined") formatfields = Object.keys(format);
         if (formatfields.length <= 0) {
             format = {};
             for (var iobjfield = 0; iobjfield < objfields.length; iobjfield++) {
-                format[objfields[iobjfield]] = {
-                    title: objfields[iobjfield]
+                if (objfields[iobjfield] !== "attributes") {
+                    format[objfields[iobjfield]] = {
+                        title: objfields[iobjfield]
+                    };
                 }
             }
         }
-        return transformJSON2TableTRX(obj, count, saveattributes, format, rowid, rowclass);
+        return uihelper.transformJSON2TableTRX(obj, count, saveattributes, format, rowid, rowclass);
     };
 
-    function transformJSON2TableTRX(obj, count, formatattributes, format, rowid, rowclass) {
+    uihelper.transformJSON2TableTRX = function (obj, count, formatattributes, format, rowid, rowclass) {
+        if ($.isEmptyObject(format)) {
+            // Berechnung Default-Format
+            format = {};
+            var keys = Object.keys(obj);
+            for (var ikey = 0; ikey < keys.length; ikey++) {
+                var feldname = keys[ikey];
+                var feldtype = typeof obj[feldname];
+                if (feldname === "number") {
+                    format[feldname] = {
+                        title: feldname,
+                        align: "right"
+                    };
+                } else if (feldname === "boolean") {
+                    format[feldname] = {
+                        title: feldname,
+                        align: "center"
+                    };
+                } else {
+                    format[feldname] = {
+                        title: feldname,
+                        align: "left"
+                    };
+                }
+            }
+        }
+
+
+
         var header = "";
         var line = "";
         var res = "";
@@ -1636,27 +1692,33 @@
                             if (format[property].align) {
                                 attrs.push(" align='" + format[property].align + "'");
                             }
-                        } else if (typ === "number") {
-                            attrs.push("align='right'");
-                            cont = wrt;
-                        } else if (!isNaN(wrt)) {
-                            attrs.push("align='right'");
-                            cont = wrt;
-                        } else {
-                            if (wrt.length <= 3) {
-                                attrs.push("align='center'");
-                            } else {}
-                            cont = wrt;
+                            if (typ === "number") {
+                                attrs.push("align='right'");
+                                cont = wrt;
+                                if (!isNaN(wrt)) {
+                                    attrs.push("align='right'");
+                                    cont = wrt;
+                                } else if (wrt.length <= 3) {
+                                    attrs.push("align='center'");
+                                    cont = wrt;
+                                } else {
+                                    cont = wrt;
+                                }
+                            }
                         }
-                    }
-                    if (format && typeof format[property] !== "undefined" &&
-                        format[property].linkclass && format[property].linkclass.length > 0) {
-                        attrs.push("class=" + format[property].linkclass);
-                    }
-                    if (typeof format[property] !== "undefined" && typeof format[property].css !== "undefined") {
-                        var cssstring = JSON.stringify(format[property].css);
-                        cssstring = cssstring.substr(1, cssstring.length - 2);
-                        attrs.push(" style='" + cssstring + "'");
+                        if (format && typeof format[property] !== "undefined" &&
+                            format[property].linkclass && format[property].linkclass.length > 0) {
+                            attrs.push("class=" + format[property].linkclass);
+                        }
+                        if (typeof format[property] !== "undefined" && typeof format[property].css !== "undefined") {
+                            var cssstring = JSON.stringify(format[property].css);
+                            cssstring = cssstring.substr(1, cssstring.length - 2);
+                            attrs.push(" style='" + cssstring + "'");
+                        }
+                        if (format && typeof format[property] !== "undefined" &&
+                            format[property].name && format[property].name.length > 0) {
+                            attrs.push("name=" + format[property].name);
+                        }
                     }
                 }
                 line += "<td";
@@ -1679,13 +1741,19 @@
             if (typeof rowclass !== "undefined" && rowclass.length > 0) {
                 rowattr += " class='" + rowclass + "'";
             }
+
+            if (typeof formatattributes.largetable !== "undefined" && formatattributes.largetable === true) {
+                if (count > 100) {
+                    rowattr += " style='display: none;'";
+                }
+            }
             res += "<tr" + rowattr + ">" + line + "</tr>";
         } catch (err) {
             res += "***ERROR***" + err + " " + err.stack;
-            console.log (err + " " + err.stack);
+            console.log(err + " " + err.stack);
         }
         return res;
-    }
+    };
 
     uihelper.normalizeString = function (instring) {
         /**

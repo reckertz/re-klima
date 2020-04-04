@@ -453,35 +453,63 @@
         reqparm.sort.push(
             ["source", "asc"], ["stationid", "asc"]
         );
+        /**
+         * Reparatur
+         */
+        reqparm = {};
+        reqparm.table = "";
+        reqparm.sel = "SELECT source, stationid, variable, count(*) AS ZAHL FROM KLIDATA ";
+        reqparm.sel += " GROUP BY source, stationid, variable";
+        reqparm.sel += " HAVING ZAHL > 1";
+        reqparm.sel += " ORDER BY source, stationid, variable";
+        var korrektur = true;
+
         sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
             if (ret1.error === true) {
                 var ret = {};
-                ret.message += " keine KLICOUNTRIES:" + ret1.message;
+                ret.message += " keine KLISTATIONS:" + ret1.message;
                 ret.countries = {};
-                callback370(null, res, ret);
+                callback370(res, ret);
                 return;
             } else {
                 if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
                     var stationids = [];
+                    var statistik = {
+                        unverarbeitet: 0,
+                        verarbeitet: {}
+                    }
                     for (var irec = 0; irec < ret1.records.length; irec++) {
-                        if (typeof ret1.records[irec].temperature === "undefined" || ret1.records[irec].temperature === null || typeof ret1.records[irec].temperature === "string" && ret1.records[irec].temperature.length === 0) {
+                        if (korrektur === true) {
                             stationids.push(ret1.records[irec].stationid);
+                            statistik.unverarbeitet += 1;
+                        } else if (typeof ret1.records[irec].temperature === "undefined" || ret1.records[irec].temperature === null || typeof ret1.records[irec].temperature === "string" && ret1.records[irec].temperature.length === 0) {
+                            stationids.push(ret1.records[irec].stationid);
+                            statistik.unverarbeitet += 1;
+                        } else {
+                            var status = ret1.records[irec].temperature;
+                            if (typeof statistik.verarbeitet[status] === "undefined") {
+                                statistik.verarbeitet[status] = 0;
+                            } else {
+                                statistik.verarbeitet[status] += 1;
+                            }
                         }
                     }
+                    console.log(JSON.stringify(statistik, null, " "));
                     reqparm.fullname = fullname;
                     reqparm.source = source;
                     reqparm.stationid = stationid;
                     reqparm.stationids = stationids;
                     reqparm.years = selyears;
+                    reqparm.statistik = statistik;
                     kla1490srv.ghcnddata(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, null, reqparm, res, function (res, ret) {
-                        callback370(null, res, ret);
+                        callback370(res, ret);
                         return;
                     });
                 } else {
                     var ret = {};
-                    ret.message += " keine KLICOUNTRIES:" + ret1.message;
+                    ret.message += " keine KLISTATIONS:" + ret1.message;
                     ret.countries = {};
-                    callback370(null, res, ret);
+                    callback370(res, ret);
                     return;
                 }
             }
@@ -629,9 +657,6 @@
                     stationids = reqparm.stationids || [];
                     selyears = reqparm.selyears || "";
                 }
-
-
-
                 var ret = {};
                 ret.source = source;
                 ret.selyears = selyears;
@@ -673,13 +698,16 @@
                         ret.stationids.splice(istation, 1);
                     }
                 }
-
                 /**
                  * Start Loop über stationsid's
                  */
                 var stationids = ret.stationids;
                 var rootpath = datapath;
                 async.eachSeries(stationids, function (station, nextstation) {
+                        if (typeof station === "undefined" || station === null || station.trim().length === 0) {
+                            nextstation();
+                            return;
+                        }
                         ret.stationid = station;
                         var datapath = path.join(rootpath, station + ".dly");
                         console.log(datapath);
@@ -981,12 +1009,20 @@
                     return;
                 },
                 function (res, ret, callback394g) {
-                    // Berechnen der Randauszählungen, noch sind years in JSON
-                    for (var property in ret.outrecs) {
-                        if (ret.outrecs.hasOwnProperty(property)) {}
-                    }
-                    callback394g(null, res, ret);
-                    return;
+                    // Löschen der alten Daten in KLIDATA
+                    var keys = Object.keys(ret.outrecs.variables);
+                    var liste = keys.length ? "'" + keys.join("','") + "'" : "";
+                    db.serialize(function () {
+                        var delstmt = "DELETE FROM KLIDATA";
+                        delstmt += " WHERE source = '" + ret.outrecs.source + "'";
+                        delstmt += " AND stationid = '" + ret.outrecs.stationid + "'";
+                        delstmt += " AND variable  IN (" + liste + ")";
+                        db.run(delstmt, function (err) {
+                            console.log("Row(s) deleted:" + this.changes);
+                            callback394g(null, res, ret);
+                            return;
+                        });
+                    }); // serialize
                 },
                 function (res, ret, callback394u) {
                     var varkeys = Object.keys(ret.outrecs.variables);
@@ -1198,11 +1234,6 @@
     };
 
 
-
-
-
-
-
     /**
      * year gegen Vorgabe prüfen
      * kommaseparierte Vorgaben
@@ -1250,6 +1281,251 @@
             }
         }
         return ifound;
+    };
+
+
+
+    /**
+     * batchreg - Batch-Analyse, Regressionsrechnung, Parameter m Filterung,
+     * Speicherung in Datenbank-Tabelle KLIDATA je source, stationid und variable
+     * Filter erst mal fest vorgeben
+     * returns function (res, ret)
+     */
+
+    kla1490srv.batchreg = function (gblInfo, gbldb, async, regression, sys0000sys, uihelper, req, res, supercallback) {
+
+        async.waterfall([
+                function (callbackba) {
+                    /**
+                     * Vorgabeparameter übernehmen
+                     */
+                    var source = "GHCND";
+                    var stationid = "";
+                    var variable = "TMAX,TMIN"; // Default
+
+                    if (req.query && typeof req.query.source !== "undefined") {
+                        source = req.query.source;
+                    }
+                    if (req.query && typeof req.query.stationid !== "undefined") {
+                        stationid = req.query.stationid;
+                    }
+                    if (req.query && typeof req.query.variable !== "undefined") {
+                        variable = req.query.variable;
+                    }
+
+                    /**
+                     * SQLite3-Selektion aufbauen, Kerndaten in Array
+                     */
+                    var selstmt = "SELECT";
+                    selstmt += " source, stationid, variable";
+                    selstmt += " FROM KLIDATA";
+                    selstmt += " WHERE source = '" + source + "'";
+                    if (stationid.length > 0) {
+                        selstmt += " AND stationid = '" + stationid + "'";
+                    }
+                    var keys = variable.split(",");
+                    var liste = keys.length ? "'" + keys.join("','") + "'" : "";
+                    selstmt += " AND variable IN (" + liste + ")";
+                    selstmt += " ORDER BY source, stationid, variable";
+                    var reqparm = {};
+                    reqparm.sel = selstmt;
+                    reqparm.skip = 0;
+                    reqparm.limit = 0;
+                    sys0000sys.getallrecords(gbldb, async, null, reqparm, res, function (res, ret1) {
+                        if (ret1.error === true) {
+                            callbackba("Error", res, {
+                                error: true,
+                                message: ret1.message
+                            });
+                            return;
+                        } else if (ret1.records === null || ret1.records.length === 0) {
+                            callbackba("Error", res, {
+                                error: true,
+                                message: "Keine Daten gefunden in KLIDATA"
+                            });
+                            return;
+                        } else {
+                            callbackba(null, res, {
+                                error: false,
+                                message: "Daten gefunden in KLIDATA",
+                                records: ret1.records
+                            });
+                            return;
+                        }
+                    });
+                },
+                function (res, ret, callbackba) {
+                    // Loop über alle stations mit variable - record hat source, stationid, variable
+                    var count = 0;
+                    async.eachSeries(ret.records, function (record, nextrecord) {
+                            count++;
+                            kla1490srv.analysis(record, res, ret, gbldb, async, regression, sys0000sys, function (res, ret) {
+                                nextrecord();
+                            });
+                        },
+                        function () {
+                            // Ende-Verarbeitung, Speichern zur Studie "gesamt"?
+                            console.log("End eachseries analysis");
+                            callbackba("finish", res, ret);
+                            return;
+                        });
+                },
+
+            ],
+            function (error, res, ret) {
+                supercallback(res, ret);
+                return;
+            });
+    };
+
+    /**
+     * Analyse für eine Station und eine variable in KLIDATA
+     * res wird nur durchgewunken, kann null sein
+     * ret enthält vorgaben und wird zurückgegeben
+     * die Analyseergebnisse werden fortgeschrieben in KLISTUDIES ???
+     * returns callback res, ret
+     */
+    kla1490srv.analysis = function (selrecord, res, ret, gbldb, async, regression, sys0000sys, callbackb1) {
+        async.waterfall([
+                function (callbackb2) {
+                    /**
+                     * Lesen der temperaturdaten zu source, stationid, variable in selrecord
+                     */
+                    var selstmt = "SELECT * ";
+                    selstmt += " FROM KLIDATA";
+                    selstmt += " WHERE source = '" + selrecord.source + "'";
+                    selstmt += " AND stationid = '" + selrecord.stationid + "'";
+                    selstmt += " AND variable = '" + selrecord.variable + "'";
+                    selstmt += " ORDER BY source, stationid, variable";
+                    var reqparm = {};
+                    reqparm.sel = selstmt;
+                    reqparm.skip = 0;
+                    reqparm.limit = 0;
+                    sys0000sys.getallrecords(gbldb, async, null, reqparm, res, function (res, ret1) {
+                        if (ret1.error === true) {
+                            console.log(ret1.message);
+                            callbackb2("Error", res, {
+                                error: true,
+                                message: ret1.message
+                            });
+                            return;
+                        } else if (ret1.records === null || ret1.records.length === 0) {
+                            console.log("Keine Daten gefunden in KLIDATA");
+                            callbackb2("Error", res, {
+                                error: true,
+                                message: "Keine Daten gefunden in KLIDATA"
+                            });
+                            return;
+                        } else {
+                            console.log("Daten gefunden in KLIDATA:" + selrecord.stationid + " " + selrecord.variable);
+                            callbackb2(null, res, {
+                                error: false,
+                                message: "Daten gefunden in KLIDATA",
+                                record: ret1.records[0]
+                            });
+                            return;
+                        }
+                    });
+                },
+                function (res, ret, callbackb2) {
+                    /**
+                     * Vorbereitung der Daten für vereinfachte Analyse
+                     * nach ret.tarray[year[0..12]]
+                     */
+                    var regarray = []; // array[x, y] mit x = periode, y = temperatur
+                    var record = ret.record;
+                    var yeardata = JSON.parse(ret.record.years);
+                    var xindex = -1;
+                    var tmax = null;
+                    var tmin = null;
+                    var tsum = 0;
+                    var tcount = 0;
+
+                    for (var iyear = parseInt(record.fromyear); iyear <= parseInt(record.toyear); iyear++) {
+                        // Iteration über alle Jahre
+                        if (typeof yeardata["" + iyear] === "undefined") {
+                            // hier kann improvisiert werden, zuerst skip
+                        } else {
+                            var yeary = yeardata["" + iyear];
+                            for (var iday = 0; iday < yeary.length; iday++) {
+                                if (yeary[iday] !== null && yeary[iday].length > 0) {
+                                    xindex++;
+                                    var x = xindex;
+                                    var y = parseFloat(yeary[iday]);
+                                    regarray.push([x, y]);
+                                    if (tmin === null) {
+                                        tmin = y;
+                                    } else if (tmin > y) {
+                                        tmin = y;
+                                    }
+                                    if (tmax === null) {
+                                        tmax = y;
+                                    } else if (tmax < y) {
+                                        tmax = y;
+                                    }
+                                    tsum += y;
+                                    tcount++;
+                                }
+                            }
+                        }
+                    }
+                    /**
+                     * Regression - total-all months
+                     */
+                    ret.regression = {};
+                    ret.regression.total = {};
+
+                    var result = regression.linear(regarray);
+                    ret.erg = {};
+                    ret.erg.regtotfirstyear = ret.record.fromyear;
+                    ret.erg.regtotlastyear = ret.record.toyear;
+                    ret.erg.regtotm = result.equation[0]; // gradient
+                    ret.erg.regtotc = result.equation[1]; // intercept
+                    ret.erg.regtotr2 = result.r2; // determination, Bestimmtheitsmaß
+                    ret.erg.regtottmin = tmin;
+                    ret.erg.regtottmax = tmax;
+                    ret.erg.regtottcount = tcount;
+                    if (tcount === 0) tcount = 1;
+                    ret.erg.regtottavg = (tsum / tcount).toFixed(2);
+                    callbackb2(null, res, ret);
+                    return;
+                },
+
+
+
+                function (res, ret, callbackb2) {
+                    /**
+                     * Ausgabe in Datenbank
+                     */
+                    var record = ret.record;
+
+                    var reqparm = {};
+                    reqparm.selfields = {
+                        source: record.source,
+                        stationid: record.stationid,
+                        variable: record.variable
+                    };
+                    reqparm.updfields = {};
+                    reqparm.updfields["$setOnInsert"] = {
+                        source: record.source,
+                        stationid: record.stationid,
+                        variable: record.variable
+                    };
+                    reqparm.updfields["$set"] = ret.erg;
+                    reqparm.table = "KLIDATA";
+                    console.log("update requested:" + record.stationid + " " + record.variable);
+                    sys0000sys.setonerecord(gbldb, async, null, reqparm, res, function (res, ret) {
+                        //console.log("setonerecord-returned:" + JSON.stringify(ret));
+                        console.log("update finished:" + record.stationid + " " + record.variable);
+                        callbackb2(null, res, ret);
+                        return;
+                    });
+                }
+            ],
+            function (error, res, ret) {
+                callbackb1(res, ret);
+                return;
+            });
     };
 
 

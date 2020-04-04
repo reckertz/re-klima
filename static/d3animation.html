@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script type="text/javascript" src="//d3js.org/d3.v3.js"></script>
+    <link rel="stylesheet" type="text/css" href="/css/result-light.css">
+
+
+    <style id="compiled-css" type="text/css">
+        path {
+            stroke: steelblue;
+            stroke-width: 1;
+            fill: none;
+        }
+    </style>
+
+</head>
+
+<body>
+    <p>
+        <b>Size:</b> 300x30 &nbsp;&nbsp;<b>Interpolation:</b> basis &nbsp;&nbsp;<b>Animation:</b> true &nbsp;&nbsp;<b>Transition:</b> 1000ms &nbsp;&nbsp;<b>Update Frequency:</b> 1000ms
+        <div id="graph1" class="aGraph" style="width:300px; height:30px;"></div>
+        <br>
+        <div id="graph2" class="aGraph" style="width:300px; height:30px;"></div>
+
+
+
+
+    </p>
+
+
+    <!-- TODO: Missing CoffeeScript 2 -->
+
+    <script type="text/javascript">
+        //<![CDATA[
+
+
+        var myTimer;
+
+        function FeedDataToChart(id, width, height, interpolation, animate, updateDelay, transitionDelay, data, startIndex) {
+            // create an SVG element inside the #graph div that fills 100% of the div
+            var graph = d3.select(id).append("svg:svg").attr("width", "500px").attr("height", "400px");
+
+            // X scale will fit values from 0-10 within pixels 0-100
+            var x = d3.scale.linear().domain([0, 48]).range([-5, width]); // starting point is -5 so the first value doesn't show and slides off the edge as part of the transition
+            // Y scale will fit values from 0-10 within pixels 0-100
+            var y = d3.scale.linear().domain([0, 20]).range([0, height]);
+
+            // create a line object that represents the SVN line we're creating
+            var line = d3.svg.line()
+                // assign the X function to plot our line as we wish
+                .x(function (d, i) {
+                    // verbose logging to show what's actually being done
+                    //console.log('Plotting X value for data point: ' + d + ' using index: ' + i + ' to be at: ' + x(i) + ' using our xScale.');
+                    // return the X coordinate where we want to plot this datapoint
+                    return x(i);
+                })
+                .y(function (d) {
+                    // verbose logging to show what's actually being done
+                    //console.log('Plotting Y value for data point: ' + d + ' to be at: ' + y(d) + " using our yScale.");
+                    // return the Y coordinate where we want to plot this datapoint
+                    return y(d);
+                })
+                .interpolate(interpolation)
+
+            var counter = startIndex;
+
+            // display the line by appending an svg:path element with the data line we created above
+            graph.append("svg:path").attr("d", line(data));
+            // or it can be done like this
+            //graph.selectAll("path").data([data]).enter().append("svg:path").attr("d", line);
+
+
+            function redrawWithAnimation() {
+                // update with animation
+                graph.selectAll("path")
+                    .data([data]) // set the new data
+                    .attr("transform", "translate(" + x(1) + ")") // set the transform to the right by x(1) pixels (6 for the scale we've set) to hide the new value
+                    .attr("d", line) // apply the new data values ... but the new value is hidden at this point off the right of the canvas
+                    .transition() // start a transition to bring the new value into view
+                    .ease("linear")
+                    .duration(transitionDelay) // for this demo we want a continual slide so set this to the same as the setInterval amount below
+                    .attr("transform", "translate(" + x(0) + ")"); // animate a slide to the left back to x(0) pixels to reveal the new value
+            }
+
+            function redrawWithoutAnimation() {
+                // static update without animation
+                graph.selectAll("path")
+                    .data([data]) // set the new data
+                    .attr("d", line); // apply the new data values
+            }
+
+            function stopTimer() {
+                clearInterval(myTimer);
+                alert("The redraw timer stop here, get new data from buffer");
+            }
+
+            function startTimer() {
+                if (myTimer == null) {
+                    myTimer = setInterval(function () {
+                        if (counter < data.length - 1) {
+                            var v = data.shift(); // remove the first element of the array
+                            data.push(v); // add a new element to the array (we're just taking the number we just shifted off the front and appending to the end)
+                            if (animate) {
+                                redrawWithAnimation();
+                            } else {
+                                redrawWithoutAnimation();
+                            }
+                            counter++;
+                        } else {
+                            alert("no more data in buffer");
+                            stopTimer();
+                            counter = startIndex;
+                        }
+                    }, updateDelay);
+                }
+            }
+
+            startTimer();
+
+        }
+
+
+        function signalGenerator() {
+            var buffer = new Array(100);
+            var i;
+            for (i = 0; i < buffer.length; i++) {
+                buffer[i] = Math.random() * 10;
+            }
+            FeedDataToChart("#graph1", 300, 300, "basis", true, 100, 100, buffer, 0);
+        }
+
+        function signalGenerator1() {
+            var buffer1 = new Array(100);
+            var i;
+            for (i = 0; i < buffer1.length; i++) {
+                buffer1[i] = Math.random() * 10 + 5;
+            }
+            FeedDataToChart("#graph1", 300, 300, "basis", true, 100, 100, buffer1, 0);
+        }
+
+
+        function startGenerator() {
+            signalGenerator();
+            signalGenerator1();
+            //setInterval("signalGenerator()", 1000);
+        }
+
+        startGenerator();
+
+
+        //]]>
+    </script>
+
+    <script>
+        // tell the embed parent frame the height of the content
+        if (window.parent && window.parent.parent) {
+            window.parent.parent.postMessage(["resultsFrame", {
+                height: document.body.getBoundingClientRect().height,
+                slug: "7RfVG"
+            }], "*")
+        }
+
+        // always overwrite window.name, in case users try to set it manually
+        window.name = "result"
+    </script>
+</body>
+
+</html>

@@ -493,6 +493,7 @@
             ret.error = true;
             ret.message = "setonerecord ERROR:" + "Keine Datenbank übergeben";
             ret.record = null;
+            console.log("ABBRUCH-ERROR-keine Datenbank");
             callbacksor(res, ret);
             return;
         }
@@ -548,7 +549,7 @@
                             // Dickes Problem!!!
                             ret.error = true;
                             ret.message += "WHERE zu komplex:" + JSON.stringify(sel);
-                            callbacksor(res, ret);
+                            callback210("Error", res, ret);
                             return;
                         }
                     }
@@ -908,7 +909,7 @@
                             // Dickes Problem!!!
                             ret.error = true;
                             ret.message = "WHERE zu komplex:" + JSON.stringify(sel);
-                            callbacksor(res, ret);
+                            callback210u("Error", res, ret);
                             return;
                         }
                     }
@@ -927,21 +928,26 @@
                         return;
                     });
                 }
-            ], function (error, result) {
+            ], function (error, res, ret) {
                 // hier geht es erst heraus
                 // db.run("BEGIN");   db.run("END");
-                result.message += " " + result.sorparms.table + " finished";
+                if (typeof error !== "undefined" && error !== null && error === "Error") {
+                    console.log("ABBRUCH-ERROR-final");
+                    callbacksor(res, ret);
+                    return;
+                }
+                ret.message += " " + ret.sorparms.table + " finished";
                 ret.endts = new Date();
                 ret.timediff = ret.endts - ret.startts;
-                if (result.error === true) {
-                    console.log("#" + result.sorcount + ". " + result.message);
+                if (ret.error === true) {
+                    console.log("#" + ret.sorcount + ". " + ret.message);
                 }
                 if (ret.sorcount % 100 === 0) {
                     console.log("#" + ret.sorcount + ". last sor-Time:" + ret.timediff);
                     console.log(JSON.stringify(perftimer.sor, null, ""));
                 }
                 perftimer.sor = {}; // Später müsste hier kumuliert werden
-                callbacksor(res, result);
+                callbacksor(res, ret);
                 return;
             }); // async.waterfall
         }); // db.serialize

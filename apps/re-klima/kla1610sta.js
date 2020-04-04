@@ -565,9 +565,6 @@
                             }
                         }))
 
-
-
-
                         .append($("<button/>", {
                             html: "Batch-Analyse",
                             css: {
@@ -584,7 +581,7 @@
                                 var popschema = {
                                     entryschema: {
                                         refname: {
-                                            title: "Batch-Rechnungen",
+                                            title: "Batch-Regressionsanalyse",
                                             type: "string", // currency, integer, datum, text, key
                                             class: "uietext",
                                             default: "",
@@ -604,9 +601,10 @@
                                 poprecord.refname = starecord.source;
                                 var anchorHash = "#kla1610sta";
                                 var title = "Batch Regressionsanalyse";
+                                /* top: Math.ceil($(this).offset().top + $(this).height() + 20) */
                                 var pos = {
-                                    left: $("#kla1610sta").offset().left,
-                                    top: Math.ceil($(this).offset().top + $(this).height() + 20)
+                                    left: $("#kla1610stat1").offset().left,
+                                    top: screen.height / 2
                                 };
 
                                 $(document).on('popupok', function (evt, extraParam) {
@@ -811,7 +809,8 @@
         sqlStmt += " temperature,";
         sqlStmt += "lats, longitude, latitude, height, ";
         sqlStmt += "KLIDATA.variable, ";
-        sqlStmt += "KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear";
+        sqlStmt += "KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear,";
+        sqlStmt += "KLIDATA.regtotm,KLIDATA.regtottmin, KLIDATA.regtottmax";
         // sqlStmt += "anzyears, realyears, fromyear, toyear";
         sqlStmt += " FROM " + table;
 
@@ -948,36 +947,13 @@
                             delete record.subregion;
                             delete record.countryname;
                             delete record.lats;
+                            record.regtotm = "";
+                            record.regtotmin = "";
+                            record.regtotmax = "";
                             try {
-                                record.regression = record.analysis.tavg.regression.total.m || "";
-                            } catch (err) {}
-                            // "analysis.tavg.regression.mtotal": 1,
-                            record.minreg = "";
-                            record.maxreg = "";
-                            // if (irow < 2) debugger;
-                            try {
-                                if (typeof record.analysis !== "undefined" && typeof record.analysis.tavg !== "undefined" &&
-                                    record.analysis.tavg.regression !== "undefined" && record.analysis.tavg.regression.mtotal !== "undefined") {
-                                    var minreg = null;
-                                    var maxreg = null;
-                                    mtotal = record.analysis.tavg.regression.mtotal;
-                                    for (var imo = 0; imo < Object.keys(mtotal).length; imo++) {
-                                        var mo = "M" + ("00" + (imo + 1)).slice(-2);
-                                        var m = mtotal[mo].m;
-                                        if (minreg === null) {
-                                            minreg = m;
-                                        } else if (m < minreg) {
-                                            minreg = m;
-                                        }
-                                        if (maxreg === null) {
-                                            maxreg = m;
-                                        } else if (m > maxreg) {
-                                            maxreg = m;
-                                        }
-                                    }
-                                    record.minreg = minreg;
-                                    record.maxreg = maxreg;
-                                }
+                                record.regression = record.regtotm || "";
+                                record.minreg = record.regtotmin || "";
+                                record.maxreg = record.regtotmax || "";
                             } catch (err) {}
                             var line = uihelper.transformJSON2TableTR(record, irow, stationformat, rowid, "kla1610staid tablesorter-ignoreRow");
                             htmltable += line;

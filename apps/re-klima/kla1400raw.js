@@ -1712,7 +1712,6 @@
         if (typeof clockcontainer === "string") {
             if (!clockcontainer.startsWith("#")) clockcontainer = "#" + clockcontainer;
         }
-
         if ($('#kliclock', clockcontainer).length === 0) {
             $(clockcontainer)
                 .append($("<span/>", {
@@ -2163,6 +2162,7 @@
                                                             }
                                                         }).done(function (r1, textStatus, jqXHR) {
                                                             clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
                                                             $("#kla1400raw_rightw").empty();
                                                             sysbase.checkSessionLogin(r1);
                                                             var ret = JSON.parse(r1);
