@@ -1352,6 +1352,16 @@
                             });
                             return;
                         } else {
+                            // Dubletten entfernen
+                            var vglrec = JSON.stringify(ret1.records.length - 1);
+                            debugger;
+                            for (var irec = ret1.records.length - 2; irec >= 0; irec++) {
+                                var actrec = JSON.stringify(irec);
+                                if (vglrec === actrec) {
+                                    ret1.records.splice((irec+1),1);
+                                }
+                            }
+                            debugger;
                             callbackba(null, res, {
                                 error: false,
                                 message: "Daten gefunden in KLIDATA",
@@ -1481,13 +1491,18 @@
                      */
                     ret.regression = {};
                     ret.regression.total = {};
-
-                    var result = regression.linear(regarray);
+                    var result;
+                    try {
+                        result = regression.linear(regarray);
+                    } catch(err) {
+                        console.log("Regression-Error:" + err + " zu " + record.stationid + " " + record.variable);
+                    }
                     ret.erg = {};
                     ret.erg.regtotfirstyear = ret.record.fromyear;
                     ret.erg.regtotlastyear = ret.record.toyear;
                     ret.erg.regtotm = result.equation[0]; // gradient
                     ret.erg.regtotc = result.equation[1]; // intercept
+                    ret.erg.string = result.string;
                     ret.erg.regtotr2 = result.r2; // determination, Bestimmtheitsmaß
                     ret.erg.regtottmin = tmin;
                     ret.erg.regtottmax = tmax;

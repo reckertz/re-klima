@@ -1635,6 +1635,7 @@
         var res = "";
         var attrs = [];
         try {
+            delete format.attributes;
             for (var property in format) {
                 if (format.hasOwnProperty(property)) {
                     attrs = [];

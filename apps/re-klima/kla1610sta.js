@@ -565,7 +565,7 @@
                         }))
 
                         .append($("<button/>", {
-                            html: "Batch-Analyse",
+                            html: "Regression (alle)",
                             css: {
                                 float: "left",
                                 margin: "10px"
@@ -1034,7 +1034,6 @@
                             reprecord.longitude = record.longitude;
                             reprecord.latitude = record.latitude;
                             reprecord.height = record.height;
-                            debugger;
                             reprecord.regression = "";
                             reprecord.regtottmin = "";
                             reprecord.regtottmax = "";

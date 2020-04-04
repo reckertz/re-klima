@@ -177,6 +177,18 @@
                 }))
 
                 .append($("<button/>", {
+                    html: "Regression testen",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // stationrecord - heatworld
+                        kla1620shm.paintU(selvariablename, selsource, selstationid, matrix1);
+                    }
+                }))
+                .append($("<button/>", {
                     html: "Chart anzeigen",
                     css: {
                         float: "left",
@@ -620,13 +632,13 @@
                         var ret1 = JSON.parse(r1);
                         sysbase.putMessage(ret1.message, 1);
                         if (ret1.error === true) {
-                            callbackshm8a ("Error", {
+                            callbackshm8a("Error", {
                                 error: ret1.error,
                                 message: ret1.message
                             });
                             return;
                         } else {
-                            callbackshm8a (null, {
+                            callbackshm8a(null, {
                                 error: ret1.error,
                                 message: ret1.message
                             });
@@ -637,7 +649,7 @@
                         //$("#kli1400raw_rightwdata").empty();
                         //document.getElementById("kli1400raw").style.cursor = "default";
                         sysbase.putMessage("ghcnddata:" + err, 3);
-                        callbackshm8a ("Error", {
+                        callbackshm8a("Error", {
                             error: true,
                             message: err
                         });
@@ -661,7 +673,7 @@
                             });
                             return;
                         } else {
-                            callbackshm8b ("Error", {
+                            callbackshm8b("Error", {
                                 error: true,
                                 message: ret.message
                             });
@@ -671,7 +683,7 @@
                 }
             ],
             function (error, result) {
-                callbackshm8 (result);
+                callbackshm8(result);
                 return;
             });
     };
@@ -1054,7 +1066,6 @@
         if (lvalue > 365) lvalue = 365; // kleine Vereinfachung
         // Iteration über Zeilen = Jahre
         for (var iarray = 0; iarray < tarray.length; iarray++) {
-
             var monindex = ivalue;
             pcount++;
             var sparkid = '#spark' + pcount;
@@ -1244,8 +1255,302 @@
             }
         }); // so funktioniert es
 
-    }; // ende paintS
+    }; // ende paintT
 
+
+
+    /**
+     * paintU - Testen der Regression
+     * - Regressionsanalyse je Zeile - concatenierte Werte 1 - Jahre
+     */
+    kla1620shm.paintU = function (selvariablename, selsource, selstationid, matrix) {
+        /**
+         * Aufbau des Rahmens für die Einzelgraphiken
+         * tarray[i] mit year und values[]
+         * colheaders direkt nutzbar
+         */
+        var years = matrix.data;
+        var tarray = [];
+        for (var year in years) {
+            if (years.hasOwnProperty(year)) {
+                tarray.push({
+                    year: matrix1.rowheaders[year],
+                    values: years[year]
+                });
+            }
+        }
+        tarray.sort(function (a, b) {
+            if (a.year < b.year)
+                return -1;
+            if (a.year > b.year)
+                return 1;
+            return 0;
+        });
+        var anzyears = tarray.length;
+
+        $("#kla1620shmwrapper").empty();
+        var h = $("#heatmap").height();
+        var w = $("#kla1620shm.content").width();
+        w -= $("#heatmap").position().left;
+        w -= $("#heatmap").width();
+        w -= 40;
+        $("#kla1620shmwrapper").css({
+            overflow: "hidden",
+            height: h,
+            width: w
+        });
+
+        $("#kla1620shmwrapper")
+            .append($("<div/>", {
+                    css: {
+                        height: h,
+                        width: w,
+                        overflow: "auto"
+                    }
+                })
+                .append($("<table/>", {
+                        class: "tablesorter",
+                        id: "kla1620shmt1",
+                        css: {
+                            "max-width": w + "px"
+                        }
+                    })
+                    .append($("<thead/>")
+                        .append($("<tr/>")
+                            .append($("<th/>", {
+                                html: "Mon"
+                            }))
+                            .append($("<th/>", {
+                                html: "Sparkline mit Regressionsgerade"
+                            }))
+                            .append($("<th/>", {
+                                html: "m"
+                            }))
+                            .append($("<th/>", {
+                                html: "c"
+                            })).append($("<th/>", {
+                                html: "r2"
+                            }))
+                            .append($("<th/>", {
+                                html: "min"
+                            }))
+                            .append($("<th/>", {
+                                html: "max"
+                            }))
+                        )
+                    )
+                    .append($("<tbody/>"))
+                )
+            );
+        /**
+         * jeder Monat über alle Jahre eine Sparkline
+         */
+        var pcount = 0;
+
+        // Iteration über Zeilen = Jahre
+        for (var iarray = 0; iarray < tarray.length; iarray++) {
+            var monindex = ivalue;
+            pcount++;
+            var sparkid = '#spark' + pcount;
+            var pearls = [];
+            var regarray = [];
+            var miny = null;
+            var maxy = null;
+            // Iteration über Werte, je Monat/je Tag/ ...
+            // Iteration über zu aggregierende Jahre
+            for (var itest = 0; itest <= iarray; itest++) {
+                // Werte eines Jahres
+                var lvalue = tarray[itest].values.length; // tarray hat year als String und values als array
+                if (lvalue > 365) lvalue = 365; // kleine Vereinfachung
+                for (var ivalue = 0; ivalue < lvalue; ivalue++) {
+                    // Iterate values
+                    var x = ivalue; // hier: laufende Periode im Jahr parseInt(tarray[iarray].year);
+                    var y;
+                    var temperatur = tarray[itest].values[ivalue];
+                    if (temperatur === null) {
+                        pearls.push(null);
+                        y = null;
+                    } else {
+                        pearls.push(parseFloat(temperatur));
+                        y = parseFloat(temperatur);
+                        if (miny === null) {
+                            miny = y;
+                        } else if (y < miny) {
+                            miny = y;
+                        }
+                        if (maxy === null) {
+                            maxy = y;
+                        } else if (y > maxy) {
+                            maxy = y;
+                        }
+                    }
+                    // Transformation von x und y
+                    //y = y + 273.15;  // Kelvin
+                    // x = iarray + 1; // hier wird numeriert, nicht die Jahreszahl verwendet, oben ist das Jahr
+                    regarray.push([x, y]);
+                }
+            }
+            var minyv = miny;
+            var maxyv = maxy;
+            var result = null;
+            var gradient = null;
+            var yIntercept = null;
+            var r2 = null;
+            var rstring = null;
+            if (miny !== null && maxy !== null) {
+                result = regression.linear(regarray);
+                gradient = result.equation[0].toFixed(2);
+                yIntercept = result.equation[1].toFixed(2);
+                rstring = result.string;
+                r2 = result.r2.toFixed(2);
+                minyv = minyv.toFixed(2);
+                maxyv = maxyv.toFixed(2);
+            }
+            var regmsg = ""+  regarray.length + " Werte von ";
+            regmsg += tarray[0].year + " bis " + tarray[iarray].year;
+            regmsg += " => " + rstring;
+            // Regression https://github.com/Tom-Alexander/regression-js
+            // rowtit noch verfeinern für spezielle Termine, wie Tag/Nachtgleiche etc.
+            var rowtit = tarray[iarray].year;
+
+            $("#kla1620shmt1")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: rowtit
+                    }))
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'spark' + pcount,
+                            html: regmsg,
+                            css: {
+                                margin: "5px",
+                                float: "left"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'reg' + pcount,
+                            html: gradient,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'reg' + pcount,
+                            html: yIntercept,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'reg' + pcount,
+                            html: r2,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'min' + pcount,
+                            html: minyv,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+
+                    .append($("<td/>", {
+
+                        })
+                        .append($("<span/>", {
+                            id: 'max' + pcount,
+                            html: maxyv,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+
+
+                );
+
+            /**
+             * Regressionsgerade berechnen und einblenden
+             * return [m, c] aus y = mx + c; basierend auf regarray.push([x, y]);
+             */
+            /*
+            var linarray = [];
+            var newpearls = [];
+            var isigvals = 0;
+            if (result !== null) {
+                for (var ilin = 0; ilin < regarray.length; ilin++) {
+                    var newx = regarray[ilin][0];
+                    var newp = result.predict(newx);
+                    var newy = newp[1].toFixed(2);
+                    var y = newp[1];
+                    if (miny === null && y !== null) {
+                        miny = y;
+                    } else if (y !== null && y < miny) {
+                        miny = y;
+                    }
+                    if (maxy === null && y !== null) {
+                        maxy = y;
+                    } else if (y !== null && y > maxy) {
+                        maxy = y;
+                    }
+                    linarray.push([newx, newy]);
+                    newpearls.push(newy);
+                }
+            }
+            // $(sparkid).sparkline(pearls);
+            var defaultpixel = 3;
+            if (pearls.length > 350) defaultpixel = 2;
+            $(sparkid).sparkline(pearls, {
+                type: 'line',
+                fillColor: false,
+                defaultPixelsPerValue: defaultpixel,
+                chartRangeMin: miny,
+                chartRangeMax: maxy,
+                lineColor: "blue"
+            });
+
+            if (result !== null) {
+                $(sparkid).sparkline(newpearls, {
+                    type: 'line',
+                    fillColor: false,
+                    defaultPixelsPerValue: defaultpixel,
+                    chartRangeMin: miny,
+                    chartRangeMax: maxy,
+                    lineColor: "red",
+                    composite: true
+                });
+            }
+            */
+
+        }
+        $(".tablesorter").tablesorter({
+            theme: "blue",
+            /* widgets: ['filter'], */
+            widthFixed: false,
+            widgetOptions: {
+                filter_hideFilters: false,
+                filter_ignoreCase: true
+            }
+        }); // so funktioniert es
+
+    }; // ende paintU
 
     /**
      * paintChart - mit chartJS wird eine Gesamtgraphik ausgegeben
