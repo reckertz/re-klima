@@ -2167,6 +2167,44 @@
     };
 
 
+    /**
+     * Qualitätsdaten in einem Jahr prüfen
+     * 1. Einlaufende oder auslaufende Lücke > 30 tage
+     * 2. verteilte Lücken > 20%
+     * Vorgabe array für das Jahr mit Temperaturdaten, return true/false
+     */
+    uihelper.isqualityyear = function (yeararray) {
+        var igood = 0;
+        var ibad = 0;
+        var istarter = 0;
+        var iender = 0;
+        var iges = yeararray.length;
+        var igesx = iges - 30 - 1;
+        for (var iqual = 0; iqual < iges; iqual++) {
+            var qvalue = yeararray[iqual];
+            var qtype = typeof qvalue;
+            if (qtype === "undefined" || qvalue === null || qtype === "string" && (qtype.length === 0 || qvalue === "-9999" || qvalue === "-999.9")) {
+                ibad ++;
+                if (iqual <= 30) {
+                    istarter++;
+                }
+                if (iqaul >= igesx) {
+                    iender++;
+                }
+                continue;
+            } else {
+                igood ++;
+                continue;
+            }
+        }
+        if (ibad /iges * 100 >= 20) {
+            return false;
+        }
+        if (istarter > 30 || iender > 30) {
+            return false;
+        }
+        return true;
+    };
 
 
 

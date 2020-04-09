@@ -46,14 +46,17 @@
         var idc = sysbase.tabcreateiframe("SQLite3-Rep", "", "re-frame", "uisql3rep");
         window.parent.$(".tablinks[idhash='#" + idc + "']").click();
 
-        var idc1 = sysbase.tabcreateiframe("Klima-Rohdaten", "", "re-klima", "kla1400raw");
+        //var idc1 = sysbase.tabcreateiframe("Klima-Rohdaten", "", "re-klima", "kla1400raw");
         //window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
+
+        var idc1 = sysbase.tabcreateiframe("Stationsanalyse", "", "re-klima", "kla1610sta");
+        window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
 
         /* sysbase.initFooter(); */
         // uientry.init();
 
         if ($("#kla0201menList li").length === 0) {
-           for (var imsg = 0; imsg < msgbuffer.length - 1; imsg++) {
+            for (var imsg = 0; imsg < msgbuffer.length - 1; imsg++) {
                 var oldtxt = msgbuffer[imsg];
                 $("#kla0201menList")
                     .prepend($('<li/>', {
@@ -97,10 +100,28 @@
             },
             */
             {
+                id: "admin0008",
+                text: "Stationen",
+                app: "re-klima",
+                module: "kla1610sta"
+            },
+            {
+                id: "admin0010",
+                text: "Rohdaten",
+                app: "re-klima",
+                module: "kla1400raw"
+            },
+            {
                 id: "admin0030",
                 text: "Codes and Keys",
                 app: "re-frame",
                 module: "syspool"
+            },
+            {
+                id: "admin0035",
+                text: "Report SQL3",
+                app: "re-frame",
+                module: "uisql3rep"
             },
             {
                 id: "admin0040",

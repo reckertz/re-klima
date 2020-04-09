@@ -949,10 +949,12 @@
                 if (ret.error === true) {
                     console.log("#" + ret.sorcount + ". " + ret.message);
                 }
+                /*
                 if (ret.sorcount % 100 === 0) {
                     console.log("#" + ret.sorcount + ". last sor-Time:" + ret.timediff);
                     console.log(JSON.stringify(perftimer.sor, null, ""));
                 }
+                */
                 perftimer.sor = {}; // Später müsste hier kumuliert werden
                 callbacksor(res, ret);
                 return;

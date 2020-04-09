@@ -7,6 +7,7 @@ yarn-error.log*
 lerna-debug.log*
 *.db3
 data/
+temp/
 uploads/
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

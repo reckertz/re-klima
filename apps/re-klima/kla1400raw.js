@@ -1037,6 +1037,14 @@
                                             width: "100px",
                                             io: "i"
                                         },
+                                        stationfilter: {
+                                            title: "Prefix-Filter stationid",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uietext",
+                                            default: "",
+                                            width: "100px",
+                                            io: "i"
+                                        },
                                         comment: {
                                             title: "Kommentar",
                                             type: "string", // currency, integer, datum, text, key
@@ -1059,7 +1067,7 @@
                                     evt.preventDefault();
                                     evt.stopPropagation();
                                     evt.stopImmediatePropagation();
-                                    kla1400raw.loadghcnall($("#kla1400rawfullname").text());
+                                    kla1400raw.loadghcnall($("#kla1400rawfullname").text(), extraParam);
                                 });
 
                                 uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
@@ -1242,7 +1250,7 @@
                                 var actvariablename = "";
                                 if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily stations \.txt")) {
                                     aktsource = "GHCND";
-                                    actvariablename = "tmax";
+                                    actvariablename = "TMAX";
                                 } else if (kla1400raw.checkfragments(fullname, "IPCC GHCNM v3 .dat")) {
                                     aktsource = "GHCN";
                                     actvariablename = "tavg";
@@ -1268,6 +1276,42 @@
                                 tourl += "&fullname=" + aktfullname;
                                 var idc20 = window.parent.sysbase.tabcreateiframe("Stations", "", "re-klima", "kla1610sta", tourl);
                                 window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                            }
+                        }))
+
+
+                        /**
+                         * Stationen korrigieren
+                         */
+                        .append($("<button/>", {
+                            html: "Stationen korrigieren",
+                            id: "kla1400rawb7",
+                            css: {
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var jqxhr = $.ajax({
+                                    method: "GET",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("dropcolumn3"),
+                                    data: {
+                                        timeout: 70 * 60 * 1000,
+                                        tablename: "KLISTATIONS",
+                                        columnnames: "anzyears,realyears,fromyear,toyear",
+                                        keys: "source,stationid"
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    //sysbase.checkSessionLogin(r1);
+                                    var ret = JSON.parse(r1);
+                                    sysbase.putMessage(ret.message, 1);
+                                    return;
+                                }).fail(function (err) {
+                                    sysbase.putMessage("ERROR:" + err, 3);
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
                             }
                         }))
                     );
@@ -1364,10 +1408,9 @@
     };
 
     /**
-     * loadghcnall - GHCN v3 oer GHCN4 v4, VRUTEM4 und ECAD komplett laden
-     * sowie GHCND
+     * loadghcnall - GHCN-Daily nur stations laden
      */
-    kla1400raw.loadghcnall = function (fullname) {
+    kla1400raw.loadghcnall = function (fullname, extraParam) {
         $("#kla1400rawb4").prop("disabled", true);
         $("#kla1400rawb5").prop("disabled", true);
         var target = "";
@@ -1398,18 +1441,6 @@
         if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily stations .txt")) {
             apiname = "ghcndcomplete";
             source = "GHCND";
-        } else if (kla1400raw.checkfragments(fullname, "IPCC GHCNM v3 .dat")) {
-            apiname = "ghcncomplete";
-            source = "GHCN";
-        } else if (kla1400raw.checkfragments(fullname, "IPCC GHCNM v4 .dat")) {
-            apiname = "ghcncomplete";
-            source = "GHCN4";
-        } else if (kla1400raw.checkfragments(fullname, "crutem4 asof .dat")) {
-            apiname = "crutem4complete";
-            source = "CRUTEM4";
-        } else if (kla1400raw.checkfragments(fullname, "ECA .zip")) {
-            apiname = "ecadcomplete";
-            source = "ECAD";
         } else {
             return;
         }
@@ -1423,7 +1454,8 @@
                     fullname: fullname,
                     timeout: 70 * 60 * 1000,
                     source: source,
-                    selyears: selrecord.seldata.years
+                    selyears: selrecord.seldata.years,
+                    extraParam: extraParam
                 }
             }).done(function (r1, textStatus, jqXHR) {
                 clearInterval(ghcnclock);

@@ -68,7 +68,6 @@
                     if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
                         selyears = req.query.selyears;
                     }
-
                     if (!fs.existsSync(fullname)) {
                         callback290a("Error", res, {
                             error: false,
@@ -76,12 +75,17 @@
                         });
                         return;
                     }
+                    var stationfilter = "";
+                    if (req.query && typeof req.query.extraParam !== "undefined" && req.query.extraParam.length > 0) {
+                        stationfilter = JSON.parse(req.query.extraParam).stationfilter;
+                    }
                     var ret = {};
                     ret.fullname = fullname;
                     ret.fullnamestations = fullname;
                     ret.dirname = path.dirname(fullname);
                     ret.source = source;
                     ret.selyears = selyears;
+                    ret.stationfilter = stationfilter;
                     callback290a(null, res, ret);
                     return;
                 },
@@ -173,6 +177,22 @@
                         return;
                     });
                 },
+
+
+                function (res, ret, callback290c1) {
+                    /**
+                     * Lesen countrycodes für die Zuordnung, return in ret1.data
+                     */
+                    var countrycodename = path.join(ret.dirname, "countrycodes.csv");
+                    ret.countrycodes3 = {};
+                    sys0000sys.importcsv2JSON(countrycodename, "alpha3", res, function (res, ret1) {
+                        ret.countrycodes3 = ret1.data;
+                        callback290c1(null, res, ret);
+                        return;
+                    });
+                },
+
+
                 function (res, ret, callback290d) {
                     /**
                      * Lesen ghncd-stations.txt und Update KLISTATIONS
@@ -232,7 +252,6 @@
                             type: "String"
                         }
                     ];
-
                     var counter = 0;
                     var linestartts = new Date();
                     var lineendts = 0;
@@ -251,6 +270,12 @@
                             var fld1 = invschema[i].name;
                             invrecord[fld1] = val1;
                         }
+                        if (ret.stationfilter.length > 0) {
+                            if (!invrecord.stationid.startsWith(ret.stationfilter)) {
+                                rl.resume();
+                                return;
+                            }
+                        }
                         var lat = invrecord.latitude;
                         var latobj = kla9020fun.getlatfieldsp(lat);
                         invrecord.latn = latobj.latn;
@@ -260,11 +285,14 @@
                          * contry festellen und Datenkomplettierung
                          */
                         var alpha2 = invrecord.stationid.substr(0, 2);
-
-
+                        if (alpha2 === "GM") alpha2 = "DE"; // nach ISO, das ist in den Daten falsch!!!
+                        if (alpha2 === "AJ") alpha2 = "AZ"; // nach ISO, das ist in den Daten falsch!!!                        invrecord.alpha2 = alpha2;
                         if (crg === null) {
                             crg = require('country-reverse-geocoding').country_reverse_geocoding();
                         }
+                        /**
+                         * Land aufgrund latitude/longitude bestimmen
+                         */
                         var country = crg.get_country(parseFloat(invrecord.latitude), parseFloat(invrecord.longitude));
                         if (typeof country !== "undefined" && country !== null) {
                             invrecord.alpha3 = country.code;
@@ -277,23 +305,52 @@
                                 delete countrydata._id;
                                 invrecord = Object.assign(invrecord, countrydata);
                             }
-                        } else {
-                            if (typeof ret.countrycodes[alpha2] !== "undefined") {
-                                delete ret.countrycodes[alpha2].tsserverupd;
-                                delete ret.countrycodes[alpha2].iostatus;
-                                var countryname = ret.countrycodes[alpha2].countryname;
-                                if (typeof countryname === "undefined") {
-                                    countryname = ret.countrycodes[alpha2].name;
-                                    delete ret.countrycodes[alpha2].name;
-                                    ret.countrycodes[alpha2].countryname = countryname;
-                                }
-                                invrecord = Object.assign(invrecord, ret.countrycodes[alpha2]);
-                            } else if (typeof ret.countries[alpha2] !== "undefined") {
-                                invrecord.countryname = ret.countries[alpha2];
-
-
+                        }
+                        if (typeof ret.countrycodes[alpha2] !== "undefined") {
+                            // name,alpha2,alpha3,countrycode,iso_31662,region,subregion,intermediateregion,regioncode,subregioncode,intermediateregioncode
+                            delete ret.countrycodes[alpha2].tsserverupd;
+                            delete ret.countrycodes[alpha2].iostatus;
+                            var countryname = ret.countrycodes[alpha2].countryname;
+                            if (typeof countryname === "undefined") {
+                                countryname = ret.countrycodes[alpha2].name;
+                                delete ret.countrycodes[alpha2].name;
+                                ret.countrycodes[alpha2].countryname = countryname;
                             }
-
+                            invrecord = Object.assign(invrecord, ret.countrycodes[alpha2]);
+                        }
+                        if (typeof invrecord.region === "undefined" || invrecord.region === null || invrecord.region.length === 0) {
+                            var alpha3 = invrecord.stationid.substr(0, 3);
+                            if (typeof ret.countrycodes3[alpha3] !== "undefined") {
+                                // name,alpha2,alpha3,countrycode,iso_31662,region,subregion,intermediateregion,regioncode,subregioncode,intermediateregioncode
+                                delete ret.countrycodes3[alpha3].tsserverupd;
+                                delete ret.countrycodes3[alpha3].iostatus;
+                                var countryname = ret.countrycodes3[alpha3].countryname;
+                                if (typeof countryname === "undefined") {
+                                    countryname = ret.countrycodes3[alpha3].name;
+                                    delete ret.countrycodes3[alpha3].name;
+                                    ret.countrycodes3[alpha3].countryname = countryname;
+                                }
+                                invrecord = Object.assign(invrecord, ret.countrycodes3[alpha3]);
+                            }
+                        }
+                        if (typeof invrecord.countryname === "undefined" || invrecord.countryname.length === 0) {
+                            if (typeof ret.countries[alpha2] !== "undefined") {
+                                invrecord.countryname = ret.countries[alpha2];
+                            }
+                        }
+                        var countrydata1 = global.countries[alpha2];
+                        if (typeof countrydata1 !== "undefined") {
+                            if (typeof invrecord.countryname === "undefined" || invrecord.countryname === null || invrecord.countryname.length === 0) {
+                                invrecord.countryname = countrydata1.name;
+                            }
+                            var continentdata1 = global.continents[countrydata1.continent] || "";
+                            if (continentdata1.length > 0) {
+                                invrecord.continent = countrydata1.continent;
+                                invrecord.continentname = continentdata1;
+                                if (typeof invrecord.region === "undefined" || invrecord.region === null || invrecord.region.length === 0) {
+                                    invrecord.region = invrecord.continentname;
+                                }
+                            }
                         }
                         if (counter % 100 === 0) {
                             var logmsg = counter + "/" + invrecord.stationid + " " + invrecord.stationname;
@@ -339,17 +396,8 @@
                         //delete invrecord.source;
                         //delete invrecord.stationid;
                         delete invrecord.history;
-                        /**
-                         * Default-Felder zufügen, werden erst nach der Übernahme versorgt
-                         */
-                        reqparm.updfields["$setOnInsert"].anzyears = 0;
-                        reqparm.updfields["$setOnInsert"].realyears = 0;
-                        reqparm.updfields["$setOnInsert"].fromyear = "";
-                        reqparm.updfields["$setOnInsert"].toyear = "";
-
                         reqparm.updfields["$set"] = invrecord;
                         reqparm.table = "KLISTATIONS";
-
                         sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret) {
                             lineendts = new Date();
                             if (counter % 100 === 0) {
@@ -1358,7 +1406,7 @@
                             for (var irec = ret1.records.length - 2; irec >= 0; irec++) {
                                 var actrec = JSON.stringify(irec);
                                 if (vglrec === actrec) {
-                                    ret1.records.splice((irec+1),1);
+                                    ret1.records.splice((irec + 1), 1);
                                 }
                             }
                             debugger;
@@ -1494,7 +1542,7 @@
                     var result;
                     try {
                         result = regression.linear(regarray);
-                    } catch(err) {
+                    } catch (err) {
                         console.log("Regression-Error:" + err + " zu " + record.stationid + " " + record.variable);
                     }
                     ret.erg = {};

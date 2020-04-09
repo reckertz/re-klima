@@ -34,6 +34,7 @@
     var stationrecord;
     var yearindexarray = {};
     var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
+    var array1 = []; // aktives Array für d3
 
     kla1620shm.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
@@ -150,6 +151,11 @@
                         float: "left"
                     }
                 })
+
+                // Auswahl selvariablename
+
+
+
                 .append($("<button/>", {
                     html: "Sparklines/Periode anzeigen",
                     css: {
@@ -175,6 +181,112 @@
                         kla1620shm.paintT(selvariablename, selsource, selstationid, matrix1);
                     }
                 }))
+
+                .append($("<button/>", {
+                    html: "Sparklines-Kelvin",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // stationrecord - heatworld
+                        var matrix2 = uihelper.cloneObject(matrix1);
+                        for (var i1 = 0; i1 < matrix2.data.length; i1++) {
+                            for (var i2 = 0; i2 < matrix2.data[i1].length; i2++) {
+                                var temp1 = matrix2.data[i1][i2];
+                                if (temp1 !== null) {
+                                    var tkelvin = (parseFloat(temp1) + 273).toFixed(1);
+                                    matrix2.data[i1][i2] = tkelvin;
+                                }
+                            }
+                        }
+                        kla1620shm.paintT(selvariablename, selsource, selstationid, matrix2);
+                    }
+                }))
+
+                .append($("<button/>", {
+                    html: "Sparklines-Download",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
+                        var canliste = $('#kla1620shmt1 tbody tr td span canvas');
+                        debugger;
+                        $(canliste).each(function (index, element) {
+                            var dataurl = element.toDataURL('image/png');
+                            var par = $(element).parent();
+                            $(par).append($("<img/>", {
+                                src: dataurl
+                            }));
+                            $(element).hide();
+                        });
+                        var elHtml = "";
+                        elHtml += "<html>";
+                        elHtml += "<head>";
+                        elHtml += "<meta charset='UTF-8'>";
+                        elHtml += "</head>";
+                        elHtml += "<body>";
+                        elHtml += $("#kla1620shmt1").parent().html();
+                        elHtml += "</body>";
+                        elHtml += "<html>";
+
+                        var filename = "sparklines.html";
+                        if (elHtml.length > 100) {
+                            var jqxhr = $.ajax({
+                                method: "POST",
+                                crossDomain: false,
+                                url: sysbase.getServer("getbackasfile"),
+                                data: {
+                                    timeout: 10 * 60 * 1000,
+                                    largestring: elHtml,
+                                    filename: filename
+                                }
+                            }).done(function (r1, textStatus, jqXHR) {
+                                sysbase.checkSessionLogin(r1);
+                                console.log("getbackasfile:" + filename + "=>" + r1);
+                                var j1 = JSON.parse(r1);
+                                if (j1.error === false) {
+                                    var download_path = j1.path;
+                                    // Could also use the link-click method.
+                                    // window.location = download_path;
+                                    window.open(download_path, '_blank');
+                                    sysbase.putMessage(filename + " download erfolgt", 1);
+                                } else {
+                                    sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
+                                }
+                                return;
+                            }).fail(function (err) {
+                                sysbase.putMessage("download:" + err, 3);
+                                return;
+                            }).always(function () {
+                                // nope
+                            });
+                        }
+                    }
+                }))
+
+
+                .append($("<button/>", {
+                    html: "Scattergram",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // stationrecord - heatworld
+                        kla1620shm.scatter(selvariablename, selsource, selstationid, matrix1);
+                    }
+                }))
+
+
+
+
+
 
                 .append($("<button/>", {
                     html: "Regression testen",
@@ -396,9 +508,18 @@
             });
         });
         savedwidth = $("#heatmap").width();
-        kla1620shm.kliheatmap1(selvariablename, selsource, selstationid, starecord, function (ret) {
+        if (typeof selvariablename !== "undefined" && selvariablename !== null && selvariablename.trim().length > 0) {
+            kla1620shm.kliheatmap1(selvariablename, selsource, selstationid, starecord, function (ret) {
 
-        });
+            });
+        } else {
+            sysbase.putMessage("Bitte eine Auswahl TMIN/TMAX treffen, default TMAX genutzt", 3);
+            selvariablename = "TMAX";
+            kla1620shm.kliheatmap1(selvariablename, selsource, selstationid, starecord, function (ret) {
+
+            });
+        }
+
     }; // Ende show
 
 
@@ -700,6 +821,7 @@
          */
         var years = matrix.data;
         var tarray = [];
+        array1 = []; // für d3 scatter
         for (var year in years) {
             if (years.hasOwnProperty(year)) {
                 tarray.push({
@@ -761,11 +883,15 @@
                                 html: "r2"
                             }))
                             .append($("<th/>", {
-                                html: "min"
+                                html: "tmin"
                             }))
                             .append($("<th/>", {
-                                html: "max"
+                                html: "tmax"
                             }))
+                            .append($("<th/>", {
+                                html: "tavg"
+                            }))
+
                         )
                     )
                     .append($("<tbody/>"))
@@ -785,6 +911,8 @@
             var regarray = [];
             var miny = null;
             var maxy = null;
+            var tsum = 0;
+            var tcount = 0;
             for (var iarray = 0; iarray < tarray.length; iarray++) {
                 // Iterate values
                 var x = parseInt(tarray[iarray].year);
@@ -806,6 +934,8 @@
                     } else if (y > maxy) {
                         maxy = y;
                     }
+                    tcount++;
+                    tsum += y;
                 }
                 // Transformation von x und y
                 //y = y + 273.15;  // Kelvin
@@ -814,6 +944,7 @@
             }
             var minyv = miny;
             var maxyv = maxy;
+            var tavg = 0;
             var result = null;
             var gradient = null;
             var yIntercept = null;
@@ -825,6 +956,15 @@
                 r2 = result.r2.toFixed(2);
                 minyv = minyv.toFixed(2);
                 maxyv = maxyv.toFixed(2);
+                if (tcount > 0) {
+                    tavg = (tsum / tcount).toFixed(2);
+                } else {
+                    tavg = null;
+                }
+                array1.push({
+                    temp: tavg || yIntercept,
+                    gradient: gradient
+                });
             }
             // Regression https://github.com/Tom-Alexander/regression-js
             // rowtit noch verfeinern für spezielle Termine, wie Tag/Nachtgleiche etc.
@@ -897,6 +1037,19 @@
                         .append($("<span/>", {
                             id: 'max' + pcount,
                             html: maxyv,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+
+                    .append($("<td/>", {
+
+                        })
+                        .append($("<span/>", {
+                            id: 'avg' + pcount,
+                            html: tavg,
                             css: {
                                 margin: "5px",
                                 float: "right"
@@ -987,10 +1140,11 @@
          */
         var years = matrix.data;
         var tarray = [];
+        array1 = [];
         for (var year in years) {
             if (years.hasOwnProperty(year)) {
                 tarray.push({
-                    year: matrix1.rowheaders[year],
+                    year: matrix.rowheaders[year],
                     values: years[year]
                 });
             }
@@ -1053,6 +1207,9 @@
                             .append($("<th/>", {
                                 html: "max"
                             }))
+                            .append($("<th/>", {
+                                html: "avg"
+                            }))
                         )
                     )
                     .append($("<tbody/>"))
@@ -1073,6 +1230,9 @@
             var regarray = [];
             var miny = null;
             var maxy = null;
+            var avgy = null;
+            var tcount = 0;
+            var tsum = 0;
             // Iteration über Werte, je Monat/je Tag/ ...
             for (var ivalue = 0; ivalue < lvalue; ivalue++) {
                 // Iterate values
@@ -1095,6 +1255,8 @@
                     } else if (y > maxy) {
                         maxy = y;
                     }
+                    tcount++;
+                    tsum += y;
                 }
                 // Transformation von x und y
                 //y = y + 273.15;  // Kelvin
@@ -1114,6 +1276,12 @@
                 r2 = result.r2.toFixed(2);
                 minyv = minyv.toFixed(2);
                 maxyv = maxyv.toFixed(2);
+                if (tcount > 0) avgy = (tsum / tcount).toFixed(2);
+                array1.push({
+                    temp: yIntercept,
+                    gradient: gradient,
+                    avg: avgy
+                });
             }
             // Regression https://github.com/Tom-Alexander/regression-js
             // rowtit noch verfeinern für spezielle Termine, wie Tag/Nachtgleiche etc.
@@ -1129,7 +1297,8 @@
                             id: 'spark' + pcount,
                             css: {
                                 margin: "5px",
-                                float: "left"
+                                float: "left",
+                                "background-color": "yellow"
                             }
                         }))
                     )
@@ -1188,6 +1357,18 @@
                         }))
                     )
 
+                    .append($("<td/>", {
+
+                        })
+                        .append($("<span/>", {
+                            id: 'avg' + pcount,
+                            html: avgy,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
 
                 );
 
@@ -1271,6 +1452,7 @@
          */
         var years = matrix.data;
         var tarray = [];
+        array1 = [];
         for (var year in years) {
             if (years.hasOwnProperty(year)) {
                 tarray.push({
@@ -1337,6 +1519,9 @@
                             .append($("<th/>", {
                                 html: "max"
                             }))
+                            .append($("<th/>", {
+                                html: "avg"
+                            }))
                         )
                     )
                     .append($("<tbody/>"))
@@ -1356,6 +1541,8 @@
             var regarray = [];
             var miny = null;
             var maxy = null;
+            var tsum = 0;
+            var tcount = 0;
             // Iteration über Werte, je Monat/je Tag/ ...
             // Iteration über zu aggregierende Jahre
             for (var itest = 0; itest <= iarray; itest++) {
@@ -1383,6 +1570,8 @@
                         } else if (y > maxy) {
                             maxy = y;
                         }
+                        tcount++;
+                        tsum += y;
                     }
                     // Transformation von x und y
                     //y = y + 273.15;  // Kelvin
@@ -1405,8 +1594,14 @@
                 r2 = result.r2.toFixed(2);
                 minyv = minyv.toFixed(2);
                 maxyv = maxyv.toFixed(2);
+                var avg = (tsum / tcount).toFixed(2);
+                array1.push({
+                    temp: yIntercept,
+                    gradient: gradient,
+                    avg: avg
+                });
             }
-            var regmsg = ""+  regarray.length + " Werte von ";
+            var regmsg = "" + regarray.length + " Werte von ";
             regmsg += tarray[0].year + " bis " + tarray[iarray].year;
             regmsg += " => " + rstring;
             // Regression https://github.com/Tom-Alexander/regression-js
@@ -1483,6 +1678,18 @@
                         }))
                     )
 
+                    .append($("<td/>", {
+
+                        })
+                        .append($("<span/>", {
+                            id: 'avg' + pcount,
+                            html: avg,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
 
                 );
 
@@ -2796,6 +3003,149 @@
                 }));
         }
     }; // ende paintSB
+
+
+
+
+    kla1620shm.scatter = function () {
+
+        $("#kla1620shmwrapper").empty();
+        var h = $("#heatmap").height();
+        var w = $("#kla1620shm.content").width();
+        w -= $("#heatmap").position().left;
+        w -= $("#heatmap").width();
+        w -= 40;
+        $("#kla1620shmwrapper").css({
+            overflow: "hidden",
+            height: h,
+            width: w
+        });
+
+        $("#kla1620shmwrapper")
+            .append($("<div/>", {
+                id: "my_dataviz",
+                css: {
+                    height: h,
+                    width: w,
+                    overflow: "auto",
+                    "background-color": "white"
+                }
+            }));
+
+
+        // set the dimensions and margins of the graph
+        var margin = {
+                top: 10,
+                right: 30,
+                bottom: 30,
+                left: 60
+            },
+            width = 920 - margin.left - margin.right,
+            height = 400 - margin.top - margin.bottom;
+        // append the svg object to the body of the page
+        var svg = d3.select("#my_dataviz")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform",
+                "translate(" + margin.left + "," + margin.top + ")")
+
+        var minx = null;
+        var maxx = null;
+        var miny = null;
+        var maxy = null;
+        for (var ind = 0; ind < array1.length; ind++) {
+            var x = parseFloat(array1[ind].temp);
+            var y = parseFloat(array1[ind].gradient);
+            if (minx === null) {
+                minx = x;
+            } else if (minx > x) {
+                minx = x;
+            }
+
+            if (maxx === null) {
+                maxx = x;
+            } else if (maxx < x) {
+                maxx = x;
+            }
+
+            if (miny === null) {
+                miny = y;
+            } else if (miny > y) {
+                miny = y;
+            }
+
+            if (maxy === null) {
+                maxy = y;
+            } else if (maxy < y) {
+                maxy = y;
+            }
+        }
+        //Read the data - or provide the data
+        var data = array1;
+
+        //d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv", function (data) {
+        // Add X axis
+        var x = d3.scaleLinear()
+            .domain([0, 0])
+            .range([0, width]);
+        svg.append("g")
+            .attr("class", "myXaxis") // Note that here we give a class to the X axis, to be able to call it later and modify it
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x))
+            .attr("opacity", "0");
+
+        // Add Y axis -  .domain([0, 500000])    .range([height, 0]);
+        var y = d3.scaleLinear()
+            .domain([miny, maxy])
+            .range([height, 0]);
+
+        svg.append("g")
+            .call(d3.axisLeft(y));
+
+        // Add dots
+        svg.append('g')
+            .selectAll("dot")
+            .data(data)
+            .enter()
+            .append("circle")
+            .attr("cx", function (d) {
+                return x(d.temp);
+            })
+            .attr("cy", function (d) {
+                return y(d.gradient);
+            })
+            .attr("r", 1.5)
+            .style("fill", "#69b3a2");
+
+        // new X axis - x.domain([0, 4000])
+        x.domain([minx, maxx]);
+        svg.select(".myXaxis")
+            .transition()
+            .duration(2000)
+            .attr("opacity", "1")
+            .call(d3.axisBottom(x));
+
+        svg.selectAll("circle")
+            .transition()
+            .delay(function (d, i) {
+                return (i * 3)
+            })
+            .duration(2000)
+            .attr("cx", function (d) {
+                return x(d.temp);
+            })
+            .attr("cy", function (d) {
+                return y(d.gradient);
+            });
+        // })
+
+    };
+
+
+
+
 
 
     kla1620shm.activateDragDrop = function () {
