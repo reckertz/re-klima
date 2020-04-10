@@ -1,4 +1,4 @@
-/*global $,this,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun */
+/*global $,this,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
 (function () {
     'use strict';
     var kla1620shm = {};
@@ -35,6 +35,7 @@
     var yearindexarray = {};
     var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
     var array1 = []; // aktives Array für d3
+    var klirecords = [];
 
     kla1620shm.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
@@ -205,6 +206,24 @@
                     }
                 }))
 
+
+                .append($("<button/>", {
+                    html: "Super-Sparklines",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        kla1620shm.loadrecs(selvariablename, selsource, selstationid, function (ret) {
+                            // Daten in klirecords[0] und [1] wenn OK
+                            kla1620shm.paintX(selvariablename, selsource, selstationid);
+                        });
+
+                    }
+                }))
+
+
                 .append($("<button/>", {
                     html: "Sparklines-Download",
                     css: {
@@ -214,8 +233,8 @@
                     click: function (evt) {
                         evt.preventDefault();
                         // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
+
                         var canliste = $('#kla1620shmt1 tbody tr td span canvas');
-                        debugger;
                         $(canliste).each(function (index, element) {
                             var dataurl = element.toDataURL('image/png');
                             var par = $(element).parent();
@@ -224,12 +243,18 @@
                             }));
                             $(element).hide();
                         });
+
                         var elHtml = "";
                         elHtml += "<html>";
                         elHtml += "<head>";
                         elHtml += "<meta charset='UTF-8'>";
+                        elHtml += "<style type='text/css'> @page { size: 29.5cm 21.0cm; margin-left: 1cm; margin-right: 1cm }</style>";
                         elHtml += "</head>";
-                        elHtml += "<body>";
+                        elHtml += "<body style='font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px'>";
+                        elHtml += "<h2>" + "selstationid" + "</h2>";
+                        elHtml += "<p style='page-break-before: always'>";
+                        var oldwidth = $("#kla1620shmt1").width();
+                        $("#kla1620shmt1").width("100%");
                         elHtml += $("#kla1620shmt1").parent().html();
                         elHtml += "</body>";
                         elHtml += "<html>";
@@ -722,6 +747,220 @@
                 return;
             });
     };
+
+    /**
+     * kla1620shm.loadrecs - Bereitstellen klirecords [0] und [1] für TMAX, TMIN
+     * @param {*} selvariablename - hier TMAX,TMIN, wird dann auf SQL aufbereitet
+     * @param {*} selsource
+     * @param {*} selstationid
+     * @param {*} callbackshm77
+     * return in ret: ret.error, ret.message, ret.klirecords
+     * ret.klirecords wird bereitgestellt in klirecords
+     */
+    kla1620shm.loadrecs = function (selvariablename, selsource, selstationid, callback77) {
+        klirecords = [];
+        var sqlStmt = "";
+        selvariablename = "TMAX,TMIN";
+        var sel = {
+            source: selsource,
+            stationid: selstationid
+        };
+        var projection = {};
+        sqlStmt += "SELECT ";
+        sqlStmt += "KLISTATIONS.source, ";
+        sqlStmt += "KLISTATIONS.stationid, ";
+        sqlStmt += "stationname, ";
+        sqlStmt += "climatezone, ";
+        sqlStmt += "region, ";
+        sqlStmt += "subregion, ";
+        sqlStmt += "countryname, ";
+        sqlStmt += "continent, ";
+        sqlStmt += "continentname, ";
+        sqlStmt += "lats, ";
+        sqlStmt += "longitude, ";
+        sqlStmt += "latitude, ";
+
+        sqlStmt += "variable, ";
+        sqlStmt += "anzyears, ";
+        sqlStmt += "realyears, ";
+        sqlStmt += "fromyear, ";
+        sqlStmt += "toyear, ";
+        sqlStmt += "height, ";
+        sqlStmt += "years ";
+        sqlStmt += "FROM KLISTATIONS ";
+        sqlStmt += "LEFT JOIN KLIDATA ";
+        sqlStmt += "ON KLISTATIONS.source = KLIDATA.source ";
+        sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
+        sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
+        sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
+        if (selvariablename.indexOf(",") < 0) {
+            selvariablename = "TMAX,TMIN";
+        }
+        var tliste = selvariablename.split(",");
+        if (tliste.length > 1) {
+            sqlStmt += "AND (";
+            for (var itliste = 0; itliste < tliste.length; itliste++) {
+                if (itliste > 0) sqlStmt += " OR ";
+                sqlStmt += "KLIDATA.variable = '" + tliste[itliste].trim().toUpperCase() + "' ";
+            }
+            sqlStmt += ") ";
+        } else {
+            sqlStmt += "AND KLIDATA.variable = '" + selvariablename.trim().toUpperCase() + "' ";
+        }
+        sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid, KLIDATA.variable";
+        var api = "getallsqlrecords";
+        var table = "KLISTATIONS";
+        async.waterfall([
+                function (callback77a) {
+                    callback77a(null, {
+                        error: false,
+                        message: "Start",
+                        sqlStmt: sqlStmt,
+                        selvariablename: selvariablename,
+                        selsource: selsource,
+                        selstationid: selstationid
+                    });
+                    return;
+                },
+                function (ret, callback77d) {
+                    uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
+                        if (ret1.error === false && ret1.record !== null) {
+                            /*
+                            intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
+                            wenn die Station komplette Temperaturdaten geliefert hat
+                            */
+
+                            stationrecord = ret1.record;
+                            klirecords = [];
+                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
+                            if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
+                            callback77d("Finish", {
+                                error: false,
+                                message: "Daten gefunden",
+                                klirecords: ret1.records
+                            });
+                            return;
+                        } else {
+                            /**
+                             * Abfrage, ob Daten geladen werden sollen
+                             */
+                            var qmsg = "Für Station:" + selstationid + " aus " + selsource;
+                            qmsg += " und " + selvariablename;
+                            qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                            var check = window.confirm(qmsg);
+                            if (check === false) {
+                                sysbase.putMessage("Keine Daten zur Station gefunden", 3);
+                                callback77d("Error", {
+                                    error: true,
+                                    message: "Keine Daten gefunden"
+                                });
+                                return;
+                            } else {
+                                callback77d(null, {
+                                    error: true,
+                                    message: "Keine Daten gefunden",
+                                    sqlStmt: ret.sqlStmt,
+                                    selvariablename: ret.selvariablename,
+                                    selsource: ret.selsource,
+                                    selstationid: ret.selstationid
+                                });
+                                return;
+                            }
+                        }
+                    });
+                },
+                function (ret, callback77g) {
+                    /**
+                     * Laden aus den Urdaten (*.dly-Files)
+                     */
+                    var ghcnclock = kla1620shm.showclock("#kla1620shmclock");
+                    var that = this;
+                    $(that).attr("disabled", true);
+                    var jqxhr = $.ajax({
+                        method: "GET",
+                        crossDomain: false,
+                        url: sysbase.getServer("ghcnddata"),
+                        data: {
+                            timeout: 10 * 60 * 1000,
+                            source: selsource,
+                            stationid: selstationid
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        clearInterval(ghcnclock);
+                        sysbase.checkSessionLogin(r1);
+                        var ret1 = JSON.parse(r1);
+                        sysbase.putMessage(ret1.message, 1);
+                        if (ret1.error === true) {
+                            callback77g("Error", {
+                                error: ret1.error,
+                                message: ret1.message
+                            });
+                            return;
+                        } else {
+                            callback77g(null, {
+                                error: ret1.error,
+                                message: ret1.message,
+                                sqlStmt: ret.sqlStmt,
+                                selvariablename: ret.selvariablename,
+                                selsource: ret.selsource,
+                                selstationid: ret.selstationid
+                            });
+                            return;
+                        }
+                    }).fail(function (err) {
+                        clearInterval(ghcnclock);
+                        //$("#kli1400raw_rightwdata").empty();
+                        //document.getElementById("kli1400raw").style.cursor = "default";
+                        sysbase.putMessage("ghcnddata:" + err, 3);
+                        callback77g("Error", {
+                            error: true,
+                            message: err.message || err
+                        });
+                        return;
+                    }).always(function () {
+                        // nope
+                        $(that).attr("disabled", false);
+                    });
+                },
+                function (ret, callback77j) {
+                    uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
+                        if (ret1.error === false && ret1.record !== null) {
+                            /*
+                            intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
+                            wenn die Station komplette Temperaturdaten geliefert hat
+                            */
+                            klirecords = [];
+                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
+                            if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
+                            callback77j("Finish", {
+                                error: false,
+                                message: "Daten gefunden",
+                                klirecords: ret1.records
+                            });
+                            return;
+                        } else {
+                            sysbase.putMessage("Keine Daten zur Station gefunden", 3);
+                            callback77j("Error", {
+                                error: true,
+                                message: "Keine Daten gefunden"
+                            });
+                            return;
+                        }
+                    });
+                }
+            ],
+            function (error, ret) {
+
+                callback77(ret);
+                return;
+            });
+    };
+
+
+
+
+
+
 
     /**
      * loadstationdata - Laden der Rohdaten nach SQLite und Bereitstellen Datensatz
@@ -1404,7 +1643,7 @@
             if (pearls.length > 350) defaultpixel = 2;
             $(sparkid).sparkline(pearls, {
                 type: 'line',
-                /* height: 60, */
+                height: 60,
                 fillColor: false,
                 defaultPixelsPerValue: defaultpixel,
                 chartRangeMin: miny,
@@ -1415,7 +1654,7 @@
             if (result !== null) {
                 $(sparkid).sparkline(newpearls, {
                     type: 'line',
-                    /* height: 60, */
+                    height: 60,
                     fillColor: false,
                     defaultPixelsPerValue: defaultpixel,
                     chartRangeMin: miny,
@@ -1692,60 +1931,6 @@
                     )
 
                 );
-
-            /**
-             * Regressionsgerade berechnen und einblenden
-             * return [m, c] aus y = mx + c; basierend auf regarray.push([x, y]);
-             */
-            /*
-            var linarray = [];
-            var newpearls = [];
-            var isigvals = 0;
-            if (result !== null) {
-                for (var ilin = 0; ilin < regarray.length; ilin++) {
-                    var newx = regarray[ilin][0];
-                    var newp = result.predict(newx);
-                    var newy = newp[1].toFixed(2);
-                    var y = newp[1];
-                    if (miny === null && y !== null) {
-                        miny = y;
-                    } else if (y !== null && y < miny) {
-                        miny = y;
-                    }
-                    if (maxy === null && y !== null) {
-                        maxy = y;
-                    } else if (y !== null && y > maxy) {
-                        maxy = y;
-                    }
-                    linarray.push([newx, newy]);
-                    newpearls.push(newy);
-                }
-            }
-            // $(sparkid).sparkline(pearls);
-            var defaultpixel = 3;
-            if (pearls.length > 350) defaultpixel = 2;
-            $(sparkid).sparkline(pearls, {
-                type: 'line',
-                fillColor: false,
-                defaultPixelsPerValue: defaultpixel,
-                chartRangeMin: miny,
-                chartRangeMax: maxy,
-                lineColor: "blue"
-            });
-
-            if (result !== null) {
-                $(sparkid).sparkline(newpearls, {
-                    type: 'line',
-                    fillColor: false,
-                    defaultPixelsPerValue: defaultpixel,
-                    chartRangeMin: miny,
-                    chartRangeMax: maxy,
-                    lineColor: "red",
-                    composite: true
-                });
-            }
-            */
-
         }
         $(".tablesorter").tablesorter({
             theme: "blue",
@@ -1758,6 +1943,394 @@
         }); // so funktioniert es
 
     }; // ende paintU
+
+    /**
+     * paintX - gemischte Auswertung TMAX, TMIN und "all years"
+     * mit Super-Sparkline auf Basis klirecords
+     */
+    kla1620shm.paintX = function (selvariablename, selsource, selstationid) {
+        try {
+            if (typeof klirecords === "undefined" || klirecords.length < 1) {
+                sysbase.putMessage("Keine Daten vorhanden", 3);
+                return;
+            }
+            /**
+             * Container kla1620shmwrapper aufbereiten
+             * in diesen Container gehen sukzessive die Auswertungen
+             */
+            $("#kla1620shmwrapper").empty();
+            var h = $("#heatmap").height();
+            var w = $("#kla1620shm.content").width();
+            w -= $("#heatmap").position().left;
+            w -= $("#heatmap").width();
+            w -= 40;
+            $("#kla1620shmwrapper").css({
+                overflow: "auto",
+                height: h,
+                width: w
+            });
+            var stationdata = klirecords[0];
+            /**
+             * Stammdaten zur Station
+             */
+            $("#kla1620shmwrapper")
+                .append($("<div/>", {
+                        css: {
+                            width: "100%",
+                            overflow: "hidden"
+                        }
+                    })
+                    .append($("<h2/>", {
+                        text: stationdata.stationid + " " + stationdata.stationname
+                    }))
+                );
+
+            /**
+             * Header zu sparkline-Tabelle
+             * */
+            $("#kla1620shmwrapper")
+                .append($("<div/>", {
+                        css: {
+                            width: "100%",
+                            overflow: "hidden"
+                        }
+                    })
+                    .append($("<table/>", {
+                            class: "tablesorter",
+                            id: "kla1620shmt1",
+                            css: {
+                                "max-width": w + "px"
+                            }
+                        })
+                        .append($("<thead/>")
+                            .append($("<tr/>")
+                                .append($("<th/>", {
+                                    html: "Mon"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Sparkline mit Regressionsgerade"
+                                }))
+                                .append($("<th/>", {
+                                    html: "m%"
+                                }))
+                                .append($("<th/>", {
+                                    html: "c"
+                                })).append($("<th/>", {
+                                    html: "r2%"
+                                }))
+                                .append($("<th/>", {
+                                    html: "min"
+                                }))
+                                .append($("<th/>", {
+                                    html: "max"
+                                }))
+                                .append($("<th/>", {
+                                    html: "avg"
+                                }))
+                            )
+                        )
+                        .append($("<tbody/>"))
+                    )
+                );
+            /**
+             * jedes Jahr mit allen Tagen für eine Sparkline
+             */
+            var varyears = [];
+            var fromyear = null;
+            var toyear = null;
+            varyears.push({
+                variablename: klirecords[0].variable,
+                years: JSON.parse(klirecords[0].years)
+            });
+            fromyear = parseInt(klirecords[0].fromyear);
+            toyear = parseInt(klirecords[0].toyear);
+            varyears.push({
+                variablename: klirecords[1].variable,
+                years: JSON.parse(klirecords[1].years)
+            });
+            var fromyear1 = parseInt(klirecords[0].fromyear);
+            var toyear1 = parseInt(klirecords[0].toyear);
+            if (fromyear1 < fromyear) fromyear = fromyear1;
+            if (toyear1 > toyear) toyear = toyear1;
+            /**
+             * Loop über alle möglichen Jahre
+             * totmin und totmax bestimmen die Dimensionierung der Sparklines!!!
+             * evtl. runden auf .5/.0
+             */
+            var totmin = null;
+            var totmax = null;
+            for (var iyear = fromyear; iyear <= toyear; iyear++) {
+                for (var ivar = 0; ivar < varyears.length; ivar++) {
+                    if (typeof varyears[ivar].years === "undefined"
+                    || typeof varyears[ivar].years[iyear] === "undefined") {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert" );
+                        continue;
+                    }
+                    for (var iday = 0; iday < varyears[ivar].years[iyear].length; iday++) {
+                        var temp = varyears[ivar].years[iyear][iday];
+                        if (temp !== null && temp.length > 0) {
+                            if (totmin === null) {
+                                totmin = temp;
+                            } else if (totmin > parseFloat(temp)) {
+                                totmin = parseFloat(temp);
+                            }
+                            if (totmax === null) {
+                                totmax = temp;
+                            } else if (totmax < parseFloat(temp)) {
+                                totmax = parseFloat(temp);
+                            }
+                        }
+                    }
+                }
+            }
+            /**
+             * Basis-Loop über die Jahr und die Variablen
+             */
+            var pcount = 0; // für die sparklines
+            for (var iyear = fromyear; iyear <= toyear; iyear++) {
+                var rowdata = []; // bekommt rowrecord[0] und [1]
+                pcount++;
+                for (var ivar = 0; ivar < varyears.length; ivar++) {
+                    // Jahr ohne Daten
+                    if (typeof varyears[ivar].years === "undefined"
+                    || typeof varyears[ivar].years[iyear] === "undefined") {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert" );
+                        continue;
+                    }
+                    var rowrecord = {};
+                    rowrecord.variablename = varyears[ivar].variablename;
+                    rowrecord.year = iyear.toFixed(0);
+                    rowrecord.tarray = [];
+                    rowrecord.pearls = [];
+                    var tcount = 0;
+                    var tsum = 0;
+                    var tmin = null;
+                    var tmax = null;
+                    for (var iday = 0; iday < varyears[ivar].years[iyear].length; iday++) {
+                        var temp = varyears[ivar].years[iyear][iday];
+                        if (temp === null || temp.length === 0) {
+                            rowrecord.tarray[iday] = [iday, null]; // x, y
+                            rowrecord.pearls.push(temp);
+                        } else {
+                            var tempf = parseFloat(temp)
+                            rowrecord.tarray[iday] = [iday, tempf];
+                            rowrecord.pearls.push(temp);
+                            tcount++;
+                            tsum += tempf;
+                            if (tmin === null) {
+                                tmin = tempf;
+                            } else if (tmin > tempf) {
+                                tmin = tempf;
+                            }
+                            if (tmax === null) {
+                                tmax = tempf;
+                            } else if (tmax < tempf) {
+                                tmax = tempf;
+                            }
+                        }
+                    }
+                    // Regressionsrechnung
+                    var result = regression.linear(rowrecord.tarray);
+                    var gradient = result.equation[0].toFixed(2);
+                    var yIntercept = result.equation[1].toFixed(2);
+                    var r2 = result.r2;
+                    rowrecord.tmin = tmin;
+                    rowrecord.tmax = tmax;
+                    rowrecord.tcount = tcount;
+                    rowrecord.tsum = tsum;
+                    rowrecord.tavg = (tsum / tcount).toFixed(2);
+                    rowrecord.gradient = (gradient * 100).toFixed(1);
+                    rowrecord.yIntercept = yIntercept;
+                    rowrecord.r2 = (r2 * 100).toFixed(1);
+                    rowrecord.points = result.points;
+                    rowdata.push(rowrecord);
+                }
+                // hier wird eine Tabellenzeile für zwei Jahre ausgegeben
+                var rowtit = iyear.toFixed(0);
+                if (rowdata.length > 0) {
+                    /**
+                     * neue eine Variable = eine einfache Zeile
+                     */
+                    $("#kla1620shmt1")
+                        .append($("<tr/>")
+                            .append($("<td/>", {
+                                html: rowtit
+                            }))
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: 'spark' + pcount,
+                                    css: {
+                                        margin: "5px",
+                                        float: "left",
+                                        "background-color": "yellow"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: 'grad' + pcount,
+                                    html: rowdata[0].gradient,
+                                    css: {
+                                        margin: "5px",
+                                        float: "right"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: 'inter' + pcount,
+                                    html: rowdata[0].yIntercept,
+                                    css: {
+                                        margin: "5px",
+                                        float: "right"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: 'r2' + pcount,
+                                    html: rowdata[0].r2,
+                                    css: {
+                                        margin: "5px",
+                                        float: "right"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: 'min' + pcount,
+                                    html: rowdata[0].tmin.toFixed(1),
+                                    css: {
+                                        margin: "5px",
+                                        float: "right"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: 'max' + pcount,
+                                    html: rowdata[0].tmax.toFixed(1),
+                                    css: {
+                                        margin: "5px",
+                                        float: "right"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: 'avg' + pcount,
+                                    html: rowdata[0].tavg,
+                                    css: {
+                                        margin: "5px",
+                                        float: "right"
+                                    }
+                                }))
+                            )
+                        );
+                    var defaultpixel = 3;
+                    if (rowdata[0].pearls.length > 350) defaultpixel = 2;
+                    var sparkid = "#spark" + pcount;
+                    $(sparkid).sparkline(rowdata[0].pearls, {
+                        type: 'line',
+                        height: 60,
+                        fillColor: false,
+                        defaultPixelsPerValue: defaultpixel,
+                        chartRangeMin: totmin,
+                        chartRangeMax: totmax,
+                        lineColor: "red"
+                        /* composite: true */
+                    });
+
+                    if (typeof rowdata[0].points !== "undefined") {
+                        var sparkpoints = [];
+                        for (var i = 0; i < rowdata[0].points.length; i++) {
+                            sparkpoints.push(rowdata[0].points[i][1]);
+                        }
+                        $(sparkid).sparkline(sparkpoints, {
+                            type: 'line',
+                            height: 60,
+                            fillColor: false,
+                            defaultPixelsPerValue: defaultpixel,
+                            chartRangeMin: totmin,
+                            chartRangeMax: totmax,
+                            lineColor: "black",
+                            composite: true
+                        });
+                    }
+                }
+                if (rowdata.length >= 1) {
+                    /**
+                     * Doppelzeile, wird spannend - anfügen an bestehende span-Bereiche
+                     * mit id aus spark, grad, inter, r2, min, max, avg und pcount als Suffix
+                     */
+                    var html = "";
+                    html = $("#grad" + pcount).html();
+                    html += "<br>" + rowdata[1].gradient;
+                    $("#grad" + pcount).html(html);
+
+                    html = $("#inter" + pcount).html();
+                    html += "<br>" + rowdata[1].yIntercept;
+                    $("#inter" + pcount).html(html);
+
+                    html = $("#r2" + pcount).html();
+                    html += "<br>" + rowdata[1].r2;
+                    $("#r2" + pcount).html(html);
+
+                    html = $("#min" + pcount).html();
+                    html += "<br>" + rowdata[1].tmin;
+                    $("#min" + pcount).html(html);
+
+                    html = $("#max" + pcount).html();
+                    html += "<br>" + rowdata[1].tmax;
+                    $("#max" + pcount).html(html);
+
+                    html = $("#avg" + pcount).html();
+                    html += "<br>" + rowdata[1].tavg;
+                    $("#avg" + pcount).html(html);
+
+                    var defaultpixel = 3;
+                    if (rowdata[0].pearls.length > 350) defaultpixel = 2;
+                    var sparkid = "#spark" + pcount;
+                    $(sparkid).sparkline(rowdata[1].pearls, {
+                        type: 'line',
+                        height: 60,
+                        fillColor: false,
+                        defaultPixelsPerValue: defaultpixel,
+                        chartRangeMin: totmin,
+                        chartRangeMax: totmax,
+                        lineColor: "green",
+                        composite: true
+                    });
+
+
+
+
+                }
+            }
+
+            $(".tablesorter").tablesorter({
+                theme: "blue",
+                /* widgets: ['filter'], */
+                widthFixed: false,
+                widgetOptions: {
+                    filter_hideFilters: false,
+                    filter_ignoreCase: true
+                }
+            }); // so funktioniert es
+        } catch (err) {
+            console.log(err);
+            console.log(err.stack);
+        }
+    }; // ende paintX
+
+
+
+
+
+
+
+
+
 
     /**
      * paintChart - mit chartJS wird eine Gesamtgraphik ausgegeben
@@ -3005,8 +3578,215 @@
     }; // ende paintSB
 
 
+    /**
+     * kliheatmap1 - Heatmap berechnen, Animation sichern und anzeigen
+     * mit "Video-Controls" - aus KLISTATIONS - YEARS
+     */
+    kla1620shm.kliheatmap1 = function (selvariablename, selsource, selstationid, starecord, callbackh0) {
+        $("#heatmap").show();
+        $("#heatworld").show();
+
+        // KLISTATIONS mit <variablename>.years[<year>][12 Werte im Array]
+
+        async.waterfall([
+                function (callbackshm1) {
+                    var sqlStmt = "";
+                    var sel = {
+                        source: selsource,
+                        stationid: selstationid
+                    };
+                    var projection = {
+                        source: 1,
+                        stationid: 1,
+                        name: 1,
+                        climatezone: 1,
+                        region: 1,
+                        subregion: 1,
+                        countryname: 1,
+                        lats: 1,
+                        longitude: 1,
+                        latitude: 1,
+                        anzyears: 1,
+                        realyears: 1,
+                        fromyear: 1,
+                        toyear: 1,
+                        height: 1,
+                        "analysis.tavg.regression.total.m": 1,
+                        "analysis.tavg.regression.mtotal": 1,
+                    };
+                    sqlStmt += "SELECT ";
+                    sqlStmt += "KLISTATIONS.source, ";
+                    sqlStmt += "KLISTATIONS.stationid, ";
+                    sqlStmt += "stationname, ";
+                    sqlStmt += "climatezone, ";
+                    sqlStmt += "region, ";
+                    sqlStmt += "subregion, ";
+                    sqlStmt += "countryname, ";
+                    sqlStmt += "lats, ";
+                    sqlStmt += "longitude, ";
+                    sqlStmt += "latitude, ";
+                    sqlStmt += "variable, ";
+                    sqlStmt += "anzyears, ";
+                    sqlStmt += "realyears, ";
+                    sqlStmt += "fromyear, ";
+                    sqlStmt += "toyear, ";
+                    sqlStmt += "height, ";
+                    sqlStmt += "years ";
+                    sqlStmt += "FROM KLISTATIONS ";
+                    sqlStmt += "LEFT JOIN KLIDATA ";
+                    sqlStmt += "ON KLISTATIONS.source = KLIDATA.source ";
+                    sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
+                    sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
+                    sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
+                    sqlStmt += "AND KLIDATA.variable = '" + selvariablename.toUpperCase() + "' ";
+                    sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
+                    // "analysis.tavg.regression.total.m": 1,
+                    // "analysis.tavg.regression.mtotal": 1,
+                    var api = "getonerecord";
+                    var table = "KLISTATIONS";
+                    uihelper.getOneRecord(sqlStmt, projection, api, table, function (ret) {
+                        if (ret.error === false && ret.record !== null) {
+                            /*
+                            intern wird getallsqlrecords gerufen und EIN Satz in record zurückgegeben.
+                            */
+                            stationrecord = ret.record;
+                            callbackshm1(null, {
+                                error: false,
+                                message: "Daten gefunden",
+                                record: ret.record
+                            });
+                            return;
+                        } else {
+                            /**
+                             * Abfrage, ob Daten geladen werden sollen
+                             */
+                            var qmsg = "Für Station:" + selstationid + " aus " + selsource;
+                            qmsg += " und " + selvariablename;
+                            qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                            var check = window.confirm(qmsg);
+                            if (check === false) {
+                                sysbase.putMessage("Keine Daten zur Station gefunden", 3);
+                                callbackshm1("Error", {
+                                    error: true,
+                                    message: "Keine Daten gefunden",
+                                });
+                                return;
+                            } else {
+                                kla1620shm.loadstationdata(selstationid, selsource, sqlStmt, function (ret, record) {
+                                    sysbase.putMessage("Daten geladen und bereitgestellt", 1);
+                                    console.log("loadstationdata fertig:" + ret.message);
+                                    callbackshm1(null, {
+                                        error: ret.error,
+                                        message: ret.message,
+                                        record: ret.record
+                                    });
+                                    return;
+                                });
+                            }
+                        }
+                    });
+                },
+                function (ret, callbackshm2) {
+                    var colwidth;
+                    var rowheight;
+                    var wratio;
+                    var hratio;
+                    try {
+                        var wmtit = "Selektion für Station:";
+                        wmtit += " " + starecord.source + " ";
+                        // isMember ? '$2.00' : '$10.00'
+                        wmtit += selstationid;
+                        wmtit += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
+                        wmtit += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
+                        wmtit += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
+                        wmtit += (ret.record.anzyears || 0).length > 0 ? " für " + ret.record.anzyears + " Jahre" : "";
+                        wmtit += (ret.record.region || "").length > 0 ? " Region:" + ret.record.region : "";
+                        wmtit += (ret.record.climatezone || "").length > 0 ? " Klimazone:" + ret.record.climatezone : "";
+                        wmtit += (ret.record.height || "").length > 0 ? " Höhe:" + ret.record.height : "";
+                        $(".headertitle").html(wmtit);
+                        var years = JSON.parse(ret.record.years);
+                        var dayyears = JSON.parse(ret.record.years); // ret.record[selvariablename].years;
+
+                        var mtitle = "";
+                        mtitle += (ret.record.variable || "").length > 0 ? " " + ret.record.variable : "";
+                        mtitle += " " + selstationid;
+                        mtitle += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
+                        mtitle += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
+                        mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
+
+                        // Aufruf Heatmap mit Container und Matrix
+                        matrix1 = {
+                            title: mtitle,
+                            colheaders: [],
+                            rowheaders: [],
+                            data: []
+                        };
+                        var irow = 0;
+                        for (var year in years) {
+                            if (years.hasOwnProperty(year)) {
+                                matrix1.rowheaders.push(year);
+                                var rowvalues = years[year];
+                                // zum Test erst mal brutal die ersten 12 Werte
+                                matrix1.data[irow] = [];
+                                for (var icol = 0; icol < 365; icol++) {
+                                    if (rowvalues[icol] === "") {
+                                        matrix1.data[irow][icol] = null;
+                                    } else if (rowvalues[icol] === "-9999" || rowvalues[icol] === "-999.9") {
+                                        matrix1.data[irow][icol] = null;
+                                    } else {
+                                        matrix1.data[irow][icol] = rowvalues[icol];
+                                    }
+                                }
+                                irow++;
+                            }
+                        }
+                        // hier ist das Layout nochmal zu kontrollieren
+
+                        var erg = kla9020fun.getHeatmap(cid, matrix1, function (ret) {
+                            sysbase.putMessage("Heatmap ausgegeben", 1);
+                            callbackshm2(null, {
+                                error: false,
+                                message: "Heatmap ausgegeben",
+                                matrix: matrix1
+                            });
+                            return;
+                        });
+                    } catch (err) {
+                        sysbase.putMessage("Error:" + err, 3);
+                        console.log(err);
+                        console.log(err.stack);
+                        callbackshm2("Error", {
+                            error: true,
+                            message: "Heatmap ausgegeben:" + err
+                        });
+                        return;
+                    }
+                },
+                function (ret, callbackshm2) {
+                    // hier muss die matrix1-Struktur übergeben werden
+                    kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
+                    callbackshm2("Finish", {
+                        error: false,
+                        message: "Heatmap ausgegeben"
+                    });
+                    return;
+                }
+            ],
+            function (error, ret) {
+                callbackh0(ret);
+                return;
+            });
+    };
 
 
+
+
+    /**
+     * scatter - Scattergramm erzeugen aus array1 in festes Zielgebiet
+     * array1 hat pairs mit Objekten aus gradient und temp (avg-Temp)
+     * das ist zu verallgemeinern mit x und y als Übergaben und
+     * Konfiguration bzw. Beschriftung, die dem Anwender die Bedeutung erklärt
+     */
     kla1620shm.scatter = function () {
 
         $("#kla1620shmwrapper").empty();

@@ -1084,11 +1084,14 @@ app.post('/getbackasfile', function (req, res) {
     */
     var fpath = "/temp/" + filename;
     var fullpath = __dirname + "/static" + fpath;
-    fs.writeFile(fullpath, largestring, function (err) {
+    fs.writeFile(fullpath, largestring, {
+        encoding: 'utf8',
+        flag: 'w'
+    }, function (err) {
         if (err) {
             var smsg = JSON.stringify({
                 error: true,
-                message: err
+                message: err.message || "Es ist ein Fehler im Server aufgetreten"
             });
             res.writeHead(200, {
                 'Content-Type': 'application/text'

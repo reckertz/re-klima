@@ -1016,7 +1016,7 @@
      * @param table
      * @param callback - gibt ret-Struktur mit error, message, record zurück
      */
-    uihelper.getAllRecords = function (sel, projection, sort, skip, limit, api, table, callback) {
+    uihelper.getAllRecords = function (sel, projection, sort, skip, limit, api, table, callbackgar1) {
         var myInfo = {}; // uihelper.getSysInfo();
         var url = api; // uisystem.getActiveServer(api);
         var selparm;
@@ -1048,14 +1048,14 @@
                     if (j1.records && j1.records !== null) {
                         var records = $.extend({}, j1.records);
                         var msg = "";
-                        callback({
+                        callbackgar1({
                             error: false,
                             message: "Satz gefunden",
                             records: records
                         });
                         return;
                     } else {
-                        callback({
+                        callbackgar1({
                             error: false,
                             message: "kein Satz gefunden",
                             records: null
@@ -1063,7 +1063,7 @@
                         return;
                     }
                 } catch (err) {
-                    callback({
+                    callbackgar1({
                         error: true,
                         message: "getAllRecords AJAX/DB-Error-3:" + err.message + " " + err.stack,
                         records: null
@@ -1071,7 +1071,7 @@
                     return;
                 }
             }).fail(function (err) {
-                callback({
+                callbackgar1({
                     error: true,
                     message: "AJAX ERROR:" + err.message,
                     records: null
@@ -1081,7 +1081,7 @@
                 // nope
             });
         } catch (err) {
-            callback({
+            callbackgar1({
                 error: true,
                 message: "AJAX ERROR:" + err.message,
                 record: null
