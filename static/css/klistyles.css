@@ -298,6 +298,7 @@ body:not(:-moz-handler-blocked) fieldset {
 
 .uieform input {
     display: block;
+    /* float: left; */
     font-size: 1em;
     margin-bottom: 0.8em;
     margin-top: 0.5em;
@@ -387,7 +388,10 @@ span .uietext  {
     margin-top: 10px;
 }
 
-
+.uiepopup .uiecheckbox {
+    margin-left: 10px;
+    margin-top: 10px;
+}
 
 .uielist li {
     font-size: 1em;
@@ -612,6 +616,7 @@ iframe {
     border: 1px solid black;
     margin: 2px;
     float: left;
+    background-color: yellow;
 }
 
 .draggable {

@@ -2156,7 +2156,7 @@
         };
     };
 
-    /**
+        /**
      * Schaltjahr bzw. leapyear
      * Vorgabe djahr als numerich, return true/false
      */
@@ -2166,6 +2166,38 @@
         return isleapy;
     };
 
+    /**
+     * fromTTT2MMTT - Konvertiert laufenden Tag im Jahr zu Monat und Tag in dem Jahr
+     * @param {*} tyear
+     * @param {*} tint - zero-based ("Tagesindex")
+     * returns Object oder false, wenn nicht erfolgreich
+     *    month - one-based
+     *    day - one-based
+    */
+    uihelper.fromTTT2MMTT = function (tyear, tint) {
+        var uihelpermd = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (uihelper.isleapyear(tyear)) {
+            uihelpermd[1] = 29;
+        } else {
+            uihelpermd[1] = 28;
+        }
+        var ttt = {
+            mend: 0
+        };
+        ttt.mend = uihelpermd[0];
+        for (var itmon = 0; itmon < 12; itmon++) {
+            if (tint <= ttt.mend) {
+                // zuordnen
+                return {
+                    month: itmon + 1,
+                    day: tint - ttt.mend + uihelpermd[itmon] + 1 + 1
+                }
+            } else {
+                ttt.mend += uihelpermd[itmon]
+            }
+        }
+        return false;
+    }
 
     /**
      * Qualitätsdaten in einem Jahr prüfen
@@ -2183,12 +2215,12 @@
         for (var iqual = 0; iqual < iges; iqual++) {
             var qvalue = yeararray[iqual];
             var qtype = typeof qvalue;
-            if (qtype === "undefined" || qvalue === null || qtype === "string" && (qtype.length === 0 || qvalue === "-9999" || qvalue === "-999.9")) {
+            if (qtype === "undefined" || qvalue === null || qtype === "string" && (qtype.length === 0 || qvalue === "-9999" || qvalue === "-999.9" || qvalue === "null")) {
                 ibad ++;
                 if (iqual <= 30) {
                     istarter++;
                 }
-                if (iqaul >= igesx) {
+                if (iqual >= igesx) {
                     iender++;
                 }
                 continue;

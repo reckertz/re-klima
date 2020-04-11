@@ -213,14 +213,111 @@
                         float: "left",
                         margin: "10px"
                     },
+
+
                     click: function (evt) {
                         evt.preventDefault();
-                        kla1620shm.loadrecs(selvariablename, selsource, selstationid, function (ret) {
-                            // Daten in klirecords[0] und [1] wenn OK
-                            kla1620shm.paintX(selvariablename, selsource, selstationid);
+                        /**
+                         * Popup Prompt zur Bestätigung der kompletten Übernahme
+                         * kla1400rawfullname -  $("#kla1400rawfullname").text();
+                         */
+                        var username = uihelper.getUsername();
+                        var popschema = {
+                            entryschema: {
+                                props: {
+                                    title: "Abrufparameter",
+                                    description: "",
+                                    type: "object", // currency, integer, datum, text, key, object
+                                    class: "uiefieldset",
+                                    properties: {
+                                        qonly: {
+                                            title: "Nur 'gute Daten'",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            /* width: "100px", */
+                                            io: "i"
+                                        },
+                                        mixed: {
+                                            title: "Mixed Sparklines",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            /* width: "100px", */
+                                            io: "i"
+                                        },
+                                        moon: {
+                                            title: "Mondphasen",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            /* width: "100px", */
+                                            io: "i"
+                                        },
+                                        sunwinter: {
+                                            title: "Sommer/Winter",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            default: false,
+                                            /* width: "100px", */
+                                            io: "i"
+                                        },
+                                        export: {
+                                            title: "HTML-Fenster",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            /* width: "100px", */
+                                            io: "i"
+                                        },
+                                        comment: {
+                                            title: "Kommentar",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uietext",
+                                            default: "",
+                                            io: "i"
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                        var poprecord = {};
+                        poprecord.mixed = true;
+                        poprecord.moon = false;
+                        poprecord.sunwinter = false;
+                        poprecord.export = false;
+                        var anchorHash = "#kla1620shmwrapper";
+                        var title = "Super-Sparklines";
+                        var pos = {
+                            left: $("#kla1620shmwrapper").offset().left,
+                            top: screen.height * .1,
+                            width: $("#kla1620shmwrapper").width() * 0.60,
+                            height: $("#kla1620shmwrapper").height() * 0.90
+                        };
+                        //Math.ceil($(this).offset().top + $(this).height() + 20)
+                        $(document).on('popupok', function (evt, extraParam) {
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                            evt.stopImmediatePropagation();
+                            console.log(extraParam);
+                            var superParam = JSON.parse(extraParam).props;
+                            kla1620shm.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
+                                // Daten in klirecords[0] und [1] wenn OK
+                                kla1620shm.paintX(selvariablename, selsource, selstationid, superParam);
+                            });
                         });
-
+                        uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
+                            if (ret.error === false) {
+                                // outrec.isactive = "false"; // true oder false wenn gelöscht
+                            } else {
+                                sysbase.putMessage("Kein Abruf Super-Sparklines", 1);
+                                return;
+                            }
+                        });
                     }
+
+
+
+
+
+
+
                 }))
 
 
@@ -757,7 +854,7 @@
      * return in ret: ret.error, ret.message, ret.klirecords
      * ret.klirecords wird bereitgestellt in klirecords
      */
-    kla1620shm.loadrecs = function (selvariablename, selsource, selstationid, callback77) {
+    kla1620shm.loadrecs = function (selvariablename, selsource, selstationid, extraParm, callback77) {
         klirecords = [];
         var sqlStmt = "";
         selvariablename = "TMAX,TMIN";
@@ -950,7 +1047,6 @@
                 }
             ],
             function (error, ret) {
-
                 callback77(ret);
                 return;
             });
@@ -1948,7 +2044,7 @@
      * paintX - gemischte Auswertung TMAX, TMIN und "all years"
      * mit Super-Sparkline auf Basis klirecords
      */
-    kla1620shm.paintX = function (selvariablename, selsource, selstationid) {
+    kla1620shm.paintX = function (selvariablename, selsource, selstationid, superParam) {
         try {
             if (typeof klirecords === "undefined" || klirecords.length < 1) {
                 sysbase.putMessage("Keine Daten vorhanden", 3);
@@ -2059,11 +2155,17 @@
              */
             var totmin = null;
             var totmax = null;
+            var xcount = 0;
             for (var iyear = fromyear; iyear <= toyear; iyear++) {
                 for (var ivar = 0; ivar < varyears.length; ivar++) {
-                    if (typeof varyears[ivar].years === "undefined"
-                    || typeof varyears[ivar].years[iyear] === "undefined") {
-                        console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert" );
+                    xcount++;
+                    if (typeof varyears[ivar].years === "undefined" ||
+                        typeof varyears[ivar].years[iyear] === "undefined") {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert");
+                        continue;
+                    }
+                    if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
                         continue;
                     }
                     for (var iday = 0; iday < varyears[ivar].years[iyear].length; iday++) {
@@ -2092,9 +2194,13 @@
                 pcount++;
                 for (var ivar = 0; ivar < varyears.length; ivar++) {
                     // Jahr ohne Daten
-                    if (typeof varyears[ivar].years === "undefined"
-                    || typeof varyears[ivar].years[iyear] === "undefined") {
-                        console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert" );
+                    if (typeof varyears[ivar].years === "undefined" ||
+                        typeof varyears[ivar].years[iyear] === "undefined") {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert");
+                        continue;
+                    }
+                    if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
                         continue;
                     }
                     var rowrecord = {};
@@ -2298,14 +2404,54 @@
                         defaultPixelsPerValue: defaultpixel,
                         chartRangeMin: totmin,
                         chartRangeMax: totmax,
-                        lineColor: "green",
+                        lineColor: "blue",
                         composite: true
                     });
-
-
-
-
                 }
+
+                /**
+                 * Vollmond als Bar-Chart zu iyear und pcount mit uihelper.moonphase
+                 * returns phase, name
+                 * 0 = Neumond => -8 in der Graphik
+                 * 4 = Vollmond => +8
+                 */
+                if (superParam.moon === true) {
+                    var moonpearls = [];
+                    var anztage = 365;
+                    if (uihelper.isleapyear(iyear)) {
+                        anztage = 366;
+                    }
+                    for (var iday = 0; iday < anztage; iday++) {
+                        var mday = uihelper.fromTTT2MMTT(iyear, iday);
+                        var moon = uihelper.moonphase(iyear, mday.month, mday.day);
+                        if (moon.phase === 0) {
+                            moonpearls.push("-8");
+                        } else if (moon.phase === 4) {
+                            moonpearls.push("8");
+                            // if (iyear === 1968) console.log("1968:" + iday + "=>" + mday.day + "." + mday.month + "=>" + moon.phase);
+                        } else {
+                            moonpearls.push(null);
+                        }
+                    }
+                    var defaultpixel = 3;
+                    if (anztage > 350) defaultpixel = 2;
+                    var sparkid = "#spark" + pcount;
+                    $(sparkid).sparkline(moonpearls, {
+                        type: 'bar',
+                        height: 60,
+                        barColor: "red",
+                        negBarColor: "blue",
+                        barWidth: defaultpixel,
+                        barSpacing: 0,
+                        fillColor: false,
+                        defaultPixelsPerValue: defaultpixel,
+                        chartRangeMin: totmin,
+                        chartRangeMax: totmax,
+                        composite: true
+                    });
+                }
+
+
             }
 
             $(".tablesorter").tablesorter({

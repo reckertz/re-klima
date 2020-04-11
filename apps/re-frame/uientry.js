@@ -587,15 +587,15 @@
                                 class: "ui-field-contain",
                                 width: "95%"
                             })
+                            .append($('<label/>', {
+                                for: pageprefix + epfieldname,
+                                text: epfield.title
+                            }))
                             .append($("<input/>", {
                                 id: pageprefix + epfieldname,
                                 name: epfieldname,
                                 type: "checkbox",
                                 class: "uiecheckbox" + " " + epfield.customclasses
-                            }))
-                            .append($('<label/>', {
-                                for: pageprefix + epfieldname,
-                                text: epfield.title
                             }))
                         );
                 } else if (epfield.type === "string" && epfield.class === "uieradio") {
@@ -1819,7 +1819,7 @@
         var l = 0;
         var t = 0;
         var ww = $(window).width();
-        if (typeof position === "undefined" || position === null || position.length === 0) {
+        if (typeof position === "undefined" || position === null || Object.keys(position).length === 0) {
             position = {};
             if (w > ww) {
                 if (ww > 600) {
@@ -1847,19 +1847,18 @@
                     id: popupid,
                     legend: title,
                     title: title,
-                    class: "popup",
+                    class: "uiepopup",
+                    "z-order": 10000,
                     css: {
-
                         "min-width": "300px",
                         position: "absolute",
-                        "background-color": "white",
-
+                        // "background-color": "white",
                         left: position.left || "10px",
                         top: position.top || "50px",
-
-                        width: w + "px",
-                        "z-index": 1000
-
+                        width: position.width || w + "px",
+                        height: position.height || "300px",
+                        "z-index": 1000,
+                        overflow: "auto"
                     }
                 })
                 .append($('<div/>', {
@@ -1870,45 +1869,51 @@
                 }))
                 .append($('<div/>', {
                     id: popupid + "form",
-                    class: "popupform uieform"
+                    class: "uieform"
                 }))
-                .append($("<br/>"))
-                .append($("<button/>", {
-                    href: "#",
-                    class: "optionConfirm",
-                    bschema: JSON.stringify(schema),
-                    css: {
-                        float: "left"
-                    },
-                    html: "OK",
-                    click: function (econfirm) {
-                        $(popupHash).hide();
-                        var bschema = $(this).attr("bschema");
-                        var schema = JSON.parse(bschema);
-                        var record = {};
-                        var result = uientry.fromUI2Record(popupHash, record, schema);
-                        $(document).trigger('popupok', [JSON.stringify(result)]);
-                        $(popupHash).remove();
-                        return;
-                    }
-                }))
-                .append($("<button/>", {
-                    href: "#",
-                    class: "optionCancel",
-                    css: {
-                        float: "left",
-                        "margin-left": "10px"
-                    },
-                    html: "Cancel",
-                    click: function (ecancel) {
-                        //$(popupHash).attr('data-confirmed', 'false');
-                        //$(popupHash).popup("close");
-                        $(popupHash).hide();
-                        $(document).trigger('popupcancel');
-                        $(popupHash).remove();
-                        return;
-                    }
-                }))
+                .append($('<div/>', {
+                        css: {
+                            width: position.width || w + "px",
+                            float: "left"
+                        }
+                    })
+                    .append($("<button/>", {
+                        href: "#",
+                        class: "optionConfirm",
+                        bschema: JSON.stringify(schema),
+                        css: {
+                            float: "left"
+                        },
+                        html: "OK",
+                        click: function (econfirm) {
+                            $(popupHash).hide();
+                            var bschema = $(this).attr("bschema");
+                            var schema = JSON.parse(bschema);
+                            var record = {};
+                            var result = uientry.fromUI2Record(popupHash, record, schema);
+                            $(document).trigger('popupok', [JSON.stringify(result)]);
+                            $(popupHash).remove();
+                            return;
+                        }
+                    }))
+                    .append($("<button/>", {
+                        href: "#",
+                        class: "optionCancel",
+                        css: {
+                            float: "left",
+                            "margin-left": "10px"
+                        },
+                        html: "Cancel",
+                        click: function (ecancel) {
+                            //$(popupHash).attr('data-confirmed', 'false');
+                            //$(popupHash).popup("close");
+                            $(popupHash).hide();
+                            $(document).trigger('popupcancel');
+                            $(popupHash).remove();
+                            return;
+                        }
+                    }))
+                )
             );
         // form vervollständigen
         // bctype, schema, pageprefix, containerID, callback
@@ -1916,6 +1921,7 @@
             if (ret.error === false) {
                 sysbase.putMessage("PopupForm" + " aufgebaut", 0);
                 // post-processing wie "enhanceWithin"
+                /*
                 var l1 = $("#" + popupid + "form").position().left;
                 var w1 = $("#" + popupid + "form").outerWidth();
                 var w0 = $("#" + popupid + "form").parent().outerWidth();
@@ -1946,6 +1952,7 @@
                         }
                     }
                 });
+                */
             } else {
                 sysbase.putMessage("PopupForm" + " NICHT aufgebaut", 3);
             }
