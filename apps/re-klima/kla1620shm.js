@@ -344,7 +344,7 @@
                             $(par).append($("<img/>", {
                                 src: dataurl
                             }));
-                            $(element).hide();
+                            $(element).remove();
                         });
 
                         var elHtml = "";
@@ -2372,19 +2372,22 @@
                     source: outrecord.source,
                     stationid: outrecord.stationid,
                     year: outrecord.year,
-                    rkat: outrecord.rkat
+                    rkat: outrecord.rkat,
+                    variable: outrecord.variablename
                 };
                 var updfields = {};
                 updfields["$setOnInsert"] = {
                     source: outrecord.source,
                     stationid: outrecord.stationid,
                     year: outrecord.year,
-                    rkat: outrecord.rkat
+                    rkat: outrecord.rkat,
+                    variable: outrecord.variablename
                 };
                 delete outrecord.source;
                 delete outrecord.stationid;
                 delete outrecord.year;
                 delete outrecord.rkat;
+                delete outrecord.variablename;
                 updfields["$set"] = outrecord;
                 uihelper.setOneRecord(selfields, updfields, "setonerecord", "KLISTA1", function (ret) {
                     nextoutrecord();

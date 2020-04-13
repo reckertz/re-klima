@@ -42,6 +42,18 @@ db.run("PRAGMA optimize", function (err) {
 db.get("PRAGMA page_size", function (err, page) {
     console.log("page_size:" + JSON.stringify(page) + " " + err);
 });
+/*
+db.get("PRAGMA index_list('KLISTA1')", function (err, indexlist) {
+    console.log("index_list KLISTA1:" + JSON.stringify(indexlist) + " " + err);
+    if (typeof indexlist === "object") {
+        var indexname = indexlist.name;
+        db.all("PRAGMA index_info('" + indexname + "')", function (err, indexfields) {
+            console.log("index_info " + indexname + ":" + JSON.stringify(indexfields) + " " + err);
+        });
+    }
+});
+*/
+/*
 db.get("PRAGMA index_list('KLISTATIONS')", function (err, indexlist) {
     console.log("index_list KLISTATIONS:" + JSON.stringify(indexlist) + " " + err);
     if (typeof indexlist === "object") {
@@ -51,7 +63,8 @@ db.get("PRAGMA index_list('KLISTATIONS')", function (err, indexlist) {
         });
     }
 });
-
+*/
+/*
 db.get("PRAGMA index_list('KLIDATA')", function (err, indexlist) {
     console.log("index_list KLIDATA:" + JSON.stringify(indexlist) + " " + err);
     if (typeof indexlist === "object") {
@@ -68,7 +81,8 @@ db.get("PRAGMA index_list('KLIDATA')", function (err, indexlist) {
         }
     }
 });
-
+*/
+/*
 db.all("PRAGMA table_info('KLISTATIONS')", function (err, felder) {
     if (typeof felder === "undefined" || felder === null || felder.length === 0) {
         console.log("Tabelle KLISTATIONS nicht vorhanden");
@@ -78,6 +92,58 @@ db.all("PRAGMA table_info('KLISTATIONS')", function (err, felder) {
         }
     }
 });
+*/
+/*
+db.serialize(function () {
+    async.waterfall([
+        function (cb100) {
+            db.all("PRAGMA index_list('KLISTA1')", function (err, indexlist) {
+                console.log("index_list KLISTA1:" + JSON.stringify(indexlist) + " " + err);
+                cb100(null, {
+                    error: false,
+                    message: "indices",
+                    indexlist: indexlist
+                });
+            });
+        },
+        function (ret, cb101) {
+            var indexlist = ret.indexlist;
+            async.eachSeries(indexlist, function(dbindex, nextindex) {
+                var dropStmt = "DROP INDEX IF EXISTS " + dbindex.name;
+                db.run(dropStmt, function (err) {
+                    console.log(dropStmt + "=>" + err);
+                    nextindex();
+                    return;
+                });
+            },
+            function (err) {
+                cb101(null, {
+                    error: false,
+                    message: "Indices gelöscht"
+                });
+                return;
+            });
+        },
+        function(ret, cb102) {
+            var dropStmt = "DROP TABLE IF EXISTS " + "KLISTA1";
+            db.run(dropStmt, function (err) {
+                console.log("KLISTA1 gelöscht:" + err);
+                cb102("Finish", {
+                    error: false,
+                    message: "fertig"
+                });
+                return;
+            });
+        }
+    ],
+    function(error, result) {
+        console.log("Fertig mit Vorlauf");
+    });
+});
+*/
+
+
+
 
 // bereitstellen countries.json und continents.json
 // "./data/countries.json"
@@ -1115,6 +1181,71 @@ app.post('/getbackasfile', function (req, res) {
     });
 });
 
+/**
+ * sql2csv - Execute SQL Select and download csv-File
+ */
+app.post('/sql2csv', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default, kann sehr lange dauern, je nach Filtert
+    req.body.filename;
+    if (req.body && typeof req.body.timeout !== "undefined" && req.body.timeout.length > 0) {
+        timeout = req.body.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var sqlstmt = "";
+    if (req.body && typeof req.body.sqlstmt !== "undefined" && req.body.sqlstmt.length > 0) {
+        sqlstmt = req.body.sqlstmt;
+    }
+    var limit = 1000;
+    if (req.body && typeof req.body.limit !== "undefined" && req.body.limit.length > 0) {
+        limit = req.body.limit;
+    }
+    var filename = "sql.csv";
+    if (req.body && typeof req.body.filename !== "undefined" && req.body.filename.length > 0) {
+        filename = req.body.filename;
+    }
+
+    var reqparm = {};
+    reqparm.sel = sqlstmt;
+    reqparm.limit = limit || 1000;
+    reqparm.offset = 0;
+    sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret1) {
+        // getbackasfile
+        var fpath = "/temp/" + filename;
+        var fullpath = __dirname + "/static" + fpath;
+        var ws = fs.createWriteStream(fullpath);
+        for (var irec = 0; irec < ret1.records.length; irec++) {
+            csv.
+            write([
+                    ret1.records[irec]
+                ], {
+                    headers: true
+                })
+                .pipe(ws);
+        }
+        // res.download(fullpath, filename);
+        var ret = {
+            error: false,
+            message: "Datei zwischengespeichert",
+            path: fpath,
+
+        };
+        var smsg1 = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text'
+        });
+        res.end(smsg1);
+        return;
+
+    });
+
+});
+
+
+
+
+
 
 
 app.get('**/*.js', function (req, res) {
@@ -1145,7 +1276,6 @@ app.get('**/*.js', function (req, res) {
     }
     return;
 });
-
 
 
 app.get('/', function (req, res) {
