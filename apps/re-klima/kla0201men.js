@@ -44,7 +44,7 @@
         sysbase.tabcreateiframe("Schlüsselverz", "", "re-frame", "syspool");
 
         var idc = sysbase.tabcreateiframe("SQLite3-Rep", "", "re-frame", "uisql3rep");
-        window.parent.$(".tablinks[idhash='#" + idc + "']").click();
+        // window.parent.$(".tablinks[idhash='#" + idc + "']").click();
 
         //var idc1 = sysbase.tabcreateiframe("Klima-Rohdaten", "", "re-klima", "kla1400raw");
         //window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();

@@ -1032,6 +1032,7 @@
                 crossDomain: false,
                 url: sysbase.getServer(url),
                 data: {
+                    timeout: 70 * 60 * 1000,
                     sel: selparm,
                     projection: JSON.stringify(projection),
                     sort: JSON.stringify(sort),
@@ -1263,15 +1264,14 @@
 
     /**
      * Selektionsvorgabe für einen Satz für delete
-     * in ret.record - _id wird entfernt, record mit stringify
-     * @param sel -  belibt leer, weil _id genommen wird
+     * @param delStmt
      * @param api
      * @param table
      * @param record
      * @param callback - gibt ret-Struktur mit error, message, record zurück
      */
 
-    uihelper.delOneRecord = function (sel, api, table, record, callback) {
+    uihelper.delOneRecord = function (delStmt, api, table, record, callback) {
         // var myInfo = uihelper.getSysInfo();
         try {
             var jqxhr = $.ajax({
@@ -1279,7 +1279,7 @@
                 crossDomain: false,
                 url: sysbase.getServer(api),
                 data: {
-                    sel: JSON.stringify(sel),
+                    delStmt: delStmt,
                     table: table,
                     record: JSON.stringify(record),
                     username: uihelper.getUsername(),

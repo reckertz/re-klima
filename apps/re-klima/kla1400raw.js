@@ -1870,7 +1870,7 @@
                 filenode.li_attr = {
                     fullname: ret.files[ilink].fullname
                 };
-                if (ret.files[ilink].isDirectory === true) {
+                if (ret.files[ilink].isDirectory === true || ret.files[ilink].isDirectory === "1") {
                     filenode.children = [];
                     filenode.li_attr.what = "directory";
                 } else {
@@ -1951,13 +1951,13 @@
             var ret = JSON.parse(r1);
             //for (var ilink = 0; ilink < ret.files.length; ilink++) {
             async.eachSeries(ret.files, function (filedata, nextfile) {
-                    filenode = {
+                    var filenode = {
                         text: filedata.name,
                     };
                     filenode.li_attr = {
                         fullname: filedata.fullname
                     };
-                    if (filedata.isDirectory === true) {
+                    if (filedata.isDirectory === true || filedata.isDirectory === "1") {
                         filenode.children = [];
                         filenode.li_attr.what = "directory";
                     } else {
@@ -2124,62 +2124,96 @@
              * Differenzieren der Dateitypen, Default ist Anzeige aus dem Inhalt,
              * spezielle Dateien werden abgefangen, GHCND vorgezogen
              */
-             if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily stations \.txt")) {
-                kla1400raw.ghcndstations  ("GHCND", "", fullname, function (ret) {
+            if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily stations \.txt")) {
+                kla1400raw.ghcndstations("GHCND", "", fullname, function (ret) {
 
                 });
             } else {
-                    // einfache Dateianzeige, inhalt
-                    kla1400raw.showfilecontent(fullname, 0, 0, "#kla1400raw_rightw", function (ret) {
-                        // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
-                        uientry.getSchemaUI("kla1400raw", klischema, "kla1400raw", "kla1400raw" + "form", function (ret) {
-                            if (ret.error === false) {
-                                //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                                console.log("kla1400raw" + " aufgebaut", 0);
-                                // Initialisierung des UI
-                                klirecord = {};
-                                // den Satz holen zum Editieren
-                                var sel = {
-                                    fullname: fullname
-                                };
-                                var projection = {
-                                    history: 0
-                                };
-                                var api = "getonerecord";
-                                var table = "KLIRAWFILES";
-                                uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                                    if (ret.error === false && ret.record !== null) {
-                                        klirecord = ret.record;
-                                        uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
-                                        $("#kla1400rawform")
-                                            .append($("<div/>", {
-                                                    css: {
-                                                        "text-align": "center",
-                                                        width: "100%"
-                                                    }
-                                                })
-                                                .append($("<button/>", {
-                                                    class: "kla1400rawActionSave",
-                                                    css: {
-                                                        "margin-left": "10px"
-                                                    },
-                                                    html: "Speichern",
-                                                }))
-                                                .append($("<button/>", {
-                                                    class: "kla1400rawActionLoad",
-                                                    css: {
-                                                        "margin-left": "10px"
-                                                    },
-                                                    html: "Laden Datei",
-                                                    click: function (evt) {
-                                                        evt.preventDefault();
-                                                        document.getElementById("kla1400raw").style.cursor = "progress";
-                                                        // Ausgabe in Map rechts
-                                                        $("#kla1400raw_rightw").empty();
-                                                        $("#kla1400raw_rightw").height($("#kla1400raw_left").height());
-                                                        var ghcnclock = kla1400raw.showclock("#kla1400raw_rightw");
-
-                                                        var klirecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
+                // einfache Dateianzeige, inhalt
+                kla1400raw.showfilecontent(fullname, 0, 0, "#kla1400raw_rightw", function (ret) {
+                    // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
+                    uientry.getSchemaUI("kla1400raw", klischema, "kla1400raw", "kla1400raw" + "form", function (ret) {
+                        if (ret.error === false) {
+                            //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
+                            console.log("kla1400raw" + " aufgebaut", 0);
+                            // Initialisierung des UI
+                            klirecord = {};
+                            // den Satz holen zum Editieren
+                            var sel = {
+                                fullname: fullname
+                            };
+                            var projection = {
+                                history: 0
+                            };
+                            var api = "getonerecord";
+                            var table = "KLIRAWFILES";
+                            uihelper.getOneRecord(sel, projection, api, table, function (ret) {
+                                if (ret.error === false && ret.record !== null) {
+                                    klirecord = ret.record;
+                                    uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
+                                    $("#kla1400rawform")
+                                        .append($("<div/>", {
+                                                css: {
+                                                    "text-align": "center",
+                                                    width: "100%"
+                                                }
+                                            })
+                                            .append($("<button/>", {
+                                                class: "kla1400rawActionSave",
+                                                css: {
+                                                    "margin-left": "10px"
+                                                },
+                                                html: "Speichern",
+                                            }))
+                                            .append($("<button/>", {
+                                                class: "kla1400rawActionLoad",
+                                                css: {
+                                                    "margin-left": "10px"
+                                                },
+                                                html: "Laden Datei",
+                                                click: function (evt) {
+                                                    evt.preventDefault();
+                                                    document.getElementById("kla1400raw").style.cursor = "progress";
+                                                    $(".kla1400rawActionLoad").prop('disabled', true);
+                                                    // Ausgabe in Map rechts
+                                                    $("#kla1400raw_rightw").empty();
+                                                    $("#kla1400raw_rightw").height($("#kla1400raw_left").height());
+                                                    var ghcnclock = kla1400raw.showclock("#kla1400raw_rightw");
+                                                    var klirecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
+                                                    if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily inventory \.txt")) {
+                                                        aktsource = "GHCND";
+                                                        var jqxhr = $.ajax({
+                                                            method: "GET",
+                                                            crossDomain: false,
+                                                            url: sysbase.getServer("ghcndinventory"),
+                                                            data: {
+                                                                fullname: fullname,
+                                                                targettable: klirecord.metadata.targettable,
+                                                                primarykey: klirecord.metadata.primarykey,
+                                                                separator: klirecord.metadata.separator,
+                                                                timeout: 10 * 60 * 1000
+                                                            }
+                                                        }).done(function (r1, textStatus, jqXHR) {
+                                                            clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            sysbase.checkSessionLogin(r1);
+                                                            var ret = JSON.parse(r1);
+                                                            sysbase.putMessage(ret.message, 1);
+                                                            return;
+                                                        }).fail(function (err) {
+                                                            clearInterval(ghcnclock);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            sysbase.putMessage(err, 1);
+                                                            return;
+                                                        }).always(function () {
+                                                            // nope
+                                                        });
+                                                    } else {
+                                                        $(".kla1400rawActionLoad").prop('disabled', true);
                                                         var jqxhr = $.ajax({
                                                             method: "POST",
                                                             crossDomain: false,
@@ -2195,6 +2229,7 @@
                                                         }).done(function (r1, textStatus, jqXHR) {
                                                             clearInterval(ghcnclock);
                                                             document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
                                                             $("#kla1400raw_rightw").empty();
                                                             sysbase.checkSessionLogin(r1);
                                                             var ret = JSON.parse(r1);
@@ -2203,41 +2238,43 @@
                                                             clearInterval(ghcnclock);
                                                             $("#kla1400raw_rightw").empty();
                                                             document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
                                                             sysbase.putMessage(err, 1);
                                                             return;
                                                         }).always(function () {
                                                             // nope
                                                         });
                                                     }
-                                                }))
+                                                }
+                                            }))
 
-                                            );
-                                    }
-                                    $("#kla1400rawselections").attr("rules", "all");
-                                    $("#kla1400rawselections").css({
-                                        border: "1px solid black",
-                                        margin: "10px"
-                                    });
-                                    $("#kla1400rawselections tbody tr:nth-child(2)").hide();
-                                    supercallback({
-                                        error: false,
-                                        message: "erledigt"
-                                    });
-                                    return;
+                                        );
+                                }
+                                $("#kla1400rawselections").attr("rules", "all");
+                                $("#kla1400rawselections").css({
+                                    border: "1px solid black",
+                                    margin: "10px"
                                 });
-                            } else {
-                                //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
-                                console.log("kla1400raw" + " NICHT aufgebaut", 3);
+                                $("#kla1400rawselections tbody tr:nth-child(2)").hide();
                                 supercallback({
                                     error: false,
                                     message: "erledigt"
                                 });
                                 return;
-                            }
-                        });
+                            });
+                        } else {
+                            //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
+                            console.log("kla1400raw" + " NICHT aufgebaut", 3);
+                            supercallback({
+                                error: false,
+                                message: "erledigt"
+                            });
+                            return;
+                        }
                     });
+                });
 
-                }
+            }
         }
     };
 

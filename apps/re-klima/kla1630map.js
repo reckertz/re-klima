@@ -150,7 +150,7 @@
             // isMember ? '$2.00' : '$10.00'
             if (typeof starecord.stasel !== "undefined") {
                 wmtit += starecord.stasel.stationid.length > 0 ? " " + starecord.stasel.stationid : "";
-                wmtit += starecord.stasel.name.length > 0 ? " " + starecord.stasel.name : "";
+                wmtit += starecord.stasel.stationname.length > 0 ? " " + starecord.stasel.stationname : "";
                 wmtit += starecord.stasel.fromyear.length > 0 ? " von " + starecord.stasel.fromyear : "";
                 wmtit += starecord.stasel.toyear.length > 0 ? " bis " + starecord.stasel.toyear : "";
                 wmtit += starecord.stasel.anzyears.length > 0 ? " für " + starecord.stasel.anzyears + " Jahre" : "";
@@ -167,7 +167,7 @@
             stationarray = [];
             for (station in stations) {
                 if (stations.hasOwnProperty(station)) {
-                    var sitename = stations[station].station;
+                    var sitename = stations[station].stationname;
                     var longitude = Number(stations[station].longitude);
                     var latitude = Number(stations[station].latitude);
                     stationarray.push({
@@ -269,8 +269,28 @@
             });
 
         }
+        var worldmaplinks = {
+            'link1': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 23,
+                    longitude: -179.0
+                }, {
+                    latitude: 24,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2
+                },
+                tooltip: {
+                    content: "Link"
+                }
+            }
+        };
 
-        $(".mapcontainer").mapael({
+
+        var worldmap =   {
             map: {
                 // Set the name of the map to display
                 name: "world",
@@ -363,7 +383,9 @@
                     */
                 }
             },
-            plots: plots
+            plots: plots,
+            links: worldmaplinks
+
             /*
             ,
             links: {
@@ -386,9 +408,152 @@
                 }
             }
             */
-        });
+        };
+        // jetzt kann in worldmaplink entsprechend eine Modifikation stattfinden
+        worldmap.links = kla1630map.getClimatezonelinks(worldmaplinks);
+        $(".mapcontainer").mapael(worldmap);
     };
 
+    kla1630map.getClimatezonelinks = function(worldmaplinks) {
+        // 23,5 - 40 - 60
+        var wl = {
+            'link0': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 0.1,
+                    longitude: -179.0
+                }, {
+                    latitude: 0.2,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Tropic"
+                }
+            },
+            'link1': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 23.50,
+                    longitude: -179.0
+                }, {
+                    latitude: 23.51,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6                },
+                tooltip: {
+                    content: "Subtropic"
+                }
+            },
+            'link2': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 40.0,
+                    longitude: -179.0
+                }, {
+                    latitude: 40.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Gemäßigt"
+                }
+            },
+            'link3': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 60.0,
+                    longitude: -179.0
+                }, {
+                    latitude: 60.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Kalt"
+                }
+            },
+
+
+            'link1s': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: -23.50,
+                    longitude: -179.0
+                }, {
+                    latitude: -23.51,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Subtropic"
+                }
+            },
+            'link2s': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: -40.0,
+                    longitude: -179.0
+                }, {
+                    latitude: -40.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Gemäßigt"
+                }
+            },
+            'link3s': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: -60.0,
+                    longitude: -179.0
+                }, {
+                    latitude: -60.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Kalt"
+                }
+            }
+        };
+        return wl;
+    };
     /**
      * fitMap nach http://jsfiddle.net/neveldo/mrga03aj/
      * und https://github.com/neveldo/jQuery-Mapael/issues/216

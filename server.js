@@ -42,6 +42,16 @@ db.run("PRAGMA optimize", function (err) {
 db.get("PRAGMA page_size", function (err, page) {
     console.log("page_size:" + JSON.stringify(page) + " " + err);
 });
+db.get("PRAGMA index_list('KLICONFIG')", function (err, indexlist) {
+    console.log("index_list KLICONFIG:" + JSON.stringify(indexlist) + " " + err);
+    if (typeof indexlist === "object") {
+        var indexname = indexlist.name;
+        db.all("PRAGMA index_info('" + indexname + "')", function (err, indexfields) {
+            console.log("index_info " + indexname + ":" + JSON.stringify(indexfields) + " " + err);
+        });
+    }
+});
+
 /*
 db.get("PRAGMA index_list('KLISTA1')", function (err, indexlist) {
     console.log("index_list KLISTA1:" + JSON.stringify(indexlist) + " " + err);
@@ -93,12 +103,15 @@ db.all("PRAGMA table_info('KLISTATIONS')", function (err, felder) {
     }
 });
 */
+/**
+ * Sequenz zum kompletten Löscher einer Tabelle mit ihren Indices
+*/
 /*
 db.serialize(function () {
     async.waterfall([
         function (cb100) {
-            db.all("PRAGMA index_list('KLISTA1')", function (err, indexlist) {
-                console.log("index_list KLISTA1:" + JSON.stringify(indexlist) + " " + err);
+            db.all("PRAGMA index_list('KLIINVENTORY')", function (err, indexlist) {
+                console.log("index_list KLIINVENTORY:" + JSON.stringify(indexlist) + " " + err);
                 cb100(null, {
                     error: false,
                     message: "indices",
@@ -125,9 +138,9 @@ db.serialize(function () {
             });
         },
         function(ret, cb102) {
-            var dropStmt = "DROP TABLE IF EXISTS " + "KLISTA1";
+            var dropStmt = "DROP TABLE IF EXISTS " + "KLIINVENTORY";
             db.run(dropStmt, function (err) {
-                console.log("KLISTA1 gelöscht:" + err);
+                console.log("KLIINVENTORY gelöscht:" + err);
                 cb102("Finish", {
                     error: false,
                     message: "fertig"
@@ -368,6 +381,76 @@ app.get('/getsql3tablesx', function (req, res) {
 
 
 /**
+ * getsql3index - API - Holen Information zu Indices auf Tabelle
+ * in SQLite3 für node.js, Vorgaben
+ * - tablename - ist muss
+ * - indexname ist optional
+ * return: in ret indices als array mit
+ * {
+ *  - name - Name des Index
+ *  - fields - als Strukr der Felder mit
+ * }
+ */
+
+app.get('/getsql3index', function (req, res) {
+    if (checkSession(req, res)) return;
+    var indices = [];
+    var tablename = "";
+    if (req.query && typeof req.query.tablename !== "undefined" && req.query.tablename.length > 0) {
+        tablename = req.query.tablename;
+    }
+    /*
+    index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+    index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+    */
+    async.waterfall([
+        function (callback) {
+            db.all("PRAGMA index_list('" + tablename + "')", function (err, indexlist) {
+                callback(null, {
+                    error: false,
+                    message: "OK",
+                    indexlist: indexlist
+                });
+                return;
+            });
+        },
+        function (ret, callback) {
+            async.eachSeries(ret.indexlist, function (indexinfo, nextindex) {
+                var indexname = indexinfo.name;
+                db.all("PRAGMA index_info('" + indexname + "')", function (err, indexfields) {
+                    console.log("index_info " + indexname + ":" + JSON.stringify(indexfields) + " " + err);
+                    indexinfo.indexfields = indexfields;
+                    nextindex();
+                    return;
+                });
+            }, function (error) {
+                callback("Finish", {
+                    error: false,
+                    message: "OK",
+                    indexlist: ret.indexlist
+                });
+                return;
+            });
+        }
+    ], function (error, ret) {
+        var smsg = JSON.stringify({
+            error: false,
+            message: "Indexinfo bereitgestellt",
+            indexlist: ret.indexlist
+        });
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
+
+/**
  * getdirectoryfiles  - generische Funktion
  */
 app.get('/getdirectoryfiles', function (req, res) {
@@ -510,6 +593,11 @@ app.get('/getfilecontent', function (req, res) {
  */
 app.get('/getallrecords', function (req, res) {
     if (checkSession(req, res)) return;
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
     var rootdir = path.dirname(require.main.filename);
     sys0000sys.getallsqlrecords(db, async, req, null, res, function (res, ret) {
         // in ret liegen error, message und record
@@ -529,6 +617,11 @@ app.get('/getallrecords', function (req, res) {
  */
 app.get('/getallsqlrecords', function (req, res) {
     if (checkSession(req, res)) return;
+    var timeout = 70 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
     sys0000sys.getallsqlrecords(db, async, req, null, res, function (res, ret) {
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
@@ -560,7 +653,7 @@ app.get('/getonerecord', function (req, res) {
 });
 
 /**
- * setonerecord - API wie bei MongoDB, inter Umsetzung sqlite3
+ * setonerecord - API wie bei MongoDB, interne Umsetzung sqlite3
  * komfortabel mit SELECT, CREATE TABLE, INSERT oder UPDATE
  */
 app.post('/setonerecord', function (req, res) {
@@ -577,6 +670,26 @@ app.post('/setonerecord', function (req, res) {
     });
 });
 
+/**
+ * delonerecord - API wie bei MongoDB, interne Umsetzung sqlite3
+ * für DELETE FROM ... in SQL
+ */
+app.post('/delonerecord', function (req, res) {
+    if (checkSession(req, res)) return;
+    sys0000sys.delonerecord(db, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
 
 
 /**
@@ -592,6 +705,31 @@ app.get('/ghcndcomplete', function (req, res) {
     }
     var rootname = __dirname;
     kla1490srv.ghcndcomplete(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+/**
+ * ghcndinventory - ghcnd-inventory.txt Randdaten zu Stations und Variablen
+ */
+app.get('/ghcndinventory', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.ghcndinventory(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
         res.writeHead(200, {
@@ -1011,7 +1149,6 @@ app.get('/dropcolumn3', function (req, res) {
                 sqlStmt += " FROM " + ret.oldtablename;
                 console.log(sqlStmt);
                 db.run(sqlStmt, function (err) {
-                    debugger;
                     console.log("dropcolumn3: inserted:" + this.changes);
                     callback77d(null, res, ret);
                     return;

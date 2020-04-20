@@ -42,7 +42,7 @@
         $(".headertitle").html("Database-Control (SQLite3)");
         $(".headertitle").attr("title", "uisql3");
         $(".content").attr("pageid", "uisql3");
-        $(".content").attr("id", "uisql3");
+        //$(".content").attr("id", "uisql3");
 
 
 
@@ -155,7 +155,7 @@
                             if (operator === "=") {
                                 var bwert = null;
                                 if (wert === "true") {
-                                   bwert = true;
+                                    bwert = true;
                                 }
                                 if (wert === "false") {
                                     bwert = false;
@@ -388,9 +388,17 @@
                         /**
                          * Optimierung der Darstellung
                          */
+                        var recordkeys = {};
                         for (var fieldname in record) {
                             if (record.hasOwnProperty(fieldname)) {
                                 var fieldvalue = record[fieldname];
+                                if (typeof fieldvalue === "string" && fieldvalue.length < 50) {
+                                    recordkeys[fieldname] = fieldvalue;
+                                }
+                                if (typeof fieldvalue === "number") {
+                                    recordkeys[fieldname] = fieldvalue;
+                                }
+
                                 if (typeof fieldvalue === "string" && fieldvalue.length > 50) {
                                     var feld = "";
                                     ifield++;
@@ -418,7 +426,7 @@
                                     css: {
                                         "white-space": "normal"
                                     },
-                                    key: record._id,
+                                    key: JSON.stringify(recordkeys),
                                     tablename: uisql3.parms.table
                                 })
                                 .append($("<span/>", {
@@ -815,6 +823,9 @@
     uisql3.deleteOneRecord = function (that) {
 
         var key = $(that).closest("li").attr("key");
+        if (typeof key !== "undefined" && key.length > 0 && key.startsWith("{")) {
+            key = JSON.parse(key);
+        }
         var tablename = $(that).closest("li").attr("tablename");
 
         /**
@@ -830,63 +841,125 @@
                     class: "uietext",
                     default: "",
                     io: "o"
-                },
-                key: {
-                    title: "Primärkey",
-                    type: "string", // currency, integer, datum, text, key
-                    class: "uietext",
-                    default: "",
-                    io: "o"
                 }
             }
         };
         var poprecord = {
-            tablename: tablename,
-            key: key
+            tablename: tablename
         };
-        var anchorHash = "#uisql3";
-        var title = "Satz löschen";
-        var position = {};
-        /*
-        position.left = $(this).position().left;
-        position.left -= $(myidhash).find(".popup").outerWidth();
-        position.top = $(this).position().top;
-        position.top += $(this).outerHeight() + 5;
-        */
-        //uientry.inputDialogX = function (container, position, title, schema, record, callback) {
+        /**
+         * Die Eingabefelder sind zu ergänzen, es werden die Felder des ersten Index genommen
+         * später kann auf UNIQUE in diesem Index geprüft werden.
+         * hier muss daher auf async.waterfall umgestellt werden
+         */
+        async.waterfall([
+                function (callback300) {
+                    /**
+                     * Lesen Index-Informationen zur Tabelle über AJAX getsql3index
+                     */
+                    var jqxhr = $.ajax({
+                        method: "GET",
+                        url: sysbase.getServer("getsql3index"),
+                        data: {
+                            tablename: tablename
+                        }
+                    }).done(function (r1) {
+                        console.log("getbackasfile:" + tablename + "=>" + r1);
+                        var j1 = JSON.parse(r1);
+                        if (j1.error === false) {
+                            var indexlist = j1.indexlist;
+                            for (var i = 0; i < j1.indexlist[0].indexfields.length; i++) {
+                                var indexfield = j1.indexlist[0].indexfields[i];
+                                popschema.entryschema[indexfield.name] = {
+                                    title: indexfield.name,
+                                    type: "string", // currency, integer, datum, text, key
+                                    class: "uietext",
+                                    default: "",
+                                    io: "i"
+                                };
+                            }
+                            sysbase.putMessage(tablename + " index-Analyse erfolgt", 1);
+                            callback300("Finish");
+                            return;
+                        } else {
+                            sysbase.putMessage(tablename + " index-Analyse ERROR:" + j1.message, 3);
+                            callback300("Finish");
+                            return;
+                        }
+                    }).fail(function (err) {
+                        console.log("getsql3index:" + tablename + "=>" + err.message);
+                        sysbase.putMessage(err, 3);
+                        callback300("Error");
+                        return;
+                    }).always(function () {
+                        // nope
+                    });
+                }
+            ],
+            function (error, ret) {
+                if (error === "Error") {
+                    sysbase.putMessage("delOneRecord-Error:" + ret.message, 3);
+                    return;
+                }
+                var anchorHash = "#uisql3";
+                var title = "Satz löschen";
+                var position = {};
+                /*
+                position.left = $(this).position().left;
+                position.left -= $(myidhash).find(".popup").outerWidth();
+                position.top = $(this).position().top;
+                position.top += $(this).outerHeight() + 5;
+                */
+                //uientry.inputDialogX = function (container, position, title, schema, record, callback) {
 
-        $(document).on('popupok', function (evt, extraParam) {
-            evt.preventDefault();
-            evt.stopImmediatePropagation();
-            //This code runs when the event is triggered
-            // https://stackoverflow.com/questions/9584892/can-you-set-event-data-with-jquery-trigger
-            console.log(extraParam);
+                $(document).on('popupok', function (evt, extraParam) {
+                    evt.preventDefault();
+                    evt.stopImmediatePropagation();
+                    //This code runs when the event is triggered
+                    // https://stackoverflow.com/questions/9584892/can-you-set-event-data-with-jquery-trigger
+                    console.log(extraParam);
+                    // extraParam hat den poprecord
+                    debugger;
+                    var poprecord = JSON.parse(extraParam);
+                    var delStmt = "DELETE FROM " + poprecord.tablename;
+                    var where = "";
 
-
-        });
-        uientry.inputDialogX(anchorHash, position, title, popschema, poprecord, function (ret) {
-            if (ret.error === false) {
-                var sel = {
-                    recid: key
-                };
-                var api = "delonerecord";
-                var table = tablename;
-                var record = {};
-                $("body").css("cursor", "progress");
-                uihelper.delOneRecord(sel, api, table, record, function (ret) {
-                    if (ret.error === false) {
-                        // record upserted
-                        sysbase.putMessage("delOneRecord:" + ret.message, 1);
-                        console.log("delOneRecord:" + key + " erledigt");
-                        $(that).html(" Satz wurde gelöscht");
-                        $(that).removeAttr('href');
-                    } else {
-                        sysbase.putMessage("delOneRecord:" + ret.message, 3);
+                    for (var fieldname in poprecord) {
+                        if (poprecord.hasOwnProperty(fieldname)) {
+                            // do stuff
+                            if (fieldname !== "tablename") {
+                                var field = poprecord[fieldname];
+                                if (where.length > 0) where += " AND ";
+                                where += fieldname + " = '" + field + "'";
+                            }
+                        }
                     }
-                    $("body").css("cursor", "default");
+                    delStmt += " WHERE " + where;
+                    var api = "delonerecord";
+                    var table = tablename;
+                    var record = {};
+                    $("body").css("cursor", "progress");
+                    uihelper.delOneRecord(delStmt, api, table, record, function (ret) {
+                        if (ret.error === false) {
+                            // record upserted
+                            sysbase.putMessage("delOneRecord:" + ret.message, 1);
+                            console.log("delOneRecord:" + key + " erledigt");
+                            $(that).html(" Satz wurde gelöscht");
+                            $(that).removeAttr('href');
+                        } else {
+                            sysbase.putMessage("delOneRecord:" + ret.message, 3);
+                        }
+                        $("body").css("cursor", "default");
+                    });
                 });
-            }
-        });
+
+                poprecord = Object.assign(poprecord, key);
+                uientry.inputDialogX(anchorHash, position, title, popschema, poprecord, function (ret) {
+                    if (ret.error === false) {
+                        sysbase.putMessage("Popup ausgegeben");
+                    }
+                });
+            }); // Ende async
     };
 
 

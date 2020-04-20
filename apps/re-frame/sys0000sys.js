@@ -115,6 +115,14 @@
             }
             if (req.query && typeof req.query.projection !== "undefined" && req.query.projection.length > 0) {
                 projection = JSON.parse(req.query.projection);
+                if (projection !== "undefined" && projection !== null) {
+                    var pkeys = Object.keys(projection);
+                    if (pkeys.length === 1 && pkeys[0] === "history") {
+                        projection = {};
+                    }
+                } else {
+                    projection = {};
+                }
             }
             if (req.query && typeof req.query.sort !== "undefined" && req.query.sort.length > 0) {
                 sort = JSON.parse(req.query.sort);
@@ -197,7 +205,6 @@
                     where += " = " + "'" + condval + "'";
                 } else {
                     // Dickes Problem!!!
-                    debugger;
                     ret.error = true;
                     ret.message = "WHERE zu komplex:" + JSON.stringify(sel);
                     callback(res, ret);
@@ -277,6 +284,7 @@
             var record = {};
             console.log("***SKIP***" + skip + " " + typeof skip);
             var sqlStmt = sel;
+            var rows;
             db.serialize(function () {
                 db.all(sqlStmt, function (err, rows) {
                     var ret = {};
@@ -627,7 +635,11 @@
                                 vallist += pvalue + ",";
                             } else {
                                 createStmt += " TEXT,";
-                                vallist += "'" + pvalue.replace(/'/g, "''") + "',";
+                                if (pvalue === null) {
+                                    vallist += "null,";
+                                } else {
+                                    vallist += pvalue + ",";
+                                }
                             }
                         }
                     }
@@ -659,7 +671,7 @@
                             if (indFields.length > 0) {
                                 var indrnd = "T" + Math.floor(Math.random() * 100000) + 1;
                                 var createInd = "CREATE INDEX IF NOT EXISTS ";
-                                createInd +=  " ind" + indrnd + "_" + ret.sorparms.table;
+                                createInd += " ind" + indrnd + "_" + ret.sorparms.table;
                                 createInd += " ON " + ret.sorparms.table + "(";
                                 createInd += indFields;
                                 createInd += ")";
@@ -799,7 +811,11 @@
                             } else if (ptype === "boolean") {
                                 vallist += pvalue + ",";
                             } else {
-                                vallist += "'" + pvalue.replace(/'/g, "''") + "',";
+                                if (pvalue === null) {
+                                    vallist += "null,";
+                                } else {
+                                    vallist += pvalue + ",";
+                                }
                             }
                         }
                     }
@@ -817,6 +833,7 @@
                         perftimer.sor.start = new Date();
                         if (err) {
                             ret.message += " INSERT-Error:" + err.message;
+                            console.log(" INSERT-Error:" + err.message);
                         } else {
                             ret.message += " " + ret.sorparms.table + " ID:" + this.lastID + " inserted";
                         }
@@ -972,14 +989,14 @@
      * @param res
      * @param callback
      */
-    sys0000sys.delonerecord = function (db, async, ObjectID, req, reqparm, res, callback) {
+    sys0000sys.delonerecord = function (db, async, req, reqparm, res, callback) {
         /**
          * Prüfen, welche Parameter vorliegen, dann zugreifen
          * username und firma sind auch verfügbar
          */
-        var sel = {};
-        if (req.body && typeof req.body.sel !== "undefined" && req.body.sel.length > 0) {
-            sel = JSON.parse(req.body.sel);
+        var delStmt = {};
+        if (req.body && typeof req.body.delStmt !== "undefined" && req.body.delStmt.length > 0) {
+            delStmt = req.body.delStmt;
         }
         var table = "";
         if (req.body && typeof req.body.table !== "undefined" && req.body.table.length > 0) {
@@ -990,24 +1007,14 @@
             firma = req.body.firma;
         }
         var record = {};
-        if (req.body && typeof req.body.record !== "undefined" && req.body.record.length > 0) {
+        if (req.body && typeof req.body.record === "object" && req.body.record !== null) {
             record = JSON.parse(req.body.record);
         }
 
         var ret = {};
-        var recid = "";
         console.log("delonerecord:" + table);
-        console.log("delonerecord:" + JSON.stringify(sel, null, " "));
-        if (typeof sel.recid !== "undefined") {
-            recid = sel.recid;
-            delete sel.recid;
-        } else {
-            ret.error = true;
-            ret.message = "delonerecord:" + "keine recid übergeben";
-            ret.record = null;
-            callback(res, ret);
-            return;
-        }
+        console.log("delonerecord:" + delStmt);
+        var selStmt = delStmt.replace("DELETE ", "SELECT * ");
         try {
             if (db === null) {
                 ret.error = true;
@@ -1016,73 +1023,75 @@
                 callback(res, ret);
                 return;
             }
-            /**
-             * später erst den Protokollsatz Schreiben
-             *
-             */
             var saverec = {}; // $.extend({}, record);
-            saverec.oldid = recid;
-            delete saverec._id;
-            sel = {};
-            sel._id = ObjectID(recid);
-            db.collection(table).findOne(sel, function (err, result) {
-                if (err) {
-                    ret.error = true;
-                    ret.message = "nichts gefunden:" + err.message;
-                    console.log("delonerecord:" + ret.message);
-                    ret.record = null;
-                    callback(res, ret);
-                    return;
-                } else if (result) {
-                    console.log("delonerecord:" + recid + " gefunden");
-
-                    var newrec = JSON.parse(JSON.stringify(result));
-                    var oldid = newrec._id;
-                    newrec.oldid = oldid;
-                    delete newrec._id;
-                    db.collection(table + "history").insert(newrec, {
-                        w: 1
-                    }, function (err, result) {
-                        ret = {};
-                        if (err) {
-                            console.log("delonerecord insert " + table + "history" + " Error:" + err.message);
-                            ret.error = true;
-                            ret.message = "delonerecord:" + err.message;
-                            callback(res, ret);
-                            return;
-                        } else {
-                            console.log("delonerecord insert " + table + "history OK");
-                            /**
-                             * und jetzt die Daten wirklich löschen
-                             */
-                            db.collection(table).remove(sel, function (err, result) {
-                                if (err) {
-                                    ret.error = true;
-                                    ret.message = "delonerecord:" + err.message;
-                                    console.log("delonerecord:" + ret.message);
-                                    callback(res, ret);
-                                    return;
-                                } else {
-                                    ret.error = false;
-                                    ret.message = "delonerecord:" + "gelöscht:" + recid;
-                                    ret.record = null;
-                                    console.log("delonerecord:" + ret.message);
-                                    callback(res, ret);
-                                    return;
-                                }
+            db.serialize(function () {
+                async.waterfall([
+                    function (callback77) {
+                        /**
+                         * Holen Satz für Protokoll
+                         */
+                        db.get(selStmt, function (err, row) {
+                            callback77(null, res, {
+                                error: false,
+                                message: "OK",
+                                row: row
                             });
-                        }
-                    });
+                            return;
+                        });
+                    },
+                    function (res, ret, callback77b) {
 
-                } else {
+                        var updfields = {};
+                        /*
+                        metafields: Array mit Objects
+                        fielddescr:"Year AD, ,,AD, , speleothem, ,,N,   "
+                        fieldname:"year"
+                        */
+                        updfields["$setOnInsert"] = ret.row;
+                        var reqparm = {
+                            table: table + "_history",
+                            selfields: {
+                                saveuuid: uihelper.uuid(),
+                                savets: new Date().toISOString()
+                            },
+                            updfields: updfields
+                        };
+                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                            callback77b(null, res, {
+                                error: false,
+                                message: "gesichert",
+                                row: ret.row
+                            });
+                            return;
+                        });
+
+                    },
+                    function (res, ret, callback77c) {
+                        db.run(delStmt, function (err) {
+                            console.log("Row(s) deleted:" + this.changes);
+                            callback77c(null, res, {
+                                error: false,
+                                message: "gelöscht",
+                                row: ret.row
+                            });
+                            return;
+                        });
+
+                    }
+                ], function (error, res, ret) {
                     ret.error = false;
-                    ret.message = "gefunden:0 für " + JSON.stringify(sel);
+                    ret.message = "delonerecord:" + "Fertig";
+                    ret.row = null;
                     console.log("delonerecord:" + ret.message);
-                    ret.record = null;
                     callback(res, ret);
                     return;
-                }
-            });
+                });
+
+            }); // serialize
+
+
+
+
         } catch (err) {
             ret.error = true;
             ret.message = "delonerecord:" + err.message;
@@ -1139,12 +1148,14 @@
                                 }
                             } catch (err) {
                                 var errinfo = {};
+                                console.log(err.stack);
                                 errinfo.name = err.message;
                                 errinfo.error = true;
                                 dirtree.root.push(errinfo);
                             }
                         }
                         callback("Finish", dirtree);
+                        return;
                     });
                 }
             ],
@@ -1480,6 +1491,7 @@
                     /**
                      * Komplettieren oder Anlegen KLIFILES für netCDF albedo
                      */
+                    var saveret = uihelper.cloneObject(ret);
                     async.eachSeries(ret.files, function (file, nextfile) {
 
                             async.waterfall([
@@ -1507,7 +1519,7 @@
                                         },
                                         updfields: updfields
                                     };
-                                    sys0000sys.setonerecord(gbldb, async, null, reqparm, res, function (res, ret) {
+                                    sys0000sys.setonerecord(gbldb, async, null, reqparm, res, function (res, ret1) {
                                         nextfile();
                                         return;
                                     });
@@ -1516,7 +1528,8 @@
                         },
                         function (err) {
                             // Ende von eachseries
-                            callback("Finish", ret);
+                            callback("Finish", saveret);
+                            return;
                         }
 
                     );

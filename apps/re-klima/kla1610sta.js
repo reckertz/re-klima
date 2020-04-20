@@ -189,16 +189,16 @@
         if (queryString && queryString.length > 0) {
             var parms = queryString.split("&");
             var parmobj = {};
-            parms.forEach(function(item) {
+            parms.forEach(function (item) {
                 var subparms = item.split("=");
                 var key = subparms[0];
                 parmobj[key] = subparms[1];
-             });
-             console.log(parmobj);
-             defaultsource = parmobj.source || "";
-             defaultvariablename = parmobj.variablename || "";
-             fullname = parmobj.fullname || "";
-             actfullname = parmobj.fullname || "";
+            });
+            console.log(parmobj);
+            defaultsource = parmobj.source || "";
+            defaultvariablename = parmobj.variablename || "";
+            fullname = parmobj.fullname || "";
+            actfullname = parmobj.fullname || "";
         }
 
 
@@ -413,7 +413,7 @@
                                 float: "left",
                                 "margin": "10px"
                             },
-                            html: "Worldmap (Datenbankzugriff)",
+                            html: "Worldmap (Filter)",
                             click: function (evt) {
                                 evt.preventDefault();
                                 //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
@@ -435,7 +435,7 @@
                                 float: "left",
                                 "margin": "10px"
                             },
-                            html: "Worldmap (aus der Liste)",
+                            html: "Worldmap (Liste)",
                             click: function (evt) {
                                 evt.preventDefault();
                                 //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
@@ -471,7 +471,7 @@
                                 float: "left",
                                 "margin": "10px"
                             },
-                            html: "Übernahme (aus der Liste)",
+                            html: "Übernahme (Liste)",
                             click: function (evt) {
                                 evt.preventDefault();
                                 //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
@@ -495,7 +495,7 @@
                                     sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
                                     return;
                                 } else {
-                                    var source = $("#kla1610stasource").val();    //   $(this).closest("tr").find('td:first-child').text();
+                                    var source = $("#kla1610stasource").val(); //   $(this).closest("tr").find('td:first-child').text();
                                     var ghcnclock = kla1610sta.showclock("#kla1610stalock");
                                     var that = this;
                                     $(that).attr("disabled", true);
@@ -536,44 +536,44 @@
                                 float: "left",
                                 "margin": "10px"
                             },
-                            html: "Übernahme (alle)",
+                            html: "Übernahme (Filter)",
                             click: function (evt) {
                                 evt.preventDefault();
-                                    var source = $("#kla1610stasource").val();    //   $(this).closest("tr").find('td:first-child').text();
-                                    var ghcnclock = kla1610sta.showclock("#kla1610stalock");
-                                    var that = this;
-                                    $(that).attr("disabled", true);
-                                    var jqxhr = $.ajax({
-                                        method: "GET",
-                                        crossDomain: false,
-                                        url: sysbase.getServer("ghcndall"),
-                                        data: {
-                                            timeout: 10 * 60 * 1000,
-                                            source: source
-                                        }
-                                    }).done(function (r1, textStatus, jqXHR) {
-                                        clearInterval(ghcnclock);
-                                        sysbase.checkSessionLogin(r1);
-                                        var ret = JSON.parse(r1);
-                                        sysbase.putMessage(ret.message, 1);
-                                        $("#kla1610staliste").click();
-                                        return;
-                                    }).fail(function (err) {
-                                        clearInterval(ghcnclock);
-                                        //$("#kli1400raw_rightwdata").empty();
-                                        //document.getElementById("kli1400raw").style.cursor = "default";
-                                        sysbase.putMessage("ghcnddata:" + err, 3);
-                                        return;
-                                    }).always(function () {
-                                        // nope
-                                        $(that).attr("disabled", false);
-                                    });
+                                var source = $("#kla1610stasource").val(); //   $(this).closest("tr").find('td:first-child').text();
+                                var ghcnclock = kla1610sta.showclock("#kla1610stalock");
+                                var that = this;
+                                $(that).attr("disabled", true);
+                                var jqxhr = $.ajax({
+                                    method: "GET",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("ghcndall"),
+                                    data: {
+                                        timeout: 10 * 60 * 1000,
+                                        source: source
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    clearInterval(ghcnclock);
+                                    sysbase.checkSessionLogin(r1);
+                                    var ret = JSON.parse(r1);
+                                    sysbase.putMessage(ret.message, 1);
+                                    $("#kla1610staliste").click();
+                                    return;
+                                }).fail(function (err) {
+                                    clearInterval(ghcnclock);
+                                    //$("#kli1400raw_rightwdata").empty();
+                                    //document.getElementById("kli1400raw").style.cursor = "default";
+                                    sysbase.putMessage("ghcnddata:" + err, 3);
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                    $(that).attr("disabled", false);
+                                });
 
                             }
                         }))
 
                         .append($("<button/>", {
-                            html: "Regression (alle)",
+                            html: "Regression (Filter)",
                             css: {
                                 float: "left",
                                 margin: "10px"
@@ -664,7 +664,7 @@
                                 float: "left",
                                 "margin": "10px"
                             },
-                            html: "Regression (aus der Liste)",
+                            html: "Regression (Liste)",
                             click: function (evt) {
                                 evt.preventDefault();
                                 //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
@@ -699,7 +699,7 @@
                                     sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
                                     return;
                                 } else {
-                                    var source = $("#kla1610stasource").val();    //   $(this).closest("tr").find('td:first-child').text();
+                                    var source = $("#kla1610stasource").val(); //   $(this).closest("tr").find('td:first-child').text();
                                     var ghcnclock = kla1610sta.showclock("#kla1610stalock");
                                     var that = this;
                                     $(that).attr("disabled", true);
@@ -754,7 +754,7 @@
         var idis1 = str1.indexOf(" ");
         var variablename = "";
         if (idis1 > 10) {
-            variablename = str1.substr(idis1+1, 4);
+            variablename = str1.substr(idis1 + 1, 4);
             selvariablename = variablename;
         }
         console.log("Station:" + stationid + " from:" + source);
@@ -778,7 +778,7 @@
             }));
             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
-            var tabname =variablename + " " + stationname;
+            var tabname = variablename + " " + stationname;
             var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1620shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         } else if (source === "ECAD") {
@@ -804,121 +804,188 @@
         $("#kla1610stalist").empty();
         starecord = {};
         uientry.fromUI2Record("#kla1610staform", starecord, staschema);
-        var selvariablename = starecord.variablename; // wird erst später gebraucht
-        var sel = {};
-        var where = "";
-        if (typeof starecord.source !== "undefined" && starecord.source.length > 0) {
-            if (where.length > 0) where += " AND ";
-            where += " KLISTATIONS.source ='" +  starecord.source + "'";
-        }
-        if (typeof starecord.stationid !== "undefined" && starecord.stationid.length > 0) {
-            if (where.length > 0) where += " AND ";
-            if (starecord.stationid.indexOf("*") >= 0) {
-                var stationid1 = starecord.stationid.replace(/\*/g, "%");
-                where += " KLISTATIONS.stationid LIKE '" +  stationid1 + "'";
-            } else {
-                where += " KLISTATIONS.stationid ='" +  starecord.stationid + "'";
-            }
-        }
-        if (typeof starecord.name !== "undefined" && starecord.name.length > 0) {
-            if (where.length > 0) where += " AND ";
-            where += " lower(stationname) LIKE '%" +  starecord.name.toLowerCase() + "%'";
-        }
-        if (typeof starecord.region !== "undefined" && starecord.region.length > 0) {
-            if (where.length > 0) where += " AND ";
-            if (starecord.region.toLowerCase().indexOf("is null") >= 0) {
-                where += "(";
-                where += "region is null";
-                where += " OR countryname is null";
-                where += " OR alpha2 is null";
-                where += ")";
-            } else {
-                where += "(";
-                where += " lower(region) LIKE '%" +  starecord.region.toLowerCase() + "%'";
-                where += " OR lower(subregion) LIKE '%" +  starecord.region.toLowerCase() + "%'";
-                where += " OR lower(countryname) LIKE '%" +  starecord.region.toLowerCase() + "%'";
-                where += ")";
-            }
-        }
-        if (typeof starecord.anzyears !== "undefined" && starecord.anzyears.trim().length > 0) {
-            if (where.length > 0) where += " AND ";
-            var anzparts = starecord.anzyears.match(/(<=|>=|<|>|=)(\d*)/);
-            if (anzparts !== null && anzparts.length > 2) {
-                where += " anzyears " + anzparts[1] + parseInt(anzparts[2]);
-            }
-        }
-        if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
-            if (where.length > 0) where += " AND ";
-            var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)(\d*)/);
-            if (fromyear !== null && fromyear.length > 2) {
-                where += " fromyear " + fromyear[1] + parseInt(fromyear[2]);
-            }
-        }
-        if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
-            if (where.length > 0) where += " AND ";
-            var toyear = starecord.toyear.match(/(<=|>=|<|>|=)(\d*)/);
-            if (toyear !== null && toyear.length > 2) {
-                where += " toyear " + toyear[1] + parseInt(toyear[2]);
-            }
-        }
-        if (typeof starecord.climatezone !== "undefined" && starecord.climatezone.trim().length > 0) {
-            var selclimatezone = starecord.climatezone.substr(0, 2);
-            if (where.length > 0) where += " AND ";
-            if (selclimatezone.startsWith("G")) {
-                var cz1 = "N" + starecord.climatezone.substr(1, 1);
-                var cz2 = "S" + starecord.climatezone.substr(1, 1);
-                    where += " (substr(climatezone, 1, 2) = '" + cz1 + "'";
-                where += " OR substr(climatezone, 1, 2) = '" + cz2 + "')";
-            } else {
-                where += " substr(climatezone, 1, 2) = '" + selclimatezone + "'";
-            }
-        }
 
-        if (typeof starecord.height !== "undefined" && starecord.height.trim().length > 0) {
-            if (where.length > 0) where += " AND ";
-            var height = starecord.height.match(/(<=|>=|<|>|=)(\d*)/);
-            if (height !== null && height.length > 2) {
-                where += " height " + height[1] + parseInt(height[2]);
-            }
-        }
-        if (typeof starecord.variablename !== "undefined" && starecord.variablename.trim().length > 0) {
-            selvariablename = starecord.variablename;
-            if (selvariablename.indexOf(",") < 0) {
-                if (where.length > 0) where += " AND ";
-                where += " KLIDATA.variable = '" + selvariablename + "'";
-            } else {
-                var keys = selvariablename.split(",");
-                var liste = keys.length ? "'" + keys.join("','") + "'" : "";
-                if (where.length > 0) where += " AND ";
-                where += " KLIDATA.variable IN (" + liste + ")";
-            }
-        }
+
+        var sel = {};
         var table = "KLISTATIONS";
         var sqlStmt = "";
-        sqlStmt += "SELECT ";
-        sqlStmt += "KLISTATIONS.source, KLISTATIONS.stationid, stationname, ";
-        sqlStmt += "alpha2, alpha3, ";
-        sqlStmt += "region, subregion, countryname, ";
-        sqlStmt += " temperature,";
-        sqlStmt += "lats, longitude, latitude, height, ";
-        sqlStmt += "KLIDATA.variable, ";
-        sqlStmt += "KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear,";
-        sqlStmt += "KLIDATA.regtotm,KLIDATA.regtottmin, KLIDATA.regtottmax, KLIDATA.regtottavg";
-        // sqlStmt += "anzyears, realyears, fromyear, toyear";
-        sqlStmt += " FROM " + table;
+        var where = "";
+        // löschen nicht signifikante Feldnamen
+        var selfieldnames = Object.keys(starecord);
+        for (var ifield = 0; ifield < selfieldnames.length; ifield++) {
+            var fieldname = selfieldnames[ifield];
+            var fieldvalue = starecord[fieldname];
+            if (typeof fieldvalue === "undefined" && fieldvalue !== null || typeof fieldvalue === "string" && fieldvalue.trim().length === 0) {
+                delete starecord[fieldname];
+            }
+        }
+        selfieldnames = Object.keys(starecord);
+        if (selfieldnames.length === 3
+            && typeof starecord.source === "string" && starecord.source.length > 0
+            && typeof starecord.variablename === "string" && starecord.variablename.length > 0
+            && typeof starecord.fromyear === "string" && starecord.fromyear.length > 0) {
+            sqlStmt += "SELECT ";
+            sqlStmt += " KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
+            sqlStmt += " KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
+            sqlStmt += " KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
+            sqlStmt += " KLISTATIONS.temperature,";
+            sqlStmt += " KLISTATIONS.lats, KLISTATIONS.longitude, KLISTATIONS.latitude, KLISTATIONS.height, ";
+            sqlStmt += " KLIDATA.variable, ";
+            sqlStmt += " KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear,";
+            sqlStmt += " KLIDATA.regtotm,KLIDATA.regtottmin, KLIDATA.regtottmax, KLIDATA.regtottavg";
+            sqlStmt += " FROM KLISTATIONS";
 
-        sqlStmt += " LEFT JOIN KLIDATA";
-        sqlStmt += " ON KLIDATA.source = KLISTATIONS.source";
-        sqlStmt += " AND KLIDATA.stationid = KLISTATIONS.stationid";
-        if (where.length > 0){
+            sqlStmt += " LEFT JOIN KLIDATA";
+            sqlStmt += " ON KLISTATIONS.source = KLIDATA.source";
+            sqlStmt += " AND KLISTATIONS.stationid = KLIDATA.stationid";
+            where += " KLISTATIONS.stationid IN (";
+            where += " SELECT stationid FROM KLIINVENTORY";
+            where += " WHERE KLIINVENTORY.source = '" + starecord.source + "'";
+            where += " AND KLIINVENTORY.variable = '" + starecord.variablename + "'";
+            where += " AND KLIINVENTORY.fromyear <= '" + starecord.fromyear + "'";
+            where += ")";
+
             sqlStmt += " WHERE " + where;
+            sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
+
+        } else {
+            var selvariablename = starecord.variablename; // wird erst später gebraucht
+            if (typeof starecord.source !== "undefined" && starecord.source.trim().length > 0) {
+                if (where.length > 0) where += " AND ";
+                where += " KLISTATIONS.source ='" + starecord.source + "'";
+            }
+            if (typeof starecord.stationid !== "undefined" && starecord.stationid.trim().length > 0) {
+                if (where.length > 0) where += " AND ";
+                if (starecord.stationid.indexOf("*") >= 0) {
+                    var stationid1 = starecord.stationid.replace(/\*/g, "%");
+                    where += " KLISTATIONS.stationid LIKE '" + stationid1 + "'";
+                } else {
+                    where += " KLISTATIONS.stationid ='" + starecord.stationid + "'";
+                }
+            }
+            if (typeof starecord.name !== "undefined" && starecord.name.trim().length > 0) {
+                if (where.length > 0) where += " AND ";
+                where += " lower(KLISTATIONS.stationname) LIKE '%" + starecord.name.toLowerCase() + "%'";
+            }
+            if (typeof starecord.region !== "undefined" && starecord.region.trim().length > 0) {
+                if (where.length > 0) where += " AND ";
+                if (starecord.region.toLowerCase().indexOf("is null") >= 0) {
+                    where += "(";
+                    where += "KLISTATIONS.region is null";
+                    where += " OR KLISTATIONS.countryname is null";
+                    where += " OR KLISTATIONS.alpha2 is null";
+                    where += ")";
+                } else {
+                    where += "(";
+                    where += " lower(KLISTATIONS.region) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                    where += " OR lower(KLISTATIONS.subregion) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                    where += " OR lower(KLISTATIONS.countryname) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                    where += ")";
+                }
+            }
+            if (typeof starecord.anzyears !== "undefined" && starecord.anzyears.trim().length > 0) {
+                if (where.length > 0) where += " AND ";
+                var anzparts = starecord.anzyears.match(/(<=|>=|<|>|=)(\d*)/);
+                if (anzparts !== null && anzparts.length > 2) {
+                    where += " KLIDATA.anzyears " + anzparts[1] + parseInt(anzparts[2]);
+                } else {
+                    where += " KLIDATA.anzyears >= " + starecord.anzyears.trim();
+                }
+            }
+            if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
+                if (where.length > 0) where += " AND ";
+                var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)(\d*)/);
+                if (fromyear !== null && fromyear.length > 2) {
+                    where += " KLIDATA.fromyear " + fromyear[1] + parseInt(fromyear[2]);
+                } else {
+                    where += " KLIDATA.fromyear >= " + starecord.fromyear.trim();
+                }
+            }
+            if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
+                if (where.length > 0) where += " AND ";
+                var toyear = starecord.toyear.match(/(<=|>=|<|>|=)(\d*)/);
+                if (toyear !== null && toyear.length > 2) {
+                    where += " KLIDATA.toyear " + toyear[1] + parseInt(toyear[2]);
+                } else {
+                    where += " KLIDATA.toyear <= " + starecord.to.trim();
+                }
+            }
+            if (typeof starecord.climatezone !== "undefined" && starecord.climatezone.trim().length > 0) {
+                var selclimatezone = starecord.climatezone.substr(0, 2);
+                if (where.length > 0) where += " AND ";
+                if (selclimatezone.startsWith("G")) {
+                    var cz1 = "N" + starecord.climatezone.substr(1, 1);
+                    var cz2 = "S" + starecord.climatezone.substr(1, 1);
+                    where += " (substr(KLISTATIONS.climatezone, 1, 2) = '" + cz1 + "'";
+                    where += " OR substr(KLISTATIONS.climatezone, 1, 2) = '" + cz2 + "')";
+                } else {
+                    where += " substr(KLISTATIONS.climatezone, 1, 2) = '" + selclimatezone + "'";
+                }
+            }
+
+            if (typeof starecord.height !== "undefined" && starecord.height.trim().length > 0) {
+                var height = starecord.height.match(/(<=|>=|<|>|=)(\d*)/);
+                if (height !== null && height.length > 2) {
+                    if (where.length > 0) where += " AND ";
+                    where += " KLISTATIONS.height " + height[1] + parseInt(height[2]);
+                } else {
+                    sysbase.putMessage("bitte Vergleichsoperator vor die Höhe setzen", 3);
+                }
+            }
+            if (typeof starecord.variablename !== "undefined" && starecord.variablename.trim().length > 0) {
+                selvariablename = starecord.variablename;
+                if (selvariablename.indexOf(",") < 0) {
+                    if (where.length > 0) where += " AND ";
+                    where += " KLIDATA.variable = '" + selvariablename + "'";
+                } else {
+                    var keys = selvariablename.split(",");
+                    var liste = keys.length ? "'" + keys.join("','") + "'" : "";
+                    if (where.length > 0) where += " AND ";
+                    where += " KLIDATA.variable IN (" + liste + ")";
+                }
+            }
+
+            sqlStmt += "SELECT ";
+            sqlStmt += "KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
+            sqlStmt += "KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
+            sqlStmt += "KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
+            sqlStmt += " KLISTATIONS.temperature,";
+            sqlStmt += "KLISTATIONS.lats, KLISTATIONS.longitude, KLISTATIONS.latitude, KLISTATIONS.height, ";
+            sqlStmt += "KLIDATA.variable, ";
+            sqlStmt += "KLIDATA.anzyears, KLIDATA.realyears, KLIDATA.fromyear, KLIDATA.toyear,";
+            sqlStmt += "KLIDATA.regtotm,KLIDATA.regtottmin, KLIDATA.regtottmax, KLIDATA.regtottavg";
+            // sqlStmt += "anzyears, realyears, fromyear, toyear";
+
+            /**
+             * Optimierung des SQL-Statements - denn SQLite3 kann dies nicht ausreichend
+             */
+            var checkwhere = where;
+            checkwhere = checkwhere.replace(/KLISTATIONS.source/g, " ");
+            if (checkwhere.indexOf("KLISTATIONS") >= 0) {
+                sqlStmt += " FROM KLISTATIONS";
+                sqlStmt += " LEFT JOIN KLIDATA";
+                sqlStmt += " ON KLIDATA.source = KLISTATIONS.source";
+                sqlStmt += " AND KLIDATA.stationid = KLISTATIONS.stationid";
+                if (where.length > 0) {
+                    sqlStmt += " WHERE " + where;
+                }
+                sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
+            } else {
+                where = where.replace(/KLISTATIONS.source/g, "KLIDATA.source");
+                sqlStmt += " FROM KLIDATA";
+                sqlStmt += " LEFT JOIN KLISTATIONS";
+                sqlStmt += " ON KLIDATA.source = KLISTATIONS.source";
+                sqlStmt += " AND KLIDATA.stationid = KLISTATIONS.stationid";
+                if (where.length > 0) {
+                    sqlStmt += " WHERE " + where;
+                }
+                sqlStmt += " ORDER BY KLIDATA.source, KLIDATA.stationid";
+            }
         }
 
-        sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
         var skip = 0;
         var limit = 0;
         var api = "getallrecords";
-
 
         uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
             if (ret.error === true) {
@@ -1028,7 +1095,7 @@
                             reprecord.station = record.stationid;
                             reprecord.station += " " + record.variable || "" + " ";
                             reprecord.station += "<br>" + record.stationname;
-                            if (typeof record.temperature === "undefined" || record.temperature ===null) {
+                            if (typeof record.temperature === "undefined" || record.temperature === null) {
                                 reprecord.station += "*unknown";
                             } else {
                                 reprecord.station += " " + record.temperature;

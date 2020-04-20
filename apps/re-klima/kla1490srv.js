@@ -566,6 +566,216 @@
 
 
 
+    /**
+     * ghcndinventory - GHCN daily-Aufbereitung ghcnd-inventory.txt
+     * Vorgabe ist fullname von ghcnd-inventory.txt
+     * damit wird KLIINVENTORY fortgeschrieben, die +.dly-Files werden hier NICHT geladen
+     * @param {*} gblInfo
+     * @param {*} db
+     * @param {*} fs
+     * @param {*} path
+     * @param {*} rootname
+     * @param {*} async
+     * @param {*} stream
+     * @param {*} StreamZip
+     * @param {*} readline
+     * @param {*} sys0000sys
+     * @param {*} req
+     * @param {*} res
+     * returns function (res, ret)
+     */
+    kla1490srv.ghcndinventory = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, res, callback290) {
+        async.waterfall([
+                function (callback290a) {
+                    /**
+                     * Dateinamen bereitstellen
+                     */
+                    var fullname = "";
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    var source = "";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    var selyears = "";
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+                    if (!fs.existsSync(fullname)) {
+                        callback290a("Error", res, {
+                            error: false,
+                            message: fullname + " nicht auf dem Server vorhanden"
+                        });
+                        return;
+                    }
+                    var stationfilter = "";
+                    if (req.query && typeof req.query.extraParam !== "undefined" && req.query.extraParam.length > 0) {
+                        stationfilter = JSON.parse(req.query.extraParam).stationfilter;
+                    }
+                    var ret = {};
+                    ret.fullname = fullname;
+                    ret.fullnamestations = fullname;
+                    ret.dirname = path.dirname(fullname);
+                    ret.source = source;
+                    ret.selyears = selyears;
+                    ret.stationfilter = stationfilter;
+                    callback290a(null, res, ret);
+                    return;
+                },
+                function (res, ret, callback290b) {
+                    /**
+                     * KLIINVENTORY neu aufbauen aus ghcnd-inventory.txt
+                     *          1         1         1         1
+                     * 12345678901234567890123456789012345678901234567890
+                     * ACW00011604  17.1167  -61.7833 TMAX 1949 1949
+                     * ACW00011604  17.1167  -61.7833 TMIN 1949 1949
+                     * als Zusatzfeld wird source = GHCND zugefügt
+                     */
+                    var invschema = [{
+                            name: "stationid", //
+                            von: "1",
+                            bis: "12",
+                            type: "String"
+                        },
+                        {
+                            name: "skip1", // Leerstelle
+                            von: "13",
+                            bis: "13",
+                            type: "String"
+                        },
+                        {
+                            name: "longitude", // "Longitude"
+                            von: "14",
+                            bis: "20",
+                            type: "String"
+                        },
+                        {
+                            name: "skip2", // Leerstelle
+                            von: "21",
+                            bis: "21",
+                            type: "String"
+                        },
+                        {
+                            name: "latitude", // "Latitude"
+                            von: "22",
+                            bis: "30",
+                            type: "String"
+                        },
+                        {
+                            name: "skip3", // Leerstelle
+                            von: "31",
+                            bis: "31",
+                            type: "String"
+                        },
+                        {
+                            name: "variable", // variable-Name
+                            von: "32",
+                            bis: "35",
+                            type: "String"
+                        },
+                        {
+                            name: "skip4", // Leerstelle
+                            von: "36",
+                            bis: "36",
+                            type: "String"
+                        },                        {
+                            name: "fromyear", //
+                            von: "37",
+                            bis: "40",
+                            type: "String"
+                        },                        {
+                            name: "skip5", // Leerstelle
+                            von: "41",
+                            bis: "41",
+                            type: "String"
+                        },                        {
+                            name: "toyear", //
+                            von: "42",
+                            bis: "45",
+                            type: "String"
+                        }
+                    ];
+                    var inventoryfilename = path.join(ret.dirname, "ghcnd-inventory.txt");
+                    ret.inventoryfilename = inventoryfilename;
+                    if (!fs.existsSync(inventoryfilename)) {
+                        callback290b("Error", res, {
+                            error: true,
+                            message: "Datei nicht gefunden:" + inventoryfilename
+                        });
+                        return;
+                    }
+                    /**
+                     * Lesen ghcnd-inventory.txt und Update KLIINVENTORY
+                     */
+                    var counter = 0;
+                    var html = "";
+                    var rl = new LineByLineReader(ret.inventoryfilename);
+                    // event is emitted after each line
+                    rl.on('line', function (line) {
+                        var that = this;
+                        rl.pause();
+                        counter++;
+                        var invrecord = {};
+                        for (var i = 0; i < invschema.length; i++) {
+                            var val1 = line.substring(invschema[i].von - 1, invschema[i].bis).trim();
+                            var fld1 = invschema[i].name;
+                            invrecord[fld1] = val1.trim();
+                        }
+                        var reqparm = {};
+                        var stationid = invrecord.stationid;
+                        var variable = invrecord.variable;
+                        var fromyear = invrecord.fromyear;
+                        delete invrecord.stationid;
+                        delete invrecord.variable;
+                        delete invrecord.fromyear;
+                        delete invrecord.skip1;
+                        delete invrecord.skip2;
+                        delete invrecord.skip3;
+                        delete invrecord.skip4;
+                        delete invrecord.skip5;
+                        reqparm.selfields = {
+                            source: "GHCND",
+                            stationid: stationid,
+                            variable: variable,
+                            fromyear: fromyear
+                        };
+                        reqparm.updfields = {};
+                        reqparm.updfields["$setOnInsert"] = {
+                            source: "GHCND",
+                            stationid: stationid,
+                            variable: variable,
+                            fromyear: fromyear
+                        };
+                        reqparm.updfields["$set"] = invrecord;
+                        reqparm.table = "KLIINVENTORY";
+                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                            if (counter > 1000) {
+                                if (counter % 2000 === 0) console.log("KLIINVENTORY:" + counter);
+                            } else {
+                                if (counter % 100 === 0) console.log("KLIINVENTORY:" + counter);
+                            }
+                            rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                        });
+                    });
+                    // end - line-by-line davor war es close
+                    rl.on('end', function (line) {
+                        console.log('Total lines : ' + counter);
+                        ret.message += " KLIINVENTORY:" + counter;
+                        callback290b("Finish", res, ret);
+                        return;
+                    });
+                }
+
+            ],
+            function (error, res, ret) {
+                callback290(res, ret);
+                return;
+            });
+    };
+
+
+
 
     /**
      * get Daily Data for Stations GHCND
