@@ -134,6 +134,7 @@
                 )
             );
         sysbase.initFooter();
+
         $("#kla1630map.content")
             .append($("<div/>", {
                 css: {
@@ -300,6 +301,8 @@
                 defaultArea: {
                     eventHandlers: {
                         click: function (e, id, mapElem, textElem) {
+                            sysbase.putMessage("Hit:" + id);
+
                             var newData = {
                                 'areas': {}
                             };

@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, 
-    initial-scale=1.0, 
-    maximum-scale=1.0, 
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
     user-scalable=no">
     <title>Climate Sub-Analysis</title>
     <meta name="description" content="Klima Admin-App" />
@@ -15,6 +15,7 @@
     <link href="css/style.min.css" rel="stylesheet">    <!-- jstree -->
     <link href="css/klistyles.css" rel="stylesheet">
     <link href="css/pivot.css" rel="stylesheet">
+
 
     <!-- erst die libs laden, dann die js module -->
     <!-- <script src="lib/jquery.min.js"></script> -->
@@ -27,10 +28,12 @@
     <script src="lib/md5.js"></script>
     <script src="lib/dtm.js"></script>
     <script src="lib/mingo.min.js"></script>
-    <script type="application/javascript" src="lib/jstree.min.js"></script>
-    <script type="application/javascript" src="lib/dotize.js"></script>
+    <script src="lib/jstree.min.js"></script>
+    <script src="lib/dotize.js"></script>
 
     <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
+
+
     <script src="lib/raphael.min.js" charset="utf-8"></script>
     <script src="lib/jquery.mapael.js" charset="utf-8"></script>
     <script src="maps/germany.js" charset="utf-8"></script>
@@ -38,7 +41,6 @@
     <!-- script src="lib/regression.js" charset="utf-8"></script -->
     <!-- script src="lib/jerzybrowser.js" charset="utf-8"></script -->
 
-    
     <script src="lib/jquery-ui.min.js"></script>
     <script src="lib/jquery.ui.touch-punch.min.js"></script>
 
@@ -70,7 +72,7 @@
     <script type="text/javascript" src="apps/re-ghcnm/ghc9000load.js"></script>
     <script type="text/javascript" src="apps/re-ghcnm/ghc9010gm.js"></script>
 
-    
+
     <script type="text/javascript" src="apps/re-klima/kli0000con.js"></script>
     <script type="text/javascript" src="apps/re-klima/kli1000loc.js"></script>
     <script type="text/javascript" src="apps/re-klima/kli1010prj.js"></script>
@@ -132,15 +134,11 @@
             } catch (err) {
 
             }
-            
             sysbase.navigateTo(target, [], function (ret) {
                 if (ret.error === true) {
                     alert(ret.message);
                 }
             });
-            
-           
-
         });
     </script>
 </body>

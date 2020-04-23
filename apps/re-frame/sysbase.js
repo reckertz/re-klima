@@ -396,6 +396,7 @@
                     var err = new Error("Missing ID in page");
                     sysbase.putMessage("Missing ID in page", 3);
                     alert(new Error("ID").stack);
+
                     if (typeof callback !== "undefined") {
                         callback({
                             error: true,

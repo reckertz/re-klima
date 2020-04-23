@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no">
+    <title>klaworldmap - Weltkarte</title>
+    <meta name="description" content="Klima Admin-App" />
+    <meta name="cache-control" content="no-cache, no-store">
+    <meta name="keywords" content="Node.js, JavaScript, AWS EC2, MongoDB, PWA, SPA">
+    <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/klistyles.css" rel="stylesheet">
+    <link href="css/planetaryjs.css" rel="stylesheet">
+
+    <script src="lib/async.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.backDetect.js"></script>
+    <script src="lib/jquery.cookie.min.js"></script>
+    <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
+
+    <script src="lib/d3.v3.min.js"></script>
+    <script src="lib/topojson.v1.min.js"></script>
+
+    <script src="lib/planetaryjs.js" charset="utf-8"></script>
+    <!--script src="lib/world-110m.json" charset="utf-8"></script-->
+
+
+    <script src="apps/re-frame/uihelper.js"></script>
+    <script src="apps/re-frame/sysbase.js"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
+        <span class="headertitle" style="color:red;font-weight:bold;">klaplanetary - World-Globe</span>
+        <noscript>
+            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+                <span style="color:blue">
+                    Your browser does not support scripts, you have to enable it to run this page
+                </span>
+            </div>
+        </noscript>
+    </div>
+    <div class="content">
+        <div class="col1of2">
+
+        </div>
+        <div class="col2of2">
+            <canvas id='rotatingGlobe' width='400' height='400' style='width: 400px; height: 400px; cursor: move;'></canvas>
+        </div>
+    </div>
+    <div class="footer">
+    </div>
+    <script>
+        $(window).off("resize");
+        $(window).resize(function () {
+            var hh = $(".header").outerHeight();
+            var fh = $(".footer").outerHeight();
+            var wh = $(window).height();
+            $(".content").height(wh - hh - fh - 1);
+            // $(".content").css("overflow", "auto");
+        });
+        $(document).ready(function () {
+            $('body').backDetect(function () {
+                alert("The back-button terminates the app (2)");
+            });
+            if (window.location.href.indexOf("localhost") >= 0) {
+                $("body").css({
+                    "background-color": "#5ff80611"
+                });
+            }
+            var app = "";
+            var target = "";
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                app = urlParams.get('app');
+                target = urlParams.get('target');
+            } catch (err) {
+
+            }
+            console.log("klaplanetary.html=>" + target);
+            sysbase.navigateTo(target, [], function (ret) {
+                if (ret.error === true) {
+                    alert(ret.message);
+                }
+            });
+        });
+
+        (function () {
+            debugger;
+            var globe = planetaryjs.planet();
+            globe.loadPlugin(autorotate(10));
+            globe.loadPlugin(planetaryjs.plugins.earth({
+                topojson: {
+                    file: '/world-110m-withlakes.json'
+                },
+                oceans: {
+                    fill: '#000080'
+                },
+                land: {
+                    fill: '#339966'
+                },
+                borders: {
+                    stroke: '#008000'
+                }
+            }));
+            globe.loadPlugin(lakes({
+                fill: '#000080'
+            }));
+            globe.loadPlugin(planetaryjs.plugins.pings());
+            globe.loadPlugin(planetaryjs.plugins.zoom({
+                scaleExtent: [100, 300]
+            }));
+            globe.loadPlugin(planetaryjs.plugins.drag({
+                onDragStart: function () {
+                    this.plugins.autorotate.pause();
+                },
+                onDragEnd: function () {
+                    this.plugins.autorotate.resume();
+                }
+            }));
+            globe.projection.scale(175).translate([175, 175]).rotate([0, -10, 0]);
+
+            var colors = ['red', 'yellow', 'white', 'orange', 'green', 'cyan', 'pink'];
+            setInterval(function () {
+                var lat = Math.random() * 170 - 85;
+                var lng = Math.random() * 360 - 180;
+                var color = colors[Math.floor(Math.random() * colors.length)];
+                globe.plugins.pings.add(lng, lat, {
+                    color: color,
+                    ttl: 2000,
+                    angle: Math.random() * 10
+                });
+            }, 150);
+
+            var canvas = document.getElementById('rotatingGlobe');
+            if (window.devicePixelRatio == 2) {
+                canvas.width = 800;
+                canvas.height = 800;
+                context = canvas.getContext('2d');
+                context.scale(2, 2);
+            }
+            globe.draw(canvas);
+
+            function autorotate(degPerSec) {
+                // Planetary.js plugins are functions that take a `planet` instance
+                // as an argument...
+                return function (planet) {
+                    var lastTick = null;
+                    var paused = false;
+                    planet.plugins.autorotate = {
+                        pause: function () {
+                            paused = true;
+                        },
+                        resume: function () {
+                            paused = false;
+                        }
+                    };
+                    planet.onDraw(function () {
+                        if (paused || !lastTick) {
+                            lastTick = new Date();
+                        } else {
+                            var now = new Date();
+                            var delta = now - lastTick;
+                            // This plugin uses the built-in projection (provided by D3)
+                            // to rotate the globe each time we draw it.
+                            var rotation = planet.projection.rotate();
+                            rotation[0] += degPerSec * delta / 1000;
+                            if (rotation[0] >= 180) rotation[0] -= 360;
+                            planet.projection.rotate(rotation);
+                            lastTick = now;
+                        }
+                    });
+                };
+            };
+
+            // This plugin takes lake data from the special
+            // TopoJSON we're loading and draws them on the map.
+            function lakes(options) {
+                options = options || {};
+                var lakes = null;
+
+                return function (planet) {
+                    planet.onInit(function () {
+                        // We can access the data loaded from the TopoJSON plugin
+                        // on its namespace on `planet.plugins`. We're loading a custom
+                        // TopoJSON file with an object called "ne_110m_lakes".
+                        var world = planet.plugins.topojson.world;
+                        lakes = topojson.feature(world, world.objects.ne_110m_lakes);
+                    });
+
+                    planet.onDraw(function () {
+                        planet.withSavedContext(function (context) {
+                            context.beginPath();
+                            planet.path.context(context)(lakes);
+                            context.fillStyle = options.fill || 'black';
+                            context.fill();
+                        });
+                    });
+                };
+            };
+        })();
+    </script>
+</body>
+
+</html>
