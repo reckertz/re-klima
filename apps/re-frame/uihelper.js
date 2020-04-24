@@ -2,7 +2,7 @@
 /*jshint laxbreak:true */
 /*global $:false, intel:false, cordova:false, device:false */
 /*global ecsystem,parseNumberconsole,devide,window,module,define,root,global,self */
-/*global async,uilogger,nta1010login,nta1000men,kber2,kassenber1cal,nta3001show,nta3005mit,nta3010devlst,nta3007raw,uiloginControl,nta3050users,nta3055user,nta3060invite,nta3020uploader,uimessages,uisystem */
+/*global async,sysbase,uilogger,nta1010login,nta1000men,kber2,kassenber1cal,nta3001show,nta3005mit,nta3010devlst,nta3007raw,uiloginControl,nta3050users,nta3055user,nta3060invite,nta3020uploader,uimessages,uisystem */
 (function () {
     var uihelper = {};
 
@@ -1979,6 +1979,158 @@
         }
     };
 
+    /**
+     * Berechnung der Kontinentzugehörigkeit oder beliebig
+     * der Zugehörigkeit eines Punktes zu einem Polygon (2D) nach
+     * https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon/17490923#17490923
+     * x=longitude, y=latitude
+     * @param {*} p - Point to check mit p = { x=, y=} als Koordinaten
+     * @param {*} polygon - Point-Array with points {x=, y=}
+     * returns true or false
+     */
+    uihelper.pointIsInPolygon = function (p, polygon) {
+        var isInside = false;
+        var minX = polygon[0].x,
+            maxX = polygon[0].x;
+        var minY = polygon[0].y,
+            maxY = polygon[0].y;
+        for (var n = 1; n < polygon.length; n++) {
+            var q = polygon[n];
+            minX = Math.min(q.x, minX);
+            maxX = Math.max(q.x, maxX);
+            minY = Math.min(q.y, minY);
+            maxY = Math.max(q.y, maxY);
+        }
+
+        if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) {
+            return false;
+        }
+
+        var i = 0,
+            j = polygon.length - 1;
+        for (i, j; i < polygon.length; j = i++) {
+            if ((polygon[i].y > p.y) !== (polygon[j].y > p.y) &&
+                p.x < (polygon[j].x - polygon[i].x) * (p.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x) {
+                isInside = !isInside;
+            }
+        }
+        return isInside;
+    };
+
+    uihelper.setContinents = function () {
+        var continents = sysbase.getCache("continents");
+        if (typeof continents === "undefined" || continents === null) {
+            continents = [];
+            continents.push({
+                code: "NAm1",
+                name: "North America-1",
+                lat: new Array(90, 90, 78.13, 57.5, 15, 15, 1.25, 1.25, 51, 60, 60, 90),
+                lon: new Array(-168.75, -10, -10, -37.5, -30, -75, -82.5, -105, -180, -180, -168.75, -168.75)
+            });
+
+            continents.push({
+                code: "NAm2",
+                name: "North America-2",
+                lat: new Array(51, 51, 60, 51),
+                lon: new Array(166.6, 180, 180, 166.6)
+            });
+
+            continents.push({
+                code: "SAm",
+                name: "South America",
+                lat: new Array(1.25,   1.25,  15,  15, -60, -60, 1.25),
+                lon: new Array(-105, -82.5,  -75, -30, -30, -105, -105)
+            });
+
+            continents.push({
+                code: "europe",
+                name: "Europa",
+                lat: new Array(90,   90,  42.5, 42.5, 40.79, 41, 40.55, 40.40, 40.05, 39.17, 35.46, 33,   38,  35.42, 28.25, 15,  57.5,  78.13, 90),
+                lon: new Array(-10, 77.5, 48.8, 30,   28.81, 29, 27.31, 26.75, 26.36, 25.19, 27.91, 27.5, 10, -10,  -13,   -30, -37.5, -10, -10)
+            });
+
+            continents.push({
+                code: "africa",
+                name: "Afrika",
+                lat: new Array(15,  28.25 ,35.42 ,38 ,33   ,31.74 ,29.54 ,27.78 ,11.3 ,12.5 ,-60 ,-60, 15),
+                lon: new Array(-30 ,-13   ,-10 ,10 ,27.5 ,34.58 ,34.92 ,34.46 ,44.3 ,52    ,75 ,-30, -30)
+            });
+
+            continents.push({
+                code: "australia",
+                name: "Australien",
+                lat: new Array(-11.88, -10.27, -10 ,-30    ,-52.5 ,-31.88, -11.88),
+                lon: new Array(110,      140  ,145 ,161.25 ,142.5  ,110, 110)
+            });
+
+            continents.push({
+                code: "asia",
+                name: "Asien",
+                lat: new Array(90   ,42.5 ,42.5 ,40.79 ,41 ,40.55 ,40.4  ,40.05 ,39.17 ,35.46 ,33   , 31.74 ,29.54 ,27.78 ,11.3 ,12.5 ,-60 ,-60 ,-31.88 ,-11.88 ,-10.27 ,33.13 ,51    ,60  ,90, 90),
+                lon: new Array(77.5 ,48.8 ,30   ,28.81 ,29 ,27.31 ,26.75 ,26.36 ,25.19 ,27.91 ,27.5 , 34.58 ,34.92 ,34.46 ,44.3 ,52   ,75  ,110  ,110   ,110    ,140    ,140   ,166.6 ,180 ,180, 77.5)
+            });
+
+            continents.push({
+                code: "asia2",
+                name: "Asien2",
+                lat: new Array(90    ,90      ,60      ,60, 90),
+                lon: new Array(-180 ,-168.75 ,-168.75 ,-180, -180)
+            });
+
+            continents.push({
+                code: "antarctica",
+                name: "Antarktis",
+                lat: new Array(-60, -60, -90, -90, -60),
+                lon: new Array(-180, 180, 180, -180, -180)
+            });
+            sysbase.setCache("continents", continents);
+        }
+        return continents;
+    };
+
+    /**
+     * finden des Kontinents zu einem Punkt
+     * https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon/17490923#17490923
+     * x=longitude, y=latitude
+     * @param {*} longitude - Längegrad, senkrecht zu Greenich
+     * @param {*} latitude - Breitengrad, waagerecht zu Äquator
+     * returns continentcode, continenttext
+     */
+    uihelper.getContinent = function (longitude, latitude) {
+        var continents = [];
+        if (continents.length === 0) {
+            continents = uihelper.setContinents();
+        }
+        for (var icon = 0; icon < continents.length; icon++) {
+            var continent = continents[icon];
+            // konvertieren contient zu polygon
+            var polygon = [];
+            for (var ilat = 0; ilat < continent.lat.length; ilat++) {
+                polygon.push({
+                    y: continent.lat[ilat],
+                    x: continent.lon[ilat]
+                });
+            }
+            var p = {
+                x: longitude,
+                y: latitude
+            };
+            if (uihelper.pointIsInPolygon(p, polygon)) {
+                return {
+                    error: false,
+                    message: "found:" + continent.code,
+                    continentcode: continent.code,
+                    continentname: continent.name,
+                    continent: continent,
+                    polygon: polygon
+                };
+            }
+        }
+        return {
+            error: true,
+            message: "no continent found"
+        };
+    };
 
     /**
      * geodistance - rechnet mit externem Server, virtualearth.net
@@ -2156,7 +2308,7 @@
         };
     };
 
-        /**
+    /**
      * Schaltjahr bzw. leapyear
      * Vorgabe djahr als numerich, return true/false
      */
@@ -2173,7 +2325,7 @@
      * returns Object oder false, wenn nicht erfolgreich
      *    month - one-based
      *    day - one-based
-    */
+     */
     uihelper.fromTTT2MMTT = function (tyear, tint) {
         var uihelpermd = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         if (uihelper.isleapyear(tyear)) {
@@ -2216,7 +2368,7 @@
             var qvalue = yeararray[iqual];
             var qtype = typeof qvalue;
             if (qtype === "undefined" || qvalue === null || qtype === "string" && (qtype.length === 0 || qvalue === "-9999" || qvalue === "-999.9" || qvalue === "null")) {
-                ibad ++;
+                ibad++;
                 if (iqual <= 30) {
                     istarter++;
                 }
@@ -2225,11 +2377,11 @@
                 }
                 continue;
             } else {
-                igood ++;
+                igood++;
                 continue;
             }
         }
-        if (ibad /iges * 100 >= 20) {
+        if (ibad / iges * 100 >= 20) {
             return false;
         }
         if (istarter > 30 || iender > 30) {

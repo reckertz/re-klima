@@ -31,6 +31,7 @@
     var starecord = {};
     var stations = {};
     var stationarray = [];
+    var worldmap;
 
     kla1630map.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
@@ -106,6 +107,89 @@
                         }
                     })
                     .append($("<ul/>")
+
+                        .append($("<li/>", {
+                            class: "dropdown-menuepoint",
+                            html: "Kontinente",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var continents = uihelper.setContinents();
+                                // https://github.com/neveldo/jQuery-Mapael/blob/master/UPGRADE.md
+                                var newLinks = {};
+                                var ilink = 0;
+                                for (var icon = 0; icon < continents.length; icon++) {
+                                    var continent = continents[icon];
+                                    for (var iko = 0; iko < continent.lat.length; iko++) {
+                                        ilink++;
+                                        var name = continent.code + ilink;
+                                        var fakt = 1.0;
+                                        if (continent.lat[iko] === continent.lat[iko + 1]) {
+                                            fakt = 1.001;
+                                        }
+                                        newLinks[name] = {
+                                            factor: 0.01,
+                                            // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                                            between: [{
+                                                latitude: continent.lat[iko],
+                                                longitude: continent.lon[iko]
+                                            }, {
+                                                latitude: continent.lat[iko + 1] * fakt,
+                                                longitude: continent.lon[iko + 1]
+                                            }],
+                                            attrs: {
+                                                "stroke-width": 2,
+                                                stroke: "red",   /* "#a4e100", */
+                                                opacity: 0.6
+                                            },
+                                            tooltip: {
+                                                content: continent.name
+                                            }
+                                        };
+                                    }
+                                    // Rück-Linie - letzte zu erster Linie - ist nicht notwendig
+                                }
+                                // dahin muss die Ausgabe
+                                // http://jsfiddle.net/neveldo/dk3ers47/
+                                // https://github.com/neveldo/jQuery-Mapael/blob/master/UPGRADE.md
+                                var options = {
+                                    mapOptions: {}, // was updatedOptions
+                                    replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
+                                    newPlots: {}, // was newPlots
+                                    newLinks: newLinks, // was opt.newLinks
+                                    deletePlotKeys: [], // was deletedPlots
+                                    deleteLinkKeys: [], // was opt.deletedLinks
+                                    setLegendElemsState: true, // is new
+                                    animDuration: 0, // was opt.animDuration
+                                    afterUpdate: function () {} // was opt.afterUpdate
+                                };
+                                $(".mapcontainer").trigger('update', [options]);
+
+                            }
+                        }))
+
+                        .append($("<li/>", {
+                            class: "dropdown-menuepoint",
+                            html: "Klimazonen",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                //kla1630map.fitMap(".content", "world", paper);
+                                var zoneLinks = kla1630map.getClimatezonelinks();
+                                // https://github.com/neveldo/jQuery-Mapael/blob/master/UPGRADE.md
+                                var options = {
+                                    mapOptions: {}, // was updatedOptions
+                                    replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
+                                    newPlots: {}, // was newPlots
+                                    newLinks: zoneLinks, // was opt.newLinks
+                                    deletePlotKeys: [], // was deletedPlots
+                                    deleteLinkKeys: [], // was opt.deletedLinks
+                                    setLegendElemsState: true, // is new
+                                    animDuration: 0, // was opt.animDuration
+                                    afterUpdate: function () {} // was opt.afterUpdate
+                                };
+                                $(".mapcontainer").trigger('update', [options]);
+                            }
+                        }))
+
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
                             html: "Justierte Karte",
@@ -116,6 +200,7 @@
 
                             }
                         }))
+
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
                             html: "zurück",
@@ -270,28 +355,10 @@
             });
 
         }
-        var worldmaplinks = {
-            'link1': {
-                factor: 0.01,
-                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
-                between: [{
-                    latitude: 23,
-                    longitude: -179.0
-                }, {
-                    latitude: 24,
-                    longitude: 179.0
-                }],
-                attrs: {
-                    "stroke-width": 2
-                },
-                tooltip: {
-                    content: "Link"
-                }
-            }
-        };
+        var worldmaplinks = {};
 
 
-        var worldmap =   {
+        worldmap = {
             map: {
                 // Set the name of the map to display
                 name: "world",
@@ -300,9 +367,17 @@
                 },
                 defaultArea: {
                     eventHandlers: {
+                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
+                            /*
+                            if (typeof elemOptions.myText != 'undefined') {
+                                $('.myText span').html(elemOptions.myText).css({display: 'none'}).fadeIn('slow');
+                            }
+                            */
+                            sysbase.putMessage("MouseOver:" + id);
+                        },
                         click: function (e, id, mapElem, textElem) {
-                            sysbase.putMessage("Hit:" + id);
-
+                            sysbase.putMessage("MouseClick:" + id);
+                            // uihelper.pointIsInContinent
                             var newData = {
                                 'areas': {}
                             };
@@ -328,6 +403,16 @@
                 defaultPlot: {
                     eventHandlers: {
                         click: function (e, id, mapElem, textElem, elemOptions) {
+                            /**
+                             * Test Kontinentbestimmung aus Polygon
+                             * mapElem.attrs.x und mapElem.attrs.y sind pixel-Koordinaten
+                             * daher besser  mit Station-Data zum Beginn
+                             * elemOptions.longitude und elemOptions.latitude sind vorhanden
+                             */
+                            var cont = uihelper.getContinent(elemOptions.longitude, elemOptions.latitude);
+                            if (cont.error === false) {
+                                sysbase.putMessage(cont.code);
+                            }
                             var msg = elemOptions.myText || "Kein Hinweis vorhanden";
                             var msg1 = msg.replace("<br>", " ");
                             var msgp = msg1.split(" ");
@@ -373,51 +458,18 @@
                     $(window).on('resize', function () {
                         kla1630map.fitMap(".content", "world", paper);
                     });
-                    /*
-                    $('.mapcontainer .map').unbind("resizeEnd");
-                    var viewportHeight = $("#kla1630map.content").height();
-                    var viewportWidth = $.mapael.maps['world'].width * (viewportHeight / $.mapael.maps['world'].height);
-                    paper.setSize(viewportWidth, viewportHeight);
-                    $(window).on('resize', function () {
-                        var viewportHeight = $("#kla1630map.content").height();
-                        var viewportWidth = $.mapael.maps['world'].width * (viewportHeight / $.mapael.maps['world'].height);
-                        paper.setSize(viewportWidth, viewportHeight);
-                    }).trigger('resize');
-                    */
                 }
             },
             plots: plots,
             links: worldmaplinks
-
-            /*
-            ,
-            links: {
-                'link1': {
-                    factor: 0.5,
-                    // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
-                    between: [{
-                        latitude: 23,
-                        longitude: 0.0
-                    }, {
-                        latitude: 24,
-                        longitude: 100
-                    }],
-                    attrs: {
-                        "stroke-width": 2
-                    },
-                    tooltip: {
-                        content: "Link"
-                    }
-                }
-            }
-            */
         };
         // jetzt kann in worldmaplink entsprechend eine Modifikation stattfinden
-        worldmap.links = kla1630map.getClimatezonelinks(worldmaplinks);
+        // worldmap.links = kla1630map.getClimatezonelinks(worldmaplinks);
         $(".mapcontainer").mapael(worldmap);
     };
 
-    kla1630map.getClimatezonelinks = function(worldmaplinks) {
+    // Klimazone
+    kla1630map.getClimatezonelinks = function (worldmaplinks) {
         // 23,5 - 40 - 60
         var wl = {
             'link0': {
@@ -452,7 +504,8 @@
                 attrs: {
                     "stroke-width": 2,
                     stroke: "#a4e100",
-                    opacity: 0.6                },
+                    opacity: 0.6
+                },
                 tooltip: {
                     content: "Subtropic"
                 }
@@ -495,7 +548,6 @@
                     content: "Kalt"
                 }
             },
-
 
             'link1s': {
                 factor: 0.01,
@@ -606,8 +658,6 @@
         }
         return;
     };
-
-
 
     /**
      * standardisierte Mimik zur Integration mit App, Browser und node.js
