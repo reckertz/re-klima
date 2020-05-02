@@ -509,7 +509,7 @@
                                     return;
                                 }
                                 uihelper.markok("#kla1610statoyear");
-                                if (typeof starecord.toyear === "undefined" || starecord.fromyear.length === 0) {
+                                if (typeof starecord.toyear === "undefined" || starecord.toyear.length === 0) {
                                     uihelper.markerror("#kla1610statoyear");
                                     return;
                                 }
@@ -545,6 +545,88 @@
                                 window.parent.$(".tablinks[idhash='#" + idc640 + "']").click();
                             }
                         }))
+
+
+                        .append($("<button/>", {
+                            css: {
+                                float: "left",
+                                "margin": "10px"
+                            },
+                            html: "Pivot (Filter)",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
+                                $("#kla1610sta").find(".col2of2").empty();
+                                starecord = {};
+                                uientry.fromUI2Record("#kla1610staform", starecord, staschema);
+                                var sel = {};
+                                var table = "KLISTATIONS";
+                                var sqlStmt = "";
+                                var where = "";
+                                // löschen nicht signifikante Feldnamen
+                                var selfieldnames = Object.keys(starecord);
+                                for (var ifield = 0; ifield < selfieldnames.length; ifield++) {
+                                    var fieldname = selfieldnames[ifield];
+                                    var fieldvalue = starecord[fieldname];
+                                    if (typeof fieldvalue === "undefined" && fieldvalue !== null || typeof fieldvalue === "string" && fieldvalue.trim().length === 0) {
+                                        delete starecord[fieldname];
+                                    }
+                                }
+                                uihelper.markok("#kla1610stasource");
+                                if (typeof starecord.source === "undefined" || starecord.source.length === 0) {
+                                    uihelper.markerror("#kla1610stasource");
+                                    return;
+                                }
+                                uihelper.markok("#kla1610stavariablename");
+                                if (typeof starecord.variablename === "undefined" || starecord.variablename.length === 0) {
+                                    uihelper.markerror("#kla1610stavariablename");
+                                    return;
+                                }
+                                uihelper.markok("#kla1610stafromyear");
+                                if (typeof starecord.fromyear === "undefined" || starecord.fromyear.length === 0) {
+                                    uihelper.markerror("#kla1610stafromyear");
+                                    return;
+                                }
+                                uihelper.markok("#kla1610statoyear");
+                                if (typeof starecord.toyear === "undefined" || starecord.fromyear.length === 0) {
+                                    uihelper.markerror("#kla1610statoyear");
+                                    return;
+                                }
+                                if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
+                                    var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+                                    if (fromyear !== null && fromyear.length >= 3) {
+                                        if (where.length > 0) where += " AND ";
+                                        where += " KLIINVENTORY.toyear " + ">=" + parseInt(fromyear[2]);
+                                        starecord.fromyear = fromyear[2];
+                                        $("#kla1610stafromyear").val(starecord.fromyear);
+                                    } else {
+                                        uihelper.markerror("#kla1610stafromyear");
+                                        return;
+                                    }
+                                }
+                                if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
+                                    var toyear = starecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+                                    if (toyear !== null && toyear.length >= 3) {
+                                        if (where.length > 0) where += " AND ";
+                                        where += " KLIINVENTORY.fromyear " + "<=" + parseInt(toyear[2]);
+                                        starecord.toyear = toyear[2];
+                                        $("#kla1610stafromyear").val(starecord.toyear);
+                                    } else {
+                                        uihelper.markerror("#kla1610statoyear");
+                                        return;
+                                    }
+                                }
+                                var tourl = "klapivot.html" + "?" + "source=" + starecord.source;
+                                tourl += "&variablename=" + starecord.variablename;
+                                tourl += "&fromyear=" + starecord.fromyear;
+                                tourl += "&toyear=" + starecord.toyear;
+                                var idc640 = window.parent.sysbase.tabcreateiframe("Pivot", "", "re-klima", "kla1670piv", tourl);
+                                window.parent.$(".tablinks[idhash='#" + idc640 + "']").click();
+                            }
+                        }))
+
+
+
 
                         .append($("<button/>", {
                             css: {

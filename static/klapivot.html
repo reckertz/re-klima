@@ -7,49 +7,39 @@
     initial-scale=1.0,
     maximum-scale=1.0,
     user-scalable=no">
-    <title>klaworldmap - Weltkarte</title>
+    <title>Pivottable</title>
     <meta name="description" content="Klima Admin-App" />
     <meta name="cache-control" content="no-cache, no-store">
     <meta name="keywords" content="Node.js, JavaScript, AWS EC2, MongoDB, PWA, SPA">
     <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
     <link href="css/style.min.css" rel="stylesheet">
     <link href="css/klistyles.css" rel="stylesheet">
+    <link href="css/pivot.css" rel="stylesheet">
 
     <script src="lib/async.js"></script>
+
     <script src="lib/jquery.min.js"></script>
     <script src="lib/jquery.backDetect.js"></script>
     <script src="lib/jquery.cookie.min.js"></script>
-    <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
-    <script src="lib/raphael.min.js" charset="utf-8"></script>
-    <script src="lib/jquery.mapael.js" charset="utf-8"></script>
-    <script src="maps/germany.js" charset="utf-8"></script>
-    <script src="maps/world.js" charset="utf-8"></script>
+    <script src="lib/jquery-ui.min.js"></script>
+    <script src="lib/jquery.ui.touch-punch.min.js"></script>
 
-    <script type="text/javascript" src="apps/re-frame/uihelper.js"></script>
-    <script type="text/javascript" src="apps/re-frame/uientry.js"></script>
-    <script type="text/javascript" src="apps/re-frame/sysbase.js"></script>
-    <script type="text/javascript" src="apps/re-klima/kla1560wma.js"></script>
-    <style>
-        .mapael .mapTooltip {
-            position: absolute;
-            background-color: #474c4b;
-            moz-opacity: 0.70;
-            opacity: 0.70;
-            filter: alpha(opacity=70);
-            border-radius: 10px;
-            padding: 10px;
-            z-index: 1000;
-            max-width: 200px;
-            display: none;
-            color: #fff;
-        }
-    </style>
+    <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
+    <script src="lib/pivot.js"></script>
+
+    <script src="apps/re-frame/uihelper.js"></script>
+    <script src="apps/re-frame/sysbase.js"></script>
+
+    <script src="apps/re-klima/kla1670piv.js"></script>
+
+    <script src="apps/re-klima/kli9020fun.js"></script>
+
 </head>
 
 <body>
     <div class="header">
         <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
-        <span class="headertitle" style="color:red;font-weight:bold;">kliworldmap - World-Map</span>
+        <span class="headertitle" style="color:red;font-weight:bold;">klappivot - Pivottabelle</span>
         <noscript>
             <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
                 <span style="color:blue">
@@ -59,6 +49,15 @@
         </noscript>
     </div>
     <div class="content">
+        <!--
+        <div class="col1of2">
+
+        </div>
+        <div class="col2of2">
+            <canvas id='rotatingGlobe' width='400' height='400' style='width: 400px; height: 400px; cursor: move;'></canvas>
+        </div>
+        -->
+        <!--canvas id='rotatingGlobe' width='400' height='400' style='width: 400px; height: 400px; cursor: move;'></canvas-->
     </div>
     <div class="footer">
     </div>
@@ -80,7 +79,6 @@
                     "background-color": "#5ff80611"
                 });
             }
-
             var app = "";
             var target = "";
             try {
@@ -90,7 +88,7 @@
             } catch (err) {
 
             }
-            console.log("klaworldmap.html=>" + target);
+            console.log("klaplanetary.html=>" + target);
             sysbase.navigateTo(target, [], function (ret) {
                 if (ret.error === true) {
                     alert(ret.message);
@@ -99,5 +97,4 @@
         });
     </script>
 </body>
-
 </html>

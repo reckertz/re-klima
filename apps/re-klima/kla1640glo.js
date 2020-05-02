@@ -469,21 +469,23 @@
                         var actyear = fromyear;
                         // var stationloop = setInterval(function () {
                         var tstationloop;
+
                         function stationloop() {
                             $("#slider640").val(actyear);
                             $("#date640").html(actyear);
                             //$("#slider640").slider("refresh");
                             for (var ipearl = 0; ipearl < pearls.length; ipearl++) {
-                                if (pearls[ipearl].ispainted === false && actyear >= pearls[ipearl].fromyear && actyear <= pearls[ipearl].toyear)
+                                if (pearls[ipearl].ispainted === false && actyear >= pearls[ipearl].fromyear && actyear <= pearls[ipearl].toyear) {
                                     pearls[ipearl].ispainted = true;
-                                var lat = pearls[ipearl].latitude;
-                                var lng = pearls[ipearl].longitude;
-                                var color = colors[Math.floor(Math.random() * colors.length)];
-                                globe.plugins.pings.add(lng, lat, {
-                                    color: color,
-                                    ttl: 200000,
-                                    angle: 1
-                                });
+                                    var lat = pearls[ipearl].latitude;
+                                    var lng = pearls[ipearl].longitude;
+                                    var color = colors[Math.floor(Math.random() * colors.length)];
+                                    globe.plugins.pings.add(lng, lat, {
+                                        color: color,
+                                        ttl: 200000,
+                                        angle: 1
+                                    });
+                                }
                             }
                             actyear++;
                             if (actyear > toyear) {
@@ -519,7 +521,7 @@
                         }
                         // Draw that globe!
                         globe.draw(canvas);
-                        stationloop();   // initialisieren des Loops
+                        stationloop(); // initialisieren des Loops
 
                         // http://planetaryjs.com/examples/quake.html
 

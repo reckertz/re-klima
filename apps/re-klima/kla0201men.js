@@ -50,8 +50,10 @@
         //window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
 
         var idc1 = sysbase.tabcreateiframe("Stationsanalyse", "", "re-klima", "kla1610sta");
-        window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
+        // window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
 
+        var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1630map");
+        window.parent.$(".tablinks[idhash='#" + idc2 + "']").click();
         /* sysbase.initFooter(); */
         // uientry.init();
 
