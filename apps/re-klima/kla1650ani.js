@@ -3,13 +3,13 @@
 /*global $:false, intel:false, cordova:false, device:false */
 /*global window,module,define,root,global,self,var,this,sysbase,uihelper,uientry,async */
 (function () {
-    var kla1630map = {};
+    var kla1650ani = {};
 
     var root = typeof self === 'object' && self.self === self && self ||
         typeof global === 'object' && global.global === global && global ||
         this;
     /**
-     * kla1630map  bekommt über getCache pivotdata oder yearlats(?)
+     * kla1650ani  bekommt über getCache pivotdata oder yearlats(?)
      * und erzeugt animierte Gifs mit der Option weiterer Zuordnungen
      * nach latitude und
      * nach temperatur, grundet auf Ganzzahlen
@@ -28,23 +28,17 @@
     var sgif;
     var aktyear;
     var aktvariablename;
-    var starecord = {};
     var selrecord = {};
     var stations = {};
     var stationarray = [];
-    var worldmap;
+    var worldmap = {};
+    var firststationid = "";
 
-    kla1630map.show = function (parameters, navigatebucket) {
+    kla1650ani.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
 
         }
-        if (typeof parameters !== "undefined" && parameters.length > 0) {
-            fullname = parameters[0].fullname;
-            fulldatafilename = parameters[0].fulldatafilename;
-            datafilename = parameters[0].datafilename;
-            selyears = parameters[0].selyears;
-            yearlats = parameters[0].yearlats;
-        }
+        if (typeof parameters !== "undefined" && parameters.length > 0) {}
         if (typeof navigatebucket === "object") {
             if (navigatebucket.navigate === "back") {
                 if (typeof navigatebucket.oldparameters === "object") {
@@ -67,14 +61,14 @@
         cidw = cid + "w";
         $(".content").empty();
         $(".headertitle").html("Worldmap für Stations");
-        $(".headertitle").attr("title", "kla1630map");
-        $(".content").attr("pageid", "kla1630map");
-        $(".content").attr("id", "kla1630map");
+        $(".headertitle").attr("title", "kla1650ani");
+        $(".content").attr("pageid", "kla1650ani");
+        $(".content").attr("id", "kla1650ani");
         $(".content")
             .css({
                 overflow: "hidden"
             });
-        $("#kla1630map")
+        $("#kla1650ani")
             .append($("<input/>", {
                 type: "hidden",
                 id: "kla1630map_isdirty",
@@ -164,7 +158,6 @@
                                     afterUpdate: function () {} // was opt.afterUpdate
                                 };
                                 $(".mapcontainer").trigger('update', [options]);
-
                             }
                         }))
 
@@ -173,8 +166,8 @@
                             html: "Klimazonen",
                             click: function (evt) {
                                 evt.preventDefault();
-                                //kla1630map.fitMap(".content", "world", paper);
-                                var zoneLinks = kla1630map.getClimatezonelinks();
+                                //kla1650ani.fitMap(".content", "world", paper);
+                                var zoneLinks = kla1650ani.getClimatezonelinks();
                                 // https://github.com/neveldo/jQuery-Mapael/blob/master/UPGRADE.md
                                 var options = {
                                     mapOptions: {}, // was updatedOptions
@@ -197,7 +190,7 @@
                             html: "Animation",
                             click: function (evt) {
                                 evt.preventDefault();
-                                kla1630map.prepeditor(function (ret) {
+                                kla1650ani.prepeditor(function (ret) {
                                     return;
                                 });
                             }
@@ -209,7 +202,7 @@
                             click: function (evt) {
                                 evt.preventDefault();
                                 $(window).resize();
-                                //kla1630map.fitMap(".content", "world", paper);
+                                //kla1650ani.fitMap(".content", "world", paper);
                             }
                         }))
 
@@ -232,422 +225,73 @@
             );
         sysbase.initFooter();
 
-        $("#kla1630map.content").css({
+        $("#kla1650ani.content").css({
             width: "100%",
             "background-color": "lightsteelblue"
         });
 
+        $(".headertitle").html("Animation Worldmap und Sparklines");
         var ret = {};
-        starecord = window.parent.sysbase.getCache("starecord");
-        if (typeof starecord !== "undefined" && starecord !== null && Object.keys(starecord).length > 0) {
-            var wmtit = "Worldmap für Stations";
-            wmtit += " " + starecord.source;
-            // isMember ? '$2.00' : '$10.00'
-            if (typeof starecord.stasel !== "undefined") {
-                wmtit += starecord.stasel.stationid.length > 0 ? " " + starecord.stasel.stationid : "";
-                wmtit += starecord.stasel.stationname.length > 0 ? " " + starecord.stasel.stationname : "";
-                wmtit += starecord.stasel.fromyear.length > 0 ? " von " + starecord.stasel.fromyear : "";
-                wmtit += starecord.stasel.toyear.length > 0 ? " bis " + starecord.stasel.toyear : "";
-                wmtit += starecord.stasel.anzyears.length > 0 ? " für " + starecord.stasel.anzyears + " Jahre" : "";
-                wmtit += starecord.stasel.region.length > 0 ? " Region:" + starecord.stasel.region : "";
-                wmtit += starecord.stasel.climatezone.length > 0 ? " Klimazone:" + starecord.stasel.climatezone : "";
-                wmtit += starecord.stasel.height.length > 0 ? " Höhe:" + starecord.stasel.height : "";
-            }
-            $(".headertitle").html(wmtit);
-        } else {
-            starecord = null; // keine Verzweigung auf einzelne Stations möglich
-        }
-        stations = window.parent.sysbase.getCache("stationrecords");
-
-        if (typeof stations !== "undefined" && stations !== null && Object.keys(stations).length > 0) {
-            stationarray = [];
-            for (var station in stations) {
-                if (stations.hasOwnProperty(station)) {
-                    var sitename = stations[station].stationname;
-                    var longitude = Number(stations[station].longitude);
-                    var latitude = Number(stations[station].latitude);
-                    stationarray.push({
-                        sitename: sitename,
-                        longitude: longitude,
-                        latitude: latitude
-                    });
-                }
-            }
-            kla1630map.showMap(stationarray);
-        } else {
-            stationarray = window.parent.sysbase.getCache("stationarray");
-            if (typeof stationarray !== "undefined" && Array.isArray(stationarray) && stationarray.length > 0) {
-                kla1630map.showMap(stationarray);
-            } else {
-                stationarray = [];
-
-                    kla1630map.prepeditor(function (ret) {
-                        sysbase.putMessage(ret.message);
-                        return;
-                    });
-
-            }
-        }
-        window.parent.sysbase.delCache("stationarray");
-        window.parent.sysbase.delCache("stationrecords");
-    }; // Ende show
-
-
-
-    /**
-     * Anzeige Stationen
-     *
-     * @param {*} stations
-     */
-    kla1630map.showMap = function (stationarray) {
-
 
         var h = $("body").height();
         h = h - $(".header").outerHeight();
         h = h - $(".footer").outerHeight();
 
-        $("#kla1630map.content").css({
-            height: h - 3,
-            overflow: "hidden"
-        });
-
-        if ($(".col1of2").length === 0) {
-            $("#kla1630map.content")
+        $("#kla1650ani.content")
+            .append($("<div/>", {
+                    class: "col1of2",
+                    css: {
+                        height: h - 3,
+                        width: "75%",
+                        overflow: "auto"
+                    }
+                })
                 .append($("<div/>", {
-                        class: "col1of2",
+                        class: "mapcontainer",
                         css: {
-                            height: h - 3,
-                            width: "75%",
-                            overflow: "auto"
+                            width: "100%"
                         }
                     })
                     .append($("<div/>", {
-                            class: "mapcontainer",
-                            css: {
-                                width: "100%"
-                            }
+                            class: "map"
                         })
-                        .append($("<div/>", {
-                                class: "map"
-                            })
 
-                        ))
-                    .append($("<div/>", {
-                            id: "kla1630mapline"
-                        })
-                        .append($("<span/>", {
-                            id: "kla1630mapspark",
-                            html: "&nbsp;"
-                        }))
-                        .append($("<br/>"))
-                        .append($("<span/>", {
-                            id: "kla1630mapsres",
-                            html: "&nbsp;"
-                        }))
-                    )
-                )
+                    ))
                 .append($("<div/>", {
-                    class: "col2of2",
-                    css: {
-                        height: h - 3,
-                        width: "24%",
-                        overflow: "auto"
-                    }
-                }));
-        }
-        /*
-        var h = $("body").height() - $("#kla1630map.header") - $("#kla1630map.footer");
-        $("#kla1630map.content").css({
-            height: h - 3,
-            overflow: "auto"
-        });
-        $("#kla1630map.container").css({
-            height: h - 3,
-            overflow: "auto"
-        });
-        */
-        $("#kla1630map.mapcontainer").css({
-            height: h - 100,
-            overflow: "auto"
-        });
-        $("#kla1630mapline").css({
-            height: 99,
-            overflow: "auto"
-        });
-
-
-        plots = {}; // [];
-        /*
-        "047_N043":
-            {"stations":"40371624003;",
-             "xstations":[
-                 {"latn":"N43","lon":"-79.4000","lat":"43.6700","name":"TORONTO,ON"}
-                ],
-        */
-        for (var isa = 0; isa < stationarray.length; isa++) {
-            var station = stationarray[isa];
-            if (typeof station.stationid === "undefined" || station.stationid.length === 0) {
-                station.stationid = 'plot-' + Math.round(Math.random() * 10000);
-            }
-            var sitename = station.sitename || "unknown";
-            var longitude = Number(station.longitude);
-            var latitude = Number(station.latitude);
-            var contenthtml = ""; // "<span style=\"font-weight:bold;font-size:x-small;\">";
-            contenthtml += sitename.replace("<br>", " ");
-            //contenthtml += "</span>";
-            var texthtml = sitename;
-            /*
-            tooltip: {content: "<span style=\"font-weight:bold;\">City :</span> Rennes"},
-                    text: {content: "Rennes"},
-            */
-            //plots.push({
-                console.log(contenthtml);
-            plots[station.stationid] = {
-                type: "square", // circle
-                size: 5,
-                latitude: latitude,
-                longitude: longitude,
-                tooltip: {
-                    content: contenthtml
-                },
-                text: {
-                    /*
-                    attrs: {
-                        "font-size": "10px"
-                    },
-                    content: texthtml
-                    */
-                },
-                myText: sitename + " lon:" + longitude + " lat:" + latitude,
-                selstationid: station.stationid
-            //});
-            };
-
-        }
-        var worldmaplinks = {};
-
-        worldmap = {
-            map: {
-                // Set the name of the map to display
-                name: "world",
-                zoom: {
-                    "enabled": true
-                },
-                defaultArea: {
-                    eventHandlers: {
-                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
-                            /*
-                            if (typeof elemOptions.myText != 'undefined') {
-                                $('.myText span').html(elemOptions.myText).css({display: 'none'}).fadeIn('slow');
-                            }
-                            */
-
-                            var msg = "MouseOver:" + id;
-                            var coords = $(".mapcontainer").data("mapael").mapPagePositionToXY(e.pageX, e.pageY);
-                            msg += "e.pageX:" + e.pageX;
-                            msg += " e.pageY:" + e.pageY;
-                            msg += " x:" + coords.x;
-                            msg += " y:" + coords.y;
-                            sysbase.putMessage(msg);
-                        },
-                        click: function (e, id, mapElem, textElem) {
-                            sysbase.putMessage("MouseClick:" + id);
-                            // uihelper.pointIsInContinent
-                            var newData = {
-                                'areas': {}
-                            };
-                            if (mapElem.originalAttrs.fill == "#5ba400") {
-                                newData.areas[id] = {
-                                    attrs: {
-                                        fill: "#0088db"
-                                    }
-                                };
-                            } else {
-                                newData.areas[id] = {
-                                    attrs: {
-                                        fill: "#5ba400"
-                                    }
-                                };
-                            }
-                            $(".mapcontainer").trigger('update', [{
-                                mapOptions: newData
-                            }]);
-
-                        }
-                    }
-                },
-                defaultPlot: {
-                    eventHandlers: {
-                        click: function (e, id, mapElem, textElem, elemOptions) {
-                            /**
-                             * Test Kontinentbestimmung aus Polygon
-                             * mapElem.attrs.x und mapElem.attrs.y sind pixel-Koordinaten
-                             * daher besser  mit Station-Data zum Beginn
-                             * elemOptions.longitude und elemOptions.latitude sind vorhanden
-                             */
-                            var cont = uihelper.getContinent(elemOptions.longitude, elemOptions.latitude);
-                            if (cont.error === false) {
-                                sysbase.putMessage(cont.code);
-                            }
-                            var msg = elemOptions.myText || "Kein Hinweis vorhanden";
-                            var msg1 = msg.replace("<br>", " ");
-                            var msgp = msg1.split(" ");
-                            var stationname = msgp[1];
-                            var stationid = msgp[0];
-                            if (typeof starecord === "undefined" || typeof starecord.variablename === "undefined") {
-                                starecord = selrecord;
-                            }
-                            var selvariablename = starecord.variablename;
-                            var source = starecord.source;
-                            // alert(msg);
-                            window.parent.sysbase.setCache("onestation", JSON.stringify({
-                                stationid: stationid,
-                                source: starecord.source,
-                                variablename: starecord.variablename,
-                                starecord: starecord
-                            }));
-                            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
-                                source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
-                            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima",
-                                "kla1620shm", tourl);
-                            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-
-                        },
-                        /*
-                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
-                            debugger;
-                            if (typeof elemOptions.myText !== 'undefined') {
-                                $('.myText span').html(elemOptions.myText).css({
-                                    display: 'none'
-                                }).fadeIn('slow');
-                            }
-                        }
-                        */
-
-                    }
-
-                },
-                afterInit: function ($self, paper, areas, plots, options) {
-                    $('.mapcontainer .map').unbind("resizeEnd");
-                    var mapi = $(".mapcontainer").data("mapael");
-                    var mapW = paper._viewBox[2];
-                    var mapH = paper._viewBox[3];
-                    var mapRatio = mapW / mapH;
-                    var availableH = $(".content").height() - 100; // für content - Bereich für
-                    var availableW = availableH * mapRatio;
-                    var maxW = $(".col1of2").width();
-                    if (availableW > maxW) {
-                        availableH = maxW / mapRatio; // für content - Bereich für
-                        availableW = maxW;
-                    }
-                    var msg = "";
-                    msg += " avH:" + availableH;
-                    msg += " ratio:" + mapRatio;
-                    msg += " avW:" + availableW;
-                    console.log(msg);
-                    paper.setSize(availableW, availableH);
-                    //kla1630map.fitMap(".content", "world", paper);
-                    /*
-                    $(window).on('resize', function () {
-                        kla1630map.fitMap (".content", "world", paper);
-                    }).trigger('resize');
-                    */
-                    $(window).on('resize', function () {
-                        // kla1630map.fitMap(".content", "world", paper);
-                    });
+                        id: "kla1630mapline"
+                    })
+                    .append($("<span/>", {
+                        id: "kla1630mapspark",
+                        html: "&nbsp;"
+                    }))
+                    .append($("<br/>"))
+                    .append($("<span/>", {
+                        id: "kla1630mapsres",
+                        html: "&nbsp;"
+                    }))
+                )
+            )
+            .append($("<div/>", {
+                class: "col2of2",
+                css: {
+                    height: h - 3,
+                    width: "24%",
+                    overflow: "auto"
                 }
-            },
-            plots: plots,
-            links: worldmaplinks
-        };
-        // jetzt kann in worldmaplink entsprechend eine Modifikation stattfinden
-        // worldmap.links = kla1630map.getClimatezonelinks(worldmaplinks);
-
-
-        $(document).on('click', ".mapcontainer", function (e) {
-            // mapPagePositionToXY() allows to get the x,y coordinates
-            // on the map from a x,y coordinates on the page
-            var msg = " ";
-            var mapi = $(".mapcontainer").data("mapael");
-            var coords = mapi.mapPagePositionToXY(e.pageX, e.pageY);
-            // var lon = (x - xoffset) / xfactor;
-            var lon = (coords.x - mapi.mapConf.xoffset) / mapi.mapConf.xfactor;
-            var lat = (coords.y - mapi.mapConf.yoffset) / mapi.mapConf.yfactor;
-
-            var coninfo = uihelper.getContinent(lon, lat);
-            msg += " Continent:" + coninfo.continentcode + " " + coninfo.continentname;
-            msg += " x:" + coords.x;
-            msg += " lon:" + lon;
-            msg += " y:" + coords.y;
-            msg += " lat:" + lat;
-            console.log(msg);
-            sysbase.putMessage(msg);
-
-            var updateOptions = {
-                mapOptions: {}, // was updatedOptions
-                replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
-                newPlots: {}, // was newPlots
-                newLinks: [], // was opt.newLinks
-                deletePlotKeys: [], // was deletedPlots
-                deleteLinkKeys: [], // was opt.deletedLinks
-                setLegendElemsState: true, // is new
-                animDuration: 0, // was opt.animDuration
-                afterUpdate: function (container, paper, areas, plots, options) {} // was opt.afterUpdate
-            };
-            // Each new plot must have its own unique ID
-            var plotId = 'plot-' + Math.round(Math.random() * 1000);
-            updateOptions.newPlots[plotId] = {
-                longitude: lon,
-                latitude: lat,
-                tooltip: {
-                    content: "Dies ist ein Test"
-                }
-            };
-            $(".mapcontainer").trigger('update', [updateOptions]);
-        });
-
-        $(".mapcontainer").mapael(worldmap);
-
-        // Berechnung xoffset und yoffset
-        var mapi = $(".mapcontainer").data("mapael");
-        var xoffset = mapi.mapConf.width / 2;
-        var yoffset = mapi.mapConf.height / 2;
-        var lat = 45;
-        var lon = 90;
-        var testcoord = mapi.mapConf.getCoords(lat, lon);
-        var xfactor = (testcoord.x - xoffset) / lon;
-        var yfactor = (testcoord.y - yoffset) / lat;
-        var msg = "";
-        msg += " xoffset:" + xoffset;
-        msg += " longitude:" + lon;
-        msg += " testcoord.x:" + testcoord.x;
-        msg += " xfactor:" + xfactor;
-
-        msg += " yoffset:" + yoffset;
-        msg += " latitude:" + lat;
-        msg += " testcoord.y:" + testcoord.y;
-        msg += " yfactor:" + yfactor;
-
-        mapi.mapConf.xoffset = xoffset;
-        mapi.mapConf.yoffset = yoffset;
-        mapi.mapConf.xfactor = xfactor;
-        mapi.mapConf.yfactor = yfactor;
-
-        console.log(msg);
-        sysbase.putMessage(msg);
+            }));
 
         /**
-         * Animation hier vorprüfen und gegf. ausführen
+         * erst mal rechts den Editor einrichten
          */
-        if (typeof starecord === "undefined") {
-            kla1630map.prepeditor(function (ret) {
-                return;
-            });
-        }
-    };
+        kla1650ani.prepeditor(function (ret) {
+            sysbase.putMessage(ret.message);
+
+        });
+
+    }; // Ende show
 
     /**
-     * prepanimation - rechts Selektionskriterien ausgeben
+     * prepeditor - Rechts den Editor ausgeben für die Selektion
      * selrecord hält die Selektionsparamter
      * selschema definiert die Erfassungsstruktur
      */
@@ -794,17 +438,10 @@
         }
     };
 
-    kla1630map.prepeditor = function (cb1630A) {
-        /*
-        stationarray = [];
-        kla1630map.showMap([{
-            longitude: 15,
-            latitude: 15,
-            tooltip: "Dies ist ein Test-Tooltip"
-        }]);
-        */
+    kla1650ani.prepeditor = function (cb1630A) {
+
         $("#kla1630mapwrapper").remove();
-        $("#kla1630map .col2of2")
+        $("#kla1650ani .col2of2")
             .append($("<div/>", {
                     id: "kla1630mapwrapper",
                     width: "100%"
@@ -814,7 +451,7 @@
                     class: "uieform"
                 }))
             );
-        uientry.getSchemaUI("kla1630map", selschema, "kla1630map", "kla1630mapform", function (ret) {
+        uientry.getSchemaUI("kla1650ani", selschema, "kla1650ani", "kla1630mapform", function (ret) {
             if (ret.error === false) {
                 if (typeof selrecord.source === "undefined") {
                     selrecord.source = "GHCND";
@@ -839,7 +476,7 @@
                                 var thisbutton = this;
                                 $('.kla1630mapbut1').prop('disabled', true);
                                 $('.kla1630mapbut1').hide();
-                                kla1630map.animate(false, function (ret) {
+                                kla1650ani.animate(false, function (ret) {
                                     $('.kla1630mapbut1').prop('disabled', false);
                                     $('.kla1630mapbut1').show();
                                 });
@@ -854,25 +491,249 @@
         });
     };
 
+    /**
+     * Anzeige Stationen
+     *
+     * @param {*} stations
+     */
+    kla1650ani.prepMap = function (plots) {
+        var h = $("#kla1650ani.content").height();
+        $("#kla1650ani.mapcontainer").css({
+            height: h - 100,
+            overflow: "auto"
+        });
+        $("#kla1630mapline").css({
+            height: 99,
+            overflow: "auto"
+        });
+
+        var worldmaplinks = {};
+        worldmap = {
+            map: {
+                // Set the name of the map to display
+                name: "world",
+                zoom: {
+                    "enabled": true
+                },
+                defaultArea: {
+                    eventHandlers: {
+                        /*
+                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
+                            var msg = "MouseOver:" + id;
+                            var coords = $(".mapcontainer").data("mapael").mapPagePositionToXY(e.pageX, e.pageY);
+                            msg += "e.pageX:" + e.pageX;
+                            msg += " e.pageY:" + e.pageY;
+                            msg += " x:" + coords.x;
+                            msg += " y:" + coords.y;
+                            sysbase.putMessage(msg);
+                        },
+                        */
+                        click: function (e, id, mapElem, textElem) {
+                            sysbase.putMessage("MouseClick:" + id);
+                            // uihelper.pointIsInContinent
+                            var newData = {
+                                'areas': {}
+                            };
+                            // färbt die areas ein
+                            if (mapElem.originalAttrs.fill == "#5ba400") {
+                                newData.areas[id] = {
+                                    attrs: {
+                                        fill: "#0088db"
+                                    }
+                                };
+                            } else {
+                                newData.areas[id] = {
+                                    attrs: {
+                                        fill: "#5ba400"
+                                    }
+                                };
+                            }
+                            // hier funktioniert wohl noch die alte Mimik
+                            $(".mapcontainer").trigger('update', [{
+                                mapOptions: newData
+                            }]);
+                        }
+                    }
+                },
+                defaultPlot: {
+                    eventHandlers: {
+                        click: function (e, id, mapElem, textElem, elemOptions) {
+                            /**
+                             * Test Kontinentbestimmung aus Polygon
+                             * mapElem.attrs.x und mapElem.attrs.y sind pixel-Koordinaten
+                             * daher besser  mit Station-Data zum Beginn
+                             * elemOptions.longitude und elemOptions.latitude sind vorhanden
+                             */
+                            var cont = uihelper.getContinent(elemOptions.longitude, elemOptions.latitude);
+                            if (cont.error === false) {
+                                sysbase.putMessage(cont.code);
+                            }
+                            // TODO anpassen
+                            var msg = elemOptions.myText || "Kein Hinweis vorhanden";
+                            var msg1 = msg.replace("<br>", " ");
+                            var msgp = msg1.split(" ");
+                            var stationname = msgp[1];
+                            var stationid = elemOptions.selstationid; // msgp[0];
+                            var variablename = elemOptions.selvariable;
+                            var source = elemOptions.selsource;
+                            // alert(msg);
+
+                            window.parent.sysbase.setCache("onestation", JSON.stringify({
+                                stationid: stationid,
+                                source: source,
+                                variablename: variablename
+                            }));
+                            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
+                                source + "&variablename=" + variablename; // + "&starecord=" + JSON.stringify(starecord);
+                            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima",
+                                "kla1620shm", tourl);
+                            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+
+                        },
+
+                        mouseover: function (e, id, mapElem, textElem, elemOptions) {
+
+                            var x = elemOptions.attrs.x;
+                            var y = elemOptions.attrs.y;
+                            var con = elemOptions.tooltip.content;
+                            $(".mapael .mapTooltip").css({
+                                'position': 'absolute',
+                                'top': x + 10,
+                                'left': y + 10,
+                                "background-color": "#474c4b",
+                                "moz-opacity": 0.70,
+                                opacity: 0.70,
+                                filter: "alpha(opacity= 70)",
+                                "border-radius": "10px",
+                                padding: "10px",
+                                "z-index": 1000,
+                                "max-width": "200px",
+                                display: "none",
+                                color: "#fff"
+                            });
+
+                            /*
+                            if (typeof elemOptions.myText !== 'undefined') {
+                                $('.myText span').html(elemOptions.myText).css({
+                                    display: 'none'
+                                }).fadeIn('slow');
+                            }
+                            */
+                        }
+
+
+                    }
+                },
+                afterInit: function ($self, paper, areas, plots, options) {
+                    $('.mapcontainer .map').unbind("resizeEnd");
+                    var mapi = $(".mapcontainer").data("mapael");
+                    var mapW = paper._viewBox[2];
+                    var mapH = paper._viewBox[3];
+                    var mapRatio = mapW / mapH;
+                    var availableH = $(".content").height() - 100; // für content - Bereich für
+                    var availableW = availableH * mapRatio;
+                    var maxW = $(".col1of2").width();
+                    if (availableW > maxW) {
+                        availableH = maxW / mapRatio; // für content - Bereich für
+                        availableW = maxW;
+                    }
+                    var msg = "";
+                    msg += " avH:" + availableH;
+                    msg += " ratio:" + mapRatio;
+                    msg += " avW:" + availableW;
+                    console.log(msg);
+                    paper.setSize(availableW, availableH);
+                    $(".mapcontainer").css({
+                        width: availableW,
+                        height: availableH
+                    });
+                }
+            },
+            plots: plots,
+            links: worldmaplinks
+        };
+        // jetzt kann in worldmaplink entsprechend eine Modifikation stattfinden
+        // worldmap.links = kla1650ani.getClimatezonelinks(worldmaplinks);
+
+
+        $(document).on('click', ".mapcontainer", function (e) {
+            // mapPagePositionToXY() allows to get the x,y coordinates
+            // on the map from a x,y coordinates on the page
+            var msg = " ";
+            var mapi = $(".mapcontainer").data("mapael");
+            var coords = mapi.mapPagePositionToXY(e.pageX, e.pageY);
+            var lon = (coords.x - mapi.mapConf.xoffset) / mapi.mapConf.xfactor;
+            var lat = (coords.y - mapi.mapConf.yoffset) / mapi.mapConf.yfactor;
+            var coninfo = uihelper.getContinent(lon, lat);
+            msg += " Continent:" + coninfo.continentcode + " " + coninfo.continentname;
+            msg += " x:" + coords.x;
+            msg += " lon:" + lon;
+            msg += " y:" + coords.y;
+            msg += " lat:" + lat;
+            console.log(msg);
+            sysbase.putMessage(msg);
+
+            var updateOptions = {
+                mapOptions: {}, // was updatedOptions
+                replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
+                newPlots: {}, // was newPlots
+                newLinks: [], // was opt.newLinks
+                deletePlotKeys: [], // was deletedPlots
+                deleteLinkKeys: [], // was opt.deletedLinks
+                setLegendElemsState: true, // is new
+                animDuration: 0, // was opt.animDuration
+                afterUpdate: function (container, paper, areas, plots, options) {} // was opt.afterUpdate
+            };
+            // Each new plot must have its own unique ID
+            var plotId = 'plot-' + Math.round(Math.random() * 1000);
+            updateOptions.newPlots[plotId] = {
+                longitude: lon,
+                latitude: lat,
+                tooltip: {
+                    content: "Dies ist ein Test"
+                }
+            };
+            $(".mapcontainer").trigger('update', [updateOptions]);
+        });
+        $(".mapcontainer").mapael(worldmap);
+
+        // Berechnung xoffset und yoffset
+        var mapi = $(".mapcontainer").data("mapael");
+        var xoffset = mapi.mapConf.width / 2;
+        var yoffset = mapi.mapConf.height / 2;
+        var lat = 45;
+        var lon = 90;
+        var testcoord = mapi.mapConf.getCoords(lat, lon);
+        var xfactor = (testcoord.x - xoffset) / lon;
+        var yfactor = (testcoord.y - yoffset) / lat;
+        var msg = "";
+        msg += " xoffset:" + xoffset;
+        msg += " longitude:" + lon;
+        msg += " testcoord.x:" + testcoord.x;
+        msg += " xfactor:" + xfactor;
+
+        msg += " yoffset:" + yoffset;
+        msg += " latitude:" + lat;
+        msg += " testcoord.y:" + testcoord.y;
+        msg += " yfactor:" + yfactor;
+
+        mapi.mapConf.xoffset = xoffset;
+        mapi.mapConf.yoffset = yoffset;
+        mapi.mapConf.xfactor = xfactor;
+        mapi.mapConf.yfactor = yfactor;
+        console.log(msg);
+        sysbase.putMessage(msg);
+    };
 
     /**
      * animate - animierte Anzeige und optional gif-Ausgabe
      */
-    kla1630map.animate = function (dogif, cb1630B) {
-        /*
-        kla1630map.showMap([{
-            sitename: "hoffentlich"
-            longitude: 15,
-            latitude: 15,
-            tooltip: "Dies ist ein Test-Tooltip"
-        }]);
-        */
-
+    kla1650ani.animate = function (dogif, cb1630B) {
         var creategif = false;
         if (typeof dogif !== "undefined" && dogif === true) {
             creategif = true;
         }
-        if (typeof selrecord === "undefined") {
+        if (typeof selrecord === "undefined" || typeof selrecord.source === "undefined") {
             sysbase.putMessage("Animation nur mit Selektionsvorgabe");
         }
 
@@ -937,8 +798,8 @@
             var selclimatezone = selrecord.climatezone.substr(0, 2);
             if (where.length > 0) where += " AND ";
             if (selclimatezone.startsWith("G")) {
-                var cz1 = "N" + starecord.climatezone.substr(1, 1);
-                var cz2 = "S" + starecord.climatezone.substr(1, 1);
+                var cz1 = "N" + selrecord.climatezone.substr(1, 1);
+                var cz2 = "S" + selrecord.climatezone.substr(1, 1);
                 where += " (substr(KLISTATIONS.climatezone, 1, 2) = '" + cz1 + "'";
                 where += " OR substr(KLISTATIONS.climatezone, 1, 2) = '" + cz2 + "')";
             } else {
@@ -954,16 +815,8 @@
                 where += " anzyears >= " + selrecord.anzyears.trim();
             }
         }
-
-        // where += " AND KLIISTATIONS.temperature = 'TMAX,TMIN'";
         sqlStmt += " WHERE " + where;
-        /*
-        sqlStmt += " GROUP BY KLISTATIONS.continent, KLISTATIONS.climatezone,";
-        sqlStmt += " KLIINVENTORY.variable,",
-        sqlStmt += " KLIINVENTORY.fromyear, KLIINVENTORY.toyear";
-        */
         sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-        // sqlStmt += " ORDER BY KLISTATIONS.continent, KLISTATIONS.climatezone";
         async.waterfall([
                 function (cb1630B1) {
                     var skip = 0;
@@ -974,7 +827,6 @@
                     var vgldata = {};
                     uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
                         if (ret.error === true) {
-                            // sollte nicht passieren??? oder auch hier anlegen
                             sysbase.putMessage("Error:" + ret.message, 3);
                             cb1630B1("error", {
                                 error: true,
@@ -1000,7 +852,6 @@
                                             sysbase.putMessage("Doppel:" + vglstationid);
                                             console.log("OLD:" + JSON.stringify(vgldata));
                                             console.log("DUP:" + JSON.stringify(record));
-                                            debugger;
                                         }
                                         vglstationid = record.stationid;
                                         vgldata = uihelper.cloneObject(record);
@@ -1014,7 +865,6 @@
                                         } else if (record.toyear > toyear) {
                                             toyear = record.toyear;
                                         }
-
                                         pearls.push({
                                             source: record.source,
                                             stationid: record.stationid,
@@ -1035,11 +885,17 @@
                                     }
                                 }
                                 if (irow > 0) {
+                                    var ichanged = false;
                                     if (typeof selrecord.fromyear === "undefined" || selrecord.fromyear === null || selrecord.fromyear.trim().length === 0) {
                                         selrecord.fromyear = "" + fromyear;
+                                        ichanged = true;
                                     }
                                     if (typeof selrecord.toyear === "undefined" || selrecord.toyear === null || selrecord.toyear.trim().length === 0) {
                                         selrecord.toyear = "" + toyear;
+                                        ichanged = true;
+                                    }
+                                    if (ichanged === true) {
+                                        uientry.fromRecord2UI("#kla1630mapform", selrecord, selschema);
                                     }
                                     cb1630B1(null, {
                                         error: false,
@@ -1065,7 +921,7 @@
                      * in ret: pearls[] mit: continent, climatezone, variable, fromyear, toyear, ispainted
                      * sowie error, message und selrecord
                      */
-                    kla1630map.loop(dogif, ret1.selrecord, ret1.pearls, function (ret) {
+                    kla1650ani.loop(dogif, ret1.selrecord, ret1.pearls, function (ret) {
                         cb1630B2("Finish", ret);
                         return;
                     });
@@ -1089,7 +945,7 @@
      * @param {*} pearls [] - Daten aus der Datenbank
      * @param {*} cb1630C - Callback, returns error, message
      */
-    kla1630map.loop = function (dogif, selrecord, pearls, cb1630C) {
+    kla1650ani.loop = function (dogif, selrecord, pearls, cb1630C) {
         // Anlegen des Steuer-Arrays, Loop über Auswertungsspanne
         try {
             var loopyears = [];
@@ -1152,22 +1008,27 @@
                         if (pearl.fromyear <= actyear && pearl.toyear >= actyear) {
                             pearls[ipearl].ispainted = 1;
                             var contenthtml = pearl.stationid + " " + pearl.stationname;
+                            /*
+                            contenthtml += " <img src='/images/icons-png/arrow-u-black.png'";
+                            contenthtml += " title='Upload *.dly'";
+                            contenthtml += " class='kla1610staupl'>";
+                            */
                             anznew++;
                             options.newPlots[pearl.stationid] = {
                                 type: "square", // circle
                                 size: 5,
-                                latitude: pearl.latitude,
-                                longitude: pearl.longitude,
+                                latitude: parseFloat(pearl.latitude),
+                                longitude: parseFloat(pearl.longitude),
                                 tooltip: {
                                     content: contenthtml
                                 },
-                                /*
                                 text: {
-
+                                    /* */
                                 },
-                                myText: pearl.stationname + " lon:" + pearl.longitude + " lat:" + pearl.latitude,
-                                */
-                                selstationid: pearl.stationid
+                                // myText: pearl.stationname + " lon:" + pearl.longitude + " lat:" + pearl.latitude,
+                                selstationid: pearl.stationid,
+                                selsource: pearl.source,
+                                selvariable: pearl.variable
                             };
                             continue;
                         }
@@ -1182,9 +1043,17 @@
                     }
                 }
                 // Aktualisierung worldmap
-                if (anznew > 0 || anzdel > 0) {
-                    // if (anzdel > 0 && anzdel < 2) debugger;
-                    $(".mapcontainer").trigger('update', [options]);
+                /**
+                 * das erste Jahr wird speziell ausgegeben
+                 * mit Initialisierung der MAP, sonst Update
+                 */
+                if (icontrol === 1) {
+                    kla1650ani.prepMap(options.newPlots);
+                } else {
+                    if (anznew > 0 || anzdel > 0) {
+                        // if (anzdel > 0 && anzdel < 2) debugger;
+                        $(".mapcontainer").trigger('update', [options]);
+                    }
                 }
                 // Ausgabe sparklines aktualisiert
                 /**
@@ -1238,7 +1107,7 @@
 
 
     // Klimazone
-    kla1630map.getClimatezonelinks = function (worldmaplinks) {
+    kla1650ani.getClimatezonelinks = function (worldmaplinks) {
         // 23,5 - 40 - 60
         var wl = {
             'link0': {
@@ -1394,7 +1263,7 @@
      * - widthRemaining - Platz für die Liste und für die Entscheidung, ob die Liste daneben geht ...
      * - heightRemaining - Platz für die Liste und für die Entscheidung, ob die Liste darunter geht ...
      */
-    kla1630map.fitMap = function (mapcontainer, mapname, paper) {
+    kla1650ani.fitMap = function (mapcontainer, mapname, paper) {
         var mapW = $.mapael.maps[mapname].width;
         var mapH = $.mapael.maps[mapname].height;
         var mapRatio = mapW / mapH;
@@ -1432,14 +1301,14 @@
      */
     if (typeof module === 'object' && module.exports) {
         // Node.js
-        module.exports = kla1630map;
+        module.exports = kla1650ani;
     } else if (typeof define === 'function' && define.amd) {
         // AMD / RequireJS
         define([], function () {
-            return kla1630map;
+            return kla1650ani;
         });
     } else {
         // included directly via <script> tag
-        root.kla1630map = kla1630map;
+        root.kla1650ani = kla1650ani;
     }
 }());

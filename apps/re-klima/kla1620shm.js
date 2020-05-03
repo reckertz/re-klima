@@ -4039,7 +4039,7 @@
                     var hratio;
                     try {
                         var wmtit = "Selektion für Station:";
-                        wmtit += " " + starecord.source + " ";
+                        wmtit += " " + ret.record.source + " ";
                         // isMember ? '$2.00' : '$10.00'
                         wmtit += selstationid;
                         wmtit += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
