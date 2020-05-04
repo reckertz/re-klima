@@ -52,7 +52,7 @@
         var idc1 = sysbase.tabcreateiframe("Stationsanalyse", "", "re-klima", "kla1610sta");
         // window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
 
-        var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1650ani");
+        var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1650ani", "klaworldmap.html");
         window.parent.$(".tablinks[idhash='#" + idc2 + "']").click();
         /* sysbase.initFooter(); */
         // uientry.init();

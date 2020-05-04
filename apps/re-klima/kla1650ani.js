@@ -1,7 +1,7 @@
 /*jslint es5:true, browser:true, devel:true, white:true, vars:true */
 /*jshint laxbreak:true */
 /*global $:false, intel:false, cordova:false, device:false */
-/*global window,module,define,root,global,self,var,this,sysbase,uihelper,uientry,async */
+/*global window,module,define,root,global,self,var,this,sysbase,uihelper,uientry,async,GIF */
 (function () {
     var kla1650ani = {};
 
@@ -468,6 +468,7 @@
                                 float: "left"
                             }
                         })
+
                         .append($("<button/>", {
                             html: "Animation",
                             class: "kla1630mapbut1",
@@ -476,8 +477,30 @@
                                 var thisbutton = this;
                                 $('.kla1630mapbut1').prop('disabled', true);
                                 $('.kla1630mapbut1').hide();
+                                $('.kla1630mapbut2').hide();
                                 kla1650ani.animate(false, function (ret) {
                                     $('.kla1630mapbut1').prop('disabled', false);
+                                    $('.kla1630mapbut1').show();
+                                    $('.kla1630mapbut2').show();
+                                });
+                            }
+                        }))
+
+                        .append($("<button/>", {
+                            html: "Animation mit gif-Sicherung",
+                            class: "kla1630mapbut2",
+                            css: {
+                                "margin-left": "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var thisbutton = this;
+                                $('.kla1630mapbut2').prop('disabled', true);
+                                $('.kla1630mapbut2').hide();
+                                $('.kla1630mapbut1').hide();
+                                kla1650ani.animate(true, function (ret) {
+                                    $('.kla1630mapbut2').prop('disabled', false);
+                                    $('.kla1630mapbut2').show();
                                     $('.kla1630mapbut1').show();
                                 });
                             }
@@ -592,7 +615,6 @@
                         },
 
                         mouseover: function (e, id, mapElem, textElem, elemOptions) {
-
                             var x = elemOptions.attrs.x;
                             var y = elemOptions.attrs.y;
                             var con = elemOptions.tooltip.content;
@@ -611,17 +633,7 @@
                                 display: "none",
                                 color: "#fff"
                             });
-
-                            /*
-                            if (typeof elemOptions.myText !== 'undefined') {
-                                $('.myText span').html(elemOptions.myText).css({
-                                    display: 'none'
-                                }).fadeIn('slow');
-                            }
-                            */
                         }
-
-
                     }
                 },
                 afterInit: function ($self, paper, areas, plots, options) {
@@ -661,6 +673,7 @@
             // on the map from a x,y coordinates on the page
             var msg = " ";
             var mapi = $(".mapcontainer").data("mapael");
+            debugger;
             var coords = mapi.mapPagePositionToXY(e.pageX, e.pageY);
             var lon = (coords.x - mapi.mapConf.xoffset) / mapi.mapConf.xfactor;
             var lat = (coords.y - mapi.mapConf.yoffset) / mapi.mapConf.yfactor;
@@ -727,6 +740,8 @@
 
     /**
      * animate - animierte Anzeige und optional gif-Ausgabe
+     * dogif === true setzt gif-Sicherung in Gang
+     * mit creategif als Indiktor
      */
     kla1650ani.animate = function (dogif, cb1630B) {
         var creategif = false;
@@ -921,7 +936,7 @@
                      * in ret: pearls[] mit: continent, climatezone, variable, fromyear, toyear, ispainted
                      * sowie error, message und selrecord
                      */
-                    kla1650ani.loop(dogif, ret1.selrecord, ret1.pearls, function (ret) {
+                    kla1650ani.loop(creategif, ret1.selrecord, ret1.pearls, function (ret) {
                         cb1630B2("Finish", ret);
                         return;
                     });
@@ -945,9 +960,16 @@
      * @param {*} pearls [] - Daten aus der Datenbank
      * @param {*} cb1630C - Callback, returns error, message
      */
-    kla1650ani.loop = function (dogif, selrecord, pearls, cb1630C) {
+    kla1650ani.loop = function (creategif, selrecord, pearls, cb1630C) {
         // Anlegen des Steuer-Arrays, Loop über Auswertungsspanne
+        var gif;
         try {
+            if (creategif === true) {
+                var gif = new GIF({
+                    workers: 2,
+                    quality: 10
+                });
+            }
             var loopyears = [];
             var fromyear = parseInt(selrecord.fromyear);
             var toyear = parseInt(selrecord.toyear);
@@ -1055,6 +1077,22 @@
                         $(".mapcontainer").trigger('update', [options]);
                     }
                 }
+                // Jahreszahl über SVG
+                if (icontrol === 1) {
+                    var svg = document.getElementsByTagName('svg')[0];
+                    var svgtext = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext.setAttributeNS(null, 'x', '250');
+                    svgtext.setAttributeNS(null, 'y', '150');
+                    svgtext.setAttributeNS(null, 'font-size', '30');
+                    svgtext.setAttributeNS(null, 'fill', 'red');
+                    svgtext.setAttributeNS(null, 'id', 'actyear1650');
+                    svgtext.textContent = actyear + "(" + actcount + ")";
+                    svg.appendChild(svgtext);
+
+                } else {
+                    document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
+                }
+
                 // Ausgabe sparklines aktualisiert
                 /**
                  * Sparkline vorbereiten
@@ -1071,27 +1109,121 @@
                     height: 60,
                     fillColor: false,
                     defaultPixelsPerValue: defaultpixels,
+                    lineWidth: 2,
                     chartRangeMin: 0,
                     chartRangeMax: maxcount,
                     lineColor: "blue"
                     // composite: true
                 });
+
+                var bararray = new Array(sparkarray.length).fill(null);
+                var div = 10;
+                if (anzyears <= 20) {
+                    div = 5;
+                } else if (anzyears <= 100) {
+                    div = 10;
+                } else {
+                    div = 50;
+                }
+                debugger;
+                for (var ibar = 0; ibar < bararray.length; ibar++) {
+                    var checkyear = loopyears[ibar].year;
+                    if (checkyear%div === 0) {
+                        bararray[ibar] = maxcount / 2;
+                    }
+                }
+
+
+                $("#kla1630mapspark").sparkline(bararray, {
+                    type: 'bar',
+                    height: 60,
+                    barColor: "red",
+                    negBarColor: "blue",
+                    barWidth: defaultpixels,
+                    barSpacing: 0,
+                    fillColor: false,
+                    defaultPixelsPerValue: defaultpixels,
+                    chartRangeMin: 0,
+                    chartRangeMax: maxcount,
+                    composite: true
+
+                });
                 var html = "JAHR:" + actyear + " - " + actcount;
                 $("#kla1630mapsres").html(html);
 
                 setTimeout(function () {
-                    nextyear();
-                    return;
+                    // hier wird die gif-Sicherung aktiviert
+                    if (creategif === true) {
+                        async.waterfall([
+                            function (cb1650E1) {
+                                var img = new Image();
+                                img.crossOrigin = "Anonymous";
+                                var serialized = new XMLSerializer().serializeToString(document.querySelector('svg'));
+                                var svg = new Blob([serialized], {
+                                    type: "image/svg+xml"
+                                });
+                                var url = URL.createObjectURL(svg);
+                                // Onload, callback to move on to next frame
+                                img.onload = function () {
+
+                                    gif.addFrame(img, {
+                                        delay: 400,
+                                        copy: true
+                                    });
+                                    cb1650E1(null, {
+                                        error: false,
+                                        message: "image1",
+                                        image: img
+                                    });
+                                    return;
+                                };
+                                img.src = url;
+                            },
+                            function (ret, cb1650E2) {
+                                cb1650E2("Finish", {
+                                    error: false,
+                                    message: "image1"
+                                });
+                                return;
+                            }
+                        ], function (error, result) {
+                            nextyear();
+                            return;
+                        });
+                    }
                 }, 400);
 
 
             }, function (error) {
                 // Ende des Loops
-                cb1630C({
-                    error: false,
-                    message: "worldmap fertiggestellt"
+                gif.on('finished', function (blob) {
+                    try {
+                        window.open(URL.createObjectURL(blob));
+                        console.log("Animierte worldmap fertiggestellt");
+                        cb1630C({
+                            error: false,
+                            message: "Animierte worldmap fertiggestellt"
+                        });
+                        return;
+                    } catch (err) {
+                        console.log("Aninmierte worldmap Error-1:" + err);
+                        cb1630C({
+                            error: true,
+                            message: "Aninmierte worldmap Error-1:" + err
+                        });
+                        return;
+                    }
                 });
-                return;
+                try {
+                    gif.render();
+                } catch (err) {
+                    console.log("Aninmierte worldmap Error-2:" + err);
+                    cb1630C({
+                        error: true,
+                        message: "Aninmierte worldmap Error-2:" + err
+                    });
+                    return;
+                }
             });
         } catch (err) {
             console.log(err);
