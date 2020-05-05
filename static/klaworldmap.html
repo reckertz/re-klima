@@ -27,7 +27,7 @@
     <script src="lib/jquery.mapael.js" charset="utf-8"></script>
     <script src="maps/germany.js" charset="utf-8"></script>
     <script src="maps/world.js" charset="utf-8"></script>
-    <script src="lib/svg.js" charset="utf-8"></script>
+    <script src="lib/svgspark02.js" charset="utf-8"></script>
 
     <script type="text/javascript" src="apps/re-frame/uihelper.js"></script>
     <script type="text/javascript" src="apps/re-frame/uientry.js"></script>
@@ -36,7 +36,7 @@
     <style>
         .mapael .mapTooltip {
             position: absolute;
-            background-color: #474c4b;
+            background-color: DARKSLATEGRAY;
             moz-opacity: 0.70;
             opacity: 0.70;
             filter: alpha(opacity=70);
@@ -45,7 +45,51 @@
             z-index: 1000;
             max-width: 200px;
             display: none;
-            color: #fff;
+            color: white;
+        }
+
+        /* just the line */
+        .svgsparkline {
+            stroke: red;
+            stroke-width: 2.0;
+            fill: none;
+        }
+
+        /* line with highlight area */
+        /*
+        .svgsparkline {
+            stroke: red;
+            fill: rgba(255, 0, 0, .3);
+        }
+        */
+
+        /* change the spot color */
+        .sparkline--spot {
+            stroke: blue;
+            fill: blue;
+        }
+
+        /* change the cursor color */
+        .sparkline--cursor {
+            stroke: orange;
+        }
+
+        /* style fill area and line colors using specific class name */
+        .sparkline--fill {
+            fill: lightsalmon;
+            opacity: 0.2;
+        }
+
+        .sparkline--line {
+            stroke: red;
+            stroke-width: 2.0;
+            opacity: 0.5;
+        }
+
+        .sparkline--interaction-layer {
+            stroke: CORNFLOWERBLUE;
+            stroke-width: 2.0;
+            opacity: 0.5;
         }
     </style>
 </head>
@@ -81,7 +125,7 @@
             });
             if (window.location.href.indexOf("localhost") >= 0) {
                 $("body").css({
-                    "background-color": "#5ff80611"
+                    "background-color": "CADETBLUE2"
                 });
             }
 

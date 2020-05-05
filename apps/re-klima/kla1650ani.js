@@ -1,7 +1,7 @@
 /*jslint es5:true, browser:true, devel:true, white:true, vars:true */
 /*jshint laxbreak:true */
 /*global $:false, intel:false, cordova:false, device:false */
-/*global window,module,define,root,global,self,var,this,sysbase,uihelper,uientry,async,GIF */
+/*global window,module,define,root,global,self,var,this,sysbase,uihelper,uientry,async,GIF,svgspark02 */
 (function () {
     var kla1650ani = {};
 
@@ -459,6 +459,7 @@
                     selrecord.climatezone = "N1";
                     selrecord.stepyear = "1";
                     selrecord.anzyears = ">=150";
+                    selrecord.fromyear = "2018";
                 }
                 uientry.fromRecord2UI("#kla1630mapform", selrecord, selschema);
                 $(".col2of2")
@@ -558,16 +559,16 @@
                                 'areas': {}
                             };
                             // färbt die areas ein
-                            if (mapElem.originalAttrs.fill == "#5ba400") {
+                            if (mapElem.originalAttrs.fill == "lightsalmon") {
                                 newData.areas[id] = {
                                     attrs: {
-                                        fill: "#0088db"
+                                        fill: "lightgreen"
                                     }
                                 };
                             } else {
                                 newData.areas[id] = {
                                     attrs: {
-                                        fill: "#5ba400"
+                                        fill: "lightsalmon"
                                     }
                                 };
                             }
@@ -622,16 +623,16 @@
                                 'position': 'absolute',
                                 'top': x + 10,
                                 'left': y + 10,
-                                "background-color": "#474c4b",
+                                "background-color": "DARKSLATEGRAY",
                                 "moz-opacity": 0.70,
                                 opacity: 0.70,
-                                filter: "alpha(opacity= 70)",
+                                filter: "alpha(opacity=70)",
                                 "border-radius": "10px",
                                 padding: "10px",
                                 "z-index": 1000,
                                 "max-width": "200px",
                                 display: "none",
-                                color: "#fff"
+                                color: "WHITE"
                             });
                         }
                     }
@@ -673,7 +674,6 @@
             // on the map from a x,y coordinates on the page
             var msg = " ";
             var mapi = $(".mapcontainer").data("mapael");
-            debugger;
             var coords = mapi.mapPagePositionToXY(e.pageX, e.pageY);
             var lon = (coords.x - mapi.mapConf.xoffset) / mapi.mapConf.xfactor;
             var lat = (coords.y - mapi.mapConf.yoffset) / mapi.mapConf.yfactor;
@@ -963,6 +963,9 @@
     kla1650ani.loop = function (creategif, selrecord, pearls, cb1630C) {
         // Anlegen des Steuer-Arrays, Loop über Auswertungsspanne
         var gif;
+        var svgrect;
+        var svgnested;
+        var svg;
         try {
             if (creategif === true) {
                 var gif = new GIF({
@@ -1078,8 +1081,13 @@
                     }
                 }
                 // Jahreszahl über SVG
+
                 if (icontrol === 1) {
-                    var svg = document.getElementsByTagName('svg')[0];
+                    var svgs = document.getElementsByTagName('svg');
+                    svg = document.getElementsByTagName('svg')[0];
+                    $(svg).css({
+                        "background-color": "lightsteelblue"
+                    });
                     var svgtext = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     svgtext.setAttributeNS(null, 'x', '250');
                     svgtext.setAttributeNS(null, 'y', '150');
@@ -1088,6 +1096,32 @@
                     svgtext.setAttributeNS(null, 'id', 'actyear1650');
                     svgtext.textContent = actyear + "(" + actcount + ")";
                     svg.appendChild(svgtext);
+
+                    /*
+                    svg = document.getElementsByTagName('svg')[0];
+                    svgnested = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svgnested.setAttribute('id', 'svgnested');
+                    svgnested.setAttribute('width', $(".col1of2").width() / 2);
+                    svgnested.setAttribute('height', 60);
+                    svgnested.setAttribute('class', "svgsparkline");
+                    svgnested.setAttribute('stroke-width', "3");
+                    svgnested.setAttributeNS(null, 'x', 0);
+                    svgnested.setAttributeNS(null, 'y', 300);
+                    svgnested.setAttributeNS(null, "viewBox", "0 0 400 60");
+                    svgnested.setAttribute('overflow', 'visible');
+                    svg.appendChild(svgnested);
+
+                    // <rect id="smallRect" x="10" y="10" width="100" height="100" />
+                    svgrect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                    svgrect.setAttributeNS(null, 'x', 0);
+                    svgrect.setAttributeNS(null, 'y', 0);
+                    svgrect.setAttribute('width', $(".col1of2").width() / 2);
+                    svgrect.setAttribute('height', 60);
+                    svgrect.setAttribute('fill', 'lightgrey');
+                    svgrect.setAttribute('fill-opacity', "0.4");
+                    svgrect.setAttribute('id', "spark1650");
+                    svgnested.appendChild(svgrect);
+                    */
 
                 } else {
                     document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
@@ -1104,6 +1138,42 @@
                     if (defaultpixels < 1) defaultpixels = 1;
                 }
 
+                /** spark1650
+                 * Sparkline in svg-Rectangle als Container
+                 */
+                //var container = document.getElementsByClassName("spark1650");
+                //svgspark01.makeChart(sparkarray, 60, document.getElementById('svgnested'), false);
+                // svg = document.getElementsByTagName('svg')[0];
+                // document.getElementById('svgnested')
+                svgspark02.sparkline(document.getElementsByTagName('svg')[0], [1, 5, 2, 4, 8, 3, 7], {
+                    offsetX: 5,
+                    offsetY: 300,
+                    width: 300,
+                    fullHeight: 60,
+                    stroke: "green",
+                    strokeOpacity: 1,
+                    fill: "mistyrose",
+                    interactive: true
+                });
+
+
+                var bararray = new Array(sparkarray.length).fill(null);
+                var div = 10;
+                if (anzyears <= 20) {
+                    div = 5;
+                } else if (anzyears <= 100) {
+                    div = 10;
+                } else {
+                    div = 50;
+                }
+                for (var ibar = 0; ibar < bararray.length; ibar++) {
+                    var checkyear = loopyears[ibar].year;
+                    if (checkyear % div === 0) {
+                        bararray[ibar] = maxcount / 2;
+                    }
+                }
+
+                /*
                 $("#kla1630mapspark").sparkline(sparkarray, {
                     type: 'line',
                     height: 60,
@@ -1115,24 +1185,6 @@
                     lineColor: "blue"
                     // composite: true
                 });
-
-                var bararray = new Array(sparkarray.length).fill(null);
-                var div = 10;
-                if (anzyears <= 20) {
-                    div = 5;
-                } else if (anzyears <= 100) {
-                    div = 10;
-                } else {
-                    div = 50;
-                }
-                debugger;
-                for (var ibar = 0; ibar < bararray.length; ibar++) {
-                    var checkyear = loopyears[ibar].year;
-                    if (checkyear%div === 0) {
-                        bararray[ibar] = maxcount / 2;
-                    }
-                }
-
 
                 $("#kla1630mapspark").sparkline(bararray, {
                     type: 'bar',
@@ -1148,6 +1200,8 @@
                     composite: true
 
                 });
+                */
+
                 var html = "JAHR:" + actyear + " - " + actcount;
                 $("#kla1630mapsres").html(html);
 
@@ -1157,15 +1211,9 @@
                         async.waterfall([
                             function (cb1650E1) {
                                 var img = new Image();
-                                img.crossOrigin = "Anonymous";
-                                var serialized = new XMLSerializer().serializeToString(document.querySelector('svg'));
-                                var svg = new Blob([serialized], {
-                                    type: "image/svg+xml"
-                                });
-                                var url = URL.createObjectURL(svg);
+                                var url = "data:image/svg+xml," + encodeURIComponent((new XMLSerializer()).serializeToString(document.querySelector('svg')));
                                 // Onload, callback to move on to next frame
                                 img.onload = function () {
-
                                     gif.addFrame(img, {
                                         delay: 400,
                                         copy: true
@@ -1198,7 +1246,13 @@
                 // Ende des Loops
                 gif.on('finished', function (blob) {
                     try {
-                        window.open(URL.createObjectURL(blob));
+                        var winurl = URL.createObjectURL(blob);
+                        var win = window.open(winurl, "_blank");
+                        if (typeof win !== "undefined" && win !== null) {
+                            win.focus();
+                        } else {
+                            alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
+                        }
                         console.log("Animierte worldmap fertiggestellt");
                         cb1630C({
                             error: false,
@@ -1254,7 +1308,7 @@
                 }],
                 attrs: {
                     "stroke-width": 2,
-                    stroke: "#a4e100",
+                    stroke: "CRIMSON",
                     opacity: 0.6
                 },
                 tooltip: {
@@ -1273,7 +1327,7 @@
                 }],
                 attrs: {
                     "stroke-width": 2,
-                    stroke: "#a4e100",
+                    stroke: "CRIMSON",
                     opacity: 0.6
                 },
                 tooltip: {
@@ -1292,7 +1346,7 @@
                 }],
                 attrs: {
                     "stroke-width": 2,
-                    stroke: "#a4e100",
+                    stroke: "CRIMSON",
                     opacity: 0.6
                 },
                 tooltip: {
@@ -1311,7 +1365,7 @@
                 }],
                 attrs: {
                     "stroke-width": 2,
-                    stroke: "#a4e100",
+                    stroke: "CRIMSON",
                     opacity: 0.6
                 },
                 tooltip: {
@@ -1331,7 +1385,7 @@
                 }],
                 attrs: {
                     "stroke-width": 2,
-                    stroke: "#a4e100",
+                    stroke: "CRIMSON",
                     opacity: 0.6
                 },
                 tooltip: {
@@ -1350,7 +1404,7 @@
                 }],
                 attrs: {
                     "stroke-width": 2,
-                    stroke: "#a4e100",
+                    stroke: "CRIMSON",
                     opacity: 0.6
                 },
                 tooltip: {
@@ -1369,7 +1423,7 @@
                 }],
                 attrs: {
                     "stroke-width": 2,
-                    stroke: "#a4e100",
+                    stroke: "CRIMSON",
                     opacity: 0.6
                 },
                 tooltip: {
