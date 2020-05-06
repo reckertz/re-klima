@@ -1146,7 +1146,7 @@
                 // svg = document.getElementsByTagName('svg')[0];
                 // document.getElementById('svgnested')
                 svgspark02.sparkline(document.getElementsByTagName('svg')[0], [1, 5, 2, 4, 8, 3, 7], {
-                    offsetX: 5,
+                    offsetX: 100,
                     offsetY: 300,
                     width: 300,
                     fullHeight: 60,

@@ -46,7 +46,7 @@
                 // element.setAttributeNS(null, name, attrs[name]);
             }
         }
-        element.setAttribute("family","svgspark");
+        element.setAttribute("family", "svgspark");
         return element;
     };
 
@@ -145,10 +145,10 @@
         // Hold the line coordinates.
         var pathY = options.offsetY + svgspark02.getY(max, height, strokeWidth + spotRadius, values[0]);
         //var pathCoords = 'M${spotDiameter} ${pathY}';
-        var pathCoords = "M" + spotDiameter + " " + pathY;
+        var pathCoords = "M" + (options.offsetX + spotDiameter) + " " + pathY;
 
         values.forEach(function (value, index) {
-            var x = options.offsetX + index * offset; //  + spotDiameter;
+            var x = options.offsetX + index * offset + spotDiameter;
             var y = options.offsetY + svgspark02.getY(max, height, strokeWidth + spotRadius, value);
 
             datapoints.push(Object.assign({}, entries[index], {
@@ -166,7 +166,7 @@
             "stroke-opacity": options.strokeOpacity
         });
 
-        var fillCoords = "" + pathCoords + " V " + (options.offsetY + fullHeight) + " L " + spotDiameter + " " + (options.offsetY + fullHeight) + " Z";
+        var fillCoords = "" + pathCoords + " V " + (options.offsetY + fullHeight) + " L " + (options.offsetX + spotDiameter) + " " + (options.offsetY + fullHeight) + " Z";
 
         var fill = svgspark02.buildElement("path", {
             d: fillCoords,
@@ -234,37 +234,56 @@
                 onmouseout(event);
             }
         });
-
         interactionLayer.addEventListener("mousemove", function (event) {
             event.preventDefault();
 
             var pOffset = $(svg).offset();
+            var currentTarget = event.currectTarget;
+            var mouseX = event.x; //event.x; // event.offsetX;
 
-            var mouseX = event.x;  // event.offsetX;
+            // https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
+            var pt = svg.createSVGPoint();
+            pt.x = event.clientX;
+            pt.y = event.clientY;
+            var svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+
+            mouseX = Math.round(svgP.x);
+
+            sysbase.putMessage(event.x + "=>" + mouseX + "");
             var nextDataIndex = datapoints.findIndex(function (entry) {
                 return entry.x >= mouseX;
             });
+
+            //sysbase.putMessage("event.x:" + event.x + "data.x:" + mouseX + " clientX:" + event.clientX + " screenX:" + event.screenX + " datapoints:" + JSON.stringify(datapoints));
             var currentDataPoint;
             var halfX;
 
             if (nextDataIndex < 0) {
                 nextDataIndex = lastItemIndex;
+                sysbase.putMessage("1-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + lastItemIndex + " mit:" + datapoints[nextDataIndex].x);
                 currentDataPoint = datapoints[nextDataIndex];
-            } else if (nextDataIndex === 0) {
-                currentDataPoint = datapoints[0];
-            } else if (nextDataIndex < lastItemIndex) {
-                halfX = (datapoints[nextDataIndex].x + datapoints[nextDataIndex + 1].x) / 2;
-                if (mouseX > halfX) {
-                    nextDataIndex ++;
-                    currentDataPoint = datapoints[nextDataIndex];
+            } else {
+                // hier echter Hit
+                if (nextDataIndex === 0) {
+                    sysbase.putMessage("2-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + 0 + " mit:" + datapoints[0].x);
+                    currentDataPoint = datapoints[0];
+                } else if (nextDataIndex < lastItemIndex) {
+                    halfX = (datapoints[nextDataIndex].x + datapoints[nextDataIndex + 1].x) / 2;
+                    halfX = Math.round(halfX);
+                    if (mouseX > halfX) {
+                        nextDataIndex++;
+                        sysbase.putMessage("3-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + lastItemIndex + " mit:" + datapoints[nextDataIndex].x);
+                        currentDataPoint = datapoints[nextDataIndex];
+                    } else {
+                        sysbase.putMessage("4-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + nextDataIndex + " mit:" + datapoints[nextDataIndex].x);
+                        currentDataPoint = datapoints[nextDataIndex];
+                    }
                 } else {
+                    nextDataIndex = lastItemIndex;
+                    sysbase.putMessage("5.event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + lastItemIndex + " mit:" + datapoints[nextDataIndex].x);
                     currentDataPoint = datapoints[nextDataIndex];
                 }
-            } else {
-                nextDataIndex = lastItemIndex;
-                currentDataPoint = datapoints[nextDataIndex];
             }
-
             var x = currentDataPoint.x;
             var y = currentDataPoint.y;
 
@@ -285,7 +304,6 @@
             }
         });
     };
-
 
     /**
      * standardisierte Mimik zur Integration mit App, Browser und node.js
