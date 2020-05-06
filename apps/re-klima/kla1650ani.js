@@ -978,6 +978,7 @@
             var toyear = parseInt(selrecord.toyear);
             var anzyears = toyear - fromyear + 1;
             var maxcount = 0;
+            var mincount = null;
             var yearindex = {};
             var ind = 0;
             for (var iyear = fromyear; iyear <= toyear; iyear++) {
@@ -997,6 +998,13 @@
                         loopyears[yearind].count += 1;
                         if (loopyears[yearind].count > maxcount) maxcount = loopyears[yearind].count;
                     }
+                }
+            }
+            for (var iloop = 0; iloop < loopyears.length; iloop++) {
+                if (mincount === null) {
+                    mincount = loopyears[iloop].count;
+                } else if (loopyears[iloop].count < mincount) {
+                    mincount = loopyears[iloop].count;
                 }
             }
             var sparkarray = new Array(anzyears).fill(null);
@@ -1127,7 +1135,6 @@
                     document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
                 }
 
-                // Ausgabe sparklines aktualisiert
                 /**
                  * Sparkline vorbereiten
                  */
@@ -1145,7 +1152,7 @@
                 //svgspark01.makeChart(sparkarray, 60, document.getElementById('svgnested'), false);
                 // svg = document.getElementsByTagName('svg')[0];
                 // document.getElementById('svgnested')
-                svgspark02.sparkline(document.getElementsByTagName('svg')[0], [1, 5, 2, 4, 8, 3, 7], {
+                svgspark02.sparkline(document.getElementsByTagName('svg')[0], sparkarray, {
                     offsetX: 100,
                     offsetY: 300,
                     width: 300,
@@ -1153,6 +1160,8 @@
                     stroke: "green",
                     strokeOpacity: 1,
                     fill: "mistyrose",
+                    chartRangeMin: mincount,
+                    chartRangeMax: maxcount,
                     interactive: true
                 });
 

@@ -12,8 +12,8 @@
         this;
 
 
-    svgspark02.getY = function (max, height, diff, value) {
-        return parseFloat((height - (value * height / max) + diff).toFixed(2));
+    svgspark02.getY = function (max, min, height, diff, value) {
+        return parseFloat((height - ((value - min) * height / (max - min)) + diff).toFixed(2));
     };
 
     svgspark02.removeChildren = function (svg) {
@@ -126,7 +126,9 @@
 
         // The maximum value. This is used to calculate the Y coord of
         // each svgspark02.sparkline datapoint.
-        var max = Math.max.apply(null, values);
+        // Problem null-Values gibt es hier noch
+        var min = options.chartRangeMin || Math.min.apply(null, values);
+        var max = options.chartRangeMax || Math.max.apply(null, values);
 
         // Some arbitrary value to remove the cursor and spot out of
         // the viewing canvas.
@@ -143,39 +145,107 @@
         var datapoints = [];
 
         // Hold the line coordinates.
-        var pathY = options.offsetY + svgspark02.getY(max, height, strokeWidth + spotRadius, values[0]);
+        var pathY = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, values[0]);
         //var pathCoords = 'M${spotDiameter} ${pathY}';
-        var pathCoords = "M" + (options.offsetX + spotDiameter) + " " + pathY;
-
+        var pathString = ""; // "M" + (options.offsetX + spotDiameter) + " " + pathY;
+        var saveString = "";
+        var anznulls = 0;
+        // null-values werden zugelassen und beachtet
         values.forEach(function (value, index) {
-            var x = options.offsetX + index * offset + spotDiameter;
-            var y = options.offsetY + svgspark02.getY(max, height, strokeWidth + spotRadius, value);
-
-            datapoints.push(Object.assign({}, entries[index], {
-                index: index,
-                x: x,
-                y: y
-            }));
-            pathCoords += " L " + x + " " + y;
+            if (value === null) {
+                anznulls++;
+                if (pathString.length > 0) {
+                    var path = svgspark02.buildElement("path", {
+                        d: pathString,
+                        fill: "none",
+                        stroke: options.stroke,
+                        "stroke-opacity": options.strokeOpacity
+                    });
+                    svg.appendChild(path);
+                    pathString = "";
+                }
+            } else {
+                if (svgspark02.getPredecessor(index, values) === null && svgspark02.getSuccessor(index, values) === null) {
+                    // solitärer Wert
+                    var x = options.offsetX + index * offset + spotDiameter;
+                    var y = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, value);
+                    datapoints.push(Object.assign({}, entries[index], {
+                        index: index,
+                        x: x,
+                        y: y
+                    }));
+                    pathString += " M" + x + " " + y;
+                    // TODO: den Min-Value nehmen, wenn er realisiert ist, sonst echte 0
+                    var y0 = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, min);
+                    pathString += " L " + x + " " + y0;
+                    var path = svgspark02.buildElement("path", {
+                        d: pathString,
+                        fill: "none",
+                        stroke: options.stroke,
+                        "stroke-opacity": options.strokeOpacity
+                    });
+                    svg.appendChild(path);
+                    saveString = pathString;
+                    pathString = "";
+                } else if (svgspark02.getPredecessor(index, values) === null) {
+                    // kein Vorgänger, neuer path
+                    var x = options.offsetX + index * offset + spotDiameter;
+                    var y = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, value);
+                    datapoints.push(Object.assign({}, entries[index], {
+                        index: index,
+                        x: x,
+                        y: y
+                    }));
+                    pathString += " M" + x + " " + y;
+                } else if (svgspark02.getSuccessor(index, values) === null) {
+                    // kein Nachfolger, Erzeugen und Ausgabe vornehmen, gibt auch den letzten schon aus
+                    if (index === lastItemIndex) debugger;
+                    var x = options.offsetX + index * offset + spotDiameter;
+                    var y = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, value);
+                    datapoints.push(Object.assign({}, entries[index], {
+                        index: index,
+                        x: x,
+                        y: y
+                    }));
+                    pathString += " L " + x + " " + y;
+                    var path = svgspark02.buildElement("path", {
+                        d: pathString,
+                        fill: "none",
+                        stroke: options.stroke,
+                        "stroke-opacity": options.strokeOpacity
+                    });
+                    svg.appendChild(path);
+                    saveString = pathString;
+                    pathString = "";
+                } else {
+                    // umrandeter Wert/Sandwich
+                    var x = options.offsetX + index * offset + spotDiameter;
+                    var y = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, value);
+                    datapoints.push(Object.assign({}, entries[index], {
+                        index: index,
+                        x: x,
+                        y: y
+                    }));
+                    pathString += " L " + x + " " + y;
+                }
+            }
         });
 
-        var path = svgspark02.buildElement("path", {
-            d: pathCoords,
-            fill: "none",
-            stroke: options.stroke,
-            "stroke-opacity": options.strokeOpacity
-        });
+        if (anznulls === 0) {
+            // zurück zum ersten Datenpunkt
+            var fillCoords = "" + saveString;
+            fillCoords += " V " + (options.offsetY + fullHeight);
+            fillCoords += " L " + (options.offsetX + spotDiameter) + " " + (options.offsetY + fullHeight);
+            fillCoords += " Z";
+            // parseFloat((height - (value * height / (max - min)) + diff).toFixed(2));
+            var fill = svgspark02.buildElement("path", {
+                d: fillCoords,
+                fill: options.fill,
+                "fill-opacity": options.fillOpacity
+            });
+            svg.appendChild(fill);
+        }
 
-        var fillCoords = "" + pathCoords + " V " + (options.offsetY + fullHeight) + " L " + (options.offsetX + spotDiameter) + " " + (options.offsetY + fullHeight) + " Z";
-
-        var fill = svgspark02.buildElement("path", {
-            d: fillCoords,
-            fill: options.fill,
-            "fill-opacity": options.fillOpacity
-        });
-
-        svg.appendChild(fill);
-        svg.appendChild(path);
 
         if (!interactive) {
             var interactionLayer1 = svgspark02.buildElement("rect", {
@@ -305,6 +375,21 @@
         });
     };
 
+    svgspark02.getPredecessor = function (index, values) {
+        if (index <= 0) {
+            return null;
+        } else {
+            return values[index - 1];
+        }
+    };
+
+    svgspark02.getSuccessor = function (index, values) {
+        if (index >= values.length - 1) {
+            return null;
+        } else {
+            return values[index + 1];
+        }
+    };
     /**
      * standardisierte Mimik zur Integration mit App, Browser und node.js
      */
