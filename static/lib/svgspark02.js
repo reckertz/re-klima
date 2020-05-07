@@ -11,6 +11,9 @@
         typeof global === 'object' && global.global === global && global ||
         this;
 
+    var datapoints = [];
+    var spot;
+    var cursor;
 
     svgspark02.getY = function (max, min, height, diff, value) {
         return Math.round(height - ((value - min) * height / (max - min)) + diff);
@@ -160,7 +163,7 @@
 
         // Hold all datapoints, which is whatever we got as the entry plus
         // x/y coords and the index.
-        var datapoints = [];
+        datapoints = [];
         // Hold the line coordinates.
         var pathY = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, values[0]);
         //var pathCoords = 'M${spotDiameter} ${pathY}';
@@ -267,7 +270,7 @@
             return;
         }
 
-        var cursor = svgspark02.buildElement("line", {
+        cursor = svgspark02.buildElement("line", {
             x1: offscreen,
             x2: offscreen,
             y1: 0,
@@ -277,11 +280,12 @@
             "stroke-opacity": options.strokeOpacity
         });
 
-        var spot = svgspark02.buildElement("circle", {
+        spot = svgspark02.buildElement("circle", {
             cx: offscreen,
             cy: offscreen,
             r: spotRadius,
             fill: options.fill,
+            stroke: options.stroke,
             "fill-opacity": options.fillOpacity
         });
         svg.appendChild(cursor);
@@ -356,7 +360,7 @@
             var y = currentDataPoint.y;
 
             spot.setAttribute("cx", x);
-            spot.setAttribute("cy", options.offsetY + y);
+            spot.setAttribute("cy", y);
 
             cursor.setAttributeNS(null, "x1", x);
             cursor.setAttributeNS(null, "y1", options.offsetY);
@@ -372,8 +376,21 @@
                 onmousemove(event, currentDataPoint);
             }
         });
-
     };
+
+    svgspark02.setCursor = function (svg, values, options, index) {
+        var currentDataPoint = datapoints[index];
+        var x = currentDataPoint.x;
+        var y = currentDataPoint.y;
+        var fullHeight = options.fullHeight || 30;
+        spot.setAttribute("cx", x);
+        spot.setAttribute("cy", options.offsetY + y);
+        cursor.setAttributeNS(null, "x1", x);
+        cursor.setAttributeNS(null, "y1", options.offsetY);
+        cursor.setAttributeNS(null, "x2", x);
+        cursor.setAttributeNS(null, "y2", options.offsetY + fullHeight);
+    };
+
 
     svgspark02.getPredecessor = function (index, values) {
         if (index <= 0) {
@@ -390,6 +407,8 @@
             return values[index + 1];
         }
     };
+
+
     /**
      * standardisierte Mimik zur Integration mit App, Browser und node.js
      */

@@ -1130,10 +1130,42 @@
                     svgrect.setAttribute('id', "spark1650");
                     svgnested.appendChild(svgrect);
                     */
+                    // alle Werte bereitstellen
+                    var sparkarray1 = [];
+                    for (var iind = 0; iind < loopyears.length; iind++) {
+                        sparkarray1.push(loopyears[iind].count);
+                    }
+                    svgspark02.sparkline(document.getElementsByTagName('svg')[0], sparkarray1, {
+                        offsetX: 100,
+                        offsetY: 300,
+                        width: 300,
+                        fullHeight: 60,
+                        stroke: "green",
+                        strokeOpacity: 1,
+                        fill: "mistyrose",
+                        chartRangeMin: mincount,
+                        chartRangeMax: maxcount,
+                        interactive: true
+                    });
 
                 } else {
                     document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
                 }
+                svgspark02.setCursor(document.getElementsByTagName('svg')[0], sparkarray1, {
+                    offsetX: 100,
+                    offsetY: 300,
+                    width: 300,
+                    fullHeight: 60,
+                    stroke: "green",
+                    strokeOpacity: 1,
+                    fill: "mistyrose",
+                    chartRangeMin: mincount,
+                    chartRangeMax: maxcount,
+                    interactive: true
+                }, icontrol - 1);
+
+
+
 
                 /**
                  * Sparkline vorbereiten
@@ -1152,18 +1184,7 @@
                 //svgspark01.makeChart(sparkarray, 60, document.getElementById('svgnested'), false);
                 // svg = document.getElementsByTagName('svg')[0];
                 // document.getElementById('svgnested')
-                svgspark02.sparkline(document.getElementsByTagName('svg')[0], sparkarray, {
-                    offsetX: 100,
-                    offsetY: 300,
-                    width: 300,
-                    fullHeight: 60,
-                    stroke: "green",
-                    strokeOpacity: 1,
-                    fill: "mistyrose",
-                    chartRangeMin: mincount,
-                    chartRangeMax: maxcount,
-                    interactive: true
-                });
+
 
 
                 var bararray = new Array(sparkarray.length).fill(null);
