@@ -13,7 +13,7 @@
 
 
     svgspark02.getY = function (max, min, height, diff, value) {
-        return parseFloat((height - ((value - min) * height / (max - min)) + diff).toFixed(2));
+        return Math.round(height - ((value - min) * height / (max - min)) + diff);
     };
 
     svgspark02.removeChildren = function (svg) {
@@ -29,6 +29,8 @@
     svgspark02.defaultFetch = function (entry) {
         if (typeof entry === "number") {
             return entry;
+        } else if (entry === null) {
+            return null;
         } else if (typeof entry === "object") {
             return entry.value;
         } else {
@@ -49,6 +51,8 @@
         element.setAttribute("family", "svgspark");
         return element;
     };
+
+
 
     svgspark02.sparkline = function (svg, entries, options) {
         // svgspark02.removeChildren(svg);
@@ -85,7 +89,7 @@
         var interactive = ("interactive" in options) ? options.interactive : !!onmousemove;
 
         // Define how big should be the spot area.
-        var spotRadius = options.spotRadius || 2;
+        var spotRadius = options.spotRadius || 4;
         var spotDiameter = spotRadius * 2;
 
         // Define how wide should be the cursor area.
@@ -140,10 +144,23 @@
         // Calculate the X coord base step.
         var offset = width / lastItemIndex;
 
+
+        var interactionLayer = svgspark02.buildElement("rect", {
+            width: options.width + 10,
+            height: options.fullHeight,
+            stroke: "magenta",
+            "stroke-opacity": 0.2,
+            "stroke-width": 2,
+            fill: "transparent",
+            x: options.offsetX,
+            y: options.offsetY
+        });
+        svg.appendChild(interactionLayer);
+
+
         // Hold all datapoints, which is whatever we got as the entry plus
         // x/y coords and the index.
         var datapoints = [];
-
         // Hold the line coordinates.
         var pathY = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, values[0]);
         //var pathCoords = 'M${spotDiameter} ${pathY}';
@@ -199,7 +216,6 @@
                     pathString += " M" + x + " " + y;
                 } else if (svgspark02.getSuccessor(index, values) === null) {
                     // kein Nachfolger, Erzeugen und Ausgabe vornehmen, gibt auch den letzten schon aus
-                    if (index === lastItemIndex) debugger;
                     var x = options.offsetX + index * offset + spotDiameter;
                     var y = options.offsetY + svgspark02.getY(max, min, height, strokeWidth + spotRadius, value);
                     datapoints.push(Object.assign({}, entries[index], {
@@ -231,7 +247,7 @@
             }
         });
 
-        if (anznulls === 0) {
+        if (anznulls === 0 && interactive === false) {
             // zurück zum ersten Datenpunkt
             var fillCoords = "" + saveString;
             fillCoords += " V " + (options.offsetY + fullHeight);
@@ -248,17 +264,6 @@
 
 
         if (!interactive) {
-            var interactionLayer1 = svgspark02.buildElement("rect", {
-                width: options.width,
-                height: options.fullHeight,
-                stroke: "magenta",
-                "stroke-opacity": 0.2,
-                "stroke-width": 2,
-                fill: "transparent",
-                x: options.offsetX,
-                y: options.offsetY
-            });
-            svg.appendChild(interactionLayer1);
             return;
         }
 
@@ -281,18 +286,6 @@
         });
         svg.appendChild(cursor);
         svg.appendChild(spot);
-
-        var interactionLayer = svgspark02.buildElement("rect", {
-            width: options.width + 10,
-            height: options.fullHeight,
-            stroke: "magenta",
-            "stroke-opacity": 0.2,
-            "stroke-width": 2,
-            fill: "transparent",
-            x: options.offsetX,
-            y: options.offsetY
-        });
-        svg.appendChild(interactionLayer);
 
         interactionLayer.addEventListener("mouseout", function (event) {
             cursor.setAttribute("x1", offscreen);
@@ -319,7 +312,6 @@
 
             mouseX = Math.round(svgP.x);
 
-            sysbase.putMessage(event.x + "=>" + mouseX + "");
             var nextDataIndex = datapoints.findIndex(function (entry) {
                 return entry.x >= mouseX;
             });
@@ -330,22 +322,28 @@
 
             if (nextDataIndex < 0) {
                 nextDataIndex = lastItemIndex;
-                sysbase.putMessage("1-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + lastItemIndex + " mit:" + datapoints[nextDataIndex].x);
+                sysbase.putMessage("1-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " mit:" + datapoints[nextDataIndex].x);
                 currentDataPoint = datapoints[nextDataIndex];
             } else {
                 // hier echter Hit
                 if (nextDataIndex === 0) {
-                    sysbase.putMessage("2-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + 0 + " mit:" + datapoints[0].x);
+                    sysbase.putMessage("2-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " mit:" + datapoints[nextDataIndex].x);
                     currentDataPoint = datapoints[0];
-                } else if (nextDataIndex < lastItemIndex) {
-                    halfX = (datapoints[nextDataIndex].x + datapoints[nextDataIndex + 1].x) / 2;
+                } else if (nextDataIndex <= lastItemIndex) {
+                    halfX = (datapoints[nextDataIndex].x + datapoints[nextDataIndex - 1].x) / 2;
                     halfX = Math.round(halfX);
                     if (mouseX > halfX) {
-                        nextDataIndex++;
-                        sysbase.putMessage("3-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + lastItemIndex + " mit:" + datapoints[nextDataIndex].x);
+                        var msg = "3-event.x:" + event.x + "=>" + mouseX;
+                        msg += " between:" + (nextDataIndex-1) + "=>" + nextDataIndex + " " + datapoints[nextDataIndex-1].x + "=>" + datapoints[nextDataIndex].x;
+                        msg += " hit:" + nextDataIndex + " mit:" + datapoints[nextDataIndex].x;
+                        sysbase.putMessage(msg);
                         currentDataPoint = datapoints[nextDataIndex];
                     } else {
-                        sysbase.putMessage("4-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + nextDataIndex + " mit:" + datapoints[nextDataIndex].x);
+                        var msg = "4-event.x:" + event.x + "=>" + mouseX;
+                        msg += " between:" + (nextDataIndex-1) + "=>" + nextDataIndex + " " + datapoints[nextDataIndex-1].x + "=>" + datapoints[nextDataIndex].x;
+                        msg += " hit:" + (nextDataIndex-1) + " mit:" + datapoints[nextDataIndex-1].x;
+                        sysbase.putMessage(msg);
+                        nextDataIndex--;
                         currentDataPoint = datapoints[nextDataIndex];
                     }
                 } else {
@@ -364,15 +362,17 @@
             cursor.setAttributeNS(null, "y1", options.offsetY);
             cursor.setAttributeNS(null, "x2", x);
             cursor.setAttributeNS(null, "y2", options.offsetY + fullHeight);
-
+            /*
             console.log(JSON.stringify(datapoints));
             console.log(JSON.stringify(values));
             console.log(mouseX + "=>" + halfX + "=>" + x + " ind:" + nextDataIndex + " val:" + values[nextDataIndex]);
             console.log(JSON.stringify(currentDataPoint));
+            */
             if (onmousemove) {
                 onmousemove(event, currentDataPoint);
             }
         });
+
     };
 
     svgspark02.getPredecessor = function (index, values) {
