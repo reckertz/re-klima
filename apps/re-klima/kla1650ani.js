@@ -1135,7 +1135,7 @@
                     for (var iind = 0; iind < loopyears.length; iind++) {
                         sparkarray1.push(loopyears[iind].count);
                     }
-                    svgspark02.sparkline(document.getElementsByTagName('svg')[0], sparkarray1, {
+                    svgspark02.sparkline("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
                         offsetX: 100,
                         offsetY: 300,
                         width: 300,
@@ -1151,7 +1151,7 @@
                 } else {
                     document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
                 }
-                svgspark02.setCursor(document.getElementsByTagName('svg')[0], sparkarray1, {
+                svgspark02.setCursor("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
                     offsetX: 100,
                     offsetY: 300,
                     width: 300,
@@ -1283,6 +1283,8 @@
                         } else {
                             alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
                         }
+                        // deleteGroup funktioniert, war nur Test
+                        // svgspark02.deleteGroup("mygroup", svg);
                         console.log("Animierte worldmap fertiggestellt");
                         cb1630C({
                             error: false,
