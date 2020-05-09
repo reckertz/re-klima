@@ -1,7 +1,7 @@
 /*jslint es5:true, browser:true, devel:true, white:true, vars:true */
 /*jshint laxbreak:true */
 /*global $:false, intel:false, cordova:false, device:false */
-/*global window,module,define,root,global,self,var,this,sysbase,uihelper,uientry,async,GIF,svgspark02 */
+/*global window,module,define,root,global,self,var,this,sysbase,uihelper,uientry,async,GIF,svgspark02,PlainDraggable */
 (function () {
     var kla1650ani = {};
 
@@ -552,6 +552,7 @@
                             sysbase.putMessage(msg);
                         },
                         */
+
                         click: function (e, id, mapElem, textElem) {
                             sysbase.putMessage("MouseClick:" + id);
                             // uihelper.pointIsInContinent
@@ -668,7 +669,7 @@
         // jetzt kann in worldmaplink entsprechend eine Modifikation stattfinden
         // worldmap.links = kla1650ani.getClimatezonelinks(worldmaplinks);
 
-
+        /*
         $(document).on('click', ".mapcontainer", function (e) {
             // mapPagePositionToXY() allows to get the x,y coordinates
             // on the map from a x,y coordinates on the page
@@ -708,6 +709,7 @@
             };
             $(".mapcontainer").trigger('update', [updateOptions]);
         });
+        */
         $(".mapcontainer").mapael(worldmap);
 
         // Berechnung xoffset und yoffset
@@ -1089,7 +1091,7 @@
                     }
                 }
                 // Jahreszahl über SVG
-
+                var sparkarray1 = [];
                 if (icontrol === 1) {
                     var svgs = document.getElementsByTagName('svg');
                     svg = document.getElementsByTagName('svg')[0];
@@ -1131,7 +1133,7 @@
                     svgnested.appendChild(svgrect);
                     */
                     // alle Werte bereitstellen
-                    var sparkarray1 = [];
+
                     for (var iind = 0; iind < loopyears.length; iind++) {
                         sparkarray1.push(loopyears[iind].count);
                     }
@@ -1145,6 +1147,7 @@
                         fill: "mistyrose",
                         chartRangeMin: mincount,
                         chartRangeMax: maxcount,
+                        draggable: true,
                         interactive: true
                     });
 

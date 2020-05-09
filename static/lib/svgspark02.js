@@ -1,7 +1,7 @@
 // basiert auf https://raw.githubusercontent.com/fnando/svgspark02.sparkline/master/src/svgspark02.sparkline.js
 // mit MIT-License
 // geändert durch Rolf Eckertz 2020
-/*global $,this,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
+/*global $,this,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression,PlainDraggable */
 /*global document */
 (function () {
     'use strict';
@@ -11,7 +11,7 @@
         typeof global === 'object' && global.global === global && global ||
         this;
 
-    var svgspark02g = {};  // Container für alle Daten einer Instanz = Group mit id
+    var svgspark02g = {}; // Container für alle Daten einer Instanz = Group mit id
 
     svgspark02.getY = function (max, min, height, diff, value) {
         return Math.round(height - ((value - min) * height / (max - min)) + diff);
@@ -72,6 +72,8 @@
         svgspark02g[sparkid].strokeOpacity = options.strokeOpacity || 0.5;
         svgspark02g[sparkid].fill = options.fill || "mistyrose";
         svgspark02g[sparkid].fillOpacity = options.fillOpacity || 0.5;
+        svgspark02g[sparkid].draggable = options.draggable || true;
+
 
         // This function will be called whenever the mouse moves
         // over the SVG. You can use it to render something like a
@@ -84,7 +86,7 @@
 
         // Should we run in interactive mode? If yes, this will handle the
         // cursor and spot position when moving the mouse.
-        svgspark02g[sparkid].interactive = ("interactive" in options) ? options.interactive : !! svgspark02g[sparkid].onmousemove;
+        svgspark02g[sparkid].interactive = ("interactive" in options) ? options.interactive : !!svgspark02g[sparkid].onmousemove;
 
         // Define how big should be the spot area.
         svgspark02g[sparkid].spotRadius = options.spotRadius || 4;
@@ -106,7 +108,7 @@
 
         // Retrieve only values, easing the find for the maximum value.
         var values = entries.map(function (entry) {
-           return fetch(entry);
+            return fetch(entry);
         });
         svgspark02g[sparkid].values = values;
 
@@ -138,13 +140,14 @@
         // Calculate the X coord base step.
         svgspark02g[sparkid].offset = svgspark02g[sparkid].width / svgspark02g[sparkid].lastItemIndex;
 
-        svgspark02g[sparkid].group = document.createElementNS("http://www.w3.org/2000/svg","g");
-        svgspark02g[sparkid].group.setAttribute("id",sparkid);
+        svgspark02g[sparkid].group = document.createElementNS("http://www.w3.org/2000/svg", "g");
+        svgspark02g[sparkid].group.setAttribute("id", sparkid);
         svg.appendChild(svgspark02g[sparkid].group);
 
         //$("#" + sparkid).draggable();
 
         svgspark02g[sparkid].interactionLayer = svgspark02.buildElement("rect", {
+            id: sparkid + "rect",
             width: svgspark02g[sparkid].width + 10,
             height: svgspark02g[sparkid].fullHeight,
             stroke: "magenta",
@@ -181,13 +184,16 @@
             } else {
                 if (svgspark02.getPredecessor(index, svgspark02g[sparkid].values) === null && svgspark02.getSuccessor(index, svgspark02g[sparkid].values) === null) {
                     // solitärer Wert
-                    var x = svgspark02g[sparkid].offsetX + index * svgspark02g[sparkid].offset + svgspark02g[sparkid].spotDiameter;
+                    //var x = svgspark02g[sparkid].offsetX + index * svgspark02g[sparkid].offset + svgspark02g[sparkid].spotDiameter;
+                    // Distanz links svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
+                    var x = index * svgspark02g[sparkid].offset;
                     var y = svgspark02g[sparkid].offsetY + svgspark02.getY(svgspark02g[sparkid].max, svgspark02g[sparkid].min, svgspark02g[sparkid].height, svgspark02g[sparkid].strokeWidth + svgspark02g[sparkid].spotRadius, value);
                     svgspark02g[sparkid].datapoints.push(Object.assign({}, entries[index], {
                         index: index,
                         x: x,
                         y: y
                     }));
+                    x = x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
                     pathString += " M" + x + " " + y;
                     // TODO: den Min-Value nehmen, wenn er realisiert ist, sonst echte 0
                     var y0 = svgspark02g[sparkid].offsetY + svgspark02.getY(svgspark02g[sparkid].max, svgspark02g[sparkid].min, svgspark02g[sparkid].height, svgspark02g[sparkid].strokeWidth + svgspark02g[sparkid].spotRadius, svgspark02g[sparkid].min);
@@ -203,23 +209,25 @@
                     pathString = "";
                 } else if (svgspark02.getPredecessor(index, svgspark02g[sparkid].values) === null) {
                     // kein Vorgänger, neuer path
-                    var x = svgspark02g[sparkid].offsetX + index * svgspark02g[sparkid].offset + svgspark02g[sparkid].spotDiameter;
+                    var x = index * svgspark02g[sparkid].offset;
                     var y = svgspark02g[sparkid].offsetY + svgspark02.getY(svgspark02g[sparkid].max, svgspark02g[sparkid].min, svgspark02g[sparkid].height, svgspark02g[sparkid].strokeWidth + svgspark02g[sparkid].spotRadius, value);
                     svgspark02g[sparkid].datapoints.push(Object.assign({}, entries[index], {
                         index: index,
                         x: x,
                         y: y
                     }));
+                    x = x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
                     pathString += " M" + x + " " + y;
                 } else if (svgspark02.getSuccessor(index, svgspark02g[sparkid].values) === null) {
                     // kein Nachfolger, Erzeugen und Ausgabe vornehmen, gibt auch den letzten schon aus
-                    var x = svgspark02g[sparkid].offsetX + index * svgspark02g[sparkid].offset + svgspark02g[sparkid].spotDiameter;
+                    var x = index * svgspark02g[sparkid].offset;
                     var y = options.offsetY + svgspark02.getY(svgspark02g[sparkid].max, svgspark02g[sparkid].min, svgspark02g[sparkid].height, svgspark02g[sparkid].strokeWidth + svgspark02g[sparkid].spotRadius, value);
                     svgspark02g[sparkid].datapoints.push(Object.assign({}, entries[index], {
                         index: index,
                         x: x,
                         y: y
                     }));
+                    x = x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
                     pathString += " L " + x + " " + y;
                     svgspark02g[sparkid].path = svgspark02.buildElement("path", {
                         d: pathString,
@@ -232,18 +240,19 @@
                     pathString = "";
                 } else {
                     // umrandeter Wert/Sandwich
-                    var x = svgspark02g[sparkid].offsetX + index * svgspark02g[sparkid].offset + svgspark02g[sparkid].spotDiameter;
+                    var x = index * svgspark02g[sparkid].offset;
                     var y = options.offsetY + svgspark02.getY(svgspark02g[sparkid].max, svgspark02g[sparkid].min, svgspark02g[sparkid].height, svgspark02g[sparkid].strokeWidth + svgspark02g[sparkid].spotRadius, value);
                     svgspark02g[sparkid].datapoints.push(Object.assign({}, entries[index], {
                         index: index,
                         x: x,
                         y: y
                     }));
+                    x = x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
                     pathString += " L " + x + " " + y;
                 }
             }
         });
-
+        console.log(svgspark02g[sparkid].datapoints);
         if (anznulls === 0 && svgspark02g[sparkid].interactive === false) {
             // zurück zum ersten Datenpunkt
             var fillCoords = "" + saveString;
@@ -300,57 +309,67 @@
 
             var pOffset = $(svg).offset();
             var currentTarget = event.currectTarget;
-            var mouseX = event.x; //event.x; // event.offsetX;
+            var eventX = event.x; //event.x; // event.offsetX;
 
             // https://www.sitepoint.com/how-to-translate-from-dom-to-svg-coordinates-and-back-again/
             var pt = svg.createSVGPoint();
             pt.x = event.clientX;
             pt.y = event.clientY;
             var svgP = pt.matrixTransform(svg.getScreenCTM().inverse());
+            var mouseX = svgP.x;
+            var rect = this;
+            var transX = Math.round(rect.transform.animVal[0].matrix.e);
+            var transY = Math.round(rect.transform.animVal[0].matrix.f);
+            var mouseXkorr = mouseX - svgspark02g[sparkid].offsetX - svgspark02g[sparkid].spotDiameter - transX;
+            console.log("eventX:" + eventX + " mouseX:" + svgP.x.toFixed() + " mouseXkorr:" + mouseXkorr.toFixed() + " transX:" + transX.toFixed() + " vgl:" + (mouseX - transX).toFixed());
 
-            mouseX = Math.round(svgP.x);
-
-            var nextDataIndex = svgspark02g[sparkid].datapoints.findIndex(function (entry) {
-                return entry.x >= mouseX;
-            });
-
-            //sysbase.putMessage("event.x:" + event.x + "data.x:" + mouseX + " clientX:" + event.clientX + " screenX:" + event.screenX + " datapoints:" + JSON.stringify(datapoints));
+            var lastItemIndex = svgspark02g[sparkid].datapoints.length - 1;
+            var nextDataIndex = -1;
             var currentDataPoint;
-            var halfX;
-
-            if (nextDataIndex < 0) {
-                nextDataIndex = svgspark02g[sparkid].lastItemIndex;
-                sysbase.putMessage("1-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " mit:" + svgspark02g[sparkid].datapoints[nextDataIndex].x);
+            if (mouseXkorr <= svgspark02g[sparkid].datapoints[0].x) {
+                nextDataIndex = 0;
                 currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
+                console.log("R1-vor Beginn");
+            } else if (mouseXkorr >= svgspark02g[sparkid].datapoints[lastItemIndex].x) {
+                nextDataIndex = lastItemIndex;
+                currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
+                console.log("R2-nach Ende");
             } else {
-                // hier echter Hit
-                if (nextDataIndex === 0) {
-                    sysbase.putMessage("2-event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " mit:" + svgspark02g[sparkid].datapoints[nextDataIndex].x);
-                    currentDataPoint = svgspark02g[sparkid].datapoints[0];
-                } else if (nextDataIndex <= svgspark02g[sparkid].lastItemIndex) {
-                    halfX = (svgspark02g[sparkid].datapoints[nextDataIndex].x + svgspark02g[sparkid].datapoints[nextDataIndex - 1].x) / 2;
-                    halfX = Math.round(halfX);
-                    if (mouseX > halfX) {
-                        var msg = "3-event.x:" + event.x + "=>" + mouseX;
-                        msg += " between:" + (nextDataIndex-1) + "=>" + nextDataIndex + " " + svgspark02g[sparkid].datapoints[nextDataIndex-1].x + "=>" + svgspark02g[sparkid].datapoints[nextDataIndex].x;
-                        msg += " hit:" + nextDataIndex + " mit:" + svgspark02g[sparkid].datapoints[nextDataIndex].x;
-                        sysbase.putMessage(msg);
-                        currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
-                    } else {
-                        var msg = "4-event.x:" + event.x + "=>" + mouseX;
-                        msg += " between:" + (nextDataIndex-1) + "=>" + nextDataIndex + " " + svgspark02g[sparkid].datapoints[nextDataIndex-1].x + "=>" + svgspark02g[sparkid].datapoints[nextDataIndex].x;
-                        msg += " hit:" + (nextDataIndex-1) + " mit:" + svgspark02g[sparkid].datapoints[nextDataIndex-1].x;
-                        sysbase.putMessage(msg);
-                        nextDataIndex--;
-                        currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
-                    }
-                } else {
-                    nextDataIndex = svgspark02g[sparkid].lastItemIndex;
-                    sysbase.putMessage("5.event.x:" + event.x + "=>" + mouseX + " nextDataIndex:" + nextDataIndex + " auf:" + svgspark02g[sparkid].lastItemIndex + " mit:" + svgspark02g[sparkid].datapoints[nextDataIndex].x);
+                nextDataIndex = svgspark02g[sparkid].datapoints.findIndex(function (entry) {
+                    return entry.x >= mouseXkorr;
+                });
+                // äquidistante Intervalle, daher erst mal half an sich rechnen
+                var halfX = (svgspark02g[sparkid].datapoints[0].x + svgspark02g[sparkid].datapoints[1].x)/2;
+                // wieder zwei spezialregeln und dann der Loop
+                if (mouseXkorr < (svgspark02g[sparkid].datapoints[0].x + halfX)) {
+                    nextDataIndex = 0;
                     currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
+                    console.log("R3-in first + half");
+                } else if (mouseXkorr > (svgspark02g[sparkid].datapoints[lastItemIndex].x - halfX)) {
+                    nextDataIndex = lastItemIndex;
+                    currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
+                    console.log("R4-in last - half");
+                } else {
+                    for (var ihalf = 1; ihalf < lastItemIndex; ihalf++) {
+                        if (mouseXkorr >= (svgspark02g[sparkid].datapoints[ihalf].x - halfX)
+                        && mouseXkorr <= (svgspark02g[sparkid].datapoints[ihalf].x + halfX)) {
+                            nextDataIndex = ihalf;
+                            currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
+                            console.log("R5-around");
+                            break;
+                        }
+                    }
                 }
             }
-            var x = currentDataPoint.x;
+            if (nextDataIndex === -1) {
+                alert("Katastrophe");
+                debugger;
+            }
+
+
+
+            var x = currentDataPoint.x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
+            console.log("HIT:" + nextDataIndex + " x:" + x);
             var y = currentDataPoint.y;
 
             svgspark02g[sparkid].spot.setAttribute("cx", x);
@@ -370,7 +389,41 @@
                 svgspark02g[sparkid].onmousemove(event, currentDataPoint);
             }
         });
+
+
+        if (svgspark02g[sparkid].draggable === true) {
+            var rect = document.getElementById(sparkid + "rect");
+            var drgG1 = new PlainDraggable(rect, {
+                /* containment: field,*/
+                containment: {
+                    left: 0,
+                    top: 0,
+                    right: "95%",
+                    height: "95%"
+                },
+                onDragEnd: function (newPosition) {
+                    var group = document.getElementById(sparkid);
+                    var rect = document.getElementById(sparkid + 'rect');
+                    var transX = Math.round(rect.transform.animVal[0].matrix.e);
+                    var transY = Math.round(rect.transform.animVal[0].matrix.f);
+                    var children = group.childNodes;
+                    for (var inode = 0; inode < children.length; inode++) {
+                        var child = children[inode];
+                        if (typeof child.tagName !== "undefined") {
+                            if (child.tagName !== "rect") {
+                                child.setAttributeNS(null, "transform", "translate(" + transX + ", " + transY + ")");
+                            }
+                        }
+                    }
+                }
+            });
+
+        }
+
+
+
     };
+
 
     svgspark02.setCursor = function (sparkid, svg, values, options, index) {
         var currentDataPoint = svgspark02g[sparkid].datapoints[index];
@@ -387,9 +440,9 @@
 
     svgspark02.deleteGroup = function (sparkid, svg) {
         try {
-        var gdel = document.getElementById(sparkid);
-        gdel.remove();
-        } catch(err) {
+            var gdel = document.getElementById(sparkid);
+            gdel.remove();
+        } catch (err) {
             console.log(err);
         }
         delete svgspark02g[sparkid];
