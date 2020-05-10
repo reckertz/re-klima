@@ -1882,6 +1882,8 @@
                         class: "optionConfirm",
                         bschema: JSON.stringify(schema),
                         css: {
+                            "margin-top": "10px",
+                            "margin-left": "10px",
                             float: "left"
                         },
                         html: "OK",
@@ -1901,6 +1903,7 @@
                         class: "optionCancel",
                         css: {
                             float: "left",
+                            "margin-top": "10px",
                             "margin-left": "10px"
                         },
                         html: "Cancel",

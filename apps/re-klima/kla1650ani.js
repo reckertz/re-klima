@@ -33,6 +33,7 @@
     var stationarray = [];
     var worldmap = {};
     var firststationid = "";
+    var gif;
 
     kla1650ani.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
@@ -780,6 +781,13 @@
         where += " SELECT stationid FROM KLIINVENTORY";
         where += " WHERE KLIINVENTORY.source = '" + selrecord.source + "'";
         where += " AND KLIINVENTORY.variable = '" + selrecord.variablename + "'";
+
+        /**
+         * wenn stepyear > 1 vorgegeben ist, dann wird eine Jahresliste mit den
+         * entsprechenden Sprüngen im Bereich von-bis erzeugt
+         * das wird allerdings erst später wirksam wenn die Daten u.a. ausgewertet werden!
+         */
+
         if (typeof selrecord.fromyear !== "undefined" && selrecord.fromyear.trim().length > 0) {
             var fromyear = selrecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
             if (fromyear !== null && fromyear.length >= 3) {
@@ -808,6 +816,11 @@
                 return;
             }
         }
+
+
+
+
+
         where += ")";
         where += " AND KLISTATIONS.source = '" + selrecord.source + "'";
         where += " AND KLIINVENTORY.variable = '" + selrecord.variablename + "'";
@@ -835,7 +848,20 @@
         sqlStmt += " WHERE " + where;
         sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
         async.waterfall([
-                function (cb1630B1) {
+                function (cb1630B0) {
+                    // ret1.selrecord und ret1.pearls müssen weitergegeben werden - oder das geht nach oben
+                    if (creategif === true) {
+                        gif = new GIF({
+                            workers: 2,
+                            quality: 10
+                        });
+                    }
+                    kla1650ani.getTitlePageData(true, selrecord, selschema, function (ret) {
+                        cb1630B0(null, ret);
+                        return;
+                    });
+                },
+                function (ret, cb1630B1) {
                     var skip = 0;
                     var limit = 0;
                     var api = "getallrecords";
@@ -932,14 +958,14 @@
                         }
                     });
                 },
-                function (ret1, cb1630B2) {
+                function (ret1, cb1630B3) {
                     /**
                      * Loop über die Daten aufrufen zur Ausgabe mit Animation
                      * in ret: pearls[] mit: continent, climatezone, variable, fromyear, toyear, ispainted
                      * sowie error, message und selrecord
                      */
                     kla1650ani.loop(creategif, ret1.selrecord, ret1.pearls, function (ret) {
-                        cb1630B2("Finish", ret);
+                        cb1630B3("Finish", ret);
                         return;
                     });
                 }
@@ -964,17 +990,13 @@
      */
     kla1650ani.loop = function (creategif, selrecord, pearls, cb1630C) {
         // Anlegen des Steuer-Arrays, Loop über Auswertungsspanne
-        var gif;
+
         var svgrect;
         var svgnested;
         var svg;
         try {
-            if (creategif === true) {
-                var gif = new GIF({
-                    workers: 2,
-                    quality: 10
-                });
-            }
+
+
             var loopyears = [];
             var fromyear = parseInt(selrecord.fromyear);
             var toyear = parseInt(selrecord.toyear);
@@ -983,13 +1005,42 @@
             var mincount = null;
             var yearindex = {};
             var ind = 0;
+            if (typeof selrecord.stepyear === "undefined") {
+                selrecord.stepyear = 1;
+            } else if (parseInt(selrecord.stepyear) < 1) {
+                selrecord.stepyear = 1;
+            } else {
+                selrecord.stepyear = parseInt(selrecord.stepyear);
+            }
+
             for (var iyear = fromyear; iyear <= toyear; iyear++) {
-                loopyears.push({
-                    year: iyear,
-                    count: 0
-                });
-                yearindex["" + iyear] = ind;
-                ind++;
+                /**
+                 * hier kommt die stepyear-Filterung zum Einsatz
+                 */
+                if (selrecord.stepyear === 1) {
+                    loopyears.push({
+                        year: iyear,
+                        count: 0
+                    });
+                    yearindex["" + iyear] = ind;
+                    ind++;
+                } else {
+                    if (iyear === fromyear || iyear === toyear) {
+                        loopyears.push({
+                            year: iyear,
+                            count: 0
+                        });
+                        yearindex["" + iyear] = ind;
+                        ind++;
+                    } else if (iyear % selrecord.stepyear === 0) {
+                        loopyears.push({
+                            year: iyear,
+                            count: 0
+                        });
+                        yearindex["" + iyear] = ind;
+                        ind++;
+                    }
+                }
             }
             for (var ipearl = 0; ipearl < pearls.length; ipearl++) {
                 var pearl = pearls[ipearl];
@@ -1104,39 +1155,48 @@
                     svgtext.setAttributeNS(null, 'font-size', '30');
                     svgtext.setAttributeNS(null, 'fill', 'red');
                     svgtext.setAttributeNS(null, 'id', 'actyear1650');
+                    svgtext.setAttribute("obliquity", .5);
                     svgtext.textContent = actyear + "(" + actcount + ")";
                     svg.appendChild(svgtext);
+                } else {
+                    document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
+                }
+                /*
+                svg = document.getElementsByTagName('svg')[0];
+                svgnested = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                svgnested.setAttribute('id', 'svgnested');
+                svgnested.setAttribute('width', $(".col1of2").width() / 2);
+                svgnested.setAttribute('height', 60);
+                svgnested.setAttribute('class', "svgsparkline");
+                svgnested.setAttribute('stroke-width', "3");
+                svgnested.setAttributeNS(null, 'x', 0);
+                svgnested.setAttributeNS(null, 'y', 300);
+                svgnested.setAttributeNS(null, "viewBox", "0 0 400 60");
+                svgnested.setAttribute('overflow', 'visible');
+                svg.appendChild(svgnested);
 
-                    /*
-                    svg = document.getElementsByTagName('svg')[0];
-                    svgnested = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                    svgnested.setAttribute('id', 'svgnested');
-                    svgnested.setAttribute('width', $(".col1of2").width() / 2);
-                    svgnested.setAttribute('height', 60);
-                    svgnested.setAttribute('class', "svgsparkline");
-                    svgnested.setAttribute('stroke-width', "3");
-                    svgnested.setAttributeNS(null, 'x', 0);
-                    svgnested.setAttributeNS(null, 'y', 300);
-                    svgnested.setAttributeNS(null, "viewBox", "0 0 400 60");
-                    svgnested.setAttribute('overflow', 'visible');
-                    svg.appendChild(svgnested);
+                // <rect id="smallRect" x="10" y="10" width="100" height="100" />
+                svgrect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+                svgrect.setAttributeNS(null, 'x', 0);
+                svgrect.setAttributeNS(null, 'y', 0);
+                svgrect.setAttribute('width', $(".col1of2").width() / 2);
+                svgrect.setAttribute('height', 60);
+                svgrect.setAttribute('fill', 'lightgrey');
+                svgrect.setAttribute('fill-opacity', "0.4");
+                svgrect.setAttribute('id', "spark1650");
+                svgnested.appendChild(svgrect);
+                */
+                // alle Werte bereitstellen
 
-                    // <rect id="smallRect" x="10" y="10" width="100" height="100" />
-                    svgrect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                    svgrect.setAttributeNS(null, 'x', 0);
-                    svgrect.setAttributeNS(null, 'y', 0);
-                    svgrect.setAttribute('width', $(".col1of2").width() / 2);
-                    svgrect.setAttribute('height', 60);
-                    svgrect.setAttribute('fill', 'lightgrey');
-                    svgrect.setAttribute('fill-opacity', "0.4");
-                    svgrect.setAttribute('id', "spark1650");
-                    svgnested.appendChild(svgrect);
-                    */
-                    // alle Werte bereitstellen
 
+                if (icontrol === 1) {
                     for (var iind = 0; iind < loopyears.length; iind++) {
                         sparkarray1.push(loopyears[iind].count);
                     }
+                }
+
+
+                if (icontrol === 1) {
                     svgspark02.sparkline("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
                         offsetX: 100,
                         offsetY: 300,
@@ -1150,9 +1210,6 @@
                         draggable: true,
                         interactive: true
                     });
-
-                } else {
-                    document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
                 }
                 svgspark02.setCursor("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
                     offsetX: 100,
@@ -1168,72 +1225,34 @@
                 }, icontrol - 1);
 
 
+                if (icontrol === 1) {
+                    svgspark02.sparkline("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
+                        offsetX: 100,
+                        offsetY: 150,
+                        width: 300,
+                        fullHeight: 60,
+                        stroke: "green",
+                        strokeOpacity: 1,
+                        fill: "mistyrose",
+                        chartRangeMin: mincount,
+                        chartRangeMax: maxcount,
+                        draggable: true,
+                        interactive: true
+                    });
 
-
-                /**
-                 * Sparkline vorbereiten
-                 */
-                var defaultpixels = 3;
-                var sparkwidth = $(".mapcontainer").width();
-                if (sparkarray.length > 0) {
-                    defaultpixels = Math.floor(sparkwidth / sparkarray.length);
-                    if (defaultpixels < 1) defaultpixels = 1;
                 }
-
-                /** spark1650
-                 * Sparkline in svg-Rectangle als Container
-                 */
-                //var container = document.getElementsByClassName("spark1650");
-                //svgspark01.makeChart(sparkarray, 60, document.getElementById('svgnested'), false);
-                // svg = document.getElementsByTagName('svg')[0];
-                // document.getElementById('svgnested')
-
-
-
-                var bararray = new Array(sparkarray.length).fill(null);
-                var div = 10;
-                if (anzyears <= 20) {
-                    div = 5;
-                } else if (anzyears <= 100) {
-                    div = 10;
-                } else {
-                    div = 50;
-                }
-                for (var ibar = 0; ibar < bararray.length; ibar++) {
-                    var checkyear = loopyears[ibar].year;
-                    if (checkyear % div === 0) {
-                        bararray[ibar] = maxcount / 2;
-                    }
-                }
-
-                /*
-                $("#kla1630mapspark").sparkline(sparkarray, {
-                    type: 'line',
-                    height: 60,
-                    fillColor: false,
-                    defaultPixelsPerValue: defaultpixels,
-                    lineWidth: 2,
-                    chartRangeMin: 0,
+                svgspark02.setCursor("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
+                    offsetX: 100,
+                    offsetY: 150,
+                    width: 300,
+                    fullHeight: 60,
+                    stroke: "green",
+                    strokeOpacity: 1,
+                    fill: "mistyrose",
+                    chartRangeMin: mincount,
                     chartRangeMax: maxcount,
-                    lineColor: "blue"
-                    // composite: true
-                });
-
-                $("#kla1630mapspark").sparkline(bararray, {
-                    type: 'bar',
-                    height: 60,
-                    barColor: "red",
-                    negBarColor: "blue",
-                    barWidth: defaultpixels,
-                    barSpacing: 0,
-                    fillColor: false,
-                    defaultPixelsPerValue: defaultpixels,
-                    chartRangeMin: 0,
-                    chartRangeMax: maxcount,
-                    composite: true
-
-                });
-                */
+                    interactive: true
+                }, icontrol - 1);
 
                 var html = "JAHR:" + actyear + " - " + actcount;
                 $("#kla1630mapsres").html(html);
@@ -1273,8 +1292,6 @@
                         });
                     }
                 }, 400);
-
-
             }, function (error) {
                 // Ende des Loops
                 gif.on('finished', function (blob) {
@@ -1324,6 +1341,171 @@
             return;
         }
     };
+
+
+    kla1650ani.getTitlePageData = function (clearmap, selrecord, selschema, cb1650F0) {
+
+        async.waterfall([
+                function (cb1650F1) {
+                    /**
+                     * Popup Prompt zur Bestätigung der kompletten Übernahme
+                     * kla1400rawfullname -  $("#kla1400rawfullname").text();
+                     */
+                    var username = uihelper.getUsername();
+                    var titleschema = {
+                        entryschema: {
+                            props: {
+                                title: "Titelerfassung",
+                                description: "",
+                                type: "object", // currency, integer, datum, text, key, object
+                                class: "uiefieldset",
+                                properties: {
+                                    headertitle: {
+                                        title: "Titel",
+                                        type: "string", // currency, integer, datum, text, key
+                                        class: "uietext",
+                                        default: "",
+                                        width: "100px",
+                                        io: "i"
+                                    },
+                                    subtitle: {
+                                        title: "Untertitel",
+                                        type: "string", // currency, integer, datum, text, key
+                                        class: "uietext",
+                                        default: "",
+                                        width: "100px",
+                                        io: "i"
+                                    },
+                                    selection: {
+                                        title: "Selektion",
+                                        type: "string", // currency, integer, datum, text, key
+                                        class: "uietext",
+                                        default: "",
+                                        width: "100px",
+                                        io: "o"
+                                    },
+                                    comment: {
+                                        title: "Kommentar",
+                                        type: "string", // currency, integer, datum, text, key
+                                        class: "uiearea",
+                                        rows: 8,
+                                        cols: 50,
+                                        default: "",
+                                        io: "i"
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    var titlerecord = {};
+
+                    titlerecord.selection = "Hier wird die Selektion protokolliert";
+                    var anchorHash = "#kla1650ani";
+                    var title = "";
+                    var pos = {
+                        left: Math.round($(".col1of2").width() * 0.2),
+                        top: Math.round($(".col1of2").height() * 0.15),
+                        width: $(".col1of2").width() / 2,
+                        height: Math.round($(".col1of2").height() * 0.75)
+                    };
+                    //Math.ceil($(this).offset().top + $(this).height() + 20)
+                    $(document).on('popupcancel', function (evt, extraParam) {
+                        evt.preventDefault();
+                        $('.kla1630mapbut1').prop('disabled', false);
+                        $('.kla1630mapbut2').prop('disabled', false);
+                        $('.kla1630mapbut1').show();
+                        $('.kla1630mapbut2').show();
+                        cb1650F1("error", {
+                            error: true,
+                            message: "Popup abgebrochen"
+                        });
+                        return;
+                    });
+                    $(document).on('popupok', function (evt, extraParam) {
+                        evt.preventDefault();
+                        evt.stopPropagation();
+                        evt.stopImmediatePropagation();
+                        var titleParam = JSON.parse(extraParam); // Satzstruktur!
+                        var titlerecord = titleParam.props;
+                        cb1650F1(null, {
+                            error: false,
+                            message: "Popup erfasst",
+                            titlerecord: titlerecord
+                        });
+                        return;
+                    });
+                    uientry.inputDialogX(anchorHash, pos, title, titleschema, titlerecord, function (ret1) {
+                        if (ret1.error === false) {
+                            sysbase.putMessage("Erfassungsdialog ist ausgegeben worden", 1);
+                        } else {
+                            $('.kla1630mapbut1').prop('disabled', false);
+                            $('.kla1630mapbut2').prop('disabled', false);
+                            $('.kla1630mapbut1').show();
+                            $('.kla1630mapbut2').show();
+                            cb1650F1("error", {
+                                error: true,
+                                message: "Der Dialog wurde nicht aufgebaut:" + ret1.message
+                            });
+                        }
+                    });
+                },
+                function (ret, cb1650F2) {
+                    /**
+                     * Ausgabe der Titelseite
+                     */
+                    var titlerecord = ret.titlerecord;
+                    if (clearmap === true) {
+                        kla1650ani.prepMap({});
+                    }
+                    // Textboxen ausgeben
+                    var svgs = document.getElementsByTagName('svg');
+                    var svg = document.getElementsByTagName('svg')[0];
+                    $(svg).css({
+                        "background-color": "lightsteelblue"
+                    });
+                    var svgtext = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext.setAttributeNS(null, 'x', '100');
+                    svgtext.setAttributeNS(null, 'y', '50');
+                    svgtext.setAttributeNS(null, 'font-size', '30');
+                    svgtext.setAttributeNS(null, 'fill', 'red');
+                    svgtext.setAttributeNS(null, 'id', 'headertitle1650');
+                    svgtext.setAttribute("obliquity", .5);
+                    svgtext.textContent = titlerecord.headertitle;
+                    svg.appendChild(svgtext);
+
+
+                    /**
+                     * Ausgabe des gif mit den Titeldaten
+                     */
+                    var img = new Image();
+                    var url = "data:image/svg+xml," + encodeURIComponent((new XMLSerializer()).serializeToString(document.querySelector('svg')));
+                    // Onload, callback to move on to next frame
+                    img.onload = function () {
+                        gif.addFrame(img, {
+                            delay: 400,
+                            copy: true
+                        });
+                        cb1650F2("finish", {
+                            error: false,
+                            message: "Header-Image ausgegeben",
+                            image: img,
+                            titlerecord: titlerecord
+                        });
+                        return;
+                    };
+                    img.src = url;
+                }
+            ],
+            function (error, ret1) {
+                sysbase.putMessage("Headertitle fertig:" + ret1.message, 1);
+                cb1650F0({
+                    error: ret1.error,
+                    message: ret1.message
+                });
+            });
+    };
+
+
 
 
 

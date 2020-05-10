@@ -322,7 +322,6 @@
             var transY = Math.round(rect.transform.animVal[0].matrix.f);
             var mouseXkorr = mouseX - svgspark02g[sparkid].offsetX - svgspark02g[sparkid].spotDiameter - transX;
             console.log("eventX:" + eventX + " mouseX:" + svgP.x.toFixed() + " mouseXkorr:" + mouseXkorr.toFixed() + " transX:" + transX.toFixed() + " vgl:" + (mouseX - transX).toFixed());
-
             var lastItemIndex = svgspark02g[sparkid].datapoints.length - 1;
             var nextDataIndex = -1;
             var currentDataPoint;
@@ -366,8 +365,6 @@
                 debugger;
             }
 
-
-
             var x = currentDataPoint.x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
             console.log("HIT:" + nextDataIndex + " x:" + x);
             var y = currentDataPoint.y;
@@ -401,6 +398,23 @@
                     right: "95%",
                     height: "95%"
                 },
+                // onDragStart - verstecken und Rechteck wandern lassen
+                onMoveStart: function (newPosition) {
+                    var group = document.getElementById(sparkid);
+                    // group.setAttribute( 'display', "none"); // none oder inline
+                    // group.setAttribute( 'visiblility', "none"); // none oder visible
+                    var children = group.childNodes;
+                    for (var inode = 0; inode < children.length; inode++) {
+                        var child = children[inode];
+                        if (typeof child.tagName !== "undefined") {
+                            if (child.tagName !== "rect") {
+                                //child.setAttributeNS(null, "visibility", "none");
+                                //child.setAttribute("visibility", "none"); // none, hidden
+                                $(child).css("visibility", "hidden");
+                            }
+                        }
+                    }
+                },
                 onDragEnd: function (newPosition) {
                     var group = document.getElementById(sparkid);
                     var rect = document.getElementById(sparkid + 'rect');
@@ -412,23 +426,21 @@
                         if (typeof child.tagName !== "undefined") {
                             if (child.tagName !== "rect") {
                                 child.setAttributeNS(null, "transform", "translate(" + transX + ", " + transY + ")");
+                                $(child).css("visibility", "visible");
                             }
                         }
                     }
                 }
             });
-
         }
-
-
-
     };
 
 
     svgspark02.setCursor = function (sparkid, svg, values, options, index) {
         var currentDataPoint = svgspark02g[sparkid].datapoints[index];
-        var x = currentDataPoint.x;
+        var x = currentDataPoint.x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
         var y = currentDataPoint.y;
+
         var fullHeight = svgspark02g[sparkid].fullHeight || 30;
         svgspark02g[sparkid].spot.setAttribute("cx", x);
         svgspark02g[sparkid].spot.setAttribute("cy", svgspark02g[sparkid].offsetY + y);
