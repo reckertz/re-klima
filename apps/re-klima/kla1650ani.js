@@ -29,6 +29,7 @@
     var aktyear;
     var aktvariablename;
     var selrecord = {};
+    var titlerecord = {};
     var stations = {};
     var stationarray = [];
     var worldmap = {};
@@ -269,6 +270,34 @@
                     .append($("<span/>", {
                         id: "kla1630mapsres",
                         html: "&nbsp;"
+                    }))
+                )
+                .append($("<div/>", {
+                        id: "kla1630controls"
+                    })
+
+                    .append($("<button/>", {
+                        html: "Stop",
+                        class: "kla1630anistop",
+                        click: function (evt) {
+                            evt.preventDefault();
+                            var thisbutton = this;
+                            $('.kla1630mapbut1').prop('disabled', true);
+                            $('.kla1630mapbut1').hide();
+                            $('.kla1630mapbut2').hide();
+                            kla1650ani.animate(false, function (ret) {
+                                $('.kla1630mapbut1').prop('disabled', false);
+                                $('.kla1630mapbut1').show();
+                                $('.kla1630mapbut2').show();
+                            });
+                        }
+                    }))
+                )
+                .append($("<div/>", {
+
+                    })
+                    .append($("<canvas/>", {
+                        id: "kla1650can"
                     }))
                 )
             )
@@ -1064,140 +1093,127 @@
             // https://github.com/neveldo/jQuery-Mapael/blob/master/UPGRADE.md
             var icontrol = 0;
             async.eachSeries(loopyears, function (loopyear, nextyear) {
-                // Loop über pearls
-                // Bereitstellung newplots für neue stations, die hinzukommen
-                // Bereitstellung deletePlotKeys für stations, die verschwinden
-                // maxcount für die sparkline-Konfiguration
-                var options = {
-                    mapOptions: {}, // was updatedOptions
-                    replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
-                    newPlots: {}, // was newPlots
-                    newLinks: [], // was opt.newLinks
-                    deletePlotKeys: [], // was deletedPlots
-                    deleteLinkKeys: [], // was opt.deletedLinks
-                    setLegendElemsState: true, // is new
-                    animDuration: 100, // was opt.animDuration
-                    afterUpdate: function () {} // was opt.afterUpdate
-                };
-                icontrol++;
-                // if (icontrol <= 2) debugger;
-                var actyear = "" + loopyear.year;
-                var actcount = loopyear.count;
-                var sparkindex = yearindex[actyear];
-                sparkarray[sparkindex] = actcount;
-                var anznew = 0;
-                var anzdel = 0;
-                // Aufbau newPlots und deletePlotKeys
-                for (var ipearl = 0; ipearl < pearls.length; ipearl++) {
-                    if (pearls[ipearl].ispainted === 0) {
-                        var pearl = pearls[ipearl];
-                        if (pearl.fromyear <= actyear && pearl.toyear >= actyear) {
-                            pearls[ipearl].ispainted = 1;
-                            var contenthtml = pearl.stationid + " " + pearl.stationname;
-                            /*
-                            contenthtml += " <img src='/images/icons-png/arrow-u-black.png'";
-                            contenthtml += " title='Upload *.dly'";
-                            contenthtml += " class='kla1610staupl'>";
-                            */
-                            anznew++;
-                            options.newPlots[pearl.stationid] = {
-                                type: "square", // circle
-                                size: 5,
-                                latitude: parseFloat(pearl.latitude),
-                                longitude: parseFloat(pearl.longitude),
-                                tooltip: {
-                                    content: contenthtml
-                                },
-                                text: {
-                                    /* */
-                                },
-                                // myText: pearl.stationname + " lon:" + pearl.longitude + " lat:" + pearl.latitude,
-                                selstationid: pearl.stationid,
-                                selsource: pearl.source,
-                                selvariable: pearl.variable
-                            };
-                            continue;
+                    // Loop über pearls
+                    // Bereitstellung newplots für neue stations, die hinzukommen
+                    // Bereitstellung deletePlotKeys für stations, die verschwinden
+                    // maxcount für die sparkline-Konfiguration
+                    var options = {
+                        mapOptions: {}, // was updatedOptions
+                        replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
+                        newPlots: {}, // was newPlots
+                        newLinks: [], // was opt.newLinks
+                        deletePlotKeys: [], // was deletedPlots
+                        deleteLinkKeys: [], // was opt.deletedLinks
+                        setLegendElemsState: true, // is new
+                        animDuration: 100, // was opt.animDuration
+                        afterUpdate: function () {} // was opt.afterUpdate
+                    };
+                    icontrol++;
+                    // if (icontrol <= 2) debugger;
+                    var actyear = "" + loopyear.year;
+                    var actcount = loopyear.count;
+                    var sparkindex = yearindex[actyear];
+                    sparkarray[sparkindex] = actcount;
+                    var anznew = 0;
+                    var anzdel = 0;
+                    // Aufbau newPlots und deletePlotKeys
+                    for (var ipearl = 0; ipearl < pearls.length; ipearl++) {
+                        if (pearls[ipearl].ispainted === 0) {
+                            var pearl = pearls[ipearl];
+                            if (pearl.fromyear <= actyear && pearl.toyear >= actyear) {
+                                pearls[ipearl].ispainted = 1;
+                                var contenthtml = pearl.stationid + " " + pearl.stationname;
+                                /*
+                                contenthtml += " <img src='/images/icons-png/arrow-u-black.png'";
+                                contenthtml += " title='Upload *.dly'";
+                                contenthtml += " class='kla1610staupl'>";
+                                */
+                                anznew++;
+                                options.newPlots[pearl.stationid] = {
+                                    type: "square", // circle
+                                    size: 5,
+                                    latitude: parseFloat(pearl.latitude),
+                                    longitude: parseFloat(pearl.longitude),
+                                    tooltip: {
+                                        content: contenthtml
+                                    },
+                                    text: {
+                                        /* */
+                                    },
+                                    // myText: pearl.stationname + " lon:" + pearl.longitude + " lat:" + pearl.latitude,
+                                    selstationid: pearl.stationid,
+                                    selsource: pearl.source,
+                                    selvariable: pearl.variable
+                                };
+                                continue;
+                            }
+                        } else if (pearls[ipearl].ispainted === 1) {
+                            var pearl = pearls[ipearl];
+                            if (pearl.toyear < actyear) {
+                                pearls[ipearl].ispainted = 9;
+                                anzdel++;
+                                options.deletePlotKeys.push(pearl.stationid);
+                                continue;
+                            }
                         }
-                    } else if (pearls[ipearl].ispainted === 1) {
-                        var pearl = pearls[ipearl];
-                        if (pearl.toyear < actyear) {
-                            pearls[ipearl].ispainted = 9;
-                            anzdel++;
-                            options.deletePlotKeys.push(pearl.stationid);
-                            continue;
+                    }
+                    // Aktualisierung worldmap
+                    /**
+                     * das erste Jahr wird speziell ausgegeben
+                     * mit Initialisierung der MAP, sonst Update
+                     */
+                    if (icontrol === 1) {
+                        kla1650ani.prepMap(options.newPlots);
+                    } else {
+                        if (anznew > 0 || anzdel > 0) {
+                            // if (anzdel > 0 && anzdel < 2) debugger;
+                            $(".mapcontainer").trigger('update', [options]);
                         }
                     }
-                }
-                // Aktualisierung worldmap
-                /**
-                 * das erste Jahr wird speziell ausgegeben
-                 * mit Initialisierung der MAP, sonst Update
-                 */
-                if (icontrol === 1) {
-                    kla1650ani.prepMap(options.newPlots);
-                } else {
-                    if (anznew > 0 || anzdel > 0) {
-                        // if (anzdel > 0 && anzdel < 2) debugger;
-                        $(".mapcontainer").trigger('update', [options]);
+                    // Jahreszahl über SVG
+                    var sparkarray1 = [];
+                    if (icontrol === 1) {
+                        var svgs = document.getElementsByTagName('svg');
+                        svg = document.getElementsByTagName('svg')[0];
+                        $(svg).css({
+                            "background-color": "lightsteelblue"
+                        });
+                        var svgtext = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        svgtext.setAttributeNS(null, 'x', '250');
+                        svgtext.setAttributeNS(null, 'y', '150');
+                        svgtext.setAttributeNS(null, 'font-size', '30');
+                        svgtext.setAttributeNS(null, 'fill', 'red');
+                        svgtext.setAttributeNS(null, 'id', 'actyear1650');
+                        svgtext.setAttribute("obliquity", .5);
+                        svgtext.textContent = actyear + "(" + actcount + ")";
+                        svg.appendChild(svgtext);
+                    } else {
+                        document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
                     }
-                }
-                // Jahreszahl über SVG
-                var sparkarray1 = [];
-                if (icontrol === 1) {
-                    var svgs = document.getElementsByTagName('svg');
-                    svg = document.getElementsByTagName('svg')[0];
-                    $(svg).css({
-                        "background-color": "lightsteelblue"
-                    });
-                    var svgtext = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    svgtext.setAttributeNS(null, 'x', '250');
-                    svgtext.setAttributeNS(null, 'y', '150');
-                    svgtext.setAttributeNS(null, 'font-size', '30');
-                    svgtext.setAttributeNS(null, 'fill', 'red');
-                    svgtext.setAttributeNS(null, 'id', 'actyear1650');
-                    svgtext.setAttribute("obliquity", .5);
-                    svgtext.textContent = actyear + "(" + actcount + ")";
-                    svg.appendChild(svgtext);
-                } else {
-                    document.getElementById('actyear1650').textContent = actyear + "(" + actcount + ")";
-                }
-                /*
-                svg = document.getElementsByTagName('svg')[0];
-                svgnested = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                svgnested.setAttribute('id', 'svgnested');
-                svgnested.setAttribute('width', $(".col1of2").width() / 2);
-                svgnested.setAttribute('height', 60);
-                svgnested.setAttribute('class', "svgsparkline");
-                svgnested.setAttribute('stroke-width', "3");
-                svgnested.setAttributeNS(null, 'x', 0);
-                svgnested.setAttributeNS(null, 'y', 300);
-                svgnested.setAttributeNS(null, "viewBox", "0 0 400 60");
-                svgnested.setAttribute('overflow', 'visible');
-                svg.appendChild(svgnested);
+                    // alle Werte bereitstellen
 
-                // <rect id="smallRect" x="10" y="10" width="100" height="100" />
-                svgrect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                svgrect.setAttributeNS(null, 'x', 0);
-                svgrect.setAttributeNS(null, 'y', 0);
-                svgrect.setAttribute('width', $(".col1of2").width() / 2);
-                svgrect.setAttribute('height', 60);
-                svgrect.setAttribute('fill', 'lightgrey');
-                svgrect.setAttribute('fill-opacity', "0.4");
-                svgrect.setAttribute('id', "spark1650");
-                svgnested.appendChild(svgrect);
-                */
-                // alle Werte bereitstellen
-
-
-                if (icontrol === 1) {
-                    for (var iind = 0; iind < loopyears.length; iind++) {
-                        sparkarray1.push(loopyears[iind].count);
+                    if (icontrol === 1) {
+                        for (var iind = 0; iind < loopyears.length; iind++) {
+                            sparkarray1.push(loopyears[iind].count);
+                        }
                     }
-                }
 
-
-                if (icontrol === 1) {
-                    svgspark02.sparkline("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
+                    if (icontrol === 1) {
+                        svgspark02.sparkline("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
+                            offsetX: 100,
+                            offsetY: 300,
+                            width: 300,
+                            fullHeight: 60,
+                            stroke: "green",
+                            strokeOpacity: 1,
+                            fill: "mistyrose",
+                            chartRangeMin: mincount,
+                            chartRangeMax: maxcount,
+                            draggable: true,
+                            interactive: true
+                        });
+                    }
+                    svgspark02.setCursor("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
                         offsetX: 100,
                         offsetY: 300,
                         width: 300,
@@ -1207,26 +1223,26 @@
                         fill: "mistyrose",
                         chartRangeMin: mincount,
                         chartRangeMax: maxcount,
-                        draggable: true,
                         interactive: true
-                    });
-                }
-                svgspark02.setCursor("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
-                    offsetX: 100,
-                    offsetY: 300,
-                    width: 300,
-                    fullHeight: 60,
-                    stroke: "green",
-                    strokeOpacity: 1,
-                    fill: "mistyrose",
-                    chartRangeMin: mincount,
-                    chartRangeMax: maxcount,
-                    interactive: true
-                }, icontrol - 1);
+                    }, icontrol - 1);
 
+                    if (icontrol === 1) {
+                        svgspark02.sparkline("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
+                            offsetX: 100,
+                            offsetY: 150,
+                            width: 300,
+                            fullHeight: 60,
+                            stroke: "green",
+                            strokeOpacity: 1,
+                            fill: "mistyrose",
+                            chartRangeMin: mincount,
+                            chartRangeMax: maxcount,
+                            draggable: true,
+                            interactive: true
+                        });
 
-                if (icontrol === 1) {
-                    svgspark02.sparkline("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
+                    }
+                    svgspark02.setCursor("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
                         offsetX: 100,
                         offsetY: 150,
                         width: 300,
@@ -1236,101 +1252,131 @@
                         fill: "mistyrose",
                         chartRangeMin: mincount,
                         chartRangeMax: maxcount,
-                        draggable: true,
                         interactive: true
-                    });
+                    }, icontrol - 1);
 
-                }
-                svgspark02.setCursor("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
-                    offsetX: 100,
-                    offsetY: 150,
-                    width: 300,
-                    fullHeight: 60,
-                    stroke: "green",
-                    strokeOpacity: 1,
-                    fill: "mistyrose",
-                    chartRangeMin: mincount,
-                    chartRangeMax: maxcount,
-                    interactive: true
-                }, icontrol - 1);
+                    var html = "JAHR:" + actyear + " - " + actcount;
+                    $("#kla1630mapsres").html(html);
 
-                var html = "JAHR:" + actyear + " - " + actcount;
-                $("#kla1630mapsres").html(html);
+                    /**
+                     * Ausgabe der Graphik als gif für animiertes Gif
+                     */
+                    setTimeout(function () {
+                        // hier wird die gif-Sicherung aktiviert
+                        if (creategif === true) {
+                            async.waterfall([
+                                    function (cb1650E1) {
+                                        var img = new Image();
+                                        var svghtml = (new XMLSerializer()).serializeToString(document.querySelector('svg'));
+                                        var url = "data:image/svg+xml," + encodeURIComponent(svghtml);
+                                        console.log("svg-string1:" + url.length);
+                                        // Onload, callback to move on to next frame
+                                        img.onload = function () {
+                                            gif.addFrame(img, {
+                                                delay: 400,
+                                                copy: true
+                                            });
+                                            cb1650E1(null, {
+                                                error: false,
+                                                message: "image1",
+                                                image: img,
+                                                imageurl: url,
+                                                svghtml: svghtml
+                                            });
+                                            return;
+                                        };
+                                        img.src = url;
+                                    },
 
-                setTimeout(function () {
-                    // hier wird die gif-Sicherung aktiviert
-                    if (creategif === true) {
-                        async.waterfall([
-                            function (cb1650E1) {
-                                var img = new Image();
-                                var url = "data:image/svg+xml," + encodeURIComponent((new XMLSerializer()).serializeToString(document.querySelector('svg')));
-                                // Onload, callback to move on to next frame
-                                img.onload = function () {
-                                    gif.addFrame(img, {
-                                        delay: 400,
-                                        copy: true
-                                    });
-                                    cb1650E1(null, {
-                                        error: false,
-                                        message: "image1",
-                                        image: img
-                                    });
+                                    function (ret, cb1650E2) {
+                                        var filename = titlerecord.projectid + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg";
+                                        var jqxhr = $.ajax({
+                                            method: "POST",
+                                            crossDomain: false,
+                                            url: sysbase.getServer("getbackasfile"),
+                                            data: {
+                                                largestring: ret.svghtml, // $("#heatpic").find("img").attr("src")  //    'data:image/gif;base64,' + encode64(encoder.stream().getData()),
+                                                filename: filename
+                                            }
+                                        }).done(function (r1, textStatus, jqXHR) {
+                                            sysbase.checkSessionLogin(r1);
+                                            var ret = JSON.parse(r1);
+                                            sysbase.putMessage(ret.message, 1);
+                                            if (ret.error === true) {
+                                                cb1650E2("error", {
+                                                    error: ret.error,
+                                                    message: ret.message
+                                                });
+                                                return;
+                                            } else {
+                                                cb1650E2(null, ret);
+                                            }
+                                        }).fail(function (err) {
+                                            sysbase.putMessage(err, 1);
+                                            cb1650E2("error", {
+                                                error: true,
+                                                message: "Daten NICHT bereitgestellt:" + err
+                                            });
+                                            return;
+                                        }).always(function () {
+                                            // nope
+                                        });
+                                    },
+                                    function (ret, cb1650E3) {
+                                        cb1650E3("Finish", {
+                                            error: false,
+                                            message: "image1"
+                                        });
+                                        return;
+                                    }
+                                ],
+                                function (error, result) {
+                                    nextyear();
                                     return;
-                                };
-                                img.src = url;
-                            },
-                            function (ret, cb1650E2) {
-                                cb1650E2("Finish", {
-                                    error: false,
-                                    message: "image1"
                                 });
-                                return;
-                            }
-                        ], function (error, result) {
-                            nextyear();
-                            return;
-                        });
-                    }
-                }, 400);
-            }, function (error) {
-                // Ende des Loops
-                gif.on('finished', function (blob) {
-                    try {
-                        var winurl = URL.createObjectURL(blob);
-                        var win = window.open(winurl, "_blank");
-                        if (typeof win !== "undefined" && win !== null) {
-                            win.focus();
-                        } else {
-                            alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
                         }
-                        // deleteGroup funktioniert, war nur Test
-                        // svgspark02.deleteGroup("mygroup", svg);
-                        console.log("Animierte worldmap fertiggestellt");
-                        cb1630C({
-                            error: false,
-                            message: "Animierte worldmap fertiggestellt"
-                        });
-                        return;
+                    }, 400);
+
+                },
+                function (error) {
+                    // Ende des Loops
+                    gif.on('finished', function (blob) {
+                        try {
+                            var winurl = URL.createObjectURL(blob);
+                            var win = window.open(winurl, "_blank");
+                            if (typeof win !== "undefined" && win !== null) {
+                                win.focus();
+                            } else {
+                                alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
+                            }
+                            // deleteGroup funktioniert, war nur Test
+                            // svgspark02.deleteGroup("mygroup", svg);
+                            console.log("Animierte worldmap fertiggestellt");
+                            cb1630C({
+                                error: false,
+                                message: "Animierte worldmap fertiggestellt"
+                            });
+                            return;
+                        } catch (err) {
+                            console.log("Aninmierte worldmap Error-1:" + err);
+                            cb1630C({
+                                error: true,
+                                message: "Aninmierte worldmap Error-1:" + err
+                            });
+                            return;
+                        }
+                    });
+                    try {
+                        gif.render();
                     } catch (err) {
-                        console.log("Aninmierte worldmap Error-1:" + err);
+                        console.log("Aninmierte worldmap Error-2:" + err);
                         cb1630C({
                             error: true,
-                            message: "Aninmierte worldmap Error-1:" + err
+                            message: "Aninmierte worldmap Error-2:" + err
                         });
                         return;
                     }
                 });
-                try {
-                    gif.render();
-                } catch (err) {
-                    console.log("Aninmierte worldmap Error-2:" + err);
-                    cb1630C({
-                        error: true,
-                        message: "Aninmierte worldmap Error-2:" + err
-                    });
-                    return;
-                }
-            });
         } catch (err) {
             console.log(err);
             console.log(err.stack);
@@ -1360,12 +1406,20 @@
                                 type: "object", // currency, integer, datum, text, key, object
                                 class: "uiefieldset",
                                 properties: {
+                                    projectid: {
+                                        title: "Projektkürzel",
+                                        type: "string", // currency, integer, datum, text, key
+                                        class: "uietext",
+                                        default: "",
+                                        width: "50px",
+                                        io: "i"
+                                    },
                                     headertitle: {
                                         title: "Titel",
                                         type: "string", // currency, integer, datum, text, key
                                         class: "uietext",
                                         default: "",
-                                        width: "100px",
+                                        width: "50px",
                                         io: "i"
                                     },
                                     subtitle: {
@@ -1404,14 +1458,25 @@
                             }
                         }
                     };
-                    var titlerecord = {};
-
+                    titlerecord = {};
+                    titlerecord.projectid = "Studie 4711";
                     titlerecord.headertitle = "Test-Inhalt Headertitle";
                     titlerecord.subtitle = "Test-Inhalt Subtitle";
-                    titlerecord.selection = "Hier wird die Selektion protokolliert";
-                    titlerecord.selection += "\nHier wird die Selektion protokolliert";
-                    titlerecord.selection += "\nHier wird die Selektion protokolliert";
-                    titlerecord.selection += "\nHier wird die Selektion protokolliert";
+                    /*
+                     source, variablename, climatezone, continent, region, anzyears, fromyear, toyear, stepyear, height,
+                    */
+                    titlerecord.selection = "";
+                    titlerecord.selection += " Source:" + selrecord.source;
+                    titlerecord.selection += " Variable:" + selrecord.variablename;
+                    titlerecord.selection += " Klimazone:" + selrecord.climatezone;
+                    titlerecord.selection += " Kontinentalzone:" + selrecord.continent;
+                    titlerecord.selection += " Region:" + selrecord.region;
+                    titlerecord.selection += " Anzahl Jahre:" + selrecord.anzyears;
+                    titlerecord.selection += " Von Jahr:" + selrecord.fromyear;
+                    titlerecord.selection += " Bis Jahr:" + selrecord.toyear;
+                    titlerecord.selection += " Jahresintervalle:" + selrecord.stepyear;
+                    titlerecord.selection += " Höhe üdM:" + selrecord.height;
+
                     titlerecord.comment = "Dies ist eine langer Kommentartext";
                     titlerecord.comment += "\nDies ist eine langer Kommentartext";
                     titlerecord.comment += "\nDies ist eine langer Kommentartext";
@@ -1441,11 +1506,10 @@
                         evt.stopPropagation();
                         evt.stopImmediatePropagation();
                         var titleParam = JSON.parse(extraParam); // Satzstruktur!
-                        var titlerecord = titleParam.props;
+                        titlerecord = titleParam.props;
                         cb1650F1(null, {
                             error: false,
-                            message: "Popup erfasst",
-                            titlerecord: titlerecord
+                            message: "Popup erfasst"
                         });
                         return;
                     });
@@ -1468,9 +1532,7 @@
                     /**
                      * Ausgabe der Titelseite
                      */
-                    var titlerecord = ret.titlerecord;
                     titlerecord.delay = titlerecord.delay || 3000;
-
                     if (clearmap === true) {
                         kla1650ani.prepMap({});
                     }
@@ -1481,20 +1543,8 @@
                         "background-color": "lightsteelblue"
                     });
                     var svgw = svg.getAttribute('viewBox').split(" ")[2];
-                    var texthtml = "";
-                    texthtml += "<h2>";
-                    texthtml += titlerecord.headertitle;
-                    texthtml += "</h2>";
 
                     var randi = "T" + Math.floor(Math.random() * 100000) + 1;
-
-                    /*
-                    <text x = "50%"
-                    y = "50%"
-                    style = "dominant-baseline:central; text-anchor:middle; font-size:40px;" >
-                    TEXT < /text>
-                    */
-
                     var ypegel;
                     var svgtext1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     svgtext1.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
@@ -1503,6 +1553,7 @@
                     svgtext1.setAttributeNS(null, 'font-size', '40');
                     svgtext1.setAttributeNS(null, 'fill', 'white');
                     svgtext1.setAttributeNS(null, 'id', 'hdr1' + randi);
+                    svgtext1.setAttributeNS(null, 'name', "header");
                     svgtext1.textContent = titlerecord.headertitle;
                     svg.appendChild(svgtext1);
                     var tl = svgtext1.textLength.baseVal.value;
@@ -1512,67 +1563,134 @@
 
                     var svgtext2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     svgtext2.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
-                    svgtext2.setAttributeNS(null, 'y', '100');
+                    svgtext2.setAttributeNS(null, 'y', ypegel);
                     svgtext2.setAttributeNS(null, 'width', svgw * 0.7);
                     svgtext2.setAttributeNS(null, 'font-size', '30');
                     svgtext2.setAttributeNS(null, 'fill', 'white');
-                    svgtext2.setAttributeNS(null, 'id', 'hdr1' + randi);
+                    svgtext2.setAttributeNS(null, 'id', 'hdr2' + randi);
+                    svgtext2.setAttributeNS(null, 'name', "subheader");
                     svgtext2.textContent = titlerecord.subtitle;
                     svg.appendChild(svgtext2);
                     tl = svgtext2.textLength.baseVal.value;
                     dx = (svgw - tl) / 2;
                     svgtext2.setAttributeNS(null, 'dx', dx);
-                    ypegel += 50;
+                    ypegel += 35;
 
+                    var svgtext2a = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext2a.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext2a.setAttributeNS(null, 'y', ypegel);
+                    svgtext2a.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext2a.setAttributeNS(null, 'font-size', '30');
+                    svgtext2a.setAttributeNS(null, 'fill', 'white');
+                    svgtext2a.setAttributeNS(null, 'id', 'hdr3' + randi);
+                    svgtext2a.setAttributeNS(null, 'name', "projectid");
+                    svgtext2a.textContent = titlerecord.projectid;
+                    svg.appendChild(svgtext2a);
+                    tl = svgtext2a.textLength.baseVal.value;
+                    dx = (svgw - tl) / 2;
+                    svgtext2a.setAttributeNS(null, 'dx', dx);
+                    ypegel += 20;
+                    dx = svgw * 0.20;
                     /**
                      * hier ist ein Zeilenvorschub notwendig
                      */
-                    /*
-                    var svgtext3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    svgtext3.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
-                    svgtext3.setAttributeNS(null, 'y', ypegel + 10);
-                    svgtext3.setAttributeNS(null, 'width', svgw * 0.7);
-                    svgtext3.setAttributeNS(null, 'font-size', '30');
-                    svgtext3.setAttributeNS(null, 'fill', 'white');
-                    svgtext3.setAttributeNS(null, 'id', 'hdr1' + randi);
-                    svgtext3.textContent = ""; // titlerecord.selection;
-                    svg.appendChild(svgtext3);
-                    tl = svgtext3.textLength.baseVal.value;
-                    dx = (svgw - tl) / 2;
-                    svgtext3.setAttributeNS(null, 'dx', dx);
-                    */
-
                     var seltext = kla1650ani.svg_textMultiline(svg, {
-                        width: svgw * 0.6,
+                        id: 'hdr4' + randi,
+                        name: "selection",
+                        width: svgw * 0.7,
                         x: 0,
                         y: ypegel + 14,
                         fontSize: 10,
                         dx: dx,
                         dy: 12
                     }, titlerecord.selection);
-                    //ypegel += 50;
 
+                    var metrics = seltext.getBoundingClientRect();
+                    var mheight = metrics.height;
+                    ypegel += mheight;
+                    var comtext = kla1650ani.svg_textMultiline(svg, {
+                        id: 'hdr5' + randi,
+                        name: "comment",
+                        width: svgw * 0.6,
+                        x: 0,
+                        y: ypegel + 14,
+                        fontSize: 10,
+                        dx: dx,
+                        dy: 12
+                    }, titlerecord.comment);
+                    var metrics1 = seltext.getBoundingClientRect();
+                    var mheight1 = metrics1.height;
+                    ypegel += mheight1 + 10;
+
+                    var svgtext6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext6.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext6.setAttributeNS(null, 'y',  ypegel + 14);
+                    svgtext6.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext6.setAttributeNS(null, 'font-size', '12');
+                    svgtext6.setAttributeNS(null, 'fill', 'white');
+                    svgtext6.setAttributeNS(null, 'id', 'hdr6' + randi);
+                    svgtext6.setAttributeNS(null, 'name', "selrecord");
+
+                    svgtext6.textContent = JSON.stringify(selrecord);
+                    svg.appendChild(svgtext6);
+                    dx = svgw * 0.15;
+                    svgtext6.setAttributeNS(null, 'dx', dx);
 
                     /**
                      * Ausgabe des gif mit den Titeldaten
                      */
                     var img = new Image();
-                    var url = "data:image/svg+xml," + encodeURIComponent((new XMLSerializer()).serializeToString(document.querySelector('svg')));
+                    var svghtml = (new XMLSerializer()).serializeToString(document.querySelector('svg'));
+                    var url = "data:image/svg+xml," + encodeURIComponent(svghtml);
                     // Onload, callback to move on to next frame
                     img.onload = function () {
                         gif.addFrame(img, {
                             delay: titlerecord.delay,
                             copy: true
                         });
-                        cb1650F2("finish", {
+                        cb1650F2(null, {
                             error: false,
                             message: "Header-Image ausgegeben",
                             image: img,
-                            titlerecord: titlerecord
+                            svghtml: svghtml
                         });
                         return;
                     };
                     img.src = url;
+                },
+                function (ret, cb1650F3) {
+                    var filename = titlerecord.projectid + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg";
+                    var jqxhr = $.ajax({
+                        method: "POST",
+                        crossDomain: false,
+                        url: sysbase.getServer("getbackasfile"),
+                        data: {
+                            largestring: ret.svghtml, // $("#heatpic").find("img").attr("src")  //    'data:image/gif;base64,' + encode64(encoder.stream().getData()),
+                            filename: filename
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        sysbase.checkSessionLogin(r1);
+                        var ret = JSON.parse(r1);
+                        sysbase.putMessage(ret.message, 1);
+                        if (ret.error === true) {
+                            cb1650F3("error", {
+                                error: ret.error,
+                                message: ret.message
+                            });
+                            return;
+                        } else {
+                            cb1650F3(null, ret);
+                        }
+                    }).fail(function (err) {
+                        sysbase.putMessage(err, 1);
+                        cb1650F3("error", {
+                            error: true,
+                            message: "Daten NICHT bereitgestellt:" + err
+                        });
+                        return;
+                    }).always(function () {
+                        // nope
+                    });
                 }
             ],
             function (error, ret1) {
@@ -1598,21 +1716,21 @@
     kla1650ani.svg_textMultiline = function (container, options, text) {
         options.lineHeight = options.lineHeight || 10;
 
-        options.x = options.y || 0;
+        options.id = options.id || "T" + Math.floor(Math.random() * 100000) + 1;
+        options.x = options.x || 0;
         options.y = options.y || 0;
         options.width = options.width || 200;
         options.fontSize = options.fontSize || 12;
         options.dy = options.dy || 14;
         options.dx = options.dx || 20;
 
-        var randi = "T" + Math.floor(Math.random() * 100000) + 1;
         var svgtext3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
         svgtext3.setAttributeNS(null, 'x', options.x); // damit die dx-Rechnung stimmt
         svgtext3.setAttributeNS(null, 'y', options.y);
         svgtext3.setAttributeNS(null, 'width', options.width);
         svgtext3.setAttributeNS(null, 'font-size', options.fontSize);
         svgtext3.setAttributeNS(null, 'fill', 'white');
-        svgtext3.setAttributeNS(null, 'id', 'hdr1' + randi);
+        svgtext3.setAttributeNS(null, 'id', options.id);
         svgtext3.textContent = ""; // titlerecord.selection;
         container.appendChild(svgtext3);
 
@@ -1622,7 +1740,7 @@
         svgtest.setAttributeNS(null, 'y', options.y);
         svgtest.setAttributeNS(null, 'width', options.width);
         svgtest.setAttributeNS(null, 'font-size', options.fontSize);
-        svgtest.setAttributeNS(null, 'id', 'hdr1' + randi + "1");
+        svgtest.setAttributeNS(null, 'id', options.id + "1");
         svgtest.textContent = ""; // titlerecord.selection;
         container.appendChild(svgtest);
 
@@ -1635,7 +1753,7 @@
 
         for (var n = 0; n < words.length; n++) {
             var testLine = line + words[n] + ' ';
-            var testElem = svgtest;   // document.getElementById('PROCESSING');
+            var testElem = svgtest; // document.getElementById('PROCESSING');
             /*  Add line in testElement */
             testElem.innerHTML = testLine;
             /* Messure textElement */
@@ -1644,7 +1762,6 @@
 
             var metrics1 = testElem.getBBox();
             var testWidth1 = metrics1.width;
-
             var testWidth2 = testElem.getComputedTextLength();
 
             if (testWidth > options.width && n > 0) {
@@ -1655,7 +1772,7 @@
             }
         }
         svgtext3.innerHTML += '<tspan x="' + options.dx + '" dy="' + options.dy + '">' + line + '</tspan>';
-        document.getElementById('hdr1' + randi + "1").remove();
+        document.getElementById( options.id + "1").remove();
         return svgtext3;
     };
 

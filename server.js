@@ -18,6 +18,7 @@ var compression = require("compression");
 
 var readline = require("readline");
 var stream = require("stream");
+var ba64 = require("ba64");
 // gblInfo
 var StreamZip = require("node-stream-zip");
 
@@ -1318,6 +1319,9 @@ app.post('/getbackasfile', function (req, res) {
     });
 });
 
+
+
+
 /**
  * sql2csv - Execute SQL Select and download csv-File
  */
@@ -1379,6 +1383,59 @@ app.post('/sql2csv', function (req, res) {
 
 });
 
+
+app.post("/saveBase64ToGif", function (req, res) {
+    if (typeof req.body.imagedata === "undefined") {
+        console.log("imagedata undefined");
+        res.writeHead(200, {
+            'Content-Type': 'application/text'
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: "imagedata undefined"
+        }));
+        return;
+    }
+    console.log("imagedata length:" + req.body.imagedata.length);
+    // var base64Data = req.body.imagedata.replace(/^data:image\/jpeg;base64,/, "");
+    var base64Data = req.body.imagedata;
+    async.waterfall([
+        function (callback) {
+            var jahr = "" + new Date().getFullYear();
+            var fullpath64 = "";
+            var path64 = "";
+            fullpath64 = path.join(__dirname, "static");
+            path64 = "static";
+            fullpath64 = path.join(fullpath64, "temp");
+            path64 = path.join(path64, "temp");
+            if (!fs.existsSync(fullpath64)) {
+                fs.mkdirSync(fullpath64);
+            }
+            fullpath64 = path.join(fullpath64, jahr);
+            path64 = path.join(path64, jahr);
+            if (!fs.existsSync(fullpath64)) {
+                fs.mkdirSync(fullpath64);
+            }
+
+            var filnr = Math.floor(Math.random() * (999999999 - 100000000 + 1)) + 100000000;
+            var filename = "" + jahr.substr(2, 2) + filnr + ".gif";
+            var fullfilename = path.join(fullpath64, filename);
+            var fullfilenamex = path.join(fullpath64, "" + jahr.substr(2, 2) + filnr);
+            ba64.writeImage(fullfilenamex, base64Data, function (err) {
+                res.writeHead(200, {
+                    'Content-Type': 'application/text'
+                });
+                res.end(JSON.stringify({
+                    error: false,
+                    message: filename + " bereitgestellt",
+                    filename: filename,
+                    fullfilename: path.join(path64, filename)
+                }));
+                return;
+            });
+        }
+    ]);
+});
 
 
 
