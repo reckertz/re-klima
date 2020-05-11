@@ -1392,6 +1392,13 @@
                                         cols: 50,
                                         default: "",
                                         io: "i"
+                                    },
+                                    delay: {
+                                        title: "Spezielle Verzögerung",
+                                        type: "string", // currency, integer, datum, text, key
+                                        class: "uietext",
+                                        default: "",
+                                        io: "i"
                                     }
                                 }
                             }
@@ -1399,7 +1406,15 @@
                     };
                     var titlerecord = {};
 
+                    titlerecord.headertitle = "Test-Inhalt Headertitle";
+                    titlerecord.subtitle = "Test-Inhalt Subtitle";
                     titlerecord.selection = "Hier wird die Selektion protokolliert";
+                    titlerecord.selection += "\nHier wird die Selektion protokolliert";
+                    titlerecord.selection += "\nHier wird die Selektion protokolliert";
+                    titlerecord.selection += "\nHier wird die Selektion protokolliert";
+                    titlerecord.comment = "Dies ist eine langer Kommentartext";
+                    titlerecord.comment += "\nDies ist eine langer Kommentartext";
+                    titlerecord.comment += "\nDies ist eine langer Kommentartext";
                     var anchorHash = "#kla1650ani";
                     var title = "";
                     var pos = {
@@ -1454,6 +1469,8 @@
                      * Ausgabe der Titelseite
                      */
                     var titlerecord = ret.titlerecord;
+                    titlerecord.delay = titlerecord.delay || 3000;
+
                     if (clearmap === true) {
                         kla1650ani.prepMap({});
                     }
@@ -1463,15 +1480,77 @@
                     $(svg).css({
                         "background-color": "lightsteelblue"
                     });
-                    var svgtext = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    svgtext.setAttributeNS(null, 'x', '100');
-                    svgtext.setAttributeNS(null, 'y', '50');
-                    svgtext.setAttributeNS(null, 'font-size', '30');
-                    svgtext.setAttributeNS(null, 'fill', 'red');
-                    svgtext.setAttributeNS(null, 'id', 'headertitle1650');
-                    svgtext.setAttribute("obliquity", .5);
-                    svgtext.textContent = titlerecord.headertitle;
-                    svg.appendChild(svgtext);
+                    var svgw = svg.getAttribute('viewBox').split(" ")[2];
+                    var texthtml = "";
+                    texthtml += "<h2>";
+                    texthtml += titlerecord.headertitle;
+                    texthtml += "</h2>";
+
+                    var randi = "T" + Math.floor(Math.random() * 100000) + 1;
+
+                    /*
+                    <text x = "50%"
+                    y = "50%"
+                    style = "dominant-baseline:central; text-anchor:middle; font-size:40px;" >
+                    TEXT < /text>
+                    */
+
+                    var ypegel;
+                    var svgtext1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext1.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext1.setAttributeNS(null, 'y', '50');
+                    svgtext1.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext1.setAttributeNS(null, 'font-size', '40');
+                    svgtext1.setAttributeNS(null, 'fill', 'white');
+                    svgtext1.setAttributeNS(null, 'id', 'hdr1' + randi);
+                    svgtext1.textContent = titlerecord.headertitle;
+                    svg.appendChild(svgtext1);
+                    var tl = svgtext1.textLength.baseVal.value;
+                    var dx = (svgw - tl) / 2;
+                    svgtext1.setAttributeNS(null, 'dx', dx);
+                    ypegel = 100;
+
+                    var svgtext2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext2.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext2.setAttributeNS(null, 'y', '100');
+                    svgtext2.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext2.setAttributeNS(null, 'font-size', '30');
+                    svgtext2.setAttributeNS(null, 'fill', 'white');
+                    svgtext2.setAttributeNS(null, 'id', 'hdr1' + randi);
+                    svgtext2.textContent = titlerecord.subtitle;
+                    svg.appendChild(svgtext2);
+                    tl = svgtext2.textLength.baseVal.value;
+                    dx = (svgw - tl) / 2;
+                    svgtext2.setAttributeNS(null, 'dx', dx);
+                    ypegel += 50;
+
+                    /**
+                     * hier ist ein Zeilenvorschub notwendig
+                     */
+                    /*
+                    var svgtext3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext3.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext3.setAttributeNS(null, 'y', ypegel + 10);
+                    svgtext3.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext3.setAttributeNS(null, 'font-size', '30');
+                    svgtext3.setAttributeNS(null, 'fill', 'white');
+                    svgtext3.setAttributeNS(null, 'id', 'hdr1' + randi);
+                    svgtext3.textContent = ""; // titlerecord.selection;
+                    svg.appendChild(svgtext3);
+                    tl = svgtext3.textLength.baseVal.value;
+                    dx = (svgw - tl) / 2;
+                    svgtext3.setAttributeNS(null, 'dx', dx);
+                    */
+
+                    var seltext = kla1650ani.svg_textMultiline(svg, {
+                        width: svgw * 0.6,
+                        x: 0,
+                        y: ypegel + 14,
+                        fontSize: 10,
+                        dx: dx,
+                        dy: 12
+                    }, titlerecord.selection);
+                    //ypegel += 50;
 
 
                     /**
@@ -1482,7 +1561,7 @@
                     // Onload, callback to move on to next frame
                     img.onload = function () {
                         gif.addFrame(img, {
-                            delay: 400,
+                            delay: titlerecord.delay,
                             copy: true
                         });
                         cb1650F2("finish", {
@@ -1505,6 +1584,80 @@
             });
     };
 
+    /**
+     * Text-Wrappig für svg
+     * container ist das svg-Target-Element, in das der Text als Element kommt
+     * options mit:
+     *   x - Ziel-Position im Container, Default 0
+     *   y - Ziel-Position im Container, Default 0
+     *   width - Ziel-Breite im Container, innere Koordinaten, Default 100
+     *   fontSize - Größenangabe zur Schrift, Default 12
+     * text - Text, der u.U. mehrzeilig auszugeben ist, keine Default, Abbruch, wenn leerer Text
+     * return svg-text-Element, das erzeugt wurde
+     */
+    kla1650ani.svg_textMultiline = function (container, options, text) {
+        options.lineHeight = options.lineHeight || 10;
+
+        options.x = options.y || 0;
+        options.y = options.y || 0;
+        options.width = options.width || 200;
+        options.fontSize = options.fontSize || 12;
+        options.dy = options.dy || 14;
+        options.dx = options.dx || 20;
+
+        var randi = "T" + Math.floor(Math.random() * 100000) + 1;
+        var svgtext3 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        svgtext3.setAttributeNS(null, 'x', options.x); // damit die dx-Rechnung stimmt
+        svgtext3.setAttributeNS(null, 'y', options.y);
+        svgtext3.setAttributeNS(null, 'width', options.width);
+        svgtext3.setAttributeNS(null, 'font-size', options.fontSize);
+        svgtext3.setAttributeNS(null, 'fill', 'white');
+        svgtext3.setAttributeNS(null, 'id', 'hdr1' + randi);
+        svgtext3.textContent = ""; // titlerecord.selection;
+        container.appendChild(svgtext3);
+
+
+        var svgtest = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        svgtest.setAttributeNS(null, 'x', options.x); // damit die dx-Rechnung stimmt
+        svgtest.setAttributeNS(null, 'y', options.y);
+        svgtest.setAttributeNS(null, 'width', options.width);
+        svgtest.setAttributeNS(null, 'font-size', options.fontSize);
+        svgtest.setAttributeNS(null, 'id', 'hdr1' + randi + "1");
+        svgtest.textContent = ""; // titlerecord.selection;
+        container.appendChild(svgtest);
+
+        /* split the words into array */
+        var words = text.split(' ');
+        var line = '';
+
+        /* Make a tspan for testing */
+        svgtest.innerHTML = "<tspan id='PROCESSING'>" + text + "</tspan >";
+
+        for (var n = 0; n < words.length; n++) {
+            var testLine = line + words[n] + ' ';
+            var testElem = svgtest;   // document.getElementById('PROCESSING');
+            /*  Add line in testElement */
+            testElem.innerHTML = testLine;
+            /* Messure textElement */
+            var metrics = testElem.getBoundingClientRect();
+            var testWidth = metrics.width;
+
+            var metrics1 = testElem.getBBox();
+            var testWidth1 = metrics1.width;
+
+            var testWidth2 = testElem.getComputedTextLength();
+
+            if (testWidth > options.width && n > 0) {
+                svgtext3.innerHTML += '<tspan x="' + options.dx + '" dy="' + options.dy + '">' + line + '</tspan>';
+                line = words[n] + ' ';
+            } else {
+                line = testLine;
+            }
+        }
+        svgtext3.innerHTML += '<tspan x="' + options.dx + '" dy="' + options.dy + '">' + line + '</tspan>';
+        document.getElementById('hdr1' + randi + "1").remove();
+        return svgtext3;
+    };
 
 
 

@@ -321,18 +321,18 @@
             var transX = Math.round(rect.transform.animVal[0].matrix.e);
             var transY = Math.round(rect.transform.animVal[0].matrix.f);
             var mouseXkorr = mouseX - svgspark02g[sparkid].offsetX - svgspark02g[sparkid].spotDiameter - transX;
-            console.log("eventX:" + eventX + " mouseX:" + svgP.x.toFixed() + " mouseXkorr:" + mouseXkorr.toFixed() + " transX:" + transX.toFixed() + " vgl:" + (mouseX - transX).toFixed());
+            // console.log("eventX:" + eventX + " mouseX:" + svgP.x.toFixed() + " mouseXkorr:" + mouseXkorr.toFixed() + " transX:" + transX.toFixed() + " vgl:" + (mouseX - transX).toFixed());
             var lastItemIndex = svgspark02g[sparkid].datapoints.length - 1;
             var nextDataIndex = -1;
             var currentDataPoint;
             if (mouseXkorr <= svgspark02g[sparkid].datapoints[0].x) {
                 nextDataIndex = 0;
                 currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
-                console.log("R1-vor Beginn");
+                // console.log("R1-vor Beginn");
             } else if (mouseXkorr >= svgspark02g[sparkid].datapoints[lastItemIndex].x) {
                 nextDataIndex = lastItemIndex;
                 currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
-                console.log("R2-nach Ende");
+                // console.log("R2-nach Ende");
             } else {
                 nextDataIndex = svgspark02g[sparkid].datapoints.findIndex(function (entry) {
                     return entry.x >= mouseXkorr;
@@ -343,18 +343,18 @@
                 if (mouseXkorr < (svgspark02g[sparkid].datapoints[0].x + halfX)) {
                     nextDataIndex = 0;
                     currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
-                    console.log("R3-in first + half");
+                    // console.log("R3-in first + half");
                 } else if (mouseXkorr > (svgspark02g[sparkid].datapoints[lastItemIndex].x - halfX)) {
                     nextDataIndex = lastItemIndex;
                     currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
-                    console.log("R4-in last - half");
+                    // console.log("R4-in last - half");
                 } else {
                     for (var ihalf = 1; ihalf < lastItemIndex; ihalf++) {
                         if (mouseXkorr >= (svgspark02g[sparkid].datapoints[ihalf].x - halfX)
                         && mouseXkorr <= (svgspark02g[sparkid].datapoints[ihalf].x + halfX)) {
                             nextDataIndex = ihalf;
                             currentDataPoint = svgspark02g[sparkid].datapoints[nextDataIndex];
-                            console.log("R5-around");
+                            // console.log("R5-around");
                             break;
                         }
                     }
@@ -366,7 +366,7 @@
             }
 
             var x = currentDataPoint.x + svgspark02g[sparkid].offsetX + svgspark02g[sparkid].spotDiameter;
-            console.log("HIT:" + nextDataIndex + " x:" + x);
+            // console.log("HIT:" + nextDataIndex + " x:" + x);
             var y = currentDataPoint.y;
 
             svgspark02g[sparkid].spot.setAttribute("cx", x);
