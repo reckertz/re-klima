@@ -250,6 +250,7 @@ span {}
     border-top-right-radius: 10px;
     padding: 0px;
     text-align:left;
+    float: left;
 }
 
 
@@ -262,9 +263,21 @@ span {}
     padding: 0.01em 0 0 0 !important;
     margin: 0 !important;
     min-width: 0 !important;
+    display: flex;
+    align-items: left
 }
 
 body:not(:-moz-handler-blocked) fieldset {
+    display: table !important;
+}
+
+.uieform .ui-field-contain {
+    margin: 0.4em !important;
+    padding: 0.4em !important;
+    width: 95%;
+}
+
+body:not(:-moz-handler-blocked) .ui-field-contain {
     display: table-cell !important;
 }
 
@@ -282,19 +295,13 @@ body:not(:-moz-handler-blocked) fieldset {
     margin-right:15px;
     */
     margin-right: 1.5em;
-    /* margin-top: 0.5em; */
+    margin-top: 0.5em;
     float: left;
     width: 10em;
     /* padding-top: 0.3em; */
     text-align: right;
 }
 
-
-.uieform .ui-field-contain {
-    /* text-align: left !important; */
-    margin: 0.4em !important;
-    padding: 0.4em !important;
-}
 
 .uieform input {
     display: block;
@@ -307,10 +314,7 @@ body:not(:-moz-handler-blocked) fieldset {
     width: 15em;
 }
 
-span .uietext  {
-    border-style: none;
-    text-align: left;
-}
+
 
 .uieform .uietext,
 .uieform .uieselectinput {
@@ -329,18 +333,30 @@ span .uietext  {
     /* border: 1px solid #000; */
     margin-top: 10px;
     float: left;
+    padding: 0.3em;
+}
+
+
+.uieform .uiearea {
+    font-size: large !important;
+    margin-bottom: 0.8em;
+    margin-top: 10px;
+    border: 1px solid #000;
+    float: left;
+    padding: 0.3em;
 }
 
 
 
-
-.uiearea {
-    font-size: large !important;
-    display: block;
-    margin-bottom: 0.8em;
-    margin-top: 0.5em;
-    border: 1px solid #000;
-    padding: 0.3em;
+.ui-field-contain span.uietext {
+    height: 100%;
+    width: 95%;
+    border-style: none;
+    text-align: left;
+    word-wrap: break-word;
+    /* border: 1px solid #000; */
+    margin-top: 10px;
+    float: left;
 }
 
 
@@ -363,19 +379,6 @@ span .uietext  {
 .uieform td {
     font-size: 1em;
     text-align: left;
-}
-
-.uieform textarea {
-    font-size: 0.9em;
-    margin-top: 5px;
-    margin-bottom: 5px;
-    display: inline-block;
-    *display: inline;
-    /* for IE7*/
-    zoom: 1;
-    /* for IE7*/
-    vertical-align: middle;
-    margin-left: 20px
 }
 
 .uieform .uieblock {

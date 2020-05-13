@@ -567,7 +567,8 @@
                 // Set the name of the map to display
                 name: "world",
                 zoom: {
-                    "enabled": true
+                    "enabled": true,
+                    maxLevel: 20
                 },
                 defaultArea: {
                     eventHandlers: {
@@ -607,10 +608,44 @@
                             $(".mapcontainer").trigger('update', [{
                                 mapOptions: newData
                             }]);
+                            var mapi = $(".mapcontainer").data("mapael");
+                            var area = mapi.areas[id];
+                            if (area.zoom) {
+                                // Area has a zoom property, use it
+                                this.mapcontainer.trigger('zoom', area.zoom);
+                            } else {
+                                // Calculate zoom position
+                                var mbx = mapElem.getBBox();
+                                var posX = mbx.x + mbx.width / 2;
+                                var posY = mbx.y + mbx.height / 2;
+                                var sizeMetric = Math.round(mbx.height * mbx.width / 100);
+                                var zoomLevel = 0;
+                                if (sizeMetric < 50) {
+                                    zoomLevel = 15;
+                                }
+                                if (sizeMetric < 10) {
+                                    zoomLevel = 25;
+                                }
+                                if (sizeMetric < 5) {
+                                    zoomLevel = 35;
+                                }
+                                if (sizeMetric < 3) {
+                                    zoomLevel = 40;
+                                }
+                                //this.mapcontainer.trigger('zoom', {
+                                $(".mapcontainer").trigger('zoom', {
+                                    level: zoomLevel,
+                                    x: posX,
+                                    y: posY
+                                });
+                            }
+
                         }
                     }
                 },
                 defaultPlot: {
+                    size: 5,
+                    type: "square",
                     eventHandlers: {
                         click: function (e, id, mapElem, textElem, elemOptions) {
                             /**
@@ -699,47 +734,6 @@
         // jetzt kann in worldmaplink entsprechend eine Modifikation stattfinden
         // worldmap.links = kla1650ani.getClimatezonelinks(worldmaplinks);
 
-        /*
-        $(document).on('click', ".mapcontainer", function (e) {
-            // mapPagePositionToXY() allows to get the x,y coordinates
-            // on the map from a x,y coordinates on the page
-            var msg = " ";
-            var mapi = $(".mapcontainer").data("mapael");
-            var coords = mapi.mapPagePositionToXY(e.pageX, e.pageY);
-            var lon = (coords.x - mapi.mapConf.xoffset) / mapi.mapConf.xfactor;
-            var lat = (coords.y - mapi.mapConf.yoffset) / mapi.mapConf.yfactor;
-            var coninfo = uihelper.getContinent(lon, lat);
-            msg += " Continent:" + coninfo.continentcode + " " + coninfo.continentname;
-            msg += " x:" + coords.x;
-            msg += " lon:" + lon;
-            msg += " y:" + coords.y;
-            msg += " lat:" + lat;
-            console.log(msg);
-            sysbase.putMessage(msg);
-
-            var updateOptions = {
-                mapOptions: {}, // was updatedOptions
-                replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
-                newPlots: {}, // was newPlots
-                newLinks: [], // was opt.newLinks
-                deletePlotKeys: [], // was deletedPlots
-                deleteLinkKeys: [], // was opt.deletedLinks
-                setLegendElemsState: true, // is new
-                animDuration: 0, // was opt.animDuration
-                afterUpdate: function (container, paper, areas, plots, options) {} // was opt.afterUpdate
-            };
-            // Each new plot must have its own unique ID
-            var plotId = 'plot-' + Math.round(Math.random() * 1000);
-            updateOptions.newPlots[plotId] = {
-                longitude: lon,
-                latitude: lat,
-                tooltip: {
-                    content: "Dies ist ein Test"
-                }
-            };
-            $(".mapcontainer").trigger('update', [updateOptions]);
-        });
-        */
         $(".mapcontainer").mapael(worldmap);
 
         // Berechnung xoffset und yoffset
@@ -768,7 +762,27 @@
         mapi.mapConf.yfactor = yfactor;
         console.log(msg);
         sysbase.putMessage(msg);
+
+        $('.map').on('afterZoom', function () {
+            var mapi = $(".mapcontainer").data("mapael");
+            var oldlevel = mapi.zoomData.zoomLevel;
+            var oldsize = mapi.options.map.defaultPlot.size;
+            var size = Math.floor(5 * Math.pow(0.95, oldlevel));
+            console.log("afterZoom:" + oldlevel + "=>" + size);
+            $(this).trigger('update', [{
+                mapOptions: {
+                    map: {
+                        defaultPlot: {
+                            size: size,
+                        }
+                    }
+                }
+            }]);
+        });
+
     };
+
+
 
     /**
      * animate - animierte Anzeige und optional gif-Ausgabe
@@ -874,6 +888,19 @@
                 where += " anzyears >= " + selrecord.anzyears.trim();
             }
         }
+        if (typeof selrecord.region !== "undefined" && selrecord.region.trim().length > 0) {
+            if (where.length > 0) where += " AND ";
+            if (selrecord.region.trim().length === 2) {
+                where += " alpha2 ='" + selrecord.region + "'";
+            } else {
+                where += "(";
+                where += " lower(KLISTATIONS.region) LIKE '%" + selrecord.region.toLowerCase() + "%'";
+                where += " OR lower(KLISTATIONS.subregion) LIKE '%" + selrecord.region.toLowerCase() + "%'";
+                where += " OR lower(KLISTATIONS.countryname) LIKE '%" + selrecord.region.toLowerCase() + "%'";
+                where += ")";
+            }
+        }
+
         sqlStmt += " WHERE " + where;
         sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
         async.waterfall([
@@ -885,10 +912,18 @@
                             quality: 10
                         });
                     }
-                    kla1650ani.getTitlePageData(true, selrecord, selschema, function (ret) {
-                        cb1630B0(null, ret);
+                    if (creategif === true) {
+                        kla1650ani.getTitlePageData(true, selrecord, selschema, function (ret) {
+                            cb1630B0(null, ret);
+                            return;
+                        });
+                    } else {
+                        cb1630B0(null, {
+                            error: false,
+                            message: "OK"
+                        });
                         return;
-                    });
+                    }
                 },
                 function (ret, cb1630B1) {
                     var skip = 0;
@@ -1130,8 +1165,8 @@
                                 */
                                 anznew++;
                                 options.newPlots[pearl.stationid] = {
-                                    type: "square", // circle
-                                    size: 5,
+                                    /*  type: "square", */
+                                    /* size: 5, */
                                     latitude: parseFloat(pearl.latitude),
                                     longitude: parseFloat(pearl.longitude),
                                     tooltip: {
@@ -1261,9 +1296,9 @@
                     /**
                      * Ausgabe der Graphik als gif für animiertes Gif
                      */
-                    setTimeout(function () {
-                        // hier wird die gif-Sicherung aktiviert
-                        if (creategif === true) {
+                    if (creategif === true) {
+                        setTimeout(function () {
+                            // hier wird die gif-Sicherung aktiviert
                             async.waterfall([
                                     function (cb1650E1) {
                                         var img = new Image();
@@ -1334,45 +1369,55 @@
                                     nextyear();
                                     return;
                                 });
-                        }
-                    }, 400);
-
+                        }, 400);
+                    } else {
+                        nextyear();
+                        return;
+                    }
                 },
                 function (error) {
                     // Ende des Loops
-                    gif.on('finished', function (blob) {
-                        try {
-                            var winurl = URL.createObjectURL(blob);
-                            var win = window.open(winurl, "_blank");
-                            if (typeof win !== "undefined" && win !== null) {
-                                win.focus();
-                            } else {
-                                alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
+                    if (creategif === true) {
+                        gif.on('finished', function (blob) {
+                            try {
+                                var winurl = URL.createObjectURL(blob);
+                                var win = window.open(winurl, "_blank");
+                                if (typeof win !== "undefined" && win !== null) {
+                                    win.focus();
+                                } else {
+                                    alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
+                                }
+                                // deleteGroup funktioniert, war nur Test
+                                // svgspark02.deleteGroup("mygroup", svg);
+                                console.log("Animierte worldmap fertiggestellt");
+                                cb1630C({
+                                    error: false,
+                                    message: "Animierte worldmap fertiggestellt"
+                                });
+                                return;
+                            } catch (err) {
+                                console.log("Aninmierte worldmap Error-1:" + err);
+                                cb1630C({
+                                    error: true,
+                                    message: "Aninmierte worldmap Error-1:" + err
+                                });
+                                return;
                             }
-                            // deleteGroup funktioniert, war nur Test
-                            // svgspark02.deleteGroup("mygroup", svg);
-                            console.log("Animierte worldmap fertiggestellt");
-                            cb1630C({
-                                error: false,
-                                message: "Animierte worldmap fertiggestellt"
-                            });
-                            return;
+                        });
+                        try {
+                            gif.render();
                         } catch (err) {
-                            console.log("Aninmierte worldmap Error-1:" + err);
+                            console.log("Aninmierte worldmap Error-2:" + err);
                             cb1630C({
                                 error: true,
-                                message: "Aninmierte worldmap Error-1:" + err
+                                message: "Aninmierte worldmap Error-2:" + err
                             });
                             return;
                         }
-                    });
-                    try {
-                        gif.render();
-                    } catch (err) {
-                        console.log("Aninmierte worldmap Error-2:" + err);
+                    } else {
                         cb1630C({
-                            error: true,
-                            message: "Aninmierte worldmap Error-2:" + err
+                            error: false,
+                            message: "fertig ohne gif-Ausgabe"
                         });
                         return;
                     }
@@ -1624,7 +1669,7 @@
 
                     var svgtext6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
                     svgtext6.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
-                    svgtext6.setAttributeNS(null, 'y',  ypegel + 14);
+                    svgtext6.setAttributeNS(null, 'y', ypegel + 14);
                     svgtext6.setAttributeNS(null, 'width', svgw * 0.7);
                     svgtext6.setAttributeNS(null, 'font-size', '12');
                     svgtext6.setAttributeNS(null, 'fill', 'white');
@@ -1772,7 +1817,7 @@
             }
         }
         svgtext3.innerHTML += '<tspan x="' + options.dx + '" dy="' + options.dy + '">' + line + '</tspan>';
-        document.getElementById( options.id + "1").remove();
+        document.getElementById(options.id + "1").remove();
         return svgtext3;
     };
 
