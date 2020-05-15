@@ -610,6 +610,7 @@
                             }]);
                             var mapi = $(".mapcontainer").data("mapael");
                             var area = mapi.areas[id];
+                            debugger;
                             if (area.zoom) {
                                 // Area has a zoom property, use it
                                 this.mapcontainer.trigger('zoom', area.zoom);
