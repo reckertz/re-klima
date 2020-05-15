@@ -285,7 +285,7 @@
                             $('.kla1630mapbut1').prop('disabled', true);
                             $('.kla1630mapbut1').hide();
                             $('.kla1630mapbut2').hide();
-                            kla1650ani.animate(false, function (ret) {
+                            kla1650ani.animate(false, true, function (ret) {
                                 $('.kla1630mapbut1').prop('disabled', false);
                                 $('.kla1630mapbut1').show();
                                 $('.kla1630mapbut2').show();
@@ -509,10 +509,12 @@
                                 $('.kla1630mapbut1').prop('disabled', true);
                                 $('.kla1630mapbut1').hide();
                                 $('.kla1630mapbut2').hide();
-                                kla1650ani.animate(false, function (ret) {
+                                $('.kla1630mapbut3').hide();
+                                kla1650ani.animate(false, true, function (ret) {
                                     $('.kla1630mapbut1').prop('disabled', false);
                                     $('.kla1630mapbut1').show();
                                     $('.kla1630mapbut2').show();
+                                    $('.kla1630mapbut3').show();
                                 });
                             }
                         }))
@@ -527,15 +529,37 @@
                                 evt.preventDefault();
                                 var thisbutton = this;
                                 $('.kla1630mapbut2').prop('disabled', true);
-                                $('.kla1630mapbut2').hide();
                                 $('.kla1630mapbut1').hide();
-                                kla1650ani.animate(true, function (ret) {
+                                $('.kla1630mapbut2').hide();
+                                $('.kla1630mapbut3').hide();
+                                kla1650ani.animate(true, true, function (ret) {
                                     $('.kla1630mapbut2').prop('disabled', false);
-                                    $('.kla1630mapbut2').show();
                                     $('.kla1630mapbut1').show();
+                                    $('.kla1630mapbut2').show();
+                                    $('.kla1630mapbut3').show();
                                 });
                             }
                         }))
+
+
+                        .append($("<button/>", {
+                            html: "Kompakt",
+                            class: "kla1630mapbut3",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var thisbutton = this;
+                                $('.kla1630mapbut1').hide();
+                                $('.kla1630mapbut2').hide();
+                                $('.kla1630mapbut3').hide();
+                                kla1650ani.animate(false, false, function (ret) {
+                                    $('.kla1630mapbut1').show();
+                                    $('.kla1630mapbut2').show();
+                                    $('.kla1630mapbut3').show();
+                                });
+                            }
+                        }))
+
+
                     );
             }
             cb1630A({
@@ -788,9 +812,11 @@
     /**
      * animate - animierte Anzeige und optional gif-Ausgabe
      * dogif === true setzt gif-Sicherung in Gang
+     * doloop - Animation durchführen bei true, sonst nur Endergebnis zeigen
+     * aber blau für aktive Stationen und rot für erloschene Stationen
      * mit creategif als Indiktor
      */
-    kla1650ani.animate = function (dogif, cb1630B) {
+    kla1650ani.animate = function (dogif, doloop, cb1630B) {
         var creategif = false;
         if (typeof dogif !== "undefined" && dogif === true) {
             creategif = true;
@@ -1029,7 +1055,7 @@
                      * in ret: pearls[] mit: continent, climatezone, variable, fromyear, toyear, ispainted
                      * sowie error, message und selrecord
                      */
-                    kla1650ani.loop(creategif, ret1.selrecord, ret1.pearls, function (ret) {
+                    kla1650ani.loop(creategif, doloop, ret1.selrecord, ret1.pearls, function (ret) {
                         cb1630B3("Finish", ret);
                         return;
                     });
@@ -1053,14 +1079,13 @@
      * @param {*} pearls [] - Daten aus der Datenbank
      * @param {*} cb1630C - Callback, returns error, message
      */
-    kla1650ani.loop = function (creategif, selrecord, pearls, cb1630C) {
+    kla1650ani.loop = function (creategif, doloop, selrecord, pearls, cb1630C) {
         // Anlegen des Steuer-Arrays, Loop über Auswertungsspanne
 
         var svgrect;
         var svgnested;
         var svg;
         try {
-
 
             var loopyears = [];
             var fromyear = parseInt(selrecord.fromyear);
@@ -1188,8 +1213,17 @@
                             if (pearl.toyear < actyear) {
                                 pearls[ipearl].ispainted = 9;
                                 anzdel++;
-                                options.deletePlotKeys.push(pearl.stationid);
-                                continue;
+                                if (doloop === true) {
+                                    options.deletePlotKeys.push(pearl.stationid);
+                                    continue;
+                                } else {
+                                    if (typeof options.mapOptions === "undefined") options.mapOptions = {};
+                                    if (typeof options.mapOptions.plots === "undefined") options.mapOptions.plots = {};
+                                    if (typeof options.mapOptions.plots[pearl.stationid] === "undefined") options.mapOptions.plots[pearl.stationid] = {};
+                                    if (typeof options.mapOptions.plots[pearl.stationid].attrs === "undefined")
+                                        options.mapOptions.plots[pearl.stationid].attrs = {};
+                                    options.mapOptions.plots[pearl.stationid].attrs.fill = "red";
+                                }
                             }
                         }
                     }
@@ -1249,6 +1283,7 @@
                             interactive: true
                         });
                     }
+
                     svgspark02.setCursor("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
                         offsetX: 100,
                         offsetY: 300,
@@ -1261,36 +1296,6 @@
                         chartRangeMax: maxcount,
                         interactive: true
                     }, icontrol - 1);
-
-                    if (icontrol === 1) {
-                        svgspark02.sparkline("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
-                            offsetX: 100,
-                            offsetY: 150,
-                            width: 300,
-                            fullHeight: 60,
-                            stroke: "green",
-                            strokeOpacity: 1,
-                            fill: "mistyrose",
-                            chartRangeMin: mincount,
-                            chartRangeMax: maxcount,
-                            draggable: true,
-                            interactive: true
-                        });
-
-                    }
-                    svgspark02.setCursor("mygroup1", document.getElementsByTagName('svg')[0], sparkarray1, {
-                        offsetX: 100,
-                        offsetY: 150,
-                        width: 300,
-                        fullHeight: 60,
-                        stroke: "green",
-                        strokeOpacity: 1,
-                        fill: "mistyrose",
-                        chartRangeMin: mincount,
-                        chartRangeMax: maxcount,
-                        interactive: true
-                    }, icontrol - 1);
-
                     var html = "JAHR:" + actyear + " - " + actcount;
                     $("#kla1630mapsres").html(html);
 
