@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no">
+    <title>klaleaflet - Weltkarte und Geo-Test</title>
+    <meta name="description" content="Klima Admin-App" />
+    <meta name="cache-control" content="no-cache, no-store">
+    <meta name="keywords" content="Node.js, JavaScript, AWS EC2, MongoDB, PWA, SPA">
+    <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/klistyles.css" rel="stylesheet">
+    <link href="css/leaflet.css" rel="stylesheet">
+
+    <script src="lib/async.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.backDetect.js"></script>
+    <script src="lib/jquery.cookie.min.js"></script>
+    <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
+    <script src="lib/leaflet.js" charset="utf-8"></script>
+    <!-- script src="lib/jsts.min.js" charset="utf-8"></script -->
+    <!-- script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script -->
+    <script src="lib/turf.min.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="apps/re-frame/uihelper.js"></script>
+    <script type="text/javascript" src="apps/re-frame/sysbase.js"></script>
+    <script type="text/javascript" src="apps/re-klima/kla1560wma.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
+        <span class="headertitle" style="color:red;font-weight:bold;">klaleaflet - World-Map und Geo-Test</span>
+        <noscript>
+            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+                <span style="color:blue">
+                    Your browser does not support scripts, you have to enable it to run this page
+                </span>
+            </div>
+        </noscript>
+    </div>
+    <div class="content">
+        <div id="mapid" class="col1of2">
+        </div>
+        <div id="protwrapper" class="col2of2">
+            <div id="buttons">
+
+            </div>
+            <div id="prot">
+
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+    </div>
+    <script>
+        $(window).off("resize");
+        $(window).resize(function () {
+            var hh = $(".header").outerHeight();
+            var fh = $(".footer").outerHeight();
+            var wh = $(window).height();
+            var h = wh - hh - fh - 1;
+            $(".content").height(h);
+            $("#mapid").css({
+                height: h,
+                overflow: "auto"
+            });
+            $("#protwrapper").css({
+                height: h,
+                overflow: "auto"
+            });
+            // $(".content").css("overflow", "auto");
+        });
+        $(document).ready(function () {
+            $('body').backDetect(function () {
+                console.log("The back-button terminates the app (5)");
+            });
+            if (window.location.href.indexOf("localhost") >= 0) {
+                $("body").css({
+                    "background-color": "#5ff80611"
+                });
+            }
+            $(window).resize();
+            var mymap;
+            var msg;
+            var cells = []; // für die HYDE-Daten
+            var metafields = {
+                comment: "",
+                ncols: 4320,
+                nrows: 2160,
+                xllcorner: -180.0,
+                yllcorner: -90.0,
+                cellsize: 0.0833333,
+                NODATA_value: "-9999.0"
+            };
+            var savedmetafields = uihelper.cloneObject(metafields);
+
+            $("#buttons")
+                .append($("<button/>", {
+                    html: "Extremtest -90/-180",
+                    click: function (evt) {
+                        evt.preventDefault();
+                        metafields = uihelper.cloneObject(savedmetafields);
+                        var marker = L.marker([latitude, longitude]).addTo(mymap);
+                        metafields.comment = "Südpol";
+                        metafields.latitude = "-90.0";
+                        metafields.longitude = "-180.0";
+                        mymap.setView([metafields.latitude, metafields.longitude], 13);
+                        var marker = L.marker([metafields.latitude, metafields.longitude]).addTo(mymap);
+                        var y = lat2y(metafields, metafields.latitude);
+                        var x = lon2x(metafields, metafields.longitude);
+                        metafields.rawy = y;
+                        metafields.rawx = x;
+                        metafields.y = Math.floor(y);
+                        metafields.x = Math.floor(x);
+                        metafields.translat = y2lat(metafields, metafields.y);
+                        metafields.translon = x2lon(metafields, metafields.x);
+                        //var marker1 = L.marker([metafields.translat, metafields.translon]).addTo(mymap);
+
+                        msg = uihelper.iterateJSON2pretty(metafields, "", "");
+                        $("#prot").html(msg);
+                    }
+                }));
+
+
+            $("#buttons")
+                .append($("<button/>", {
+                    html: "Extremtest +90/+180",
+                    click: function (evt) {
+                        evt.preventDefault();
+                        metafields = uihelper.cloneObject(savedmetafields);
+                        var marker = L.marker([latitude, longitude]).addTo(mymap);
+                        metafields.comment = "Nordpol";
+                        metafields.latitude = "90.0";
+                        metafields.longitude = "180.0";
+                        mymap.setView([metafields.latitude, metafields.longitude], 13);
+                        var marker = L.marker([metafields.latitude, metafields.longitude]).addTo(mymap);
+                        var y = lat2y(metafields, metafields.latitude);
+                        var x = lon2x(metafields, metafields.longitude);
+                        metafields.rawy = y;
+                        metafields.rawx = x;
+                        metafields.y = Math.floor(y);
+                        metafields.x = Math.floor(x);
+                        metafields.translat = y2lat(metafields, metafields.y);
+                        metafields.translon = x2lon(metafields, metafields.x);
+                        //var marker1 = L.marker([metafields.translat, metafields.translon]).addTo(mymap);
+
+                        msg = uihelper.iterateJSON2pretty(metafields, "", "");
+                        $("#prot").html(msg);
+                    }
+                }));
+
+
+            $("#buttons")
+                .append($("<button/>", {
+                    html: "Der Kölner Dom",
+                    click: function (evt) {
+                        evt.preventDefault();
+                        mymap._panes.markerPane.remove();
+                        metafields = uihelper.cloneObject(savedmetafields);
+                        var marker = L.marker([latitude, longitude]).addTo(mymap);
+                        metafields.comment = "Kölner Dom";
+                        metafields.latitude = "50.941278";
+                        metafields.longitude = "6.958281";
+                        mymap.setView([metafields.latitude, metafields.longitude], 13);
+                        var marker = L.marker([metafields.latitude, metafields.longitude]).addTo(mymap);
+                        var y = lat2y(metafields, metafields.latitude);
+                        var x = lon2x(metafields, metafields.longitude);
+                        metafields.rawy = y;
+                        metafields.rawx = x;
+                        metafields.y = Math.floor(y);
+                        metafields.x = Math.floor(x);
+                        metafields.translat = y2lat(metafields, metafields.y);
+                        metafields.translon = x2lon(metafields, metafields.x);
+                        var marker1 = L.marker([metafields.translat, metafields.translon]).addTo(mymap);
+                        var cellsum = 0;
+                        if (metafields.y > metafields.nrows) {
+                            metafields.message = "ERROR:" + metafields.y + ">" + metafields.nrows;
+                        } else if (metafields.x > metafields.ncols) {
+                            metafields.message = "ERROR:" + metafields.x + ">" + metafields.ncols;
+                        } else {
+                            // transformation von row/col auf indices
+                            // row/col gehen von links unten nach rechts oben
+                            // indices gehen von rechts oben nach links unten
+                            // also x - kann verwendet werden
+                            // aber y muss mit dem Kehrwert verwendet werden
+                            metafields.jsy = metafields.nrows - metafields.y - 1;
+                            if (cells[metafields.y][metafields.x] !== "-9999.0" || cells[metafields.y][metafields.x] !== "-9999") {
+                                cellsum += parseFloat(cells[metafields.jsy][metafields.x]);
+                            }
+                            metafields.message = "Zelle gefunden";
+                        }
+                        metafields.cellsum = cellsum;
+                        /**
+                         * Berechnen km-Bereite und km-Höhe, dann Radius
+                         */
+                        metafields.latSW = y2lat(metafields, metafields.y);
+                        metafields.lonSW = x2lon(metafields, metafields.x);
+                        metafields.latNO = y2lat(metafields, metafields.y + 1);
+                        metafields.lonNO = x2lon(metafields, metafields.x + 1);
+                        var marker1 = L.marker([metafields.latSW, metafields.lonSW]).addTo(mymap);
+                        var marker2 = L.marker([metafields.latNO, metafields.lonNO]).addTo(mymap);
+
+                        var toPoint = turf.point([metafields.lonNO, metafields.latSW]);
+                        var fromPoint = turf.point([metafields.lonSW, metafields.latSW]);
+                        var options = {
+                            units: 'kilometers'
+                        };
+                        metafields.width = turf.distance(fromPoint, toPoint, options);
+                        // Turf expects the data to be standard WGS84 longitude, latitude coordinates
+                        var fromPoint = turf.point([metafields.lonSW, metafields.latSW]);
+                        var toPoint = turf.point([metafields.lonSW, metafields.latNO]);
+                        var options = {
+                            units: 'kilometers'
+                        };
+                        metafields.height = turf.distance(fromPoint, toPoint, options);
+
+                        var y = metafields.y;
+                        var x = metafields.x;
+                        paintcell(mymap, metafields, y + 1, x - 1);
+                        paintcell(mymap, metafields, y + 1, x);
+                        paintcell(mymap, metafields, y + 1, x + 1);
+
+
+                        msg = uihelper.iterateJSON2pretty(metafields, "", "");
+                        $("#prot").html(msg);
+                    }
+                }));
+
+
+
+
+            var metafields = {
+                comment: "",
+                ncols: 4320,
+                nrows: 2160,
+                xllcorner: -180.0,
+                yllcorner: -90.0,
+                cellsize: 0.0833333,
+                NODATA_value: "-9999.0"
+            };
+            // @50.9412818,6.9560927 LatLon Konvention
+            $("body").css("cursor", "progress");
+            var latitude = 50.941278;
+            var longitude = 6.958281;
+            metafields.latitude = latitude;
+            metafields.longitude = longitude;
+            mymap = L.map('mapid').setView([latitude, longitude], 13);
+            // Default public token
+            // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
+            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox/streets-v11'
+            }).addTo(mymap);
+
+            var marker = L.marker([latitude, longitude]).addTo(mymap);
+
+
+
+            /*
+            L.polygon([
+                [51.509, -0.08],
+                [51.503, -0.06],
+                [51.51, -0.047]
+            ]).addTo(mymap).bindPopup("I am a polygon.");
+            */
+
+            // Berechnung der center-Zelle LatLon-Sicht
+            var y = lat2y(metafields, latitude);
+            var x = lon2x(metafields, longitude);
+
+            metafields.rawy = y;
+            metafields.rawx = x;
+            y = Math.floor(y);
+            x = Math.floor(x);
+            metafields.y = y;
+            metafields.x = x;
+
+            // Ausgabe Kontroll-Polygon für die gefundene Zelle
+            var savey = y;
+            var savex = x;
+            var latSW = y2lat(metafields, y);
+            var lonSW = x2lon(metafields, x);
+            var marker = L.marker([latSW, lonSW]).addTo(mymap);
+            metafields.latSW = latSW;
+            metafields.lonSW = lonSW;
+
+            x = savex + 1; // seitwärts
+            y = savey + 1; // höher
+            metafields.neighbourtop = x + "," + y;
+            var latNO = y2lat(metafields, y);
+            var lonNO = x2lon(metafields, x);
+            var marker = L.marker([latNO, lonNO]).addTo(mymap);
+            metafields.latNO = latNO;
+            metafields.lonNO = lonNO;
+
+
+            msg = uihelper.iterateJSON2pretty(metafields, "", "");
+            $("#prot").html(msg + "<br>" + $("#prot").html());
+
+            // paintcell(mymap, metafields, y, x);
+
+            L.polygon([
+                [metafields.latSW, metafields.lonSW],
+                [metafields.latSW, metafields.lonNO],
+                [metafields.latNO, metafields.lonNO],
+                [metafields.latNO, metafields.lonSW],
+            ]).addTo(mymap).bindPopup("I am a polygon.");
+
+
+
+            console.log("x=" + x + " y=" + y);
+            /*
+            msg = uihelper.iterateJSON2pretty (metafields, "", "");
+            $("#prot").html(msg + "<br>" + $("#prot").html());
+            */
+            async.waterfall([
+                    function (callback) {
+                        /**
+                         * Laden Mapel Daten kontrolliert
+                         */
+                        var fullname = "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy";
+                        fullname += "\\baseline\\asc\\2017AD_pop";
+                        fullname += "\\popc_2017AD.asc";
+
+                        var jqxhr = $.ajax({
+                            method: "GET",
+                            crossDomain: false,
+                            url: sysbase.getServer("getfilecontent"),
+                            data: {
+                                fullname: fullname,
+                                fromline: 0,
+                                frombyte: 0,
+                                checklinelength: false
+                            }
+                        }).done(function (r1, textStatus, jqXHR) {
+                            sysbase.putMessage(r1, 1);
+                            var ret = JSON.parse(r1);
+                            // Ausgabe in Map rechts
+                            var fullname = ret.fullname;
+                            var nextchunk = ret.nextchunk;
+                            var fromline = ret.fromline;
+                            var frombyte = ret.aktbyte;
+                            console.log(ret.message + " Textlänge:" + nextchunk.length);
+                            sysbase.putMessage("HYDE-Matrix geladen, Textlänge:" + nextchunk.length, 1);
+                            callback(null, ret);
+                        });
+                    },
+                    function (ret, callback) {
+                        // hier wird ret.nextchunk abgearbeitet
+                        var lines = ret.nextchunk.split("<br>");
+                        console.log("Lines:" + lines.length);
+                        cells = [];
+                        for (var ilines = 0; ilines < lines.length; ilines++) {
+                            var linecells = lines[ilines].split(" ");
+                            if (linecells.length > 100) {
+                                cells.push(linecells);
+                            }
+                        }
+                        var msg = "Zeile y:" + y;
+                        msg += " Spalte x:" + x;
+                        msg += " Wert:" + cells[y][x];
+                        console.log(msg);
+
+
+
+                        // grobe Annäherung 10 km links oben bis rechts unten
+                        /*
+                        var lonNW = destinationpointNW[0];
+                        var latNW = destinationpointNW[1];
+                        var xNW = Math.floor((lonNW - metafields.xllcorner) / metafields.cellsize);
+                        var yNW = Math.floor(metafields.nrows - (latNW - metafields.yllcorner) / metafields.cellsize);
+
+                        var lonSO = destinationpointSO[0];
+                        var latSO = destinationpointSO[1];
+                        var xSO = Math.floor((lonSO - metafields.xllcorner) / metafields.cellsize);
+                        var ySO = Math.floor(metafields.nrows - (latSO - metafields.yllcorner) / metafields.cellsize);
+                        var cellsum = 0;
+                        for (var irow = yNW; irow <= ySO; irow++) {
+                            for (var icol = xNW; icol <= xSO; icol++) {
+                                if (cells[irow][icol] !== "-9999.0" || cells[irow][icol] !== "-9999") {
+                                    cellsum += parseFloat(cells[irow][icol]);
+                                }
+                            }
+                        }
+                        msg = " Center-a:" + a;
+                        msg += " lon:" + longitude + " lat:" + latitude;
+                        msg += " NWlonlat:" + lonNW + "/" + latNW;
+                        msg += " SOlonlat:" + lonSO + "/" + latSO;
+                        msg += " NWxy:" + xNW + "/" + yNW;
+                        msg += " SOxy:" + xSO + "/" + ySO;
+                        msg += " Summe:" + cellsum;
+                        */
+                        console.log(msg);
+                        callback(null, ret);
+                    },
+                    function (ret, callback) {
+                        callback("finish", ret);
+                    }
+                ],
+                function (error, result) {
+                    //
+                    $("body").css("cursor", "default");
+                });
+        });
+
+        /**
+         * paintcell
+         */
+        function paintcell(mymap, metafields, y, x) {
+            var latSW = y2lat(metafields, y);
+            var lonSW = x2lon(metafields, x);
+            var latNO = y2lat(metafields, y+1);
+            var lonNO = x2lon(metafields, x+1);
+            L.polygon([
+                [latSW, lonSW],
+                [latSW, lonNO],
+                [latNO, lonNO],
+                [latNO, lonSW],
+                [latSW, lonSW]
+            ]).addTo(mymap).bindPopup("I am a rectangle.");
+        }
+
+
+        function x2lon(esrimeta, esrix) {
+            var esrilon = parseFloat(esrimeta.xllcorner) + (esrix * esrimeta.cellsize);
+            return esrilon;
+        }
+
+        function lon2x(esrimeta, esrilon) {
+            var esrix = parseFloat((esrilon - esrimeta.xllcorner) / esrimeta.cellsize);
+            return esrix;
+        }
+
+        function y2lat(esrimeta, esriy) {
+            var esrilat = esrimeta.yllcorner + esriy * esrimeta.cellsize;
+            return esrilat;
+        }
+
+        function lat2y(esrimeta, esrilat) {
+            var esriy = (esrilat - esrimeta.yllcorner) / esrimeta.cellsize;
+            return esriy;
+        }
+
+
+
+        function addPoint(longitude, latitude, distance, bearing, plots) {
+            var point = turf.point([longitude, latitude]); // longitude, latitude
+            var options = {
+                units: 'kilometers'
+            };
+            var destination = turf.destination(point, distance, bearing, options);
+            var lon90 = destination.geometry.coordinates[0];
+            var lat90 = destination.geometry.coordinates[1];
+            plots.push({
+                type: "square", // circle
+                size: 2,
+                latitude: lat90,
+                longitude: lon90,
+                tooltip: {
+                    content: bearing + " Grad " + distance + " km"
+                },
+                text: {},
+                myText: bearing + " Grad " + distance + " km, lon:" + lon90 + " lat:" + lat90
+            });
+            return [lon90, lat90];
+        }
+    </script>
+</body>
+
+</html>

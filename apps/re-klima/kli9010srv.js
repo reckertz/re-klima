@@ -1,7 +1,8 @@
-/*jshint evil: true */ 
+/*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
 /*global sysbase,uihelper */
 (function () {
+    "use strict";
     var kli9010srv = {};
 
     var root = typeof self === 'object' && self.self === self && self ||
@@ -27,7 +28,7 @@
     var sql3inserts = 0;
     var sql3errors = 0;
 
-    /** 
+    /**
      * fullname = zui-Datei mit den Daten zu einer Variablen
      * basiert auf vorhandenen Sourcen, die umgebaut werden
      * ghc1030dta.showallzips
@@ -128,7 +129,7 @@
                         };
                         countmin = 0;
                         countmax = 0;
-                        /** 
+                        /**
                          * deleteMany ist nur für Datenkorrekturen sinnvoll
                          * und ist daher standardmäßig auskommentiert
                          */
@@ -186,7 +187,7 @@
                             async.eachSeries(files, function (fileobj, nextfile) {
                                 //optional check for properties from prototype chain
                                 if (typeof fileobj.name !== "undefined") {
-                                    //no a property from prototype chain     
+                                    //no a property from prototype chain
                                     if (fileobj.name === "elements.txt" || fileobj.name === "sources.txt" || fileobj.name === "stations.txt") {
                                         // bereits verarbeitet
                                         nextfile();
@@ -195,7 +196,7 @@
                                         var filname = fileobj.name;
                                         vglsouid = "";
                                         kli9010srv.getFileTxtData(zip, filname, StreamZip, function (ret) {
-                                            /** 
+                                            /**
                                              * für KLISTATIONS
                                              * years: years,
                                              * fldtable: fldtable
@@ -240,7 +241,7 @@
         );
     };
 
-    /** 
+    /**
      * putecaddata - Schreiben KLISTATIONS aus
      * soutable - Stammdaten zu den Stations und Sources
      * years - years[souid][sjahr][dayofyear] = temperatur;
@@ -250,7 +251,7 @@
     kli9010srv.putecaddata = function (statable, soutable, years, fldtable, targetvar, targetelem, async, callback47) {
         var souids = Object.keys(years);
         async.eachSeries(souids, function (souid, nextsouid) {
-                /** 
+                /**
                  * Suche richtige Stammdaten in soutable
                  * key berechnen, führende Nullen unterdrücken
                  *  dmode:21
@@ -474,7 +475,7 @@
                 var idis = 0;
                 var skip = false;
                 var vglyear = "";
-                /** 
+                /**
                  * icount ist laufvariable, zählt die loops
                  * idis ist die aktuelle/letzte Position
                  * inext ist das gefundene Zeilenende
@@ -569,9 +570,9 @@
                             }
 
                             /**
-                             * hier wird data nach years aufbereitet  
+                             * hier wird data nach years aufbereitet
                              * STAID, SOUID,    DATE,   TX, Q_TX
-                             * TX steht hier für ein Merkmal, die Umsetzung erfolgt dediziert, 
+                             * TX steht hier für ein Merkmal, die Umsetzung erfolgt dediziert,
                              * hier wird aus TX ein tmax in KLISTATIONS
                              *      1,     2,19180101,    0,    0
                              *      1,     2,19180102,  -40,    0
@@ -655,7 +656,7 @@
 
 
 
-    /** 
+    /**
      * kli9010srv.getSourcesTxtData = function (zip, filename, fldtable, statable) {
      * übernommen aus ghc1030dta.getSourcesTxtData(zip, "elements.txt", varfldtable, varstatable);
      */
@@ -670,7 +671,7 @@
         // Der String muss erst mal aufbereitet werden, weil die csv/ascii-Daten erst spät kommen
         // STAID, SOUID, SOUNAME - Trigger für Header-Line, genauer: alles vorher weg
         /**
-         * inline parsen - weil nicht normgerechte Daten, aber einheitlich 
+         * inline parsen - weil nicht normgerechte Daten, aber einheitlich
          */
         var dmode = 0;
         var idis = 0;
@@ -775,7 +776,7 @@
     /**
      * getFormat - String Analyse Feldformat - EIN FELD
      *  * 01- 05 STAID  : Station identifier
-     * (\d+) ... https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_match_regexp2 
+     * (\d+) ... https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_match_regexp2
      */
     kli9010srv.getLocFieldFormat = function (line) {
         //var res = line.match(/([0-9]*)(-)(\s)([0-9]*)(\s)([a-zA-Z_0-9]*)(\s*)([:]*)(\s*)(.*)/);
@@ -839,7 +840,7 @@
         return result;
     };
 
- 
+
 
     /**
      * getallclimatedata -Wrapper um getallrecords für KLISTATIONS
@@ -999,7 +1000,7 @@
         reqparm.table = table;
         var singleyears = false;
         var totyears = 0;
-        /** 
+        /**
          * Berechnung der effektiven Jahre - aus der Vorgabe
          */
         for (var isel = 0; isel < selarray.length; isel++) {
@@ -1010,8 +1011,8 @@
             if (selarray[isel].year2 === 0) selarray[isel].year2 = selarray[isel].year1;
             totyears += selarray[isel].year2 - selarray[isel].year1 + 1;
         }
-        /** 
-         * Aufbereitung projection - Einzeljahre oder "alle" generisch 
+        /**
+         * Aufbereitung projection - Einzeljahre oder "alle" generisch
          */
         if (totyears > 0 && totyears <= 60) {
             //<variablename>.years raus und explizit rein
@@ -1274,7 +1275,7 @@
      * 101603550001995TMIN-9999   -9999     980  G 1100  G 1700  G 1910  G 2160  G-9999    2040  G-9999    1380  G 1230  G
      * 101603550001996TMIN-9999   -9999    1100  G 1270  G 1490  G 1820  G 2110  G 2280  G 1850  G 1490  G 1310  G 1140  G
      * 425000406931966TMIN  567  U  584  U  760  U  966  U  997  U 1105c U-9999   -9999    1229b U 1128  U  927  U  597  U
-     * 133610990002010TMIN 1950  K-9999    2670  K-9999    2750  K-9999   -9999   -9999    2340  K 2380  K-9999   -9999   
+     * 133610990002010TMIN 1950  K-9999    2670  K-9999    2750  K-9999   -9999   -9999    2340  K 2380  K-9999   -9999
      */
     var datschema = [{
             name: "stationid", // "ID",
@@ -1328,7 +1329,7 @@
 
         async.waterfall([
                 function (callbackcc) {
-                    /** 
+                    /**
                      * Dateinamen bereitstellen
                      */
                     var fullname = "";
@@ -1429,7 +1430,7 @@
                             /**
                              * eigene Satzart für die Daten, wechselnd mit Stationsdaten
                              *  10010 709   87   10 Jan Mayen            NORWAY        19212011  541921    1  287
-                             *1921  -44  -71  -68  -43   -8   22   47   58   27  -20  -21  -40                                    
+                             *1921  -44  -71  -68  -43   -8   22   47   58   27  -20  -21  -40
                              *1922   -9  -17  -62  -37  -16   29   48   63   27   -2  -38  -26
                              * Erkennungsregel: 4 Stellen numerisch vorne => Datensatz dat4schema
                              */
@@ -1635,12 +1636,12 @@
             starec[fld1] = val1;
             lastbis = sta4schema[i].bis;
         }
-        // 
+        //
         var latfields = {};
         /*
-        (ch. 8-11) Station latitude in degrees and tenths (-999 is missing), 
+        (ch. 8-11) Station latitude in degrees and tenths (-999 is missing),
             with negative values in the Southern Hemisphere
-        (ch. 12-16) Station longitude in degrees and tenths (-1999 is missing), 
+        (ch. 12-16) Station longitude in degrees and tenths (-1999 is missing),
             with negative values in the Eastern Hemisphere (NB this is opposite to the more usual convention)
         */
 
@@ -1718,7 +1719,7 @@
 
         async.waterfall([
                 function (callbackgc) {
-                    /** 
+                    /**
                      * Dateinamen bereitstellen
                      */
                     var fullname = "";
@@ -1966,9 +1967,9 @@
                           callback2(null, res, ret1);
                           return;
                        });
-                     * 
+                     *
                      * ghcndat2all aufrufen
-                     * 
+                     *
                      */
                     kli9010srv.ghcndat2all(ret.fullnametmin, ret.selyears, "tmin", ret, gblInfo, gbldb, fs, async, stream, readline, sys0000sys, req, res, function (res, ret1) {
                         callbackgc(null, res, ret1);
@@ -2046,9 +2047,9 @@
                     var len = monschema[ifld].length;
                     var name = monschema[ifld].name;
                     var val0 = line.substr(von, len);
-                    //                   wwwwwdqd   
+                    //                   wwwwwdqd
                     //1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
-                    //101603550001995TMIN-9999 -9999 980 G 1100 G 1700 G 1910 G 2160 G-9999 2040 G-9999 1380 G 1230 G 
+                    //101603550001995TMIN-9999 -9999 980 G 1100 G 1700 G 1910 G 2160 G-9999 2040 G-9999 1380 G 1230 G
                     var0[name] = val0;
                     if (name === "value") {
                         var monvalue;
@@ -2147,7 +2148,7 @@
                }
                */
             /**
-             * hierarchie lat, year, source, 
+             * hierarchie lat, year, source,
              *              values - für year mit tmin, tmax
              *              months - Monatstabelle mit tmin, tmax
              */
@@ -2329,9 +2330,9 @@
     /**
      * eigene Satzart für die Daten, wechselnd mit Stationsdaten
      *         1         2         3         4         5         6         7
-     *1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 
+     *1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
      *  10010 709   87   10 Jan Mayen            NORWAY        19212011  541921    1  287
-     *1921  -44  -71  -68  -43   -8   22   47   58   27  -20  -21  -40                                    
+     *1921  -44  -71  -68  -43   -8   22   47   58   27  -20  -21  -40
      *1922   -9  -17  -62  -37  -16   29   48   63   27   -2  -38  -26
      * Erkennungsregel: 4 Stellen numerisch vorne => Datensatz dat4schema
      */
@@ -2355,7 +2356,7 @@
         }]
     };
     /**
-     * crutem42latitudes - dat für tavg, 
+     * crutem42latitudes - dat für tavg,
      * fullname, timeout, pivotopcode, selyears
      * Zugriff KLISTATIONS, latprofile berechnet
      * fullname wird entsprechend variiert
@@ -2575,7 +2576,7 @@
 
 
 
-  
+
 
 
 
@@ -2807,11 +2808,11 @@
     /**
      * kli9010srv.convecad2sql - Konvertieren ECAD aus MongoDB
      * nach SQLite mit Zeitkonsolidierung
-     * @param {*} gbldb 
-     * @param {*} async 
-     * @param {*} sqlite3 
-     * @param {*} uihelper 
-     * @param {*} req 
+     * @param {*} gbldb
+     * @param {*} async
+     * @param {*} sqlite3
+     * @param {*} uihelper
+     * @param {*} req
      * @param {*} res
      * @param {*} callback64 mit res, ret als retun-Variablen
      */
@@ -2848,7 +2849,7 @@
                 }
             },
             function (ret, callback64ind) {
-                /** 
+                /**
                  * Index KLISTATIONS MongoDB anlegen
                  */
                 gbldb.collection("KLISTATIONS").createIndex({
@@ -2860,7 +2861,7 @@
                 });
             },
             function (ret, callback64prep) {
-                /** 
+                /**
                  * KLISTATIONS nach ret.stations - 6-stellig mit counter
                  */
                 var reqparm = {};
@@ -2915,7 +2916,7 @@
                 });
             },
             function (ret77, callback64b) {
-                /** 
+                /**
                  * Lesen KLISTATIONS in loop über Führungsstruktur top-down in Gruppen
                  */
 
@@ -2952,7 +2953,7 @@
                                     var starecords = {}; // Buffer for old records of one station - 6 digits
                                     var newrecords = {}; // Buffer for new records, later to sqlite3
                                     var actstation = ret1.records[0].stationid.substr(0, 6);
-                                    /** 
+                                    /**
                                      * separieren nach variablename = 1 Datensatz, strenger Loop
                                      */
                                     for (var irec1 = 0; irec1 < ret1.records.length; irec1++) {

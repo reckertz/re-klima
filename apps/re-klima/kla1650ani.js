@@ -634,7 +634,6 @@
                             }]);
                             var mapi = $(".mapcontainer").data("mapael");
                             var area = mapi.areas[id];
-                            debugger;
                             if (area.zoom) {
                                 // Area has a zoom property, use it
                                 this.mapcontainer.trigger('zoom', area.zoom);
@@ -1223,6 +1222,7 @@
                                     if (typeof options.mapOptions.plots[pearl.stationid].attrs === "undefined")
                                         options.mapOptions.plots[pearl.stationid].attrs = {};
                                     options.mapOptions.plots[pearl.stationid].attrs.fill = "red";
+                                    options.mapOptions.plots[pearl.stationid].attrs.zIndex = 10000;
                                 }
                             }
                         }
