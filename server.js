@@ -821,6 +821,29 @@ app.get('/ghcnddata', function (req, res) {
 });
 
 
+/**
+ * transhyde - HYDE-Daten in JSON aufbereiten (*.txt-Files)
+ */
+app.get('/transhyde', function (req, res) {
+    if (checkSession(req, res)) return;
+    var timeout = 100 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootdir = __dirname;
+    sys0000sys.transhyde(rootdir, fs, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
 
 /**
  * batchreg - Regressionsanalyse im Batch mit Filter auf die Stations, wie vorgegeben

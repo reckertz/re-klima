@@ -19,6 +19,7 @@
     var download = require("download-file");
     var csv = require("fast-csv");
     var kli9010srv = require("re-klima/kli9010srv");
+    var kla9020fun = require("re-klima/kla9020fun");
     var uihelper = require("re-frame/uihelper");
 
     var gblInfo = {};
@@ -1201,29 +1202,43 @@
 
     var linfilelist = [];
 
-    var walkSync = function (dir, filelist, selyears, ADBC) {
+    var walkSync = function (dir, filelist, globals, selyears, selvars, ADBC) {
         var fs = fs || require('fs'),
             files = fs.readdirSync(dir);
         filelist = filelist || [];
         files.forEach(function (file) {
             var fullfilename = path.join(dir, file);
             if (fs.statSync(fullfilename).isDirectory()) {
-                var fparts = file.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
-                var j = fparts[2];
-                if (j.length > 0) {
-                    j = ("0000" + j).slice(-4);
-                }
-                if (fparts[3] === ADBC && sys0000sys.hasyear(j, selyears) === true) {
-                    filelist.push(walkSync(fullfilename, [], selyears, ADBC));
+                if (globals === false) {
+                    var fparts = file.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
+                    var j = fparts[2];
+                    if (j.length > 0) {
+                        j = ("0000" + j).slice(-4);
+                    }
+                    if (fparts[3] === ADBC && sys0000sys.hasyear(j, selyears) === true) {
+                        filelist.push(walkSync(fullfilename, [], globals, selyears, selvars, ADBC));
+                    }
+                } else {
+                    filelist.push(walkSync(fullfilename, [], globals, selyears, selvars, ADBC));
                 }
             } else {
-                var fparts = file.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
-                // console.log(fparts); // Array(4) ["conv_rangeland0AD", "conv_rangeland", "0", "AD"]
-                var j = fparts[2];
-                if (j.length > 0) {
-                    j = ("0000" + j).slice(-4);
-                }
-                if (fparts[3] === ADBC && sys0000sys.hasyear(j, selyears) === true) {
+                if (globals === false) {
+                    var fparts = file.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
+                    // console.log(fparts); // Array(4) ["conv_rangeland0AD", "conv_rangeland", "0", "AD"]
+                    var vfrag = fparts[1].replace("_", "");
+                    if (selvars.length > 0 && selvars.indexOf(vfrag) < 0) {
+                        // skip
+                    } else {
+                        var j = fparts[2];
+                        if (j.length > 0) {
+                            j = ("0000" + j).slice(-4);
+                        }
+                        if (fparts[3] === ADBC && sys0000sys.hasyear(j, selyears) === true) {
+                            filelist.push(fullfilename);
+                            linfilelist.push(fullfilename);
+                        }
+                    }
+                } else {
                     filelist.push(fullfilename);
                     linfilelist.push(fullfilename);
                 }
@@ -1937,6 +1952,10 @@
      * selyears - Liste der Jahre, die auszuwerten sind: yyy,yyyy-yyyy
      * adbc - AD oder BC
      * rootname - Verzeichnis für die Ausgabe von Dateien, default static/temp/hyde/<dateiname>
+     * stationids - optional, für liste von stationid's für die station-Auswertung, wenn vorhanden
+     *              dann wird je stationid eine Datei ausgegeben
+     * lats - optional, bei true Ausgabe der hydelats.txt-Datei wie bisher
+     * sonst werden die total-Auswertung und die Auswertung je Klimazone ausgegeben
      *
      *
      * und Ablegen auf dem Server, erst JSON, später mal sehen
@@ -1961,11 +1980,11 @@
             var longitude = Number(mydata[i].longitude);
             var latitude = Number(mydata[i].latitude);
     Neue Exports - Dateinamenskonventionen:
-    hyde<year>tot.txt - Gesamtsummen pro Jahr <year>
-    hyde<year>C<climatezone>.txt - Gesamtsummen pro Klimazone <climatezone> pro Jahr,
+    hydetot.txt - Gesamtsummen pro Jahr <year>
+    hydeC<climatezone>.txt - Gesamtsummen pro Klimazone <climatezone> pro Jahr,
         dies wird für alle Klimazonen berechnet
     und nur bei speziellen Aufrufparametern
-    hyde<year>S<stationid>.txt Werte zur Zelle einer Station pro Jahr,
+    hydeS<stationid>.txt Werte zur Zelle einer Station pro Jahr,
         dazu Wert je 1 + 8, 1 + 8 + 16 etc. Zellen, also die Stationszelle und Nachbarzellen
         in wachsendem Umfeld, das wird eine Herausforderung, kann aber gut erledigt werden,
         wird nur für ausgewählte Stationen berechnet als Umfeldindikatoren.
@@ -1975,6 +1994,7 @@
 
     sys0000sys.transhyde = function (rootname, fs, async, req, reqparm, res, callbackh) {
         var hydedata = {};
+
         var files = [];
         var predirectory = "";
         var directory = "";
@@ -1989,8 +2009,14 @@
          */
         var fullname = "";
         var selyears = "";
-        var adbc = "";
-
+        var selvars = "";
+        var adbc = "AD";
+        var stationids = []; // aufbereitete Form, kommaseparierte Liste
+        var lats = false;
+        var globals = false;
+        var hydetot = {}; // Vorlage für die Ausgabe
+        var hydezone = {}; // Vorlage für die Ausgabe
+        var hydestation = {}; // wird bei Ausgabe differenziert
         if (typeof req !== "undefined" && req !== null) {
             if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
                 fullname = req.query.fullname;
@@ -1998,13 +2024,30 @@
             if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
                 selyears = req.query.selyears;
             }
+            if (req.query && typeof req.query.selvars !== "undefined" && req.query.selvars.length > 0) {
+                selvars = req.query.selvars;
+            }
             if (req.query && typeof req.query.adbc !== "undefined" && req.query.adbc.length > 0) {
                 adbc = req.query.adbc;
             }
             if (req.query && typeof req.query.rootname !== "undefined" && req.query.rootname.length > 0) {
                 rootname = req.query.rootname;
             }
-
+            if (req.query && typeof req.query.stationids !== "undefined" && req.query.stationids.length > 0) {
+                stationids = req.query.stationids.split(",");
+            }
+            if (req.query && typeof req.query.lats !== "undefined") {
+                if (typeof req.query.lats === "string" && req.query.lats.length > 0 &&
+                    (req.query.lats === "true" || req.query.lats === "-1")) {
+                    lats = true;
+                }
+            }
+            if (req.query && typeof req.query.globals !== "undefined") {
+                if (typeof req.query.globals === "string" && req.query.globals.length > 0 &&
+                    (req.query.globals === "true" || req.query.globals === "-1")) {
+                    globals = true;
+                }
+            }
         } else if (typeof reqparm !== "undefined" && reqparm !== null) {
             if (reqparm && typeof reqparm.fullname !== "undefined" && reqparm.fullname.length > 0) {
                 fullname = reqparm.fullname;
@@ -2012,17 +2055,63 @@
             if (reqparm && typeof reqparm.selyears !== "undefined" && reqparm.selyears.length > 0) {
                 selyears = reqparm.selyears;
             }
+            if (reqparm && typeof reqparm.selvars !== "undefined" && reqparm.selvars.length > 0) {
+                selvars = reqparm.selvars;
+            }
             if (reqparm && typeof reqparm.adbc !== "undefined" && reqparm.adbc.length > 0) {
                 adbc = reqparm.adbc;
             }
             if (reqparm && typeof reqparm.rootname !== "undefined" && reqparm.rootname.length > 0) {
                 rootname = reqparm.rootname;
             }
+            if (reqparm && typeof reqparm.stationids !== "undefined" && reqparm.stationids.length > 0) {
+                stationids = reqparm.stationids.split(",");
+            }
+            if (reqparm.query && typeof reqparm.lats !== "undefined") {
+                if (typeof reqparm.lats === "string" && reqparm.lats.length > 0 &&
+                    (reqparm.lats === "true" || reqparm.lats === "-1")) {
+                    lats = true;
+                }
+            }
+            if (reqparm.query && typeof reqparm.globals !== "undefined") {
+                if (typeof reqparm.globals === "string" && reqparm.globals.length > 0 &&
+                    (reqparm.globals === "true" || reqparm.globals === "-1")) {
+                    globals = true;
+                }
+            }
         }
+        selvars = selvars.replace(/_/g, "");
+        if (fullname.length === 0) {
+            // "G:\\Projekte\klimadaten\"HYDE_lu_pop_proxy"\baseline\asc\2008AD_pop\rurc_2008AD.asc"
+            fullname = path.join("G:", "Projekte");
+            fullname = path.join(fullname, "klimadaten");
+            fullname = path.join(fullname, "HYDE_lu_pop_proxy");
+            fullname = path.join(fullname, "baseline");
+            fullname = path.join(fullname, "asc");
+            if (!fs.existsSync(fullname)) {
+                // hier ausweichverzeichnis prüfen
+                callbackh(res, {
+                    error: true,
+                    message: "keine HYDE-Datenverzeichnis vorgegeben"
+                });
+                return;
+            }
+        } else {
+            if (!fs.existsSync(fullname)) {
+                // hier ausweichverzeichnis prüfen
+                callbackh(res, {
+                    error: true,
+                    message: "keine HYDE-Datenverzeichnis vorgegeben"
+                });
+                return;
+            }
+        }
+        /**
+         * Bestimmung der Kandidaten-Dateinamen
+         */
         var firstdir = fullname;
         var filelist = [];
-        filelist = walkSync(firstdir, filelist, selyears, adbc);
-
+        filelist = walkSync(firstdir, filelist, globals, selyears, selvars, adbc);
         linfilelist.sort(function (a, b) {
             if (a < b)
                 return -1;
@@ -2031,17 +2120,7 @@
             return 0;
         });
         console.log("HYDE-Files gefunden:" + linfilelist.length);
-        /*
-        if (1 === 1) {
-            callbackh(res, {
-                error: false,
-                message: "OK",
-                metafields: metafields,
-                hitcells: hitcells,
-            });
-            return;
-        }
-        */
+
         var filecounter = 0;
         var valcounter = 0;
         async.eachSeries(linfilelist, function (fullfilename, nextfile) {
@@ -2061,18 +2140,25 @@
                             // fullfilename zerlegen für Feldname, Jahr
                             var filename = path.basename(fullfilename);
                             var fparts = filename.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
-
-                            // console.log(fparts); // Array(4) ["conv_rangeland0AD", "conv_rangeland", "0", "AD"]
-                            var year = fparts[2];
-                            if (year.length > 0) {
-                                year = ("0000" + year).slice(-4);
-                            }
-                            var variablename = fparts[1];
-                            if (typeof hydedata.variables === "undefined") {
-                                hydedata.variables = {};
-                            }
-                            if (typeof hydedata[year] === "undefined") {
-                                hydedata[year] = {};
+                            var year;
+                            if (fparts !== null) {
+                                var variablename = fparts[1];
+                                if (typeof hydedata.variables === "undefined") {
+                                    hydedata.variables = {};
+                                }
+                                year = fparts[2];
+                                if (year.length > 0) {
+                                    year = ("0000" + year).slice(-4);
+                                }
+                                if (typeof hydedata[year] === "undefined") {
+                                    hydedata[year] = {};
+                                }
+                            } else {
+                                var idis = filename.indexOf(".");
+                                var variablename = filename.substr(0, idis);
+                                if (typeof hydedata.variables === "undefined") {
+                                    hydedata.variables = {};
+                                }
                             }
                             // variablename erst innerhalb der lats unten
                             var ret = {
@@ -2085,7 +2171,7 @@
                             callbackn(null, res, ret);
                             return;
                         },
-                        function (res, ret, callbackn) {
+                        function (res, ret, callbacko) {
                             // file lesen und Update der Zielstruktur
                             var year = ret.year;
                             var variablename = ret.variablename;
@@ -2099,15 +2185,16 @@
                             var headfields = [];
                             var datafields = [];
                             var datalinecounter = 0;
-
                             // ret.filepath = path.join(ret.directory, filename, selyears);
-
                             var readInterface = readline.createInterface({
                                 input: fs.createReadStream(ret.fullfilename),
                                 console: false
                             });
                             readInterface.on('line', function (line) {
                                 //console.log(line);
+                                if (line.substr(0,1) === " ") {
+                                    line = line.trim();
+                                }
                                 var lline = line.toLocaleLowerCase();
                                 var fld = "";
                                 if (lline.startsWith("ncols")) {
@@ -2139,6 +2226,7 @@
                                      * hier kommen die Daten, VIELE DATEN!!!
                                      */
                                     rowcount++;
+                                    // Problem: es gibt Zeilen, die mit Blank beginnen
                                     var rowcells = line.split(" ");
                                     // Sizing-Test, volle Matrix im Speicher
                                     datamat.push(rowcells);
@@ -2154,9 +2242,17 @@
                                      * lats - Sortierwert von 000 = Nordpol bis 180 = Südpol und lat dahinter
                                      */
                                     var lat = kla9020fun.getlatfieldsp("" + latitude);
-                                    // Filtern der Zellen für Deutschland
+                                    var climatezone = "*";
+                                    var climateerg = uihelper.getClimateZone(latitude);
+                                    if (climateerg !== false) {
+                                        climatezone = climateerg.value;
+                                    } else {
+                                        console.log(latitude);
+                                    }
                                     var lastcell = rowcells.length; //
                                     var summe = 0;
+                                    var minval = null;
+                                    var maxval = null;
                                     var icount = 0;
                                     for (var i = 0; i < lastcell; i++) {
                                         /**
@@ -2174,13 +2270,84 @@
                                                 } else {
                                                     summe += parseInt(wert) || 0;
                                                 }
+                                                if (minval === null) {
+                                                    minval = wert;
+                                                } else if (wert < minval) {
+                                                    minval = wert;
+                                                }
+                                                if (maxval === null) {
+                                                    maxval = wert;
+                                                } else if (wert > maxval) {
+                                                    maxval = wert;
+                                                }
                                             } else {
                                                 console.log(variablename + " NaN:" + wert);
                                             }
                                         }
                                     }
-                                    // hydedata[year][variablename] = {};
+                                    /**
+                                     * Aufbereitung von summe, minval und maxval je row
+                                     * Gesamtsummen je Jahr
+                                     *
+                                     */
+                                    // Verdichtung hydetot
                                     if (icount > 0) {
+                                        if (globals === false) {
+                                            if (typeof hydetot[year] === "undefined") {
+                                                hydetot[year] = {};
+                                            }
+                                            if (typeof hydetot[year][variablename] === "undefined") {
+                                                hydetot[year][variablename] = {
+                                                    count: 0,
+                                                    summe: 0.0,
+                                                };
+                                            }
+                                            hydetot[year][variablename].count += icount;
+                                            hydetot[year][variablename].summe += summe;
+                                        } else {
+                                            if (typeof hydetot[variablename] === "undefined") {
+                                                hydetot[variablename] = {
+                                                    count: 0,
+                                                    summe: 0.0,
+                                                };
+                                            }
+                                            hydetot[variablename].count += icount;
+                                            hydetot[variablename].summe += summe;
+                                        }
+                                    }
+                                    // Verdichtung hydezone
+                                    if (icount > 0) {
+                                        if (globals === false) {
+                                            if (typeof hydezone[climatezone] === "undefined") {
+                                                hydezone[climatezone] = {};
+                                            }
+                                            if (typeof hydezone[climatezone][year] === "undefined") {
+                                                hydezone[climatezone][year] = {};
+                                            }
+                                            if (typeof hydezone[climatezone][year][variablename] === "undefined") {
+                                                hydezone[climatezone][year][variablename] = {
+                                                    count: 0,
+                                                    summe: 0.0,
+                                                };
+                                            }
+                                            hydezone[climatezone][year][variablename].count += icount;
+                                            hydezone[climatezone][year][variablename].summe += summe;
+                                        } else {
+                                            if (typeof hydezone[climatezone] === "undefined") {
+                                                hydezone[climatezone] = {};
+                                            }
+                                            if (typeof hydezone[climatezone][variablename] === "undefined") {
+                                                hydezone[climatezone][variablename] = {
+                                                    count: 0,
+                                                    summe: 0.0,
+                                                };
+                                            }
+                                            hydezone[climatezone][variablename].count += icount;
+                                            hydezone[climatezone][variablename].summe += summe;
+                                        }
+                                    }
+                                    // alte lats-Aufbereitung, jetzt bedingt; hydedata[year][variablename] = {};
+                                    if (icount > 0 && lats === true) {
                                         if (typeof hydedata[year][lat.lats] === "undefined") {
                                             hydedata[year][lat.lats] = {};
                                         }
@@ -2188,7 +2355,6 @@
                                             hydedata[year][lat.lats][variablename] = 0;
                                         }
                                         hydedata[year][lat.lats][variablename] += summe;
-
                                         if (typeof hydedata.variables[variablename] === "undefined") {
                                             hydedata.variables[variablename] = {
                                                 count: 0,
@@ -2214,7 +2380,7 @@
                             readInterface.on('close', function () {
                                 // do something on finish here
                                 console.log("Finished:" + valcounter);
-                                callbackn("Finish", res, ret);
+                                callbacko("Finish", res, ret);
                                 return;
                             });
                         }
@@ -2243,23 +2409,89 @@
                     fs.mkdirSync(fullpath64);
                 }
                 //var filnr = Math.floor(Math.random() * (999999999 - 100000000 + 1)) + 100000000;
-                var datafilename = "hydelats.txt";
-                var fulldatafilename = path.join(fullpath64, datafilename);
-                fs.writeFile(fulldatafilename, JSON.stringify(hydedata), function (err) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log("Finished-Files processed:" + filecounter);
-                    }
-                    callbackh(res, {
-                        error: false,
-                        message: err || "OK",
-                        datafilename: datafilename,
-                        fulldatafilename: fulldatafilename,
-                        hydedata: hydedata
+                async.waterfall([
+                        function (cb0000Z0) {
+                            var datafilename = "hydelats.txt";
+                            var fulldatafilename = path.join(fullpath64, datafilename);
+                            if (lats === true) {
+                                fs.writeFile(fulldatafilename, JSON.stringify(hydedata), {
+                                    encoding: 'utf8',
+                                    flag: 'w'
+                                }, function (err) {
+                                    if (err) {
+                                        console.log(err);
+                                    } else {
+                                        console.log(fulldatafilename + " Finished:" + filecounter);
+                                    }
+                                    cb0000Z0(null, res, {
+                                        error: false,
+                                        message: err || "OK",
+                                        fullpath64: fullpath64
+                                    });
+                                    return;
+                                });
+                            } else {
+                                cb0000Z0(null, res, {
+                                    error: false,
+                                    message: "OK",
+                                    fullpath64: fullpath64
+                                });
+                                return;
+                            }
+                        },
+                        function (res, ret, cb0000Z1) {
+                            /**
+                             * neue Ausgabe hydetot.txt
+                             */
+                            var datafilename = "hydetot.txt";
+                            if (globals === true) datafilename = "hydeglobal.txt";
+                            var fulldatafilename = path.join(ret.fullpath64, datafilename);
+                            fs.writeFile(fulldatafilename, JSON.stringify(hydetot), {
+                                encoding: 'utf8',
+                                flag: 'w'
+                            }, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log("Finished-Files processed:" + filecounter);
+                                }
+                                cb0000Z1(null, res, {
+                                    error: false,
+                                    message: err || "OK",
+                                    fullpath64: ret.fullpath64
+                                });
+                                return;
+                            });
+                        },
+                        function (res, ret, cb0000Z2) {
+                            /**
+                             * neue Ausgabe hydezone.txt
+                             */
+                            var datafilename = "hydezone.txt";
+                            if (globals === true) datafilename = "hydeglobalzone.txt";
+                            var fulldatafilename = path.join(ret.fullpath64, datafilename);
+                            fs.writeFile(fulldatafilename, JSON.stringify(hydezone), {
+                                encoding: 'utf8',
+                                flag: 'w'
+                            }, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log("Finished-Files processed:" + filecounter);
+                                }
+                                cb0000Z2("Finish", res, {
+                                    error: false,
+                                    message: err || "OK",
+                                    fullpath64: ret.fullpath64
+                                });
+                                return;
+                            });
+                        }
+                    ],
+                    function (error, res, ret) {
+                        callbackh(res, ret);
+                        return;
                     });
-                    return;
-                });
             });
         // G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2008AD_pop\rurc_2008AD.asc
     };

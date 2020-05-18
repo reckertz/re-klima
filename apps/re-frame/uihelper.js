@@ -2390,7 +2390,66 @@
         return true;
     };
 
-
+ /**
+     * Klimazone abrufen aus latitude
+     */
+    uihelper.getClimateZone = function (latitude) {
+        var czones = [{
+            from: 60,
+            to: 90.01,
+            value: "N0",
+            text: "North Cold 60-90"
+        },
+        {
+            from: 40,
+            to: 60,
+            value: "N1",
+            text: "North Moderate 40-60"
+        },
+        {
+            from: 23.5,
+            to: 40,
+            value: "N2",
+            text: "North Subtrop 23,5-40"
+        },
+        {
+            from: 0,
+            to: 23.5,
+            value: "N3",
+            text: "North Tropic 0-23,5"
+        },
+        {
+            from: -100,
+            to: -60,
+            value: "S0",
+            text: "South Cold 60-90"
+        },
+        {
+            from: -60,
+            to: -40,
+            value: "S1",
+            text: "South Moderate 40-60"
+        },
+        {
+            from: -40,
+            to: -23.5,
+            value: "S2",
+            text: "South Subtrop 23,5-40"
+        },
+        {
+            from: -23.5,
+            to: 0,
+            value: "S3",
+            text: "South Tropic 0-23,5"
+        }];
+        var rlat = parseFloat(latitude);
+        for (var izone = 0; izone < czones.length; izone++) {
+            if (latitude >= czones[izone].from && latitude <= czones[izone].to) {
+                return czones[izone];
+            }
+        }
+        return false;
+    };
 
 
     /**

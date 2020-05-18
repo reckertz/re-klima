@@ -503,6 +503,9 @@
                         .append($("<button/>", {
                             html: "Animation",
                             class: "kla1630mapbut1",
+                            css: {
+                                margin: 10
+                            },
                             click: function (evt) {
                                 evt.preventDefault();
                                 var thisbutton = this;
@@ -523,7 +526,7 @@
                             html: "Animation mit gif-Sicherung",
                             class: "kla1630mapbut2",
                             css: {
-                                "margin-left": "10px"
+                                "margin": "10px"
                             },
                             click: function (evt) {
                                 evt.preventDefault();
@@ -545,6 +548,9 @@
                         .append($("<button/>", {
                             html: "Kompakt",
                             class: "kla1630mapbut3",
+                            css: {
+                                margin: 10
+                            },
                             click: function (evt) {
                                 evt.preventDefault();
                                 var thisbutton = this;
@@ -558,6 +564,122 @@
                                 });
                             }
                         }))
+
+
+
+                        .append($("<button/>", {
+                            html: "HYDE laden",
+                            class: "kla1630mapbut4",
+                            css: {
+                                margin: 10
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var thisbutton = this;
+                                // hier Liste der Jahre berechnen
+                                uientry.fromUI2Record("#kla1630mapform", selrecord, selschema);
+                                var fromyear = selrecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+                                if (fromyear !== null && fromyear.length >= 3) {
+                                    fromyear = fromyear[2];
+                                } else {
+                                    fromyear = selrecord.fromyear;
+                                }
+                                var toyear = selrecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+                                if (toyear !== null && toyear.length >= 3) {
+                                    toyear = toyear[2];
+                                } else {
+                                    toyear = selrecord.toyear;
+                                }
+                                var von = parseInt(fromyear);
+                                if (toyear.length === 0) {
+                                    toyear = new Date().getFullYear();
+                                }
+                                var bis = parseInt(toyear);
+                                var step = parseInt(selrecord.stepyear || "30");
+                                var years = "";
+                                for (var istep = von; istep <= bis; istep += step) {
+                                    if (years.length > 0) years += ",";
+                                    years += "" + istep;
+                                }
+                                $('.kla1630mapbut4').hide();
+                                var jqxhr = $.ajax({
+                                    method: "GET",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("transhyde"),
+                                    data: {
+                                        lats: false,
+                                        selyears: years,
+                                        selvars: "popc,rurc,urb,uopp"
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    sysbase.checkSessionLogin(r1);
+                                    $('.kla1630mapbut4').show();
+                                    var ret = JSON.parse(r1);
+                                    sysbase.putMessage(ret.message, 1);
+                                    if (ret.error === true) {
+                                        return;
+                                    } else {
+                                        return
+                                    }
+                                }).fail(function (err) {
+                                    sysbase.putMessage(err, 1);
+                                    $('.kla1630mapbut4').show();
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
+
+                            }
+                        }))
+
+
+                        .append($("<button/>", {
+                            html: "HYDE global",
+                            class: "kla1630mapbut5",
+                            css: {
+                                margin: 10
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var thisbutton = this;
+                                // hier Liste der Jahre berechnen
+                                uientry.fromUI2Record("#kla1630mapform", selrecord, selschema);
+                                $('.kla1630mapbut4').hide();
+                                $('.kla1630mapbut5').hide();
+                                var jqxhr = $.ajax({
+                                    method: "GET",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("transhyde"),
+                                    data: {
+                                        fullname: "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy\\general_files",
+                                        lats: false,
+                                        globals: true
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    sysbase.checkSessionLogin(r1);
+                                    $('.kla1630mapbut4').show();
+                                    $('.kla1630mapbut5').show();
+                                    var ret = JSON.parse(r1);
+                                    sysbase.putMessage(ret.message, 1);
+                                    if (ret.error === true) {
+                                        return;
+                                    } else {
+                                        return
+                                    }
+                                }).fail(function (err) {
+                                    sysbase.putMessage(err, 1);
+                                    $('.kla1630mapbut4').show();
+                                    $('.kla1630mapbut5').show();
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
+
+                            }
+                        }))
+
+
+
 
 
                     );
