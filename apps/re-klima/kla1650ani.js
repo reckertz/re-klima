@@ -30,6 +30,7 @@
     var aktvariablename;
     var selrecord = {};
     var titlerecord = {};
+    var sqlStmt;
     var stations = {};
     var stationarray = [];
     var worldmap = {};
@@ -244,7 +245,7 @@
                     class: "col1of2",
                     css: {
                         height: h - 3,
-                        width: "75%",
+                        width: "70%",
                         overflow: "auto"
                     }
                 })
@@ -305,7 +306,7 @@
                 class: "col2of2",
                 css: {
                     height: h - 3,
-                    width: "24%",
+                    width: "29%",
                     overflow: "auto"
                 }
             }));
@@ -554,69 +555,12 @@
                                 var thisbutton = this;
                                 $("#kla1650anibuttons").hide();
                                 $("body").css("cursor", "progress");
-                                kla1650ani.animate(function (ret) {
+                                kla1650ani.prepanimate(function (ret) {
                                     $("body").css("cursor", "default");
                                     $("#kla1650anibuttons").show();
                                 });
                             }
                         }))
-
-                        .append($("<button/>", {
-                            html: "Animation mit gif-Sicherung",
-                            class: "kla1650anibut2",
-                            css: {
-                                "margin": "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var thisbutton = this;
-                                $("#kla1650anibuttons").hide();
-                                $("body").css("cursor", "progress");
-                                kla1650ani.animate(function (ret) {
-                                    $("body").css("cursor", "default");
-                                    $("#kla1650anibuttons").show();
-                                });
-                            }
-                        }))
-
-
-                        .append($("<button/>", {
-                            html: "Kompakt",
-                            class: "kla1650anibut3",
-                            css: {
-                                margin: 10
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var thisbutton = this;
-                                $("#kla1650anibuttons").hide();
-                                $("body").css("cursor", "progress");
-                                kla1650ani.animate(function (ret) {
-                                    $("#kla1650anibuttons").show();
-                                    $("body").css("cursor", "default");
-                                });
-                            }
-                        }))
-
-                        .append($("<button/>", {
-                            html: "Spezial",
-                            class: "kla1650anibut3",
-                            css: {
-                                margin: 10
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var thisbutton = this;
-                                $("#kla1650anibuttons").hide();
-                                $("body").css("cursor", "progress");
-
-                                kla1650ani.animate(function (ret) {
-                                    $("#kla1650anibuttons").show();
-                                    $("body").css("cursor", "default");
-                                });
-                            }
-                        }))
-
 
 
                         .append($("<button/>", {
@@ -731,11 +675,6 @@
                                 });
                             }
                         }))
-
-
-
-
-
                     );
             }
             cb1630A({
@@ -985,13 +924,13 @@
 
 
     /**
-     * animate - animierte Anzeige und optional gif-Ausgabe
+     * prepanimate - animierte Anzeige und optional gif-Ausgabe
      * setzt gif-Sicherung in Gang
      *  - Animation durchführen bei true, sonst nur Endergebnis zeigen
      * aber blau für aktive Stationen und rot für erloschene Stationen
      * mit selrecord.animatedgif als Indiktor
      */
-    kla1650ani.animate = function (cb1630B) {
+    kla1650ani.prepanimate = function (cb1630B) {
 
         if (typeof selrecord === "undefined" || typeof selrecord.source === "undefined") {
             sysbase.putMessage("Animation nur mit Selektionsvorgabe");
@@ -1001,7 +940,7 @@
 
         var sel = {};
         var table = "KLISTATIONS";
-        var sqlStmt = "";
+        sqlStmt = "";
         var where = "";
 
         sqlStmt += "SELECT ";
@@ -1034,8 +973,15 @@
             var fromyear = selrecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
             if (fromyear !== null && fromyear.length >= 3) {
                 if (where.length > 0) where += " AND ";
-                where += " KLIINVENTORY.toyear " + ">=" + parseInt(fromyear[2]);
-                selrecord.fromyear = fromyear[2];
+                if (typeof fromyear[1] !== "undefined") {
+                    where += " KLIINVENTORY.fromyear " + fromyear[1] + parseInt(fromyear[2]);
+                } else {
+                    where += " KLIINVENTORY.fromyear " + ">=" + parseInt(fromyear[2]);
+                }
+                if (typeof fromyear[3] !== "undefined" && typeof fromyear[4] !== "undefined" && fromyear[3] === "-") {
+                    where += " AND ";
+                    where += " KLIINVENTORY.fromyear " + "<=" + parseInt(fromyear[4]);
+                }
             } else {
                 cb1630B({
                     error: true,
@@ -1048,8 +994,15 @@
             var toyear = selrecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
             if (toyear !== null && toyear.length >= 3) {
                 if (where.length > 0) where += " AND ";
-                where += " KLIINVENTORY.fromyear " + "<=" + parseInt(toyear[2]);
-                selrecord.toyear = toyear[2];
+                if (typeof toyear[1] !== "undefined") {
+                    where += " KLIINVENTORY.toyear " + toyear[1] + parseInt(toyear[2]);
+                } else {
+                    where += " KLIINVENTORY.toyear " + ">=" + parseInt(toyear[2]);
+                }
+                if (typeof toyear[3] !== "undefined" && typeof toyear[4] !== "undefined" && toyear[3] === "-") {
+                    where += " AND ";
+                    where += " KLIINVENTORY.toyear " + "<=" + parseInt(toyear[4]);
+                }
             } else {
                 cb1630B({
                     error: true,
@@ -1058,11 +1011,6 @@
                 return;
             }
         }
-
-
-
-
-
         where += ")";
         where += " AND KLISTATIONS.source = '" + selrecord.source + "'";
         where += " AND KLIINVENTORY.variable = '" + selrecord.variablename + "'";
@@ -1099,30 +1047,345 @@
                 where += ")";
             }
         }
-
         sqlStmt += " WHERE " + where;
         sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-        async.waterfall([
-                function (cb1630B0) {
-                    // ret1.selrecord und ret1.pearls müssen weitergegeben werden - oder das geht nach oben
-                    if (selrecord.animatedgif === true) {
-                        gif = new GIF({
-                            workers: 2,
-                            quality: 10
-                        });
+        if (selrecord.animatedgif === true) {
+            kla1650ani.getTitlePageData(selrecord, selschema, function (ret) {
+                if (ret.error === true) {
+                    cb1630B("error", ret);
+                    return;
+                } else {
+                    // hier execution i.e.S.
+                    cb1630B(null, ret);
+                    return;
+                }
+            });
+        } else {
+            // hier execution i.e.S.
+            kla1650ani.animate(function (ret) {
+                cb1630B(null, ret);
+                return;
+            });
+        }
+    };
+
+
+    kla1650ani.getTitlePageData = function (selrecord, selschema, cb1650F0) {
+        var username = uihelper.getUsername();
+        var titleschema = {
+            entryschema: {
+                props: {
+                    title: "Titelerfassung",
+                    description: "",
+                    type: "object", // currency, integer, datum, text, key, object
+                    class: "uiefieldset",
+                    properties: {
+                        projectid: {
+                            title: "Projektkürzel",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            default: "",
+                            width: "50px",
+                            io: "i"
+                        },
+                        headertitle: {
+                            title: "Titel",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            default: "",
+                            width: "50px",
+                            io: "i"
+                        },
+                        subtitle: {
+                            title: "Untertitel",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            default: "",
+                            width: "100px",
+                            io: "i"
+                        },
+                        selection: {
+                            title: "Selektion",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            default: "",
+                            width: "100px",
+                            io: "o"
+                        },
+                        comment: {
+                            title: "Kommentar",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uiearea",
+                            rows: 8,
+                            cols: 50,
+                            default: "",
+                            io: "i"
+                        },
+                        delay: {
+                            title: "Spezielle Verzögerung",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            default: "",
+                            io: "i"
+                        }
                     }
+                }
+            }
+        };
+        titlerecord = {};
+        titlerecord.projectid = "Studie 4711";
+        titlerecord.headertitle = "Test-Inhalt Headertitle";
+        titlerecord.subtitle = "Test-Inhalt Subtitle";
+        /*
+         source, variablename, climatezone, continent, region, anzyears, fromyear, toyear, stepyear, height,
+        */
+        titlerecord.selection = "";
+        titlerecord.selection += " Source:" + selrecord.source;
+        titlerecord.selection += " Variable:" + selrecord.variablename;
+        titlerecord.selection += " Klimazone:" + selrecord.climatezone;
+        titlerecord.selection += " Kontinentalzone:" + selrecord.continent;
+        titlerecord.selection += " Region:" + selrecord.region;
+        titlerecord.selection += " Anzahl Jahre:" + selrecord.anzyears;
+        titlerecord.selection += " Von Jahr:" + selrecord.fromyear;
+        titlerecord.selection += " Bis Jahr:" + selrecord.toyear;
+        titlerecord.selection += " Jahresintervalle:" + selrecord.stepyear;
+        titlerecord.selection += " Höhe üdM:" + selrecord.height;
+
+        titlerecord.comment = "Dies ist eine langer Kommentartext";
+        titlerecord.comment += "\nDies ist eine langer Kommentartext";
+        titlerecord.comment += "\nDies ist eine langer Kommentartext";
+        var anchorHash = "#kla1650ani";
+        var title = "";
+        var pos = {
+            left: Math.round($(".col1of2").width() * 0.2),
+            top: Math.round($(".col1of2").height() * 0.15),
+            width: $(".col1of2").width() / 2,
+            height: Math.round($(".col1of2").height() * 0.75)
+        };
+        //Math.ceil($(this).offset().top + $(this).height() + 20)
+        $(document).on("click", ".optionCancel", function (evt, extraParam) {
+            evt.preventDefault();
+            $("#kla1650anibuttons").show();
+            cb1650F0({
+                error: true,
+                message: "Popup abgebrochen"
+            });
+            return;
+        });
+        $(document).on("popupok", function (evt, extraParam) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            evt.stopImmediatePropagation();
+            var titleParam = JSON.parse(extraParam); // Satzstruktur!
+            titlerecord = titleParam.props;
+            kla1650ani.animate(function (ret) {
+                cb1650F0(ret);
+                return;
+            });
+        });
+        uientry.inputDialogX(anchorHash, pos, title, titleschema, titlerecord, function (ret1) {
+            if (ret1.error === false) {
+                sysbase.putMessage("Erfassungsdialog ist ausgegeben worden", 1);
+            } else {
+                $('.kla1650anibut1').prop('disabled', false);
+                $('.kla1650anibut2').prop('disabled', false);
+                $('.kla1650anibut1').show();
+                $('.kla1650anibut2').show();
+                cb1650F0({
+                    error: true,
+                    message: "Der Dialog wurde nicht aufgebaut:" + ret1.message
+                });
+            }
+        });
+    };
+
+
+
+    kla1650ani.animate = function (cb1630B0) {
+        // ret1.selrecord und ret1.pearls müssen weitergegeben werden - oder das geht nach oben
+        if (selrecord.animatedgif === true) {
+            gif = new GIF({
+                workers: 2,
+                quality: 10
+            });
+        }
+        async.waterfall([
+                function (cb1650F2) {
+                    /**
+                     * Ausgabe der Titelseite
+                     */
+                    titlerecord.delay = titlerecord.delay || 3000;
+                    kla1650ani.prepMap({});
+                    // Textboxen ausgeben
+                    var svgs = document.getElementsByTagName('svg');
+                    var svg = document.getElementsByTagName('svg')[0];
+                    $(svg).css({
+                        "background-color": "lightsteelblue"
+                    });
+                    var svgw = svg.getAttribute('viewBox').split(" ")[2];
+
+                    var randi = "T" + Math.floor(Math.random() * 100000) + 1;
+                    var ypegel;
+                    var svgtext1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext1.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext1.setAttributeNS(null, 'y', '50');
+                    svgtext1.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext1.setAttributeNS(null, 'font-size', '40');
+                    svgtext1.setAttributeNS(null, 'fill', 'white');
+                    svgtext1.setAttributeNS(null, 'id', 'hdr1' + randi);
+                    svgtext1.setAttributeNS(null, 'name', "header");
+                    svgtext1.textContent = titlerecord.headertitle;
+                    svg.appendChild(svgtext1);
+                    var tl = svgtext1.textLength.baseVal.value;
+                    var dx = (svgw - tl) / 2;
+                    svgtext1.setAttributeNS(null, 'dx', dx);
+                    ypegel = 100;
+
+                    var svgtext2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext2.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext2.setAttributeNS(null, 'y', ypegel);
+                    svgtext2.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext2.setAttributeNS(null, 'font-size', '30');
+                    svgtext2.setAttributeNS(null, 'fill', 'white');
+                    svgtext2.setAttributeNS(null, 'id', 'hdr2' + randi);
+                    svgtext2.setAttributeNS(null, 'name', "subheader");
+                    svgtext2.textContent = titlerecord.subtitle;
+                    svg.appendChild(svgtext2);
+                    tl = svgtext2.textLength.baseVal.value;
+                    dx = (svgw - tl) / 2;
+                    svgtext2.setAttributeNS(null, 'dx', dx);
+                    ypegel += 35;
+
+                    var svgtext2a = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext2a.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext2a.setAttributeNS(null, 'y', ypegel);
+                    svgtext2a.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext2a.setAttributeNS(null, 'font-size', '30');
+                    svgtext2a.setAttributeNS(null, 'fill', 'white');
+                    svgtext2a.setAttributeNS(null, 'id', 'hdr3' + randi);
+                    svgtext2a.setAttributeNS(null, 'name', "projectid");
+                    svgtext2a.textContent = titlerecord.projectid;
+                    svg.appendChild(svgtext2a);
+                    tl = svgtext2a.textLength.baseVal.value;
+                    dx = (svgw - tl) / 2;
+                    svgtext2a.setAttributeNS(null, 'dx', dx);
+                    ypegel += 20;
+                    dx = svgw * 0.20;
+                    /**
+                     * hier ist ein Zeilenvorschub notwendig
+                     */
+                    var seltext = kla1650ani.svg_textMultiline(svg, {
+                        id: 'hdr4' + randi,
+                        name: "selection",
+                        width: svgw * 0.7,
+                        x: 0,
+                        y: ypegel + 14,
+                        fontSize: 10,
+                        dx: dx,
+                        dy: 12
+                    }, titlerecord.selection);
+
+                    var metrics = seltext.getBoundingClientRect();
+                    var mheight = metrics.height;
+                    ypegel += mheight;
+                    var comtext = kla1650ani.svg_textMultiline(svg, {
+                        id: 'hdr5' + randi,
+                        name: "comment",
+                        width: svgw * 0.6,
+                        x: 0,
+                        y: ypegel + 14,
+                        fontSize: 10,
+                        dx: dx,
+                        dy: 12
+                    }, titlerecord.comment);
+                    var metrics1 = seltext.getBoundingClientRect();
+                    var mheight1 = metrics1.height;
+                    ypegel += mheight1 + 10;
+
+                    var svgtext6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    svgtext6.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
+                    svgtext6.setAttributeNS(null, 'y', ypegel + 14);
+                    svgtext6.setAttributeNS(null, 'width', svgw * 0.7);
+                    svgtext6.setAttributeNS(null, 'font-size', '12');
+                    svgtext6.setAttributeNS(null, 'fill', 'white');
+                    svgtext6.setAttributeNS(null, 'id', 'hdr6' + randi);
+                    svgtext6.setAttributeNS(null, 'name', "selrecord");
+
+                    svgtext6.textContent = JSON.stringify(selrecord);
+                    svg.appendChild(svgtext6);
+                    dx = svgw * 0.15;
+                    svgtext6.setAttributeNS(null, 'dx', dx);
+
+                    /**
+                     * Ausgabe des gif mit den Titeldaten
+                     */
+                    var img = new Image();
+                    var svghtml = (new XMLSerializer()).serializeToString(document.querySelector('svg'));
+                    var url = "data:image/svg+xml," + encodeURIComponent(svghtml);
+                    // Onload, callback to move on to next frame
                     if (selrecord.animatedgif === true) {
-                        kla1650ani.getTitlePageData(true, selrecord, selschema, function (ret) {
-                            cb1630B0(null, ret);
+                        img.onload = function () {
+                            gif.addFrame(img, {
+                                delay: titlerecord.delay,
+                                copy: true
+                            });
+                            cb1650F2(null, {
+                                error: false,
+                                message: "Header-Image ausgegeben",
+                                image: img,
+                                svghtml: svghtml
+                            });
                             return;
-                        });
+                        };
+                        img.src = url;
                     } else {
-                        cb1630B0(null, {
+                        cb1650F2(null, {
                             error: false,
-                            message: "OK"
+                            message: "Header-Image skipped"
                         });
                         return;
                     }
+                },
+                function (ret, cb1650F3) {
+                    if (selrecord.animatedgif !== true || selrecord.savesvgs !== true) {
+                        cb1650F3(null, {
+                            error: false,
+                            message: "Header-svg-File skipped"
+                        });
+                        return;
+                    }
+                    var filename = titlerecord.projectid + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg";
+                    var jqxhr = $.ajax({
+                        method: "POST",
+                        crossDomain: false,
+                        url: sysbase.getServer("getbackasfile"),
+                        data: {
+                            largestring: ret.svghtml, // $("#heatpic").find("img").attr("src")  //    'data:image/gif;base64,' + encode64(encoder.stream().getData()),
+                            filename: filename
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        sysbase.checkSessionLogin(r1);
+                        var ret = JSON.parse(r1);
+                        sysbase.putMessage(ret.message, 1);
+                        if (ret.error === true) {
+                            cb1650F3("error", {
+                                error: ret.error,
+                                message: ret.message
+                            });
+                            return;
+                        } else {
+                            cb1650F3(null, ret);
+                        }
+                    }).fail(function (err) {
+                        sysbase.putMessage(err, 1);
+                        cb1650F3("error", {
+                            error: true,
+                            message: "Daten NICHT bereitgestellt:" + err
+                        });
+                        return;
+                    }).always(function () {
+                        // nope
+                    });
                 },
                 function (ret, cb1630B1) {
                     var skip = 0;
@@ -1134,6 +1397,7 @@
                     uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
                         if (ret.error === true) {
                             sysbase.putMessage("Error:" + ret.message, 3);
+                            $("#kla1650anibuttons").show();
                             cb1630B1("error", {
                                 error: true,
                                 message: ret.message
@@ -1234,7 +1498,8 @@
                 }
             ],
             function (error, ret) {
-                cb1630B(ret);
+                $("#kla1650anibuttons").show();
+                cb1630B0(ret);
                 return;
             });
     };
@@ -1258,7 +1523,6 @@
         var svgnested;
         var svg;
         try {
-
             var loopyears = [];
             var fromyear = parseInt(selrecord.fromyear);
             var toyear = parseInt(selrecord.toyear);
@@ -1575,21 +1839,76 @@
                     if (selrecord.animatedgif === true) {
                         gif.on('finished', function (blob) {
                             try {
-                                var winurl = URL.createObjectURL(blob);
-                                var win = window.open(winurl, "_blank");
-                                if (typeof win !== "undefined" && win !== null) {
-                                    win.focus();
-                                } else {
-                                    alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
-                                }
-                                // deleteGroup funktioniert, war nur Test
-                                // svgspark02.deleteGroup("mygroup", svg);
-                                console.log("Animierte worldmap fertiggestellt");
-                                cb1630C({
-                                    error: false,
-                                    message: "Animierte worldmap fertiggestellt"
-                                });
-                                return;
+                                async.waterfall([
+                                        function (cb1650G1) {
+                                            var winurl = URL.createObjectURL(blob);
+                                            var win = window.open(winurl, "_blank");
+                                            if (typeof win !== "undefined" && win !== null) {
+                                                win.focus();
+                                            } else {
+                                                alert("Popup wird geblockt, daher keine Anzeige des animierten Gif");
+                                            }
+                                            // deleteGroup funktioniert, war nur Test
+                                            // svgspark02.deleteGroup("mygroup", svg);
+                                            console.log("Animierte worldmap fertiggestellt");
+                                            cb1650G1(null, {
+                                                error: false,
+                                                message: "Animierte worldmap fertiggestellt",
+                                                winurl: winurl,
+                                                blob: blob
+                                            });
+                                            return;
+                                        },
+                                        function (ret, cb1650G2) {
+                                            /**
+                                             * upload des Images
+                                             */
+                                            var reader = new FileReader();
+                                            reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
+                                            reader.onload = function() {
+                                                var imagedata = reader.result; // data url
+                                                debugger;
+                                                var jqxhr = $.ajax({
+                                                    method: "POST",
+                                                    crossDomain: false,
+                                                    url: sysbase.getServer("saveBase64ToGif"),
+                                                    data: {
+                                                        imagedata: imagedata
+                                                    }
+                                                }).done(function (r1, textStatus, jqXHR) {
+                                                    sysbase.checkSessionLogin(r1);
+                                                    var ret = JSON.parse(r1);
+                                                    sysbase.putMessage(ret.message, 1);
+                                                    if (ret.error === true) {
+                                                        cb1650G2("error", {
+                                                            error: ret.error,
+                                                            message: ret.message
+                                                        });
+                                                        return;
+                                                    } else {
+                                                        cb1650G2(null, ret);
+                                                        return;
+                                                    }
+                                                }).fail(function (err) {
+                                                    sysbase.putMessage(err, 1);
+                                                    cb1650G2("error", {
+                                                        error: true,
+                                                        message: "Daten NICHT bereitgestellt:" + err
+                                                    });
+                                                    return;
+                                                }).always(function () {
+                                                    // nope
+                                                });
+                                            };
+                                        }
+                                    ],
+                                    function (error, ret) {
+                                        cb1630C({
+                                            error: ret.error,
+                                            message: ret.message
+                                        });
+                                        return;
+                                    });
                             } catch (err) {
                                 console.log("Aninmierte worldmap Error-1:" + err);
                                 cb1630C({
@@ -1629,318 +1948,7 @@
     };
 
 
-    kla1650ani.getTitlePageData = function (clearmap, selrecord, selschema, cb1650F0) {
 
-        async.waterfall([
-                function (cb1650F1) {
-                    /**
-                     * Popup Prompt zur Bestätigung der kompletten Übernahme
-                     * kla1400rawfullname -  $("#kla1400rawfullname").text();
-                     */
-                    var username = uihelper.getUsername();
-                    var titleschema = {
-                        entryschema: {
-                            props: {
-                                title: "Titelerfassung",
-                                description: "",
-                                type: "object", // currency, integer, datum, text, key, object
-                                class: "uiefieldset",
-                                properties: {
-                                    projectid: {
-                                        title: "Projektkürzel",
-                                        type: "string", // currency, integer, datum, text, key
-                                        class: "uietext",
-                                        default: "",
-                                        width: "50px",
-                                        io: "i"
-                                    },
-                                    headertitle: {
-                                        title: "Titel",
-                                        type: "string", // currency, integer, datum, text, key
-                                        class: "uietext",
-                                        default: "",
-                                        width: "50px",
-                                        io: "i"
-                                    },
-                                    subtitle: {
-                                        title: "Untertitel",
-                                        type: "string", // currency, integer, datum, text, key
-                                        class: "uietext",
-                                        default: "",
-                                        width: "100px",
-                                        io: "i"
-                                    },
-                                    selection: {
-                                        title: "Selektion",
-                                        type: "string", // currency, integer, datum, text, key
-                                        class: "uietext",
-                                        default: "",
-                                        width: "100px",
-                                        io: "o"
-                                    },
-                                    comment: {
-                                        title: "Kommentar",
-                                        type: "string", // currency, integer, datum, text, key
-                                        class: "uiearea",
-                                        rows: 8,
-                                        cols: 50,
-                                        default: "",
-                                        io: "i"
-                                    },
-                                    delay: {
-                                        title: "Spezielle Verzögerung",
-                                        type: "string", // currency, integer, datum, text, key
-                                        class: "uietext",
-                                        default: "",
-                                        io: "i"
-                                    }
-                                }
-                            }
-                        }
-                    };
-                    titlerecord = {};
-                    titlerecord.projectid = "Studie 4711";
-                    titlerecord.headertitle = "Test-Inhalt Headertitle";
-                    titlerecord.subtitle = "Test-Inhalt Subtitle";
-                    /*
-                     source, variablename, climatezone, continent, region, anzyears, fromyear, toyear, stepyear, height,
-                    */
-                    titlerecord.selection = "";
-                    titlerecord.selection += " Source:" + selrecord.source;
-                    titlerecord.selection += " Variable:" + selrecord.variablename;
-                    titlerecord.selection += " Klimazone:" + selrecord.climatezone;
-                    titlerecord.selection += " Kontinentalzone:" + selrecord.continent;
-                    titlerecord.selection += " Region:" + selrecord.region;
-                    titlerecord.selection += " Anzahl Jahre:" + selrecord.anzyears;
-                    titlerecord.selection += " Von Jahr:" + selrecord.fromyear;
-                    titlerecord.selection += " Bis Jahr:" + selrecord.toyear;
-                    titlerecord.selection += " Jahresintervalle:" + selrecord.stepyear;
-                    titlerecord.selection += " Höhe üdM:" + selrecord.height;
-
-                    titlerecord.comment = "Dies ist eine langer Kommentartext";
-                    titlerecord.comment += "\nDies ist eine langer Kommentartext";
-                    titlerecord.comment += "\nDies ist eine langer Kommentartext";
-                    var anchorHash = "#kla1650ani";
-                    var title = "";
-                    var pos = {
-                        left: Math.round($(".col1of2").width() * 0.2),
-                        top: Math.round($(".col1of2").height() * 0.15),
-                        width: $(".col1of2").width() / 2,
-                        height: Math.round($(".col1of2").height() * 0.75)
-                    };
-                    //Math.ceil($(this).offset().top + $(this).height() + 20)
-                    $(document).on('popupcancel', function (evt, extraParam) {
-                        evt.preventDefault();
-                        $('.kla1650anibut1').prop('disabled', false);
-                        $('.kla1650anibut2').prop('disabled', false);
-                        $('.kla1650anibut1').show();
-                        $('.kla1650anibut2').show();
-                        cb1650F1("error", {
-                            error: true,
-                            message: "Popup abgebrochen"
-                        });
-                        return;
-                    });
-                    $(document).on('popupok', function (evt, extraParam) {
-                        evt.preventDefault();
-                        evt.stopPropagation();
-                        evt.stopImmediatePropagation();
-                        var titleParam = JSON.parse(extraParam); // Satzstruktur!
-                        titlerecord = titleParam.props;
-                        cb1650F1(null, {
-                            error: false,
-                            message: "Popup erfasst"
-                        });
-                        return;
-                    });
-                    uientry.inputDialogX(anchorHash, pos, title, titleschema, titlerecord, function (ret1) {
-                        if (ret1.error === false) {
-                            sysbase.putMessage("Erfassungsdialog ist ausgegeben worden", 1);
-                        } else {
-                            $('.kla1650anibut1').prop('disabled', false);
-                            $('.kla1650anibut2').prop('disabled', false);
-                            $('.kla1650anibut1').show();
-                            $('.kla1650anibut2').show();
-                            cb1650F1("error", {
-                                error: true,
-                                message: "Der Dialog wurde nicht aufgebaut:" + ret1.message
-                            });
-                        }
-                    });
-                },
-                function (ret, cb1650F2) {
-                    /**
-                     * Ausgabe der Titelseite
-                     */
-                    titlerecord.delay = titlerecord.delay || 3000;
-                    if (clearmap === true) {
-                        kla1650ani.prepMap({});
-                    }
-                    // Textboxen ausgeben
-                    var svgs = document.getElementsByTagName('svg');
-                    var svg = document.getElementsByTagName('svg')[0];
-                    $(svg).css({
-                        "background-color": "lightsteelblue"
-                    });
-                    var svgw = svg.getAttribute('viewBox').split(" ")[2];
-
-                    var randi = "T" + Math.floor(Math.random() * 100000) + 1;
-                    var ypegel;
-                    var svgtext1 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    svgtext1.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
-                    svgtext1.setAttributeNS(null, 'y', '50');
-                    svgtext1.setAttributeNS(null, 'width', svgw * 0.7);
-                    svgtext1.setAttributeNS(null, 'font-size', '40');
-                    svgtext1.setAttributeNS(null, 'fill', 'white');
-                    svgtext1.setAttributeNS(null, 'id', 'hdr1' + randi);
-                    svgtext1.setAttributeNS(null, 'name', "header");
-                    svgtext1.textContent = titlerecord.headertitle;
-                    svg.appendChild(svgtext1);
-                    var tl = svgtext1.textLength.baseVal.value;
-                    var dx = (svgw - tl) / 2;
-                    svgtext1.setAttributeNS(null, 'dx', dx);
-                    ypegel = 100;
-
-                    var svgtext2 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    svgtext2.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
-                    svgtext2.setAttributeNS(null, 'y', ypegel);
-                    svgtext2.setAttributeNS(null, 'width', svgw * 0.7);
-                    svgtext2.setAttributeNS(null, 'font-size', '30');
-                    svgtext2.setAttributeNS(null, 'fill', 'white');
-                    svgtext2.setAttributeNS(null, 'id', 'hdr2' + randi);
-                    svgtext2.setAttributeNS(null, 'name', "subheader");
-                    svgtext2.textContent = titlerecord.subtitle;
-                    svg.appendChild(svgtext2);
-                    tl = svgtext2.textLength.baseVal.value;
-                    dx = (svgw - tl) / 2;
-                    svgtext2.setAttributeNS(null, 'dx', dx);
-                    ypegel += 35;
-
-                    var svgtext2a = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    svgtext2a.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
-                    svgtext2a.setAttributeNS(null, 'y', ypegel);
-                    svgtext2a.setAttributeNS(null, 'width', svgw * 0.7);
-                    svgtext2a.setAttributeNS(null, 'font-size', '30');
-                    svgtext2a.setAttributeNS(null, 'fill', 'white');
-                    svgtext2a.setAttributeNS(null, 'id', 'hdr3' + randi);
-                    svgtext2a.setAttributeNS(null, 'name', "projectid");
-                    svgtext2a.textContent = titlerecord.projectid;
-                    svg.appendChild(svgtext2a);
-                    tl = svgtext2a.textLength.baseVal.value;
-                    dx = (svgw - tl) / 2;
-                    svgtext2a.setAttributeNS(null, 'dx', dx);
-                    ypegel += 20;
-                    dx = svgw * 0.20;
-                    /**
-                     * hier ist ein Zeilenvorschub notwendig
-                     */
-                    var seltext = kla1650ani.svg_textMultiline(svg, {
-                        id: 'hdr4' + randi,
-                        name: "selection",
-                        width: svgw * 0.7,
-                        x: 0,
-                        y: ypegel + 14,
-                        fontSize: 10,
-                        dx: dx,
-                        dy: 12
-                    }, titlerecord.selection);
-
-                    var metrics = seltext.getBoundingClientRect();
-                    var mheight = metrics.height;
-                    ypegel += mheight;
-                    var comtext = kla1650ani.svg_textMultiline(svg, {
-                        id: 'hdr5' + randi,
-                        name: "comment",
-                        width: svgw * 0.6,
-                        x: 0,
-                        y: ypegel + 14,
-                        fontSize: 10,
-                        dx: dx,
-                        dy: 12
-                    }, titlerecord.comment);
-                    var metrics1 = seltext.getBoundingClientRect();
-                    var mheight1 = metrics1.height;
-                    ypegel += mheight1 + 10;
-
-                    var svgtext6 = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                    svgtext6.setAttributeNS(null, 'x', 0); // damit die dx-Rechnung stimmt
-                    svgtext6.setAttributeNS(null, 'y', ypegel + 14);
-                    svgtext6.setAttributeNS(null, 'width', svgw * 0.7);
-                    svgtext6.setAttributeNS(null, 'font-size', '12');
-                    svgtext6.setAttributeNS(null, 'fill', 'white');
-                    svgtext6.setAttributeNS(null, 'id', 'hdr6' + randi);
-                    svgtext6.setAttributeNS(null, 'name', "selrecord");
-
-                    svgtext6.textContent = JSON.stringify(selrecord);
-                    svg.appendChild(svgtext6);
-                    dx = svgw * 0.15;
-                    svgtext6.setAttributeNS(null, 'dx', dx);
-
-                    /**
-                     * Ausgabe des gif mit den Titeldaten
-                     */
-                    var img = new Image();
-                    var svghtml = (new XMLSerializer()).serializeToString(document.querySelector('svg'));
-                    var url = "data:image/svg+xml," + encodeURIComponent(svghtml);
-                    // Onload, callback to move on to next frame
-                    img.onload = function () {
-                        gif.addFrame(img, {
-                            delay: titlerecord.delay,
-                            copy: true
-                        });
-                        cb1650F2(null, {
-                            error: false,
-                            message: "Header-Image ausgegeben",
-                            image: img,
-                            svghtml: svghtml
-                        });
-                        return;
-                    };
-                    img.src = url;
-                },
-                function (ret, cb1650F3) {
-                    var filename = titlerecord.projectid + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg";
-                    var jqxhr = $.ajax({
-                        method: "POST",
-                        crossDomain: false,
-                        url: sysbase.getServer("getbackasfile"),
-                        data: {
-                            largestring: ret.svghtml, // $("#heatpic").find("img").attr("src")  //    'data:image/gif;base64,' + encode64(encoder.stream().getData()),
-                            filename: filename
-                        }
-                    }).done(function (r1, textStatus, jqXHR) {
-                        sysbase.checkSessionLogin(r1);
-                        var ret = JSON.parse(r1);
-                        sysbase.putMessage(ret.message, 1);
-                        if (ret.error === true) {
-                            cb1650F3("error", {
-                                error: ret.error,
-                                message: ret.message
-                            });
-                            return;
-                        } else {
-                            cb1650F3(null, ret);
-                        }
-                    }).fail(function (err) {
-                        sysbase.putMessage(err, 1);
-                        cb1650F3("error", {
-                            error: true,
-                            message: "Daten NICHT bereitgestellt:" + err
-                        });
-                        return;
-                    }).always(function () {
-                        // nope
-                    });
-                }
-            ],
-            function (error, ret1) {
-                sysbase.putMessage("Headertitle fertig:" + ret1.message, 1);
-                cb1650F0({
-                    error: ret1.error,
-                    message: ret1.message
-                });
-            });
-    };
 
     /**
      * Text-Wrappig für svg

@@ -2621,8 +2621,6 @@
 
 
 
-
-
     /**
      * standardisierte Mimik zur Integration mit App, Browser und node.js
      */
