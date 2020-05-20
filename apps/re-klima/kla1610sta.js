@@ -285,6 +285,17 @@
                         }
                     })
                     .append($("<ul/>")
+
+
+                    .append($("<li/>", {
+                        class: "dropdown-menuepoint",
+                        html: "HTML-Tabelle download",
+                        click: function (evt) {
+                            evt.preventDefault();
+                            uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt");
+                            return;
+                        }
+                    }))
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
                             html: "zurück",
@@ -383,6 +394,7 @@
                 uientry.init();
                 $("#kla1610staform")
                     .append($("<div/>", {
+                        id: "kla1610stabuttons",
                             css: {
                                 "text-align": "center",
                                 width: "100%"
@@ -406,7 +418,10 @@
                             html: "Liste",
                             click: function (evt) {
                                 evt.preventDefault();
-                                kla1610sta.getStations();
+                                $("#kla1610stabuttons").hide();
+                                kla1610sta.getStations(function(ret) {
+                                    $("#kla1610stabuttons").show();
+                                });
                             }
                         }))
 
@@ -962,7 +977,7 @@
     /**
      * Aufbau Filter und Listenausgaben zunächst einmal
      */
-    kla1610sta.getStations = function () {
+    kla1610sta.getStations = function (cb16100) {
         $("#kla1610stalist").empty();
         starecord = {};
         uientry.fromUI2Record("#kla1610staform", starecord, staschema);
@@ -1153,6 +1168,10 @@
             if (ret.error === true) {
                 // sollte nicht passieren??? oder auch hier anlegen
                 sysbase.putMessage("Error:" + ret.message, 3);
+                cb16100({
+                    error: true,
+                    message: ret.message
+                });
                 return;
             } else {
                 if (ret.records !== "undefined" && ret.records !== null) {
@@ -1314,8 +1333,17 @@
                         }
                     }); // so funktioniert es
                     sysbase.putMessage("Stations ausgegeben", 1);
+                    cb16100({
+                        error: false,
+                        message: "Stations ausgegeben"
+                    });
+                    return;
                 } else {
                     sysbase.putMessage("Keine Stations gefunden", 3);
+                    cb16100({
+                        error: true,
+                        message: "Keine Stations gefunden"
+                    });
                     return;
                 }
             }

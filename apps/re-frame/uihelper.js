@@ -1825,6 +1825,7 @@
     /**
      * Download einer HTML-Tabelle
      * @param {*} jQhtmltable entweder mit # als Verweis auf HTML-Table oder String als HTML-Table
+     * oder jquery-Object
      * @param {*} filename
      */
     uihelper.downloadHtmlTable = function (jQhtmltable, filename) {
@@ -1837,7 +1838,7 @@
         elHtml += "</head>";
         elHtml += "<body>";
         elHtml += "<table>";
-        if (jQhtmltable.startsWith("#")) {
+        if (typeof jQhtmltable === "object" || typeof jQhtmltable === "string" && jQhtmltable.startsWith("#")) {
             elHtml += $(jQhtmltable).html();
         } else {
             elHtml += jQhtmltable;

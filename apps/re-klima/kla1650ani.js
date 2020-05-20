@@ -73,7 +73,7 @@
         $("#kla1650ani")
             .append($("<input/>", {
                 type: "hidden",
-                id: "kla1630map_isdirty",
+                id: "kla1650ani_isdirty",
                 value: "false"
             }));
         $(".headerright").remove();
@@ -260,15 +260,15 @@
 
                     ))
                 .append($("<div/>", {
-                        id: "kla1630mapline"
+                        id: "kla1650aniline"
                     })
                     .append($("<span/>", {
-                        id: "kla1630mapspark",
+                        id: "kla1650anispark",
                         html: "&nbsp;"
                     }))
                     .append($("<br/>"))
                     .append($("<span/>", {
-                        id: "kla1630mapsres",
+                        id: "kla1650anisres",
                         html: "&nbsp;"
                     }))
                 )
@@ -282,13 +282,13 @@
                         click: function (evt) {
                             evt.preventDefault();
                             var thisbutton = this;
-                            $('.kla1630mapbut1').prop('disabled', true);
-                            $('.kla1630mapbut1').hide();
-                            $('.kla1630mapbut2').hide();
-                            kla1650ani.animate(false, true, function (ret) {
-                                $('.kla1630mapbut1').prop('disabled', false);
-                                $('.kla1630mapbut1').show();
-                                $('.kla1630mapbut2').show();
+                            $('.kla1650anibut1').prop('disabled', true);
+                            $('.kla1650anibut1').hide();
+                            $('.kla1650anibut2').hide();
+                            kla1650ani.animate(function (ret) {
+                                $('.kla1650anibut1').prop('disabled', false);
+                                $('.kla1650anibut1').show();
+                                $('.kla1650anibut2').show();
                             });
                         }
                     }))
@@ -464,24 +464,66 @@
                 class: "uietext",
                 default: "",
                 io: "i"
+            },
+            markred: {
+                title: "inaktiv rot markieren",
+                type: "string", // currency, integer, datum, text, key
+                class: "uiecheckbox",
+                /* width: "100px", */
+                io: "i"
+            },
+            animated: {
+                title: "animiert anzeigen",
+                type: "string", // currency, integer, datum, text, key
+                class: "uiecheckbox",
+                /* width: "100px", */
+                io: "i"
+            },
+            savesvgs: {
+                title: "svgs sichern",
+                type: "string", // currency, integer, datum, text, key
+                class: "uiecheckbox",
+                /* width: "100px", */
+                io: "i"
+            },
+            animatedgif: {
+                title: "animiertes Gif ausgeben",
+                type: "string", // currency, integer, datum, text, key
+                class: "uiecheckbox",
+                /* width: "100px", */
+                io: "i"
+            },
+            showspark: {
+                title: "Sparkline anzeigen",
+                type: "string", // currency, integer, datum, text, key
+                class: "uiecheckbox",
+                /* width: "100px", */
+                io: "i"
+            },
+            savetable: {
+                title: "HTML-Tabelle bereitstellen",
+                type: "string", // currency, integer, datum, text, key
+                class: "uiecheckbox",
+                /* width: "100px", */
+                io: "i"
             }
         }
     };
 
     kla1650ani.prepeditor = function (cb1630A) {
 
-        $("#kla1630mapwrapper").remove();
+        $("#kla1650aniwrapper").remove();
         $("#kla1650ani .col2of2")
             .append($("<div/>", {
-                    id: "kla1630mapwrapper",
+                    id: "kla1650aniwrapper",
                     width: "100%"
                 })
                 .append($("<form/>", {
-                    id: "kla1630mapform",
+                    id: "kla1650aniform",
                     class: "uieform"
                 }))
             );
-        uientry.getSchemaUI("kla1650ani", selschema, "kla1650ani", "kla1630mapform", function (ret) {
+        uientry.getSchemaUI("kla1650ani", selschema, "kla1650ani", "kla1650aniform", function (ret) {
             if (ret.error === false) {
                 if (typeof selrecord.source === "undefined") {
                     selrecord.source = "GHCND";
@@ -491,9 +533,10 @@
                     selrecord.anzyears = ">=150";
                     selrecord.fromyear = "2018";
                 }
-                uientry.fromRecord2UI("#kla1630mapform", selrecord, selschema);
+                uientry.fromRecord2UI("#kla1650aniform", selrecord, selschema);
                 $(".col2of2")
                     .append($("<div/>", {
+                            id: "kla1650anibuttons",
                             css: {
                                 width: "100%",
                                 float: "left"
@@ -502,44 +545,36 @@
 
                         .append($("<button/>", {
                             html: "Animation",
-                            class: "kla1630mapbut1",
+                            class: "kla1650anibut1",
                             css: {
                                 margin: 10
                             },
                             click: function (evt) {
                                 evt.preventDefault();
                                 var thisbutton = this;
-                                $('.kla1630mapbut1').prop('disabled', true);
-                                $('.kla1630mapbut1').hide();
-                                $('.kla1630mapbut2').hide();
-                                $('.kla1630mapbut3').hide();
-                                kla1650ani.animate(false, true, function (ret) {
-                                    $('.kla1630mapbut1').prop('disabled', false);
-                                    $('.kla1630mapbut1').show();
-                                    $('.kla1630mapbut2').show();
-                                    $('.kla1630mapbut3').show();
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
+                                kla1650ani.animate(function (ret) {
+                                    $("body").css("cursor", "default");
+                                    $("#kla1650anibuttons").show();
                                 });
                             }
                         }))
 
                         .append($("<button/>", {
                             html: "Animation mit gif-Sicherung",
-                            class: "kla1630mapbut2",
+                            class: "kla1650anibut2",
                             css: {
                                 "margin": "10px"
                             },
                             click: function (evt) {
                                 evt.preventDefault();
                                 var thisbutton = this;
-                                $('.kla1630mapbut2').prop('disabled', true);
-                                $('.kla1630mapbut1').hide();
-                                $('.kla1630mapbut2').hide();
-                                $('.kla1630mapbut3').hide();
-                                kla1650ani.animate(true, true, function (ret) {
-                                    $('.kla1630mapbut2').prop('disabled', false);
-                                    $('.kla1630mapbut1').show();
-                                    $('.kla1630mapbut2').show();
-                                    $('.kla1630mapbut3').show();
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
+                                kla1650ani.animate(function (ret) {
+                                    $("body").css("cursor", "default");
+                                    $("#kla1650anibuttons").show();
                                 });
                             }
                         }))
@@ -547,20 +582,37 @@
 
                         .append($("<button/>", {
                             html: "Kompakt",
-                            class: "kla1630mapbut3",
+                            class: "kla1650anibut3",
                             css: {
                                 margin: 10
                             },
                             click: function (evt) {
                                 evt.preventDefault();
                                 var thisbutton = this;
-                                $('.kla1630mapbut1').hide();
-                                $('.kla1630mapbut2').hide();
-                                $('.kla1630mapbut3').hide();
-                                kla1650ani.animate(false, false, function (ret) {
-                                    $('.kla1630mapbut1').show();
-                                    $('.kla1630mapbut2').show();
-                                    $('.kla1630mapbut3').show();
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
+                                kla1650ani.animate(function (ret) {
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
+                                });
+                            }
+                        }))
+
+                        .append($("<button/>", {
+                            html: "Spezial",
+                            class: "kla1650anibut3",
+                            css: {
+                                margin: 10
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var thisbutton = this;
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
+
+                                kla1650ani.animate(function (ret) {
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
                                 });
                             }
                         }))
@@ -569,7 +621,7 @@
 
                         .append($("<button/>", {
                             html: "HYDE laden",
-                            class: "kla1630mapbut4",
+                            class: "kla1650anibut4",
                             css: {
                                 margin: 10
                             },
@@ -577,7 +629,7 @@
                                 evt.preventDefault();
                                 var thisbutton = this;
                                 // hier Liste der Jahre berechnen
-                                uientry.fromUI2Record("#kla1630mapform", selrecord, selschema);
+                                uientry.fromUI2Record("#kla1650aniform", selrecord, selschema);
                                 var fromyear = selrecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
                                 if (fromyear !== null && fromyear.length >= 3) {
                                     fromyear = fromyear[2];
@@ -601,7 +653,8 @@
                                     if (years.length > 0) years += ",";
                                     years += "" + istep;
                                 }
-                                $('.kla1630mapbut4').hide();
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
                                 var jqxhr = $.ajax({
                                     method: "GET",
                                     crossDomain: false,
@@ -613,7 +666,8 @@
                                     }
                                 }).done(function (r1, textStatus, jqXHR) {
                                     sysbase.checkSessionLogin(r1);
-                                    $('.kla1630mapbut4').show();
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
                                     var ret = JSON.parse(r1);
                                     sysbase.putMessage(ret.message, 1);
                                     if (ret.error === true) {
@@ -623,7 +677,8 @@
                                     }
                                 }).fail(function (err) {
                                     sysbase.putMessage(err, 1);
-                                    $('.kla1630mapbut4').show();
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
                                     return;
                                 }).always(function () {
                                     // nope
@@ -635,7 +690,7 @@
 
                         .append($("<button/>", {
                             html: "HYDE global",
-                            class: "kla1630mapbut5",
+                            class: "kla1650anibut5",
                             css: {
                                 margin: 10
                             },
@@ -643,9 +698,9 @@
                                 evt.preventDefault();
                                 var thisbutton = this;
                                 // hier Liste der Jahre berechnen
-                                uientry.fromUI2Record("#kla1630mapform", selrecord, selschema);
-                                $('.kla1630mapbut4').hide();
-                                $('.kla1630mapbut5').hide();
+                                uientry.fromUI2Record("#kla1650aniform", selrecord, selschema);
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
                                 var jqxhr = $.ajax({
                                     method: "GET",
                                     crossDomain: false,
@@ -657,8 +712,8 @@
                                     }
                                 }).done(function (r1, textStatus, jqXHR) {
                                     sysbase.checkSessionLogin(r1);
-                                    $('.kla1630mapbut4').show();
-                                    $('.kla1630mapbut5').show();
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
                                     var ret = JSON.parse(r1);
                                     sysbase.putMessage(ret.message, 1);
                                     if (ret.error === true) {
@@ -668,13 +723,12 @@
                                     }
                                 }).fail(function (err) {
                                     sysbase.putMessage(err, 1);
-                                    $('.kla1630mapbut4').show();
-                                    $('.kla1630mapbut5').show();
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
                                     return;
                                 }).always(function () {
                                     // nope
                                 });
-
                             }
                         }))
 
@@ -702,7 +756,7 @@
             height: h - 100,
             overflow: "auto"
         });
-        $("#kla1630mapline").css({
+        $("#kla1650aniline").css({
             height: 99,
             overflow: "auto"
         });
@@ -932,21 +986,18 @@
 
     /**
      * animate - animierte Anzeige und optional gif-Ausgabe
-     * dogif === true setzt gif-Sicherung in Gang
-     * doloop - Animation durchführen bei true, sonst nur Endergebnis zeigen
+     * setzt gif-Sicherung in Gang
+     *  - Animation durchführen bei true, sonst nur Endergebnis zeigen
      * aber blau für aktive Stationen und rot für erloschene Stationen
-     * mit creategif als Indiktor
+     * mit selrecord.animatedgif als Indiktor
      */
-    kla1650ani.animate = function (dogif, doloop, cb1630B) {
-        var creategif = false;
-        if (typeof dogif !== "undefined" && dogif === true) {
-            creategif = true;
-        }
+    kla1650ani.animate = function (cb1630B) {
+
         if (typeof selrecord === "undefined" || typeof selrecord.source === "undefined") {
             sysbase.putMessage("Animation nur mit Selektionsvorgabe");
         }
 
-        uientry.fromUI2Record("#kla1630mapform", selrecord, selschema);
+        uientry.fromUI2Record("#kla1650aniform", selrecord, selschema);
 
         var sel = {};
         var table = "KLISTATIONS";
@@ -1054,13 +1105,13 @@
         async.waterfall([
                 function (cb1630B0) {
                     // ret1.selrecord und ret1.pearls müssen weitergegeben werden - oder das geht nach oben
-                    if (creategif === true) {
+                    if (selrecord.animatedgif === true) {
                         gif = new GIF({
                             workers: 2,
                             quality: 10
                         });
                     }
-                    if (creategif === true) {
+                    if (selrecord.animatedgif === true) {
                         kla1650ani.getTitlePageData(true, selrecord, selschema, function (ret) {
                             cb1630B0(null, ret);
                             return;
@@ -1150,7 +1201,7 @@
                                         ichanged = true;
                                     }
                                     if (ichanged === true) {
-                                        uientry.fromRecord2UI("#kla1630mapform", selrecord, selschema);
+                                        uientry.fromRecord2UI("#kla1650aniform", selrecord, selschema);
                                     }
                                     cb1630B1(null, {
                                         error: false,
@@ -1176,7 +1227,7 @@
                      * in ret: pearls[] mit: continent, climatezone, variable, fromyear, toyear, ispainted
                      * sowie error, message und selrecord
                      */
-                    kla1650ani.loop(creategif, doloop, ret1.selrecord, ret1.pearls, function (ret) {
+                    kla1650ani.loop(ret1.selrecord, ret1.pearls, function (ret) {
                         cb1630B3("Finish", ret);
                         return;
                     });
@@ -1200,7 +1251,7 @@
      * @param {*} pearls [] - Daten aus der Datenbank
      * @param {*} cb1630C - Callback, returns error, message
      */
-    kla1650ani.loop = function (creategif, doloop, selrecord, pearls, cb1630C) {
+    kla1650ani.loop = function (selrecord, pearls, cb1630C) {
         // Anlegen des Steuer-Arrays, Loop über Auswertungsspanne
 
         var svgrect;
@@ -1334,7 +1385,7 @@
                             if (pearl.toyear < actyear) {
                                 pearls[ipearl].ispainted = 9;
                                 anzdel++;
-                                if (doloop === true) {
+                                if (selrecord.markred === false) {
                                     options.deletePlotKeys.push(pearl.stationid);
                                     continue;
                                 } else {
@@ -1390,7 +1441,7 @@
                         }
                     }
 
-                    if (icontrol === 1) {
+                    if (icontrol === 1 && selrecord.showspark === true) {
                         svgspark02.sparkline("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
                             offsetX: 100,
                             offsetY: 300,
@@ -1405,26 +1456,27 @@
                             interactive: true
                         });
                     }
-
-                    svgspark02.setCursor("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
-                        offsetX: 100,
-                        offsetY: 300,
-                        width: 300,
-                        fullHeight: 60,
-                        stroke: "green",
-                        strokeOpacity: 1,
-                        fill: "mistyrose",
-                        chartRangeMin: mincount,
-                        chartRangeMax: maxcount,
-                        interactive: true
-                    }, icontrol - 1);
+                    if (selrecord.showspark === true) {
+                        svgspark02.setCursor("mygroup", document.getElementsByTagName('svg')[0], sparkarray1, {
+                            offsetX: 100,
+                            offsetY: 300,
+                            width: 300,
+                            fullHeight: 60,
+                            stroke: "green",
+                            strokeOpacity: 1,
+                            fill: "mistyrose",
+                            chartRangeMin: mincount,
+                            chartRangeMax: maxcount,
+                            interactive: true
+                        }, icontrol - 1);
+                    }
                     var html = "JAHR:" + actyear + " - " + actcount;
-                    $("#kla1630mapsres").html(html);
+                    $("#kla1650anisres").html(html);
 
                     /**
                      * Ausgabe der Graphik als gif für animiertes Gif
                      */
-                    if (creategif === true) {
+                    if (selrecord.animatedgif === true || selrecord.savesvgs === true) {
                         setTimeout(function () {
                             // hier wird die gif-Sicherung aktiviert
                             async.waterfall([
@@ -1434,11 +1486,23 @@
                                         var url = "data:image/svg+xml," + encodeURIComponent(svghtml);
                                         console.log("svg-string1:" + url.length);
                                         // Onload, callback to move on to next frame
-                                        img.onload = function () {
-                                            gif.addFrame(img, {
-                                                delay: 400,
-                                                copy: true
-                                            });
+                                        if (selrecord.animatedgif === true) {
+                                            img.onload = function () {
+                                                gif.addFrame(img, {
+                                                    delay: 400,
+                                                    copy: true
+                                                });
+                                                cb1650E1(null, {
+                                                    error: false,
+                                                    message: "image1",
+                                                    image: img,
+                                                    imageurl: url,
+                                                    svghtml: svghtml
+                                                });
+                                                return;
+                                            };
+                                            img.src = url;
+                                        } else {
                                             cb1650E1(null, {
                                                 error: false,
                                                 message: "image1",
@@ -1447,43 +1511,46 @@
                                                 svghtml: svghtml
                                             });
                                             return;
-                                        };
-                                        img.src = url;
+                                        }
                                     },
 
                                     function (ret, cb1650E2) {
-                                        var filename = titlerecord.projectid + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg";
-                                        var jqxhr = $.ajax({
-                                            method: "POST",
-                                            crossDomain: false,
-                                            url: sysbase.getServer("getbackasfile"),
-                                            data: {
-                                                largestring: ret.svghtml, // $("#heatpic").find("img").attr("src")  //    'data:image/gif;base64,' + encode64(encoder.stream().getData()),
-                                                filename: filename
-                                            }
-                                        }).done(function (r1, textStatus, jqXHR) {
-                                            sysbase.checkSessionLogin(r1);
-                                            var ret = JSON.parse(r1);
-                                            sysbase.putMessage(ret.message, 1);
-                                            if (ret.error === true) {
+                                        var filename = (titlerecord.projectid || "S") + "_" + actyear + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg";
+                                        if (selrecord.savesvgs === true) {
+                                            var jqxhr = $.ajax({
+                                                method: "POST",
+                                                crossDomain: false,
+                                                url: sysbase.getServer("getbackasfile"),
+                                                data: {
+                                                    largestring: ret.svghtml, // $("#heatpic").find("img").attr("src")  //    'data:image/gif;base64,' + encode64(encoder.stream().getData()),
+                                                    filename: filename
+                                                }
+                                            }).done(function (r1, textStatus, jqXHR) {
+                                                sysbase.checkSessionLogin(r1);
+                                                var ret = JSON.parse(r1);
+                                                sysbase.putMessage(ret.message, 1);
+                                                if (ret.error === true) {
+                                                    cb1650E2("error", {
+                                                        error: ret.error,
+                                                        message: ret.message
+                                                    });
+                                                    return;
+                                                } else {
+                                                    cb1650E2(null, ret);
+                                                }
+                                            }).fail(function (err) {
+                                                sysbase.putMessage(err, 1);
                                                 cb1650E2("error", {
-                                                    error: ret.error,
-                                                    message: ret.message
+                                                    error: true,
+                                                    message: "Daten NICHT bereitgestellt:" + err
                                                 });
                                                 return;
-                                            } else {
-                                                cb1650E2(null, ret);
-                                            }
-                                        }).fail(function (err) {
-                                            sysbase.putMessage(err, 1);
-                                            cb1650E2("error", {
-                                                error: true,
-                                                message: "Daten NICHT bereitgestellt:" + err
+                                            }).always(function () {
+                                                // nope
                                             });
-                                            return;
-                                        }).always(function () {
-                                            // nope
-                                        });
+                                        } else {
+                                            cb1650E2(null, ret);
+                                        }
                                     },
                                     function (ret, cb1650E3) {
                                         cb1650E3("Finish", {
@@ -1505,7 +1572,7 @@
                 },
                 function (error) {
                     // Ende des Loops
-                    if (creategif === true) {
+                    if (selrecord.animatedgif === true) {
                         gif.on('finished', function (blob) {
                             try {
                                 var winurl = URL.createObjectURL(blob);
@@ -1664,10 +1731,10 @@
                     //Math.ceil($(this).offset().top + $(this).height() + 20)
                     $(document).on('popupcancel', function (evt, extraParam) {
                         evt.preventDefault();
-                        $('.kla1630mapbut1').prop('disabled', false);
-                        $('.kla1630mapbut2').prop('disabled', false);
-                        $('.kla1630mapbut1').show();
-                        $('.kla1630mapbut2').show();
+                        $('.kla1650anibut1').prop('disabled', false);
+                        $('.kla1650anibut2').prop('disabled', false);
+                        $('.kla1650anibut1').show();
+                        $('.kla1650anibut2').show();
                         cb1650F1("error", {
                             error: true,
                             message: "Popup abgebrochen"
@@ -1690,10 +1757,10 @@
                         if (ret1.error === false) {
                             sysbase.putMessage("Erfassungsdialog ist ausgegeben worden", 1);
                         } else {
-                            $('.kla1630mapbut1').prop('disabled', false);
-                            $('.kla1630mapbut2').prop('disabled', false);
-                            $('.kla1630mapbut1').show();
-                            $('.kla1630mapbut2').show();
+                            $('.kla1650anibut1').prop('disabled', false);
+                            $('.kla1650anibut2').prop('disabled', false);
+                            $('.kla1650anibut1').show();
+                            $('.kla1650anibut2').show();
                             cb1650F1("error", {
                                 error: true,
                                 message: "Der Dialog wurde nicht aufgebaut:" + ret1.message

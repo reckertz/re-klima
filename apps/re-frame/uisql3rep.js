@@ -266,7 +266,7 @@
                         }));
 
 
-                        $("#uisql3repbutts")
+                    $("#uisql3repbutts")
                         .append($("<button/>", {
                             html: "csv-Download",
                             css: {
@@ -319,6 +319,17 @@
 
 
 
+                    $("#uisql3repbuttu")
+                        .append($("<button/>", {
+                            html: "HTML-Download",
+                            css: {
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                uihelper.downloadHtmlTable($("#uisql3repdata").find("table"), "html-extrakt");
+                            }
+                        }));
                 }
             });
         });
@@ -586,7 +597,7 @@
                                 // Then recall the parent function to
                                 // create a recursive loop.
                                 var cc = 0;
-                                $("#uisql3repdata").find("tr:hidden").each(function(ind, elem) {
+                                $("#uisql3repdata").find("tr:hidden").each(function (ind, elem) {
                                     cc++;
                                     if (cc > 10) return false;
                                     $(elem).show();
