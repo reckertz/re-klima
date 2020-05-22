@@ -21,6 +21,7 @@
     var kli9010srv = require("re-klima/kli9010srv");
     var kla9020fun = require("re-klima/kla9020fun");
     var uihelper = require("re-frame/uihelper");
+    var sysbase = require("re-frame/sysbase");
 
     var gblInfo = {};
     var sorcount = 0;
@@ -990,28 +991,43 @@
      * @param res
      * @param callback
      */
-    sys0000sys.delonerecord = function (db, async, req, reqparm, res, callback) {
+    sys0000sys.delonerecord = function (db, async, req, reqparm, res, callbackdel) {
         /**
          * Prüfen, welche Parameter vorliegen, dann zugreifen
          * username und firma sind auch verfügbar
          */
-        var delStmt = {};
-        if (req.body && typeof req.body.delStmt !== "undefined" && req.body.delStmt.length > 0) {
-            delStmt = req.body.delStmt;
-        }
+        var delStmt = "";
         var table = "";
-        if (req.body && typeof req.body.table !== "undefined" && req.body.table.length > 0) {
-            table = req.body.table;
-        }
         var firma = "";
-        if (req.body && typeof req.body.firma !== "undefined" && req.body.firma.length > 0) {
-            firma = req.body.firma;
-        }
         var record = {};
-        if (req.body && typeof req.body.record === "object" && req.body.record !== null) {
-            record = JSON.parse(req.body.record);
-        }
+        if (typeof reqparm === "undefined" || reqparm === null) {
+            if (req.body && typeof req.body.delStmt !== "undefined" && req.body.delStmt.length > 0) {
+                delStmt = req.body.delStmt;
+            }
+            if (req.body && typeof req.body.table !== "undefined" && req.body.table.length > 0) {
+                table = req.body.table;
+            }
 
+            if (req.body && typeof req.body.firma !== "undefined" && req.body.firma.length > 0) {
+                firma = req.body.firma;
+            }
+            if (req.body && typeof req.body.record === "object" && req.body.record !== null) {
+                record = JSON.parse(req.body.record);
+            }
+        } else {
+            if (reqparm && typeof reqparm.delStmt !== "undefined" && reqparm.delStmt.length > 0) {
+                delStmt = reqparm.delStmt;
+            }
+            if (reqparm && typeof reqparm.table !== "undefined" && reqparm.table.length > 0) {
+                table = reqparm.table;
+            }
+            if (reqparm && typeof reqparm.firma !== "undefined" && reqparm.firma.length > 0) {
+                firma = reqparm.firma;
+            }
+            if (reqparm && typeof reqparm.record === "object" && reqparm.record !== null) {
+                record = JSON.parse(reqparm.record);
+            }
+        }
         var ret = {};
         console.log("delonerecord:" + table);
         console.log("delonerecord:" + delStmt);
@@ -1021,7 +1037,7 @@
                 ret.error = true;
                 ret.message = "delonerecord:" + "Keine Datenbank übergeben";
                 ret.record = null;
-                callback(res, ret);
+                callbackdel(res, ret);
                 return;
             }
             var saverec = {}; // $.extend({}, record);
@@ -1065,7 +1081,6 @@
                             });
                             return;
                         });
-
                     },
                     function (res, ret, callback77c) {
                         db.run(delStmt, function (err) {
@@ -1084,21 +1099,16 @@
                     ret.message = "delonerecord:" + "Fertig";
                     ret.row = null;
                     console.log("delonerecord:" + ret.message);
-                    callback(res, ret);
+                    callbackdel(res, ret);
                     return;
                 });
-
             }); // serialize
-
-
-
-
         } catch (err) {
             ret.error = true;
             ret.message = "delonerecord:" + err.message;
             ret.record = null;
             console.log("delonerecord:" + ret.message);
-            callback(res, ret);
+            callbackdel(res, ret);
             return;
         }
     };
@@ -2192,7 +2202,7 @@
                             });
                             readInterface.on('line', function (line) {
                                 //console.log(line);
-                                if (line.substr(0,1) === " ") {
+                                if (line.substr(0, 1) === " ") {
                                     line = line.trim();
                                 }
                                 var lline = line.toLocaleLowerCase();
@@ -2496,7 +2506,130 @@
         // G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2008AD_pop\rurc_2008AD.asc
     };
 
+    /**
+     * updatecontinent berechnet Kontinentzuordnung neu nach Update inline
+     */
+    sys0000sys.updatecontinent = function (db, rootdir, fs, async, req, reqparm, res, callback79) {
 
+        reqparm = {
+            sel: {
+
+            },
+            projection: {
+                source: 1,
+                stationid: 1,
+                tsserverupd: 1,
+                longitude: 1,
+                latitude: 1,
+                continent: 1,
+                continentname: 1
+            },
+            sort: {
+                source: 1,
+                stationid: 1
+            },
+            table: "KLISTATIONS",
+            firma: "KLI",
+            skip: 0,
+            limit: 0
+        };
+
+        sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret1) {
+            if (ret1.records.length === 0) {
+                callback79(res, ret1);
+                return;
+            }
+            var rows = ret1.records;
+            var rcount = 0;
+            var ucount = 0;
+            var ncount = 0;
+            var xcount = 0;
+            async.eachSeries(rows, function (row, nextrow) {
+                    rcount++;
+                    async.waterfall([
+                            function (callback79a) {
+                                if (row.source === null && row.stationid === null) {
+                                    xcount++;
+                                    var delStmt = "DELETE FROM KLISTATIONS";
+                                    delStmt += " WHERE tsserverupd = '" + row.tsserverupd + "'";
+                                    delStmt += " AND source IS NULL";
+                                    delStmt += " AND stationid IS NULL";
+                                    var delparm = {};
+                                    delparm.delStmt = delStmt;
+                                    delparm.table = "KLISTATIONS";
+                                    sys0000sys.delonerecord(db, async, req, delparm, res, function (res, ret) {
+                                        callback79a("next", {
+                                            error: false,
+                                            message: "gelöscht"
+                                        });
+                                        return;
+                                    });
+                                } else {
+                                    callback79a(null, {
+                                        error: false,
+                                        message: "skipped"
+                                    });
+                                    return;
+                                }
+                            },
+                            function (ret, callback79b) {
+                                var condata = uihelper.getContinent(row.longitude, row.latitude);
+                                if (condata.error === false) {
+                                    ucount++;
+                                    var updparm = {};
+                                    updparm.selfields = {};
+                                    updparm.selfields.source = row.source;
+                                    updparm.selfields.stationid = row.stationid;
+                                    updparm.updfields = {};
+                                    updparm.updfields["$set"] = {
+                                        continent: condata.continentcode,
+                                        continentname: condata.continentname
+                                    };
+                                    updparm.table = "KLISTATIONS";
+                                    sys0000sys.setonerecord(db, async, null, updparm, res, function (res, ret) {
+                                        callback79b(null, {
+                                            error: false,
+                                            message: "updated"
+                                        });
+                                        return;
+                                    });
+                                } else {
+                                    ncount++;
+                                    var updparm = {};
+                                    updparm.selfields = {};
+                                    updparm.selfields.source = row.source;
+                                    updparm.selfields.stationid = row.stationid;
+                                    updparm.updfields = {};
+                                    updparm.updfields["$set"] = {
+                                        continent: "?",
+                                        continentname: "unknown"
+                                    };
+                                    updparm.table = "KLISTATIONS";
+                                    sys0000sys.setonerecord(db, async, null, updparm, res, function (res, ret) {
+                                        callback79b(null, {
+                                            error: false,
+                                            message: "not updated"
+                                        });
+                                        return;
+                                    });
+                                }
+                            }
+                        ],
+                        function (error, ret) {
+                            nextrow();
+                        });
+                },
+                function (error) {
+                    var msg = "Continente gelesen:" + rcount + " zugeordnet:" + ucount + " nicht zugeordnet:" + ncount + " NULL-Korr:" + xcount;
+                    console.log(msg);
+                    callback79(res, {
+                        error: false,
+                        message: msg
+                    });
+                    return;
+                });
+        });
+    };
 
 
     /**

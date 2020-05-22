@@ -34,6 +34,33 @@
         return gblsysteminfo;
     };
 
+    var uiappCache = {};
+    uihelper.setCache = function (name, data) {
+        if (typeof uiappCache[name] === "undefined") {
+            uiappCache[name] = {};
+        }
+        uiappCache[name].data = data;
+        return true;
+    };
+
+    uihelper.getCache = function (name) {
+        if (typeof uiappCache[name] === "undefined") {
+            return null;
+        }
+        return uiappCache[name].data;
+    };
+
+    uihelper.delCache = function (name) {
+        if (typeof uiappCache[name] !== "undefined") {
+            delete uiappCache[name];
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+
+
 
     /**
      * modulecheck - prüft modul
@@ -1863,7 +1890,7 @@
     };
 
     /**
-     * Datei aus String vom Client downloaden
+     * Datei aus String vom Client speichern und dann downloaden
      */
     uihelper.downloadfile = function (filename, largestring, callback) {
 
@@ -1895,6 +1922,44 @@
             // nope
         });
     };
+
+
+
+    /**
+     * Datei aus String vom Client in Server speichern
+     */
+    uihelper.storeasfile = function (filename, largestring, callback) {
+
+        var jqxhr = $.ajax({
+            method: "POST",
+            url: sysbase.getServer("getbackasfile"),
+            data: {
+                filename: filename,
+                largestring: largestring
+            }
+        }).done(function (r1) {
+            console.log("getbackasfile:" + filename + "=>" + r1);
+            var j1 = JSON.parse(r1);
+            if (j1.error === false) {
+                var download_path = j1.path;
+                // Could also use the link-click method.
+                // window.location = download_path;
+                // window.open(download_path, '_blank');
+                sysbase.putMessage(filename + " download erfolgt", 1);
+            } else {
+                sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
+            }
+            return;
+        }).fail(function (err) {
+            console.log("getbackasfile:" + filename + "=>" + err.message);
+            sysbase.putMessage(err, 3);
+            return;
+        }).always(function () {
+            // nope
+        });
+    };
+
+
 
     /**
      * geolocation mit callback returns: latitude, longitude
@@ -2019,72 +2084,72 @@
     };
 
     uihelper.setContinents = function () {
-        var continents = sysbase.getCache("continents");
+        var continents = uihelper.getCache("continents");
         if (typeof continents === "undefined" || continents === null) {
             continents = [];
             continents.push({
-                code: "NAm1",
-                name: "North America-1",
+                value: "NA1",
+                text: "North America-1",
                 lat: new Array(90, 90, 78.13, 57.5, 15, 15, 1.25, 1.25, 51, 60, 60, 90),
                 lon: new Array(-168.75, -10, -10, -37.5, -30, -75, -82.5, -105, -180, -180, -168.75, -168.75)
             });
 
             continents.push({
-                code: "NAm2",
-                name: "North America-2",
+                value: "NA2",
+                text: "North America-2",
                 lat: new Array(51, 51, 60, 51),
                 lon: new Array(166.6, 180, 180, 166.6)
             });
 
             continents.push({
-                code: "SAm",
-                name: "South America",
+                value: "SA",
+                text: "South America",
                 lat: new Array(1.25,   1.25,  15,  15, -60, -60, 1.25),
                 lon: new Array(-105, -82.5,  -75, -30, -30, -105, -105)
             });
 
             continents.push({
-                code: "europe",
-                name: "Europa",
+                value: "EU",
+                text: "Europa",
                 lat: new Array(90,   90,  42.5, 42.5, 40.79, 41, 40.55, 40.40, 40.05, 39.17, 35.46, 33,   38,  35.42, 28.25, 15,  57.5,  78.13, 90),
                 lon: new Array(-10, 77.5, 48.8, 30,   28.81, 29, 27.31, 26.75, 26.36, 25.19, 27.91, 27.5, 10, -10,  -13,   -30, -37.5, -10, -10)
             });
 
             continents.push({
-                code: "africa",
-                name: "Afrika",
+                value: "AF",
+                text: "Afrika",
                 lat: new Array(15,  28.25 ,35.42 ,38 ,33   ,31.74 ,29.54 ,27.78 ,11.3 ,12.5 ,-60 ,-60, 15),
                 lon: new Array(-30 ,-13   ,-10 ,10 ,27.5 ,34.58 ,34.92 ,34.46 ,44.3 ,52    ,75 ,-30, -30)
             });
 
             continents.push({
-                code: "australia",
-                name: "Australien",
+                value: "AU",
+                text: "Australien",
                 lat: new Array(-11.88, -10.27, -10 ,-30    ,-52.5 ,-31.88, -11.88),
                 lon: new Array(110,      140  ,145 ,161.25 ,142.5  ,110, 110)
             });
 
             continents.push({
-                code: "asia",
-                name: "Asien",
+                value: "AS1",
+                text: "Asien1",
                 lat: new Array(90   ,42.5 ,42.5 ,40.79 ,41 ,40.55 ,40.4  ,40.05 ,39.17 ,35.46 ,33   , 31.74 ,29.54 ,27.78 ,11.3 ,12.5 ,-60 ,-60 ,-31.88 ,-11.88 ,-10.27 ,33.13 ,51    ,60  ,90, 90),
                 lon: new Array(77.5 ,48.8 ,30   ,28.81 ,29 ,27.31 ,26.75 ,26.36 ,25.19 ,27.91 ,27.5 , 34.58 ,34.92 ,34.46 ,44.3 ,52   ,75  ,110  ,110   ,110    ,140    ,140   ,166.6 ,180 ,180, 77.5)
             });
 
             continents.push({
-                code: "asia2",
-                name: "Asien2",
+                value: "AS2",
+                text: "Asien2",
                 lat: new Array(90    ,90      ,60      ,60, 90),
                 lon: new Array(-180 ,-168.75 ,-168.75 ,-180, -180)
             });
 
             continents.push({
-                code: "antarctica",
-                name: "Antarktis",
+                value: "AN",
+                text: "Antarktis",
                 lat: new Array(-60, -60, -90, -90, -60),
                 lon: new Array(-180, 180, 180, -180, -180)
             });
-            sysbase.setCache("continents", continents);
+            uihelper.setCache("continents", continents);
         }
         return continents;
     };
@@ -2119,9 +2184,9 @@
             if (uihelper.pointIsInPolygon(p, polygon)) {
                 return {
                     error: false,
-                    message: "found:" + continent.code,
-                    continentcode: continent.code,
-                    continentname: continent.name,
+                    message: "found:" + continent.value,
+                    continentcode: continent.value,
+                    continentname: continent.text,
                     continent: continent,
                     polygon: polygon
                 };

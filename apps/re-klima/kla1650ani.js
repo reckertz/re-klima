@@ -36,6 +36,7 @@
     var worldmap = {};
     var firststationid = "";
     var gif;
+    var counters = {};
 
     kla1650ani.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
@@ -118,7 +119,7 @@
                                     var continent = continents[icon];
                                     for (var iko = 0; iko < continent.lat.length; iko++) {
                                         ilink++;
-                                        var name = continent.code + ilink;
+                                        var name = continent.value + ilink;
                                         var fakt = 1.0;
                                         if (continent.lat[iko] === continent.lat[iko + 1]) {
                                             fakt = 1.001;
@@ -140,7 +141,7 @@
                                                 opacity: 0.6
                                             },
                                             tooltip: {
-                                                content: continent.name
+                                                content: continent.text
                                             }
                                         };
                                     }
@@ -208,6 +209,41 @@
                                 //kla1650ani.fitMap(".content", "world", paper);
                             }
                         }))
+
+                        .append($("<li/>", {
+                            class: "dropdown-menuepoint",
+                            html: "Continent zuordnen",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
+                                var jqxhr = $.ajax({
+                                    method: "GET",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("updatecontinent"),
+                                    data: {}
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    sysbase.checkSessionLogin(r1);
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
+                                    var ret = JSON.parse(r1);
+                                    sysbase.putMessage(ret.message, 1);
+                                    if (ret.error === true) {
+                                        return;
+                                    } else {
+                                        return;
+                                    }
+                                }).fail(function (err) {
+                                    sysbase.putMessage(err, 1);
+                                    $("#kla1650anibuttons").show();
+                                    $("body").css("cursor", "default");
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
+                            }
+                        }))
+
 
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
@@ -413,7 +449,8 @@
             continent: {
                 title: "Kontinentalzone",
                 type: "string", // currency, integer, datum, text, key
-                class: "uietext",
+                class: "uieselectinput",
+                enum: uihelper.setContinents(),
                 default: "",
                 io: "i"
             },
@@ -507,7 +544,14 @@
                 class: "uiecheckbox",
                 /* width: "100px", */
                 io: "i"
-            }
+            },
+            savecounts: {
+                title: "Zähler bereitstellen (txt)",
+                type: "string", // currency, integer, datum, text, key
+                class: "uiecheckbox",
+                /* width: "100px", */
+                io: "i"
+            },
         }
     };
 
@@ -1026,6 +1070,14 @@
                 where += " substr(KLISTATIONS.climatezone, 1, 2) = '" + selclimatezone + "'";
             }
         }
+
+        if (typeof selrecord.continent !== "undefined" && selrecord.continent.trim().length > 0) {
+            var selcontinent = selrecord.continent;
+            if (where.length > 0) where += " AND ";
+            where += " KLISTATIONS.continent = '" + selcontinent + "'";
+        }
+
+
         if (typeof selrecord.anzyears !== "undefined" && selrecord.anzyears.trim().length > 0) {
             if (where.length > 0) where += " AND ";
             var anzparts = selrecord.anzyears.match(/(<=|>=|<|>|=)(\d*)/);
@@ -1216,6 +1268,15 @@
                      */
                     titlerecord.delay = titlerecord.delay || 3000;
                     kla1650ani.prepMap({});
+
+                    if (selrecord.animatedgif === false) {
+                        cb1650F2(null, {
+                            error: false,
+                            message: "Header-Image skipped"
+                        });
+                        return;
+                    }
+
                     // Textboxen ausgeben
                     var svgs = document.getElementsByTagName('svg');
                     var svg = document.getElementsByTagName('svg')[0];
@@ -1395,6 +1456,7 @@
                     var vglstationid = "";
                     var vgldata = {};
                     uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
+
                         if (ret.error === true) {
                             sysbase.putMessage("Error:" + ret.message, 3);
                             $("#kla1650anibuttons").show();
@@ -1405,6 +1467,16 @@
                             return;
                         } else {
                             if (ret.records !== "undefined" && ret.records !== null) {
+                                var anzfound = Object.keys(ret.records).length;
+                                if (anzfound === 0) {
+                                    sysbase.putMessage("keine Stations gefunden zur Selektionsvorgabe", 3);
+                                    $("#kla1650anibuttons").show();
+                                    cb1630B1("error", {
+                                        error: true,
+                                        message: "keine Stations gefunden zur Selektionsvorgabe"
+                                    });
+                                    return;
+                                }
                                 sysbase.putMessage("Stations:" + Object.keys(ret.records).length, 1);
                                 var irow = 0;
                                 var fromyear = null;
@@ -1475,12 +1547,20 @@
                                     });
                                     return;
                                 } else {
+                                    sysbase.putMessage("keine Stations gefunden zur Selektionsvorgabe", 3);
                                     cb1630B1("error", {
                                         error: true,
                                         message: "Keine Daten gefunden"
                                     });
                                     return;
                                 }
+                            } else {
+                                sysbase.putMessage("keine Stations gefunden zur Selektionsvorgabe", 3);
+                                cb1630B1("error", {
+                                    error: true,
+                                    message: "Keine Daten gefunden"
+                                });
+                                return;
                             }
                         }
                     });
@@ -1492,8 +1572,24 @@
                      * sowie error, message und selrecord
                      */
                     kla1650ani.loop(ret1.selrecord, ret1.pearls, function (ret) {
-                        cb1630B3("Finish", ret);
-                        return;
+                        debugger;
+                        if (selrecord.savecounts === true) {
+                            var fname = [];
+                            fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                            fname.push("kla1650ani");
+                            fname.push("counters");
+                            //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                            fname.push("counters.txt");
+                            var largestring = JSON.stringify(counters);
+                            uihelper.storeasfile(fname, largestring, function (ret) {
+                                sysbase.putMessage(ret.message, 1);
+                                cb1630B3("Finish", ret);
+                                return;
+                            });
+                        } else {
+                            cb1630B3("Finish", ret);
+                            return;
+                        }
                     });
                 }
             ],
@@ -1522,6 +1618,47 @@
         var svgrect;
         var svgnested;
         var svg;
+        /**
+         * counters für global, climatezone und continent
+         * mit count, plusnew, minusold - Vordefintion der kompletten Struktur!!
+         * aus selschema
+         */
+        counters = {};
+        counters.global = {
+            count: 0,
+            plusnew: 0,
+            minusold: 0
+        };
+        counters.climatezones = {};
+        for (var izone = 0; izone < selschema.entryschema.climatezone.enum.length; izone++) {
+            var cz = selschema.entryschema.climatezone.enum[izone].value;
+            counters.climatezones[cz] = {
+                count: 0,
+                plusnew: 0,
+                minusold: 0
+            };
+        }
+        counters.climatezones["?"] = {
+            count: 0,
+            plusnew: 0,
+            minusold: 0
+        };
+        counters.continents = {};
+        for (var icon = 0; icon < selschema.entryschema.continent.enum.length; icon++) {
+            var con = selschema.entryschema.continent.enum[icon].value;
+            counters.continents[con] = {
+                count: 0,
+                plusnew: 0,
+                minusold: 0
+            };
+        }
+        // Sonderfall
+        counters.continents["?"] = {
+            count: 0,
+            plusnew: 0,
+            minusold: 0
+        };
+
         try {
             var loopyears = [];
             var fromyear = parseInt(selrecord.fromyear);
@@ -1614,10 +1751,28 @@
                     var anznew = 0;
                     var anzdel = 0;
                     // Aufbau newPlots und deletePlotKeys
+                    /**
+                     * counters für global, climatezone und continent
+                     * mit count, plusnew, minusold
+                     */
                     for (var ipearl = 0; ipearl < pearls.length; ipearl++) {
                         if (pearls[ipearl].ispainted === 0) {
                             var pearl = pearls[ipearl];
                             if (pearl.fromyear <= actyear && pearl.toyear >= actyear) {
+                                // new
+                                if (selrecord.savecounts === true) {
+                                    if (typeof counters.global[actyear] === "undefined") {
+                                        counters.global[actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.global[actyear].count++;
+                                    if (pearls[ipearl].ispainted === 0) {
+                                        counters.global[actyear].plusnew++;
+                                    }
+                                }
                                 pearls[ipearl].ispainted = 1;
                                 var contenthtml = pearl.stationid + " " + pearl.stationname;
                                 /*
@@ -1649,6 +1804,16 @@
                             if (pearl.toyear < actyear) {
                                 pearls[ipearl].ispainted = 9;
                                 anzdel++;
+                                if (selrecord.savecounts === true) {
+                                    if (typeof counters.global[actyear] === "undefined") {
+                                        counters.global[actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.global[actyear].minusold++;
+                                }
                                 if (selrecord.markred === false) {
                                     options.deletePlotKeys.push(pearl.stationid);
                                     continue;
@@ -1660,6 +1825,17 @@
                                         options.mapOptions.plots[pearl.stationid].attrs = {};
                                     options.mapOptions.plots[pearl.stationid].attrs.fill = "red";
                                     options.mapOptions.plots[pearl.stationid].attrs.zIndex = 10000;
+                                }
+                            } else {
+                                if (selrecord.savecounts === true) {
+                                    if (typeof counters.global[actyear] === "undefined") {
+                                        counters.global[actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.global[actyear].count++;
                                 }
                             }
                         }
@@ -1781,13 +1957,26 @@
                                     function (ret, cb1650E2) {
                                         var filename = (titlerecord.projectid || "S") + "_" + actyear + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg";
                                         if (selrecord.savesvgs === true) {
+                                            var fname = [];
+                                            fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                            fname.push("kla1650ani");
+                                            fname.push("svgs");
+                                            fname.push(titlerecord.projectid);
+                                            var presel = actyear;
+                                            if (selrecord.climatezone.length > 0) {
+                                                presel += "_" + selrecord.climatezone;
+                                            }
+                                            if (selrecord.continent.length > 0) {
+                                                presel += "_" + selrecord.continent;
+                                            }
+                                            fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
                                             var jqxhr = $.ajax({
                                                 method: "POST",
                                                 crossDomain: false,
                                                 url: sysbase.getServer("getbackasfile"),
                                                 data: {
                                                     largestring: ret.svghtml, // $("#heatpic").find("img").attr("src")  //    'data:image/gif;base64,' + encode64(encoder.stream().getData()),
-                                                    filename: filename
+                                                    filename: fname
                                                 }
                                             }).done(function (r1, textStatus, jqXHR) {
                                                 sysbase.checkSessionLogin(r1);
@@ -1865,7 +2054,7 @@
                                              */
                                             var reader = new FileReader();
                                             reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
-                                            reader.onload = function() {
+                                            reader.onload = function () {
                                                 var imagedata = reader.result; // data url
                                                 debugger;
                                                 var jqxhr = $.ajax({
@@ -1962,8 +2151,10 @@
      * return svg-text-Element, das erzeugt wurde
      */
     kla1650ani.svg_textMultiline = function (container, options, text) {
+        if (typeof text === "undefined" || text.length === 0) {
+            return "";
+        }
         options.lineHeight = options.lineHeight || 10;
-
         options.id = options.id || "T" + Math.floor(Math.random() * 100000) + 1;
         options.x = options.x || 0;
         options.y = options.y || 0;
@@ -1993,12 +2184,11 @@
         container.appendChild(svgtest);
 
         /* split the words into array */
+
         var words = text.split(' ');
         var line = '';
-
         /* Make a tspan for testing */
         svgtest.innerHTML = "<tspan id='PROCESSING'>" + text + "</tspan >";
-
         for (var n = 0; n < words.length; n++) {
             var testLine = line + words[n] + ' ';
             var testElem = svgtest; // document.getElementById('PROCESSING');
@@ -2007,11 +2197,9 @@
             /* Messure textElement */
             var metrics = testElem.getBoundingClientRect();
             var testWidth = metrics.width;
-
             var metrics1 = testElem.getBBox();
             var testWidth1 = metrics1.width;
             var testWidth2 = testElem.getComputedTextLength();
-
             if (testWidth > options.width && n > 0) {
                 svgtext3.innerHTML += '<tspan x="' + options.dx + '" dy="' + options.dy + '">' + line + '</tspan>';
                 line = words[n] + ' ';
@@ -2020,6 +2208,7 @@
             }
         }
         svgtext3.innerHTML += '<tspan x="' + options.dx + '" dy="' + options.dy + '">' + line + '</tspan>';
+
         document.getElementById(options.id + "1").remove();
         return svgtext3;
     };

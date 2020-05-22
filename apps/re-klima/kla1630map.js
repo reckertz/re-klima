@@ -121,7 +121,7 @@
                                     var continent = continents[icon];
                                     for (var iko = 0; iko < continent.lat.length; iko++) {
                                         ilink++;
-                                        var name = continent.code + ilink;
+                                        var name = continent.value + ilink;
                                         var fakt = 1.0;
                                         if (continent.lat[iko] === continent.lat[iko + 1]) {
                                             fakt = 1.001;
@@ -143,7 +143,7 @@
                                                 opacity: 0.6
                                             },
                                             tooltip: {
-                                                content: continent.name
+                                                content: continent.text
                                             }
                                         };
                                     }

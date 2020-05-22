@@ -844,6 +844,33 @@ app.get('/transhyde', function (req, res) {
     });
 });
 
+/**
+ * updatecontinent - value zu continent in KLISTATIONS neu zuordnen
+ */
+app.get('/updatecontinent', function (req, res) {
+    if (checkSession(req, res)) return;
+    var timeout = 100 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootdir = __dirname;
+    sys0000sys.updatecontinent(db, rootdir, fs, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
+
+
 
 /**
  * batchreg - Regressionsanalyse im Batch mit Filter auf die Stations, wie vorgegeben
@@ -1299,9 +1326,29 @@ app.get('/dropcolumn3', function (req, res) {
 app.post('/getbackasfile', function (req, res) {
     var largestring = req.body.largestring;
     var filename = req.body.filename;
-    if (typeof filename === "undefined" || filename.length === 0) {
-        filename = "download.html";
+    var fullpath = "";
+    var fpath = "";
+    var targetpath = path.join(__dirname, "static");
+    targetpath = path.join(targetpath, "temp");
+    if (!fs.existsSync(targetpath)) {
+        fs.mkdirSync(targetpath);
     }
+    if (typeof filename === "object" && Array.isArray(filename)) {
+        for (var ifilename = 0; ifilename < (filename.length - 1); ifilename++) {
+            targetpath = path.join(targetpath, filename[ifilename]);
+            if (!fs.existsSync(targetpath)) {
+                fs.mkdirSync(targetpath);
+            }
+        }
+        // jetzt der echte Dateiname
+        fullpath = path.join(targetpath, filename[filename.length - 1]);
+    } else {
+        if (typeof filename === "undefined" || filename.length === 0) {
+            filename = "download.html";
+        }
+        fullpath = path.join(targetpath, filename);
+    }
+    fpath = fullpath.substr(fullpath.indexOf("static") + 7);
     /*
     res.setHeader('Content-disposition', 'attachment; filename=' + filename);
     res.setHeader('Content-type', 'text/plain');
@@ -1309,8 +1356,7 @@ app.post('/getbackasfile', function (req, res) {
     res.write(largestring);
     res.end();
     */
-    var fpath = "/temp/" + filename;
-    var fullpath = __dirname + "/static" + fpath;
+
     fs.writeFile(fullpath, largestring, {
         encoding: 'utf8',
         flag: 'w'
