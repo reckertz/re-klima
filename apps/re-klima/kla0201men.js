@@ -117,7 +117,8 @@
                 id: "admin0015",
                 text: "Statistik",
                 app: "re-klima",
-                module: "kla1680gra"
+                module: "kla1680gra",
+                htmlpage: "klaheatmap.html"
             },
             {
                 id: "admin0030",
@@ -188,6 +189,7 @@
                             class: "dropdown-menuepoint kla0201mp",
                             html: menupoint.text,
                             app: menupoint.app,
+                            htmlpage: menupoint.htmlpage,
                             module: menupoint.module,
                             exec: menupoint.exec
                         }));
@@ -202,6 +204,7 @@
             var app = $(this).attr("app");
             var module = $(this).attr("module");
             var title = $(this).html();
+            var htmlpage = $(this).attr("htmlpage") || "";
             var exec = $(this).attr("exec");
             if (typeof exec === "string") {
                 if (exec === "*close") {
@@ -214,7 +217,7 @@
                 }
 
             } else {
-                var idcode = sysbase.tabcreateiframe(title, "", app, module);
+                var idcode = sysbase.tabcreateiframe(title, "", app, module, htmlpage);
                 $(".tablinks[idhash='#" + idcode + "']").click();
             }
         });

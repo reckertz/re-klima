@@ -232,8 +232,8 @@
                             html: "Test Mondphasen",
                             click: function (evt) {
                                 evt.preventDefault();
-                                var datum = prompt("ISO-Datum eingeben", "2020-02-17");
-                                if (datum != null) {
+                                var datum = window.prompt("ISO-Datum eingeben", "2020-02-17");
+                                if (datum !== null) {
                                     var yea1 = datum.substr(0, 4);
                                     var mon1 = datum.substr(5, 2);
                                     var day1 = datum.substr(8, 2);
@@ -250,7 +250,7 @@
                             html: "zurück",
                             click: function (evt) {
                                 evt.preventDefault();
-                                var parameters = {};
+                                parameters = {};
                                 sysbase.navigateBack(parameters, function (ret) {
                                     if (ret.error === true) {
                                         sysbase.putMessage(ret.message, 3);
@@ -266,7 +266,7 @@
          */
         $(".content").append($("<div/>", {
             id: "kla1680gra_left",
-            class: "col1of3",
+            class: "col1of2",
             css: {
                 width: "30%",
                 "background-color": "lightsteelblue"
@@ -276,27 +276,12 @@
 
         $(".content").append($("<div/>", {
             id: "kla1680gra_right",
-            class: "col2of3",
+            class: "col2of2",
             css: {
-                width: "35%",
+                width: "69%",
                 "background-color": "yellow"
             }
         }));
-
-        $(".content").append($("<div/>", {
-                id: "kla1680gra_entry",
-                class: "col3of3",
-                css: {
-                    width: "35%",
-                    "background-color": "lime",
-                    overflow: "auto"
-                }
-            })
-            .append($("<form/>", {
-                id: "kla1680graform",
-                class: "uieform"
-            }))
-        );
 
         /**
          * Tab/Reiter-Struktur anlegen https://www.w3schools.com/howto/howto_js_tabs.asp
@@ -323,7 +308,6 @@
         h -= fh - 3;
         $("#kla1680gra_left").height(h);
         $("#kla1680gra_right").height(h);
-        $("#kla1680gra_entry").height(h);
 
         var url = $("#kla1680graurl").val();
         var directory = $("#kla1680gradir").val();
@@ -405,7 +389,9 @@
                                     var jsonData = JSON.stringify(treeData );
                                 */
                                 var filenodes = JSON.parse(ret.record.jsonString);
-                                if ($("#kla1680grat0").hasClass("jstree")) $("#kla1680grat0").jstree(true).destroy();
+                                if ($("#kla1680grat0").hasClass("jstree")) {
+                                    $("#kla1680grat0").jstree(true).destroy();
+                                }
                                 // "checkbox"
                                 $("#kla1680grat0").jstree({
                                     "plugins": ["state"],
@@ -526,18 +512,7 @@
                  */
                 if (typeof navigatebucket.navigate !== "undefined" && navigatebucket.navigate === "back") {
                     if (typeof navigatebucket.oldparameters === "object") {
-                        selyears = navigatebucket.oldparameters[0].selyears;
-                        fullname = navigatebucket.oldparameters[0].fullname;
-                        aktfullname = fullname;
-                        var node = {
-                            li_attr: {
-                                fullname: fullname,
-                                what: "file"
-                            }
-                        };
-                        kla1680gra.clicknode(node, function (ret) {
-                            $("#kla1680grab4").click();
-                        });
+
                     }
                 }
 
@@ -553,961 +528,6 @@
 
 
 
-    /**
-     * kla1680gra.prepselection - Dialog ausgeben etc.
-     * selyears ist die Default-Initialisierung,
-     * fullname ist gegeben aus dem Treeview
-     */
-    kla1680gra.selData = function (pivotopcode, selyears, fullname, callbacksel) {
-        aktfullname = fullname;
-
-        if ($("#kla1680gra_rightw").length === 0) {
-            $("#kla1680gra_right")
-                .append($("<div/>", {
-                    id: "kla1680gra_rightw",
-                    class: "kla1680gra_rightw",
-                    css: {
-                        resize: "horizontal",
-                        overflow: "auto",
-                        float: "left",
-                        width: "100%"
-                    }
-                }));
-        }
-        $("#kla1680gra_rightw").empty();
-        $("#kla1680gra_rightw").height($("#kla1680gra_left").height());
-        $("#kla1680gra_rightw")
-            .append($("<form/>", {
-                id: "kla1680gra" + "form1",
-                class: "uieform"
-            }));
-        uientry.getSchemaUI("kla1680gra", selschema, "kla1680gra", "kla1680gra" + "form1", function (ret) {
-            if (ret.error === false) {
-                //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                var selrecord = {
-                    years: selyears
-                };
-                uientry.fromRecord2UI("#kla1680graform1", selrecord, selschema);
-                // <button
-                $("#kla1680gra_rightw")
-                    .append($("<br/>"))
-                    .append($("<div/>", {
-                            id: "kla1680gra_rightwbutts",
-                            width: "100%"
-                        })
-                        .append($("<button/>", {
-                            html: "Rohdaten anzeigen",
-                            css: {
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var target = "";
-                                if ($("#kla1680gra_rightw").length === 0) {
-                                    $("#kla1680gra_right")
-                                        .append($("<div/>", {
-                                            id: "kla1680gra_rightw",
-                                            class: "kla1680gra_rightw",
-                                            css: {
-                                                resize: "horizontal",
-                                                overflow: "auto",
-                                                float: "left",
-                                                width: "100%"
-                                            }
-                                        }));
-                                }
-                                $("#kla1680gra_rightwdata").empty();
-                                $("#kla1680gra_rightw")
-                                    .append($("<div/>", {
-                                        id: "kla1680gra_rightwdata",
-                                        width: "98%"
-                                    }));
-                                kla1680gra.showfilecontent(aktfullname, 0, 0, "#kla1680gra_rightwdata", function (ret) {
-                                    // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
-                                });
-                            }
-                        }))
-
-                        .append($("<button/>", {
-                            html: "Breitengrade bereitstellen",
-                            id: "kla1680grab4",
-                            css: {
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                $("#kla1680grab4").prop("disabled", true);
-                                var target = "";
-                                if ($("#kla1680gra_rightw").length === 0) {
-                                    $("#kla1680gra_right")
-                                        .append($("<div/>", {
-                                            id: "kla1680gra_rightw",
-                                            class: "kla1680gra_rightw",
-                                            css: {
-                                                resize: "horizontal",
-                                                overflow: "auto",
-                                                float: "left",
-                                                width: "100%"
-                                            }
-                                        }));
-                                }
-                                $("#kla1680gra_rightwdata").empty();
-                                $("#kla1680gra_rightw")
-                                    .append($("<div/>", {
-                                        id: "kla1680gra_rightwdata",
-                                        width: "98%"
-                                    }));
-                                var ghcnclock = kla1680gra.showclock("#kla1680gra_rightwdata");
-                                var selrecord = {};
-                                selrecord = uientry.fromUI2Record("#kla1680graform1", selrecord, selschema);
-                                var apiname;
-                                if (kla1680gra.checkfragments(fullname, "IPCC GHCNM v3 .dat")) {
-                                    apiname = "ghcndat2latitudes";
-                                } else if (kla1680gra.checkfragments(fullname, "IPCC GHCNM v4 .dat")) {
-                                    apiname = "ghcndat2latitudes";
-                                } else if (kla1680gra.checkfragments(fullname, "crutem4 asof .dat")) {
-                                    apiname = "crutem42latitudes";
-                                } else if (kla1680gra.checkfragments(fullname, "ECA .zip")) {
-                                    apiname = "ecad2latitudes";
-                                } else {
-                                    return;
-                                }
-                                var jqxhr = $.ajax({
-                                    method: "GET",
-                                    crossDomain: false,
-                                    url: sysbase.getServer(apiname),
-                                    data: {
-                                        forcedata: forcedata,
-                                        fullname: fullname,
-                                        timeout: 10 * 60 * 1000,
-                                        pivotopcode: pivotopcode,
-                                        selyears: selrecord.seldata.years
-                                    }
-                                }).done(function (r1, textStatus, jqXHR) {
-                                    clearInterval(ghcnclock);
-                                    $("#kla1680grab4").prop("disabled", false);
-                                    forcedata = "false";
-                                    // $("#kla1680gra_rightw").empty();
-                                    sysbase.checkSessionLogin(r1);
-                                    var ret = JSON.parse(r1);
-                                    sysbase.putMessage(ret.message, 1);
-                                    yearlats = ret.yearlats;
-                                    var datafilename = ret.datafilename;
-                                    fulldatafilename = ret.fulldatafilename;
-                                    $("#kla1680gra_rightwdata")
-                                        .append($("<span/>", {
-                                            html: "Bereitstellung ist erfolgt in:<br>" + datafilename
-                                        }))
-                                        .append($("<br>"))
-                                        .append($("<br>"))
-                                        .append($("<span/>", {
-                                            html: yearlats
-                                        }));
-
-                                    document.getElementById("kla1680gra").style.cursor = "default";
-                                    /*
-                                    localStorage.removeItem("yearlats");
-                                    // crosswindow = window.open("klipivot.html", wname);
-                                    localStorage.setItem("yearlats", JSON.stringify(yearlats));
-                                    */
-
-                                    /**
-                                     * Aufbau Buttons für die Verarbeitung
-                                     */
-                                    $("#kla1680gra_rightwoper").empty();
-                                    $("#kla1680gra_rightwdata")
-                                        .append($("<div/>", {
-                                            id: "kla1680gra_rightwoper"
-                                        }));
-                                    $("#kla1680gra_rightwoper")
-                                        .append($("<button/>", {
-                                            html: "Pivottabelle",
-                                            css: {
-                                                margin: "10px"
-                                            },
-                                            click: function (evt) {
-                                                evt.preventDefault();
-                                                window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                                                var idc20 = window.parent.sysbase.tabcreateiframe("Pivot", "", "re-klima", "kli1500piv");
-                                                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                                            }
-                                        }))
-                                        .append($("<button/>", {
-                                            html: "Randstatistik",
-                                            css: {
-                                                margin: "10px"
-                                            },
-                                            click: function (evt) {
-                                                evt.preventDefault();
-                                                window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                                                /*
-                                                sysbase.navigateTo("kli1520sta", [], function (ret) {
-                                                    if (ret.error === true) {
-                                                        alert(ret.message);
-                                                    }
-                                                });
-                                                */
-                                                var idc20 = window.parent.sysbase.tabcreateiframe("Randstatistik", "", "re-klima", "kli1520sta");
-                                                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                                            }
-                                        }))
-                                        .append($("<button/>", {
-                                            html: "Heatmap",
-                                            css: {
-                                                margin: "10px"
-                                            },
-                                            click: function (evt) {
-                                                evt.preventDefault();
-                                                window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                                                var seldata = {
-                                                    fullname: fullname,
-                                                    selyears: selrecord.seldata.years
-                                                };
-                                                window.parent.sysbase.setCache("seldata", JSON.stringify(seldata));
-                                                var idc20 = window.parent.sysbase.tabcreateiframe("Heatmap", "", "re-klima", "kli1540map", "kliheatmap.html");
-                                                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                                            }
-                                        }));
-                                    return;
-                                }).fail(function (err) {
-                                    clearInterval(ghcnclock);
-                                    $("#kla1680grab4").prop("disabled", false);
-                                    forcedata = "false";
-                                    $("#kla1680gra_rightwdata").empty();
-                                    document.getElementById("kla1680gra").style.cursor = "default";
-                                    sysbase.putMessage(err, 1);
-                                    return;
-                                }).always(function () {
-                                    // nope
-                                });
-                            }
-                        }))
-                        /**
-                         * Daten komplett übernehmen
-                         */
-                        .append($("<button/>", {
-                            html: "Daten komplett übernehmen",
-                            id: "kla1680grab5",
-                            css: {
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                /**
-                                 * Popup Prompt zur Bestätigung der kompletten Übernahme
-                                 * kla1680grafullname -  $("#kla1680grafullname").text();
-                                 */
-                                var username = uihelper.getUsername();
-                                var popschema = {
-                                    entryschema: {
-                                        refname: {
-                                            title: "Übernahmedatei",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uietext",
-                                            default: "",
-                                            width: "100px",
-                                            io: "i"
-                                        },
-                                        stationfilter: {
-                                            title: "Prefix-Filter stationid",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uietext",
-                                            default: "",
-                                            width: "100px",
-                                            io: "i"
-                                        },
-                                        comment: {
-                                            title: "Kommentar",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uietext",
-                                            default: "",
-                                            io: "i"
-                                        }
-                                    }
-                                };
-                                var poprecord = {};
-                                poprecord.refname = $("#kla1680grafullname").text();
-                                var anchorHash = "#kla1680gra_rightw";
-                                var title = "Daten komplett übernehmen";
-                                var pos = {
-                                    left: $("#kla1680gra_rightw").offset().left,
-                                    top: screen.height / 2
-                                };
-                                //Math.ceil($(this).offset().top + $(this).height() + 20)
-                                $(document).on('popupok', function (evt, extraParam) {
-                                    evt.preventDefault();
-                                    evt.stopPropagation();
-                                    evt.stopImmediatePropagation();
-                                    kla1680gra.loadghcnall($("#kla1680grafullname").text(), extraParam);
-                                });
-
-                                uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
-                                    if (ret.error === false) {
-                                        // outrec.isactive = "false"; // true oder false wenn gelöscht
-                                    } else {
-                                        sysbase.putMessage("Stationen werden nicht komplett übernommen", 1);
-                                        callback1({
-                                            error: false,
-                                            message: "finished"
-                                        });
-                                        return;
-                                    }
-                                });
-                            }
-                        }))
-                        /**
-                         * Datenkontrolle
-                         */
-                        .append($("<button/>", {
-                            html: "Datenkontrolle",
-                            id: "kla1680grab6a",
-                            css: {
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var actvariablename = "";
-                                if (kla1680gra.checkfragments(fullname, "IPCC GHCNM v3 .dat")) {
-                                    aktsource = "GHCN";
-                                    actvariablename = "tavg";
-                                } else if (kla1680gra.checkfragments(fullname, "IPCC GHCNM v4 .dat")) {
-                                    aktsource = "GHCN4";
-                                    actvariablename = "tavg";
-                                } else if (kla1680gra.checkfragments(fullname, "crutem4 asof .dat")) {
-                                    aktsource = "CRUTEM4";
-                                    actvariablename = "tavg";
-                                } else if (kla1680gra.checkfragments(fullname, "ECA .zip")) {
-                                    aktsource = "ECAD";
-                                    actvariablename = "tmax";
-                                } else {
-                                    return;
-                                }
-                                var selstations = {
-                                    fullname: aktfullname,
-                                    source: aktsource,
-                                    actvariablename: actvariablename
-                                };
-
-                                var table = "KLISTATIONS";
-                                var api = "getaggregaterecords";
-
-                                var options = [{
-                                    $group: {
-                                        "_id": {
-                                            "source": "$source",
-                                            "hasTMAX": {
-                                                "$gt": [{
-                                                    "$ifNull": ["$tmax", ""]
-                                                }, ""]
-                                            },
-                                            "hasTMIN": {
-                                                "$gt": [{
-                                                    "$ifNull": ["$tmin", ""]
-                                                }, ""]
-                                            },
-                                            "hasTAVG": {
-                                                "$gt": [{
-                                                    "$ifNull": ["$tavg", ""]
-                                                }, ""]
-                                            }
-                                        },
-                                        "count": {
-                                            "$sum": 1
-                                        }
-                                    }
-                                }];
-                                uihelper.getAggregateRecords(options, api, table, function (ret) {
-                                    if (ret.error === true) {
-                                        sysbase.putMessage(ret.message, 3);
-                                        return;
-                                    } else if (typeof ret.records === "undefined" || ret.records === null) {
-                                        sysbase.putMessage("Keine Daten gefunden", 3);
-                                        return;
-                                    } else {
-                                        console.log(JSON.stringify(ret.records));
-                                        var html = JSON.stringify(ret.records, null, "");
-                                        $("#kla1680gra_rightw1").remove();
-                                        var htmltable = "";
-                                        // "0":{"_id":{"source":"ECAD","hasTMAX":true,"hasTMIN":false,"hasTAVG":false},"count":10050},
-                                        var staformat = {
-                                            source: {
-                                                title: "Datenquelle",
-                                                width: "20%",
-                                                align: "center"
-                                            },
-                                            TMAX: {
-                                                title: "hat TMAX",
-                                                width: "15%",
-                                                align: "center"
-                                            },
-                                            TMIN: {
-                                                title: "hat TMIN",
-                                                width: "15%",
-                                                align: "center"
-                                            },
-                                            TAVG: {
-                                                title: "hat TAVG",
-                                                width: "15%",
-                                                align: "center"
-                                            },
-                                            count: {
-                                                title: "Anzahl",
-                                                width: "20%",
-                                                align: "right"
-                                            }
-                                        };
-                                        // for (irec = 0; irec < ret.records.length; irec++) {
-                                        var irec = 0;
-                                        for (property in ret.records) {
-                                            if (ret.records.hasOwnProperty(property)) {
-                                                var record = ret.records[property];
-                                                irec++;
-                                                var rowid = record._id;
-                                                var starec = {
-                                                    source: record._id.source,
-                                                    TMAX: record._id.hasTMAX,
-                                                    TMIN: record._id.hasTMIN,
-                                                    TAVG: record._id.hasTAVG,
-                                                    count: record.count
-                                                };
-                                                var line = uihelper.transformJSON2TableTR(starec, irec - 1, staformat, "", "tablesorter-ignoreRow");
-                                                htmltable += line;
-                                            }
-                                        }
-                                        htmltable += "</body>";
-                                        htmltable += "</table>";
-                                        $("#kla1680gra_rightw")
-                                            .append($("<div/>", {
-                                                    id: "kla1680gra_rightw1"
-                                                })
-                                                .append($("<table/>", {
-                                                    id: "kla1680grat5",
-                                                    class: "tablesorter", // wichtig
-                                                    width: "95%",
-                                                    border: "2",
-                                                    rules: "all",
-                                                    css: {
-                                                        layout: "fixed"
-                                                    },
-                                                    html: htmltable
-                                                }))
-                                            );
-                                        $(".tablesorter").tablesorter({
-                                            theme: "blue",
-                                            widgets: ['filter'],
-                                            widthFixed: true,
-                                            widgetOptions: {
-                                                filter_hideFilters: false,
-                                                filter_ignoreCase: true
-                                            }
-                                        });
-                                    }
-
-                                });
-
-                            }
-                        }))
-                        /**
-                         * Stationen analysieren mit Heatmaps
-                         */
-                        .append($("<button/>", {
-                            html: "Stationen analysieren",
-                            id: "kla1680grab6",
-                            css: {
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var actvariablename = "";
-                                if (kla1680gra.checkfragments(fullname, "IPCC GHCN Daily stations \.txt")) {
-                                    aktsource = "GHCND";
-                                    actvariablename = "TMAX";
-                                } else if (kla1680gra.checkfragments(fullname, "IPCC GHCNM v3 .dat")) {
-                                    aktsource = "GHCN";
-                                    actvariablename = "tavg";
-                                } else if (kla1680gra.checkfragments(fullname, "IPCC GHCNM v4 .dat")) {
-                                    aktsource = "GHCN4";
-                                    actvariablename = "tavg";
-                                } else if (kla1680gra.checkfragments(fullname, "crutem4 asof .dat")) {
-                                    aktsource = "CRUTEM4";
-                                    actvariablename = "tavg";
-                                } else if (kla1680gra.checkfragments(fullname, "ECA .zip")) {
-                                    aktsource = "ECAD";
-                                    actvariablename = "tmax";
-                                } else {
-                                    return;
-                                }
-                                var selstations = {
-                                    fullname: aktfullname,
-                                    source: aktsource,
-                                    actvariablename: actvariablename
-                                };
-                                window.parent.sysbase.setCache("selstations", selstations);
-                                var tourl = "inframe.html" + "?" + "source=" + aktsource + "&variablename=" + actvariablename;
-                                tourl += "&fullname=" + aktfullname;
-                                var idc20 = window.parent.sysbase.tabcreateiframe("Stations", "", "re-klima", "kla1610sta", tourl);
-                                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                            }
-                        }))
-
-
-                        /**
-                         * Stationen korrigieren
-                         */
-                        .append($("<button/>", {
-                            html: "Stationen korrigieren",
-                            id: "kla1680grab7",
-                            css: {
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var jqxhr = $.ajax({
-                                    method: "GET",
-                                    crossDomain: false,
-                                    url: sysbase.getServer("dropcolumn3"),
-                                    data: {
-                                        timeout: 70 * 60 * 1000,
-                                        tablename: "KLISTATIONS",
-                                        columnnames: "anzyears,realyears,fromyear,toyear",
-                                        keys: "source,stationid"
-                                    }
-                                }).done(function (r1, textStatus, jqXHR) {
-                                    //sysbase.checkSessionLogin(r1);
-                                    var ret = JSON.parse(r1);
-                                    sysbase.putMessage(ret.message, 1);
-                                    return;
-                                }).fail(function (err) {
-                                    sysbase.putMessage("ERROR:" + err, 3);
-                                    return;
-                                }).always(function () {
-                                    // nope
-                                });
-                            }
-                        }))
-                    );
-
-                if (kla1680gra.checkfragments(fullname, "ECA .zip")) {
-                    /**
-                     * Datenkonvertierung SQLite3
-                     */
-                    $("#kla1680gra_rightwbutts")
-                        .append($("<button/>", {
-                            html: "Datenkonvertierung SQLite3",
-                            id: "kla1680grab6b",
-                            css: {
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                evt.stopPropagation();
-                                evt.stopImmediatePropagation();
-                                var selrecord = {
-                                    years: selyears
-                                };
-                                uientry.fromRecord2UI("#kla1680graform1", selrecord, selschema);
-                                var ghcnclock = kla1680gra.showclock("#kla1680gra_rightwdata");
-                                var apiname = "convecad2sql";
-                                try {
-                                    var jqxhr = $.ajax({
-                                        method: "GET",
-                                        crossDomain: false,
-                                        url: sysbase.getServer(apiname),
-                                        data: {
-                                            forcedata: forcedata,
-                                            fullname: fullname,
-                                            timeout: 70 * 60 * 1000,
-                                            source: "ECAD"
-                                            /*
-                                            selyears: selrecord.seldata.years,
-                                            minyears: selrecord.seldata.minyears
-                                            */
-                                        }
-                                    }).done(function (r1, textStatus, jqXHR) {
-                                        clearInterval(ghcnclock);
-                                        $("#kla1680grab4").prop("disabled", false);
-                                        $("#kla1680grab5").prop("disabled", false);
-                                        $("#kla1680gra_rightw1").remove();
-                                        sysbase.checkSessionLogin(r1);
-                                        var ret = JSON.parse(r1);
-                                        sysbase.putMessage(ret.message, 1);
-                                        var html = ret.html;
-                                        $("#kla1680gra_rightw1").html(html);
-                                    }).fail(function (err) {
-                                        clearInterval(ghcnclock);
-                                        $("#kla1680grab4").prop("disabled", false);
-                                        forcedata = "false";
-                                        $("#kla1680gra_rightwdata").empty();
-                                        document.getElementById("kla1680gra").style.cursor = "default";
-                                        sysbase.putMessage("ERROR:" + err, 3);
-                                        return;
-                                    }).always(function () {
-                                        // nope
-                                    });
-
-
-                                } catch (err) {
-                                    clearInterval(ghcnclock);
-                                    document.getElementById("kla1680gra").style.cursor = "default";
-                                    sysbase.putMessage("ERROR:" + err, 3);
-                                    console.log(err);
-                                    console.log(err.stack);
-                                    return;
-                                }
-                            }
-                        }));
-                }
-
-
-
-
-
-
-
-                callbacksel({
-                    error: false,
-                    message: "aufgebaut"
-                });
-            } else {
-                callbacksel({
-                    error: true,
-                    message: ret.message
-                });
-                return;
-            }
-        });
-    };
-
-    /**
-     * loadghcnall - GHCN-Daily nur stations laden
-     */
-    kla1680gra.loadghcnall = function (fullname, extraParam) {
-        $("#kla1680grab4").prop("disabled", true);
-        $("#kla1680grab5").prop("disabled", true);
-        var target = "";
-        if ($("#kla1680gra_rightw").length === 0) {
-            $("#kla1680gra_right")
-                .append($("<div/>", {
-                    id: "kla1680gra_rightw",
-                    class: "kla1680gra_rightw",
-                    css: {
-                        resize: "horizontal",
-                        overflow: "auto",
-                        float: "left",
-                        width: "100%"
-                    }
-                }));
-        }
-        $("#kla1680gra_rightwdata").empty();
-        $("#kla1680gra_rightw")
-            .append($("<div/>", {
-                id: "kla1680gra_rightwdata",
-                width: "98%"
-            }));
-        var ghcnclock = kla1680gra.showclock("#kla1680gra_rightwdata");
-        var selrecord = {};
-        selrecord = uientry.fromUI2Record("#kla1680graform1", selrecord, selschema);
-        var apiname;
-        var source;
-        if (kla1680gra.checkfragments(fullname, "IPCC GHCN Daily stations .txt")) {
-            apiname = "ghcndcomplete";
-            source = "GHCND";
-        } else {
-            return;
-        }
-        try {
-            var jqxhr = $.ajax({
-                method: "GET",
-                crossDomain: false,
-                url: sysbase.getServer(apiname),
-                data: {
-                    forcedata: forcedata,
-                    fullname: fullname,
-                    timeout: 70 * 60 * 1000,
-                    source: source,
-                    selyears: selrecord.seldata.years,
-                    extraParam: extraParam
-                }
-            }).done(function (r1, textStatus, jqXHR) {
-                clearInterval(ghcnclock);
-                $("#kla1680grab4").prop("disabled", false);
-                $("#kla1680grab5").prop("disabled", false);
-                forcedata = "false";
-                // $("#kla1680gra_rightw").empty();
-                sysbase.checkSessionLogin(r1);
-                var ret = JSON.parse(r1);
-                sysbase.putMessage(ret.message, 1);
-                yearlats = ret.yearlats;
-                var datafilename = ret.datafilename;
-                fulldatafilename = ret.fulldatafilename;
-                $("#kla1680gra_rightwdata")
-                    .append($("<span/>", {
-                        html: "Bereitstellung ist erfolgt in:<br>" + datafilename
-                    }))
-                    .append($("<br>"))
-                    .append($("<br>"))
-                    .append($("<span/>", {
-                        html: yearlats
-                    }));
-                document.getElementById("kla1680gra").style.cursor = "default";
-                /**
-                 * Aufbau Buttons für die Verarbeitung
-                 */
-                $("#kla1680gra_rightwoper").empty();
-                $("#kla1680gra_rightwdata")
-                    .append($("<div/>", {
-                        id: "kla1680gra_rightwoper"
-                    }));
-                $("#kla1680gra_rightwoper")
-                    .append($("<button/>", {
-                        html: "Pivottabelle",
-                        css: {
-                            margin: "10px"
-                        },
-                        click: function (evt) {
-                            evt.preventDefault();
-                            window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                            var idc20 = window.parent.sysbase.tabcreateiframe("Pivot", "", "re-klima", "kli1500piv");
-                            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                        }
-                    }))
-                    .append($("<button/>", {
-                        html: "Randstatistik",
-                        css: {
-                            margin: "10px"
-                        },
-                        click: function (evt) {
-                            evt.preventDefault();
-                            window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                            /*
-                            sysbase.navigateTo("kli1520sta", [], function (ret) {
-                                if (ret.error === true) {
-                                    alert(ret.message);
-                                }
-                            });
-                            */
-                            var idc20 = window.parent.sysbase.tabcreateiframe("Randstatistik", "", "re-klima", "kli1520sta");
-                            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                        }
-                    }))
-                    .append($("<button/>", {
-                        html: "Heatmap",
-                        css: {
-                            margin: "10px"
-                        },
-                        click: function (evt) {
-                            evt.preventDefault();
-                            window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                            var seldata = {
-                                fullname: fullname,
-                                selyears: selrecord.seldata.years
-                            };
-                            window.parent.sysbase.setCache("seldata", JSON.stringify(seldata));
-                            var idc20 = window.parent.sysbase.tabcreateiframe("Heatmap", "", "re-klima", "kli1540map", "kliheatmap.html");
-                            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                        }
-                    }));
-                return;
-            }).fail(function (err) {
-                clearInterval(ghcnclock);
-                $("#kla1680grab4").prop("disabled", false);
-                forcedata = "false";
-                $("#kla1680gra_rightwdata").empty();
-                document.getElementById("kla1680gra").style.cursor = "default";
-                sysbase.putMessage("ERROR:" + err, 3);
-                return;
-            }).always(function () {
-                // nope
-            });
-        } catch (err) {
-            clearInterval(ghcnclock);
-            $("#kla1680grab4").prop("disabled", false);
-            forcedata = "false";
-            $("#kla1680gra_rightwdata").empty();
-            document.getElementById("kla1680gra").style.cursor = "default";
-            sysbase.putMessage(err, 1);
-            return;
-        }
-    }
-
-
-
-
-    /**
-     * getPivotData mit pivotopcode für Variationen der Daten
-     */
-    kla1680gra.getPivotData = function (pivotopcode, selyears, fullname, callbackpiv) {
-        document.getElementById("kla1680gra").style.cursor = "progress";
-        // Ausgabe in Map rechts
-        $("#kla1680gra_rightw").empty();
-        $("#kla1680gra_rightw").height($("#kla1680gra_left").height());
-        var ghcnclock = kla1680gra.showclock("#kla1680gra_rightw");
-
-        var jqxhr = $.ajax({
-            method: "GET",
-            crossDomain: false,
-            url: sysbase.getServer("ghcndat2latitudes"),
-            data: {
-                fullname: fullname,
-                timeout: 10 * 60 * 1000,
-                pivotopcode: pivotopcode,
-                selyears: selyears
-            }
-        }).done(function (r1, textStatus, jqXHR) {
-            clearInterval(ghcnclock);
-            // $("#kla1680gra_rightw").empty();
-            sysbase.checkSessionLogin(r1);
-            var ret = JSON.parse(r1);
-            sysbase.putMessage(ret.message, 1);
-            var tarray = [];
-            /*
-            for (var lat in ret.latprofile) {
-                if (ret.latprofile.hasOwnProperty(lat)) {
-                    tarray.push({
-                        lats: lat,
-                        latprofile: ret.latprofile[lat]
-                    });
-                }
-            }
-            tarray.sort(function (a, b) {
-                if (a.lats < b.lats)
-                    return -1;
-                if (a.lats > b.lats)
-                    return 1;
-                return 0;
-            });
-            */
-            for (var year in ret.yearlats) {
-                if (ret.yearlats.hasOwnProperty(year)) {
-                    for (var lats in ret.yearlats[year]) {
-                        if (ret.yearlats[year].hasOwnProperty(lats)) {
-                            tarray.push({
-                                year: year,
-                                lats: lats,
-                                stations: ret.yearlats[year][lats].stations,
-                                months: ret.yearlats[year][lats].months /* mit tmax, tmin */
-                            });
-                        }
-                    }
-
-                }
-            }
-            yearlats = ret.yearlats;
-            tarray.sort(function (a, b) {
-                if (a.year < b.year)
-                    return -1;
-                if (a.year > b.year)
-                    return 1;
-                if (a.lats < b.lats)
-                    return -1;
-                if (a.lats > b.lats)
-                    return 1;
-                return 0;
-            });
-            var lstring = $.map(tarray, function (obj) {
-                return JSON.stringify(obj, null, " ");
-            }).join('<br>');
-            $("#kla1680gra_rightw")
-                .append($("<br/>"))
-                .append($("<button/>", {
-                    html: "Pivottabelle",
-                    click: function (evt) {
-                        evt.preventDefault();
-                        if (!window.localStorage) {
-                            alert("Kein localStorage, Pivot nicht möglich");
-                            return;
-                        }
-                        var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
-                        localStorage.removeItem("pivotdata");
-                        localStorage.removeItem("yearlats");
-                        // NEU pivotdata kompatibel aufbauen:
-                        pivotdata = [];
-                        pivotdata.push([
-                            "lats",
-                            "year",
-                            "month",
-                            "tmax",
-                            "tmin"
-                        ]);
-                        for (var ita = 0; ita < tarray.length; ita++) {
-                            var latdata = tarray[ita];
-                            var otab = [];
-                            var lats = latdata.lats;
-                            var year = latdata.year;
-                            var monthdata = latdata.months;
-                            for (var mon in monthdata) {
-                                if (monthdata.hasOwnProperty(mon)) {
-                                    pivotdata.push([
-                                        lats,
-                                        year,
-                                        mon,
-                                        monthdata[mon].tmax,
-                                        monthdata[mon].tmin
-                                    ]);
-                                }
-                            }
-                        }
-                        crosswindow = window.open("klipivot.html", wname);
-                        localStorage.setItem("pivotdata", JSON.stringify(pivotdata));
-                        localStorage.setItem("yearlats", JSON.stringify(yearlats));
-                    }
-                }));
-            var html = "";
-            html += "<br>";
-            html += lstring; // uihelper.iterateJSON2pretty(ret.latprofile, "", "");
-            $("#kla1680gra_rightw")
-                .append($("<span/>", {
-                    html: html
-                }));
-            document.getElementById("kla1680gra").style.cursor = "default";
-            callbackpiv({
-                error: false,
-                message: "Daten bereitgestellt"
-            });
-            return;
-        }).fail(function (err) {
-            clearInterval(ghcnclock);
-            $("#kla1680gra_rightw").empty();
-            document.getElementById("kla1680gra").style.cursor = "default";
-            sysbase.putMessage(err, 1);
-            callbackpiv({
-                error: true,
-                message: "Daten NICHT bereitgestellt:" + err
-            });
-            return;
-        }).always(function () {
-            // nope
-        });
-    };
-
-    /**
-     * Prüfen teststring, ob alle Fragemente in fragments enthalten sind
-     * blank-separierte fragmente
-     * return true oder false
-     */
-    kla1680gra.checkfragments = function (teststring, fragments) {
-        var test = teststring.toLowerCase();
-        var frag = fragments.toLowerCase();
-        var tfrags = frag.split(" ");
-        for (var ifrag = 0; ifrag < tfrags.length; ifrag++) {
-            var such = tfrags[ifrag].trim();
-            if (test.indexOf(such) < 0) {
-                return false;
-            }
-        }
-        return true;
-        /*
-        for (var ifrag = 0; ifrag < tfrags.length; ifrag++) {
-            if (trags[ifrag].startsWith("."))
-            var such = new RegExp(tfrags[ifrag].trim(), "i");
-            if (!such.test(teststring)) {
-                return false;
-            }
-        }
-        return true;
-        */
-
-    };
 
 
     kla1680gra.showclock = function (clockcontainer) {
@@ -1803,85 +823,8 @@
                                 return;
                             });
                         }
-                    },
-                    function (ret, callbackc) {
-                        uientry.getSchemaUI("kla1680gra", klischema, "kla1680gra", "kla1680gra" + "form", function (ret) {
-                            if (ret.error === false) {
-                                //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                                console.log("kla1680gra" + " aufgebaut", 0);
-                                // Initialisierung des UI
-                                klirecord = {};
-                                // den Satz holen zum Editieren
-                                var sel = {
-                                    fullname: fullname
-                                };
-                                var projection = {
-                                    history: 0
-                                };
-                                var api = "getonerecord";
-                                var table = "KLIRAWFILES";
-                                uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                                    if (ret.error === false && ret.record !== null) {
-                                        klirecord = ret.record;
-                                        uientry.fromRecord2UI("#kla1680graform", klirecord, klischema);
-                                        $("#kla1680graform")
-                                            .append($("<div/>", {
-                                                    css: {
-                                                        "text-align": "center",
-                                                        width: "100%"
-                                                    }
-                                                })
-                                                .append($("<button/>", {
-                                                    class: "kla1680graActionSave",
-                                                    css: {
-                                                        "margin-left": "10px"
-                                                    },
-                                                    html: "Speichern",
-                                                }))
-                                            );
-                                    }
-                                    $("#kla1680graselections").attr("rules", "all");
-                                    $("#kla1680graselections").css({
-                                        border: "1px solid black",
-                                        margin: "10px"
-                                    });
-                                    $("#kla1680graselections tbody tr:nth-child(2)").hide();
-                                    callbackc(null, {
-                                        error: false,
-                                        message: "erledigt"
-                                    });
-                                    return;
-                                });
-                            } else {
-                                //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
-                                console.log("kla1680gra" + " NICHT aufgebaut", 3);
-                                callbackc(null, {
-                                    error: false,
-                                    message: "erledigt"
-                                });
-                                return;
-                            }
-                        });
-                    },
-                    function (ret, callbackc) {
-                        if (kla1680gra.checkfragments(fullname, "G:  Projekte  klimadaten  HYDE_lu_pop_proxy  baseline  asc")) {
-                            // Ausgabe Mittelbereich für die dedizierte Verarbeitung
-                            kla1680gra.puthydeform(fullname, function (ret) {
-                                callbackc(null, {
-                                    error: false,
-                                    message: "erledigt"
-                                });
-                                return;
-                            });
-                        } else {
-                            callbackc(null, {
-                                error: false,
-                                message: "erledigt"
-                            });
-                            return;
-                        }
                     }
-                ],
+                  ],
                 function (error, ret) {
                     supercallback(ret);
                     return;
@@ -1898,192 +841,275 @@
              * spezielle Dateien werden abgefangen, GHCND vorgezogen
              */
             if (kla1680gra.checkfragments(fullname, "IPCC GHCN Daily stations \.txt")) {
-                kla1680gra.ghcndstations("GHCND", "", fullname, function (ret) {
-
+                supercallback({
+                    error: false,
+                    message: "OK"
+                });
+                return;
+            } else if (kla1680gra.checkfragments(fullname, "global \.txt")) {
+                // Graphik ausgeben
+                kla1680gra.paintChart(fullname, "global", function(ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+            } else if (kla1680gra.checkfragments(fullname, "continents \.txt")) {
+                // Graphik ausgeben
+                // {"NA1":{"2018":{"count":26,"plusnew":26,"minusold":0}
+                kla1680gra.paintChart(fullname, "continents", function(ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
                 });
             } else {
                 // einfache Dateianzeige, inhalt
                 kla1680gra.showfilecontent(fullname, 0, 0, "#kla1680gra_rightw", function (ret) {
                     // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
-                    uientry.getSchemaUI("kla1680gra", klischema, "kla1680gra", "kla1680gra" + "form", function (ret) {
-                        if (ret.error === false) {
-                            //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                            console.log("kla1680gra" + " aufgebaut", 0);
-                            // Initialisierung des UI
-                            klirecord = {};
-                            // den Satz holen zum Editieren
-                            var sel = {
-                                fullname: fullname
-                            };
-                            var projection = {
-                                history: 0
-                            };
-                            var api = "getonerecord";
-                            var table = "KLIRAWFILES";
-                            uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                                if (ret.error === false && ret.record !== null) {
-                                    klirecord = ret.record;
-                                    uientry.fromRecord2UI("#kla1680graform", klirecord, klischema);
-                                    $("#kla1680graform")
-                                        .append($("<div/>", {
-                                                css: {
-                                                    "text-align": "center",
-                                                    width: "100%"
-                                                }
-                                            })
-                                            .append($("<button/>", {
-                                                class: "kla1680graActionSave",
-                                                css: {
-                                                    "margin-left": "10px"
-                                                },
-                                                html: "Speichern",
-                                            }))
-                                            .append($("<button/>", {
-                                                class: "kla1680graActionLoad",
-                                                css: {
-                                                    "margin-left": "10px"
-                                                },
-                                                html: "Laden Datei",
-                                                click: function (evt) {
-                                                    evt.preventDefault();
-                                                    document.getElementById("kla1680gra").style.cursor = "progress";
-                                                    $(".kla1680graActionLoad").prop('disabled', true);
-                                                    // Ausgabe in Map rechts
-                                                    $("#kla1680gra_rightw").empty();
-                                                    $("#kla1680gra_rightw").height($("#kla1680gra_left").height());
-                                                    var ghcnclock = kla1680gra.showclock("#kla1680gra_rightw");
-                                                    var klirecord = uientry.fromUI2Record("#kla1680gra", klirecord, klischema);
-                                                    if (kla1680gra.checkfragments(fullname, "IPCC GHCN Daily inventory \.txt")) {
-                                                        aktsource = "GHCND";
-                                                        var jqxhr = $.ajax({
-                                                            method: "GET",
-                                                            crossDomain: false,
-                                                            url: sysbase.getServer("ghcndinventory"),
-                                                            data: {
-                                                                fullname: fullname,
-                                                                targettable: klirecord.metadata.targettable,
-                                                                primarykey: klirecord.metadata.primarykey,
-                                                                separator: klirecord.metadata.separator,
-                                                                timeout: 10 * 60 * 1000
-                                                            }
-                                                        }).done(function (r1, textStatus, jqXHR) {
-                                                            clearInterval(ghcnclock);
-                                                            document.getElementById("kla1680gra").style.cursor = "default";
-                                                            $(".kla1680graActionLoad").prop('disabled', false);
-                                                            $("#kla1680gra_rightw").empty();
-                                                            sysbase.checkSessionLogin(r1);
-                                                            var ret = JSON.parse(r1);
-                                                            sysbase.putMessage(ret.message, 1);
-                                                            return;
-                                                        }).fail(function (err) {
-                                                            clearInterval(ghcnclock);
-                                                            $("#kla1680gra_rightw").empty();
-                                                            document.getElementById("kla1680gra").style.cursor = "default";
-                                                            $(".kla1680graActionLoad").prop('disabled', false);
-                                                            sysbase.putMessage(err, 1);
-                                                            return;
-                                                        }).always(function () {
-                                                            // nope
-                                                        });
-                                                    } else {
-                                                        $(".kla1680graActionLoad").prop('disabled', true);
-                                                        var jqxhr = $.ajax({
-                                                            method: "POST",
-                                                            crossDomain: false,
-                                                            url: sysbase.getServer("loadcsvdata"),
-                                                            data: {
-                                                                fullname: fullname,
-                                                                filetype: klirecord.metadata.filetype,
-                                                                targettable: klirecord.metadata.targettable,
-                                                                primarykey: klirecord.metadata.primarykey,
-                                                                separator: klirecord.metadata.separator,
-                                                                timeout: 10 * 60 * 1000
-                                                            }
-                                                        }).done(function (r1, textStatus, jqXHR) {
-                                                            clearInterval(ghcnclock);
-                                                            document.getElementById("kla1680gra").style.cursor = "default";
-                                                            $(".kla1680graActionLoad").prop('disabled', false);
-                                                            $("#kla1680gra_rightw").empty();
-                                                            sysbase.checkSessionLogin(r1);
-                                                            var ret = JSON.parse(r1);
-                                                            sysbase.putMessage(ret.message, 1);
-                                                        }).fail(function (err) {
-                                                            clearInterval(ghcnclock);
-                                                            $("#kla1680gra_rightw").empty();
-                                                            document.getElementById("kla1680gra").style.cursor = "default";
-                                                            $(".kla1680graActionLoad").prop('disabled', false);
-                                                            sysbase.putMessage(err, 1);
-                                                            return;
-                                                        }).always(function () {
-                                                            // nope
-                                                        });
-                                                    }
-                                                }
-                                            }))
-
-                                        );
-                                }
-                                $("#kla1680graselections").attr("rules", "all");
-                                $("#kla1680graselections").css({
-                                    border: "1px solid black",
-                                    margin: "10px"
-                                });
-                                $("#kla1680graselections tbody tr:nth-child(2)").hide();
-                                supercallback({
-                                    error: false,
-                                    message: "erledigt"
-                                });
-                                return;
-                            });
-                        } else {
-                            //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
-                            console.log("kla1680gra" + " NICHT aufgebaut", 3);
-                            supercallback({
-                                error: false,
-                                message: "erledigt"
-                            });
-                            return;
-                        }
-                    });
+                    supercallback(ret);
+                    return;
                 });
-
             }
         }
     };
 
+
+
     /**
-     * click on actionSave, speichert nach Editierung
+     * paintChart - mit chartJS wird eine Gesamtgraphik ausgegeben
+     * mit Skalierung etc. (aus kla1620shm)
      */
-    $(document).on("click", ".kla1680graActionSave", function (event) {
-        event.preventDefault();
-        var selfields = {};
-        var updfields = {};
-        var api = "setonerecord";
-        var table = "KLIRAWFILES";
-        var usrrecord = {};
-        try {
-            klirecord = uientry.fromUI2Record("#kla1680gra", klirecord, klischema);
-            selfields = {
-                fullname: klirecord.fsdata.fullname
-            };
-            updfields["$set"] = {
-                metadata: klirecord.metadata
-            };
-            uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
-                if (ret.error === false) {
-                    sysbase.putMessage("kla1680gra" + " saved:" + ret.message, 1);
-                } else {
-                    sysbase.putMessage("kla1680gra-ERROR" + " saved:" + ret.message, 3);
+    kla1680gra.paintChart = function (fullname, datatype, callbackg) {
+
+        async.waterfall([
+            function(callbackh1) {
+                /**
+                 * Holen der Daten
+                 */
+                var jqxhr = $.ajax({
+                    method: "GET",
+                    crossDomain: false,
+                    url: sysbase.getServer("getfileasstring"),
+                    data: {
+                        fullname: fullname
+                    }
+                }).done(function (r1, textStatus, jqXHR) {
+                    sysbase.checkSessionLogin(r1);
+                    sysbase.putMessage(r1, 1);
+                    var ret = JSON.parse(r1);
+                    // Ausgabe in Graphik rechts
+                    sysbase.putMessage(ret.message, 1);
+                    var dataobject = JSON.parse(ret.filestring);
+                    callbackh1(null, {
+                        error: false,
+                        message: "OK",
+                        dataobject: dataobject
+                    });
+                    return;
+                }).fail(function (err) {
+                    document.getElementById("kla1680gra").style.cursor = "default";
+                    sysbase.putMessage(err, 1);
+                    callbackg({
+                        error: true,
+                        message: err
+                    });
+                    return;
+                }).always(function () {
+                    // nope
+                });
+            },
+            function (ret, callbackh2) {
+                /**
+                 * Ausgabe der Graphik - ret.dataobject
+                */
+                $("#kla1680gra_right").empty();
+                var h = $(".col1of2").height();
+                var w = $("#kla1680gra.content").width();
+                w -= $(".col1of2").position().left;
+                w -= $(".col1of2").width();
+                w -= 40;
+                $("#kla1680gra_right")
+                    .append($("<div/>", {
+                            css: {
+                                height: h,
+                                width: w,
+                                "background-color": "white"
+                            }
+                        })
+                        .append($("<canvas/>", {
+                            id: "myChart",
+                            css: {
+                                height: h,
+                                width: w
+                            }
+                        }))
+                    );
+                var datasets = [];  // hält die rows
+                var labels = [];    // hält die col-headers = Years
+                var lab;
+                // bei global.txt direkt die years als keys
+                var years;
+                if (datatype === "global") {
+                    years = Object.keys(ret.dataobject);
+                    labels = years;
+                    var counts = [];
+                    var plusnews = [];
+                    var minusolds = [];
+                    for (var iyear = 0; iyear < years.length; iyear++) {
+                        counts.push(ret.dataobject[years[iyear]].count);
+                        plusnews.push(ret.dataobject[years[iyear]].plusnew);
+                        minusolds.push(ret.dataobject[years[iyear]].minusold);
+                    }
+                    datasets.push({
+                        label: "count",
+                        backgroundColor: '#00FFFF',
+                        borderColor: '#00FFFF',
+                        borderWidth: 1,
+                        pointRadius: 1,
+                        data: counts,
+                        fill: false
+                    });
+                    datasets.push({
+                        label: "plusnew",
+                        backgroundColor: '#00FFFF',
+                        borderColor: '#00FFFF',
+                        borderWidth: 1,
+                        pointRadius: 1,
+                        data: plusnews,
+                        fill: false
+                    });
+                    datasets.push({
+                        label: "minusold",
+                        backgroundColor: '#00FFFF',
+                        borderColor: '#00FFFF',
+                        borderWidth: 1,
+                        pointRadius: 1,
+                        data: minusolds,
+                        fill: false
+                    });
+                } else if (datatype === "continents") {
+                    // {"NA1":{"2018":{"count":26,"plusnew":26,"minusold":0}
+                    // erst feststellen aller Jahre!!!
+                    var tarray = [];
+                    var cons = Object.keys(ret.dataobject);
+                    var oyears = {};
+                    for (var icon = 0; icon < cons.length; icon++) {
+                        var actcon = cons[icon];
+                        var years = Object.keys(ret.dataobject[actcon]);
+                        for (var iyear = 0; iyear < years.length; iyear++) {
+                            var actyear = years[iyear];
+                            if (typeof oyears[actyear] === "undefined") {
+                                oyears[actyear] = {
+                                    year: actyear
+                                };
+                            }
+                            /*
+                            tarray.push({
+                                continent: actcon,
+                                year: actyear,
+                                count: ret.dataobject[actcon][actyear].count,
+                                plusnew: ret.dataobject[actcon][actyear].plusnew,
+                                minusold: ret.dataobject[actcon][actyear].minusold
+                            });
+                            */
+                        }
+                    }
+                    // oyears umsortieren
+                    //oyears = Object.keys(oyears).sort();
+                    /*
+                    oyears.sort(function (a, b) {
+                        if (a.year < b.year)
+                            return -1;
+                        if (a.year > b.year)
+                            return 1;
+                        return 0;
+                    });
+                    */
+                    years = Object.keys(oyears).sort();
+                    labels = years;
+                    for (var icon1 = 0; icon1 < cons.length; icon1++) {
+                        var conkey = cons[icon1];
+                        // Die Ausgabe erfolgt je Kontinent
+                        var counts = [];
+                        var plusnews = [];
+                        var minusolds = [];
+                        for (var iyear = 0; iyear < years.length; iyear++) {
+                            if (typeof ret.dataobject[conkey][years[iyear]] === "undefined") {
+                                counts.push(null);
+                                plusnews.push(null);
+                                minusolds.push(null);
+                            } else {
+                                counts.push(ret.dataobject[conkey][years[iyear]].count || null);
+                                plusnews.push(ret.dataobject[conkey][years[iyear]].plusnew || null);
+                                minusolds.push(ret.dataobject[conkey][years[iyear]].minusold || null);
+                            }
+                        }
+                        datasets.push({
+                            label: conkey + "_count",
+                            backgroundColor: '#00FFFF',
+                            borderColor: '#00FFFF',
+                            borderWidth: 1,
+                            pointRadius: 1,
+                            data: counts,
+                            fill: false
+                        });
+                        datasets.push({
+                            label: conkey + "_plusnew",
+                            backgroundColor: '#00FFFF',
+                            borderColor: '#00FFFF',
+                            borderWidth: 1,
+                            pointRadius: 1,
+                            data: plusnews,
+                            fill: false
+                        });
+                        datasets.push({
+                            label: conkey + "_minusold",
+                            backgroundColor: '#00FFFF',
+                            borderColor: '#00FFFF',
+                            borderWidth: 1,
+                            pointRadius: 1,
+                            data: minusolds,
+                            fill: false
+                        });
+                    }
                 }
-                return;
+
+                var ctx = document.getElementById('myChart').getContext('2d');
+                Chart.defaults.global.plugins.colorschemes.override = true;
+                Chart.defaults.global.legend.display = true;
+                // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+                var config = {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: datasets
+                    },
+                    options: {
+                        plugins: {
+                            colorschemes: {
+                                scheme: 'tableau.HueCircle19'
+                            }
+                        }
+                    }
+                };
+                window.chart1 = new Chart(ctx, config);
+            }
+        ],
+        function(error, ret) {
+            callbackg({
+                error: false,
+                message: "fertig"
             });
-        } catch (err) {
-            alert(err);
-            sysbase.putMessage("kla1680gra:" + err, 3);
-            console.log(err);
-            console.log(err.stack);
-        }
-    });
+        });
+
+
+    };
+
+
+
 
     kla1680gra.setResizeObserver = function () {
 
@@ -2093,19 +1119,12 @@
                     // console.log("resize:" + $(this).width());
                     var resx = entries[entry];
                     var div0 = $("#" + resx.target.id);
-                    var div1 = $("#kla1680gra_entry");
                     // console.log(resx.target.id);
                     var ww = $(window).width();
 
                     var l0 = $(div0).position().left;
                     var w0 = $(div0).width();
                     $(div0).parent().width(w0);
-
-                    var l1 = $(div1).position().left;
-                    var w1 = $(div1).width();
-
-                    console.log("old l:" + l0 + " w:" + w0 + " l1:" + l1 + " w1:" + w1 + " ww:" + ww);
-
                     var l2 = l0 + w0;
                     var w2 = ww - l2;
                     $("#kla1680gra_entry").offset({
@@ -2119,562 +1138,6 @@
                 resizeObserver.observe(document.querySelector(".kla1680gra_rightw"));
             }
         }
-    };
-
-    /**
-     * ghcndstations - Einstieg in GHCN-Daily, erst stations laden, dann Daten
-     * später!!!
-     */
-    kla1680gra.ghcndstations = function (seltype, selyears, fullname, callback55) {
-        // seltype ist hier GHCND
-        kla1680gra.selData(seltype, selyears, fullname, function (ret) {
-            uientry.getSchemaUI("kla1680gra", klischema, "kla1680gra", "kla1680gra" + "form", function (ret) {
-                if (ret.error === false) {
-                    //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                    console.log("kla1680gra" + " aufgebaut", 0);
-                    // Initialisierung des UI
-                    klirecord = {};
-                    // den Satz holen zum Editieren
-                    var sel = {
-                        fullname: fullname
-                    };
-                    var projection = {
-                        history: 0
-                    };
-                    var api = "getonerecord";
-                    var table = "KLIRAWFILES";
-                    uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                        if (ret.error === false && ret.record !== null) {
-                            klirecord = ret.record;
-                            uientry.fromRecord2UI("#kla1680graform", klirecord, klischema);
-                            // Post-Processing
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-mini");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-icon-refresh");
-                            $("#kla1680graform").find(".refUITable").addClass('kla1680grarefresh').removeClass('refUITable');
-
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-mini");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-icon-delete");
-                            $("#kla1680graform").find(".delUITableRow").addClass('kla1680gradelete').removeClass('.delUITableRow');
-
-                            $("#kla1680graform")
-                                .append($("<div/>", {
-                                        css: {
-                                            "text-align": "center",
-                                            width: "100%"
-                                        }
-                                    })
-                                    .append($("<button/>", {
-                                        class: "kla1680graActionSave",
-                                        css: {
-                                            "margin-left": "10px"
-                                        },
-                                        html: "Speichern",
-                                    }))
-                                );
-                        }
-                        $("#kla1680graselections").attr("rules", "all");
-                        $("#kla1680graselections").css({
-                            border: "1px solid black",
-                            margin: "10px"
-                        });
-                        $("#kla1680graselections tbody tr:nth-child(2)").hide();
-                        /**
-                         * Refresh der Selektion aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680grarefresh", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            $("#kla1680grayears").val(cselyears);
-                            $("#kla1680grab4").click();
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-                        /**
-                         * Zeile löschen mit Dateiverweis aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680gradelete", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            /*
-                            selections(object=>array){
-                                0(object){
-                                    fullname(string):G:\Projekte\klimadaten\IPCC_AR4\crutem4_asof020611_stns_used.dat,
-                                    selyears(string):**50,**00,
-                                    fulldatafilename(string):C:\Projekte\re-framework\static\temp\2019\19916963924.txt,
-                                    datafilename(string):19916963924.txt,
-                                }
-                            */
-                            var table = "KLIRAWFILES";
-                            var api = "setonerecord";
-                            var selfields = {};
-                            var updfields = {};
-                            selfields.fullname = $("#kla1680grafullname").text();
-                            updfields["$pull"] = {
-                                selections: {
-                                    datafilename: cdatafilename
-                                }
-                            };
-                            uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
-                                if (ret.error === false) {
-                                    sysbase.putMessage("kla1680gra" + " deleted:" + cdatafilename + " " + ret.message, 1);
-                                    $(row).remove();
-                                    return;
-                                } else {
-                                    sysbase.putMessage("kla1680gra" + " NOT deleted:" + cdatafilename + " " + ret.message, 3);
-                                    return;
-                                }
-                            });
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-                        callback55({
-                            error: false,
-                            message: "erledigt"
-                        });
-                        return;
-                    });
-                } else {
-                    //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
-                    console.log("kla1680gra" + " NICHT aufgebaut", 3);
-                    callback55({
-                        error: true,
-                        message: "kla1680gra" + " NICHT aufgebaut"
-                    });
-                    return;
-                }
-            });
-        });
-
-
-    };
-
-
-    /**
-     * ecadfile ist Zip-Datei mit stations.txt und Daten
-     * im Namen ist die Variable zu erkennen, z.B. tx = max temperature
-     */
-    kla1680gra.ecadfile = function (seltype, selyears, fullname, callback44) {
-        // seltype ist hier ECAD
-        kla1680gra.selData(seltype, selyears, fullname, function (ret) {
-            uientry.getSchemaUI("kla1680gra", klischema, "kla1680gra", "kla1680gra" + "form", function (ret) {
-                if (ret.error === false) {
-                    //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                    console.log("kla1680gra" + " aufgebaut", 0);
-                    // Initialisierung des UI
-                    klirecord = {};
-                    // den Satz holen zum Editieren
-                    var sel = {
-                        fullname: fullname
-                    };
-                    var projection = {
-                        history: 0
-                    };
-                    var api = "getonerecord";
-                    var table = "KLIRAWFILES";
-                    uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                        if (ret.error === false && ret.record !== null) {
-                            klirecord = ret.record;
-                            uientry.fromRecord2UI("#kla1680graform", klirecord, klischema);
-                            // Post-Processing
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-mini");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-icon-refresh");
-                            $("#kla1680graform").find(".refUITable").addClass('kla1680grarefresh').removeClass('refUITable');
-
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-mini");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-icon-delete");
-                            $("#kla1680graform").find(".delUITableRow").addClass('kla1680gradelete').removeClass('.delUITableRow');
-
-                            $("#kla1680graform")
-                                .append($("<div/>", {
-                                        css: {
-                                            "text-align": "center",
-                                            width: "100%"
-                                        }
-                                    })
-                                    .append($("<button/>", {
-                                        class: "kla1680graActionSave",
-                                        css: {
-                                            "margin-left": "10px"
-                                        },
-                                        html: "Speichern",
-                                    }))
-                                );
-                        }
-                        $("#kla1680graselections").attr("rules", "all");
-                        $("#kla1680graselections").css({
-                            border: "1px solid black",
-                            margin: "10px"
-                        });
-                        $("#kla1680graselections tbody tr:nth-child(2)").hide();
-                        /**
-                         * Refresh der Selektion aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680grarefresh", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            $("#kla1680grayears").val(cselyears);
-                            $("#kla1680grab4").click();
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-                        /**
-                         * Zeile löschen mit Dateiverweis aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680gradelete", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            /*
-                            selections(object=>array){
-                                0(object){
-                                    fullname(string):G:\Projekte\klimadaten\IPCC_AR4\crutem4_asof020611_stns_used.dat,
-                                    selyears(string):**50,**00,
-                                    fulldatafilename(string):C:\Projekte\re-framework\static\temp\2019\19916963924.txt,
-                                    datafilename(string):19916963924.txt,
-                                }
-                            */
-                            var table = "KLIRAWFILES";
-                            var api = "setonerecord";
-                            var selfields = {};
-                            var updfields = {};
-                            selfields.fullname = $("#kla1680grafullname").text();
-                            updfields["$pull"] = {
-                                selections: {
-                                    datafilename: cdatafilename
-                                }
-                            };
-                            uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
-                                if (ret.error === false) {
-                                    sysbase.putMessage("kla1680gra" + " deleted:" + cdatafilename + " " + ret.message, 1);
-                                    $(row).remove();
-                                    return;
-                                } else {
-                                    sysbase.putMessage("kla1680gra" + " NOT deleted:" + cdatafilename + " " + ret.message, 3);
-                                    return;
-                                }
-                            });
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-                        callback44({
-                            error: false,
-                            message: "erledigt"
-                        });
-                        return;
-                    });
-                } else {
-                    //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
-                    console.log("kla1680gra" + " NICHT aufgebaut", 3);
-                    callback44({
-                        error: true,
-                        message: "kla1680gra" + " NICHT aufgebaut"
-                    });
-                    return;
-                }
-            });
-        });
-    };
-
-
-    /**
-     * ghcnv3file - Anzeige für Verarbeitung
-     * (nicht die Verarbeitung selbst)
-     */
-    kla1680gra.ghcnv3file = function (seltype, selyears, fullname, callbackghcn) {
-        // seltype ist hier GHCN
-        kla1680gra.selData(seltype, selyears, fullname, function (ret) {
-            uientry.getSchemaUI("kla1680gra", klischema, "kla1680gra", "kla1680gra" + "form", function (ret) {
-                if (ret.error === false) {
-                    //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                    console.log("kla1680gra" + " aufgebaut", 0);
-                    // Initialisierung des UI
-                    klirecord = {};
-                    // den Satz holen zum Editieren
-                    var sel = {
-                        fullname: fullname
-                    };
-                    var projection = {
-                        history: 0
-                    };
-                    var api = "getonerecord";
-                    var table = "KLIRAWFILES";
-                    uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                        if (ret.error === false && ret.record !== null) {
-                            klirecord = ret.record;
-                            uientry.fromRecord2UI("#kla1680graform", klirecord, klischema);
-                            // Post-Processing
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-mini");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-icon-refresh");
-                            $("#kla1680graform").find(".refUITable").addClass('kla1680grarefresh').removeClass('refUITable');
-
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-mini");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-icon-delete");
-                            $("#kla1680graform").find(".delUITableRow").addClass('kla1680gradelete').removeClass('.delUITableRow');
-
-                            $("#kla1680graform")
-                                .append($("<div/>", {
-                                        css: {
-                                            "text-align": "center",
-                                            width: "100%"
-                                        }
-                                    })
-                                    .append($("<button/>", {
-                                        class: "kla1680graActionSave",
-                                        css: {
-                                            "margin-left": "10px"
-                                        },
-                                        html: "Speichern",
-                                    }))
-                                );
-                        }
-                        $("#kla1680graselections").attr("rules", "all");
-                        $("#kla1680graselections").css({
-                            border: "1px solid black",
-                            margin: "10px"
-                        });
-                        $("#kla1680graselections tbody tr:nth-child(2)").hide();
-                        /**
-                         * Refresh der Selektion aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680grarefresh", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            $("#kla1680grayears").val(cselyears);
-                            $("#kla1680grab4").click();
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-                        /**
-                         * Zeile löschen mit Dateiverweis aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680gradelete", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            /*
-                            selections(object=>array){
-                                0(object){
-                                    fullname(string):G:\Projekte\klimadaten\IPCC_AR4\crutem4_asof020611_stns_used.dat,
-                                    selyears(string):**50,**00,
-                                    fulldatafilename(string):C:\Projekte\re-framework\static\temp\2019\19916963924.txt,
-                                    datafilename(string):19916963924.txt,
-                                }
-                            */
-                            var table = "KLIRAWFILES";
-                            var api = "setonerecord";
-                            var selfields = {};
-                            var updfields = {};
-                            selfields.fullname = $("#kla1680grafullname").text();
-                            updfields["$pull"] = {
-                                selections: {
-                                    datafilename: cdatafilename
-                                }
-                            };
-                            uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
-                                if (ret.error === false) {
-                                    sysbase.putMessage("kla1680gra" + " deleted:" + cdatafilename + " " + ret.message, 1);
-                                    $(row).remove();
-                                    return;
-                                } else {
-                                    sysbase.putMessage("kla1680gra" + " NOT deleted:" + cdatafilename + " " + ret.message, 3);
-                                    return;
-                                }
-                            });
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-                        callbackghcn({
-                            error: false,
-                            message: "erledigt"
-                        });
-                        return;
-                    });
-                } else {
-                    //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
-                    console.log("kla1680gra" + " NICHT aufgebaut", 3);
-                    callbackghcn({
-                        error: true,
-                        message: "kla1680gra" + " NICHT aufgebaut"
-                    });
-                    return;
-                }
-            });
-        });
-    };
-
-
-    /**
-     * crutem4file - Anzeige für Verarbeitung
-     * (nicht die Verarbeitung selbst)
-     */
-    kla1680gra.crutem4file = function (seltype, selyears, fullname, callbackcrutem4) {
-        // seltype ist hier CRUTEM4
-
-        kla1680gra.selData("CRUTEM4", selyears, fullname, function (ret) {
-            uientry.getSchemaUI("kla1680gra", klischema, "kla1680gra", "kla1680gra" + "form", function (ret) {
-                if (ret.error === false) {
-                    //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
-                    console.log("kla1680gra" + " aufgebaut", 0);
-                    // Initialisierung des UI
-                    klirecord = {};
-                    // den Satz holen zum Editieren
-                    var sel = {
-                        fullname: fullname
-                    };
-                    var projection = {
-                        history: 0
-                    };
-                    var api = "getonerecord";
-                    var table = "KLIRAWFILES";
-                    uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                        if (ret.error === false && ret.record !== null) {
-                            klirecord = ret.record;
-                            uientry.fromRecord2UI("#kla1680graform", klirecord, klischema);
-                            // Post-Processing
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-mini");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".refUITable").removeClass("ui-icon-refresh");
-                            $("#kla1680graform").find(".refUITable").addClass('kla1680grarefresh').removeClass('refUITable');
-
-
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui--shadow");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-mini");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-corner-all");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-btn-icon-notext");
-                            $("#kla1680graform").find(".delUITableRow").removeClass("ui-icon-delete");
-                            $("#kla1680graform").find(".delUITableRow").addClass('kla1680gradelete').removeClass('delUITableRow');
-
-                            $("#kla1680graform")
-                                .append($("<div/>", {
-                                        css: {
-                                            "text-align": "center",
-                                            width: "100%"
-                                        }
-                                    })
-                                    .append($("<button/>", {
-                                        class: "kla1680graActionSave",
-                                        css: {
-                                            "margin-left": "10px"
-                                        },
-                                        html: "Speichern",
-                                    }))
-                                );
-                        }
-                        $("#kla1680graselections").attr("rules", "all");
-                        $("#kla1680graselections").css({
-                            border: "1px solid black",
-                            margin: "10px"
-                        });
-                        $("#kla1680graselections tbody tr:nth-child(2)").hide();
-                        /**
-                         * Refresh der Selektion aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680grarefresh", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            $("#kla1680grayears").val(cselyears);
-                            $("#kla1680grab4").click();
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-
-                        /**
-                         * Zeile löschen mit Dateiverweis aus der angezeigten Tabelle
-                         */
-                        $(".content").on("click", ".kla1680gradelete", function (evt) {
-                            evt.preventDefault();
-                            var row = $(this).closest("tr");
-                            var cselyears = $(row).find("[name=selyears]").text();
-                            var cdatafilename = $(row).find("[name=datafilename]").text();
-                            /*
-                            selections(object=>array){
-                                0(object){
-                                    fullname(string):G:\Projekte\klimadaten\IPCC_AR4\crutem4_asof020611_stns_used.dat,
-                                    selyears(string):**50,**00,
-                                    fulldatafilename(string):C:\Projekte\re-framework\static\temp\2019\19916963924.txt,
-                                    datafilename(string):19916963924.txt,
-                                }
-                            */
-                            var table = "KLIRAWFILES";
-                            var api = "setonerecord";
-                            var selfields = {};
-                            var updfields = {};
-                            selfields.fullname = $("#kla1680grafullname").text();
-                            updfields["$pull"] = {
-                                selections: {
-                                    datafilename: cdatafilename
-                                }
-                            };
-                            uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
-                                if (ret.error === false) {
-                                    sysbase.putMessage("kla1680gra" + " deleted:" + cdatafilename + " " + ret.message, 1);
-                                    $(row).remove();
-                                    return;
-                                } else {
-                                    sysbase.putMessage("kla1680gra" + " NOT deleted:" + cdatafilename + " " + ret.message, 3);
-                                    return;
-                                }
-                            });
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                        });
-                        callbackcrutem4({
-                            error: false,
-                            message: "erledigt"
-                        });
-                        return;
-                    });
-                } else {
-                    //sysbase.putMessage("kli1020evt" + " NICHT aufgebaut", 3);
-                    console.log("kla1680gra" + " NICHT aufgebaut", 3);
-                    callbackcrutem4({
-                        error: true,
-                        message: "kla1680gra" + " NICHT aufgebaut"
-                    });
-                    return;
-                }
-            });
-        });
     };
 
 
@@ -2838,6 +1301,37 @@
                 // nope
             });
         }
+    };
+
+
+
+    /**
+     * Prüfen teststring, ob alle Fragemente in fragments enthalten sind
+     * blank-separierte fragmente
+     * return true oder false
+     */
+    kla1680gra.checkfragments = function (teststring, fragments) {
+        var test = teststring.toLowerCase();
+        var frag = fragments.toLowerCase();
+        var tfrags = frag.split(" ");
+        for (var ifrag = 0; ifrag < tfrags.length; ifrag++) {
+            var such = tfrags[ifrag].trim();
+            if (test.indexOf(such) < 0) {
+                return false;
+            }
+        }
+        return true;
+        /*
+        for (var ifrag = 0; ifrag < tfrags.length; ifrag++) {
+            if (trags[ifrag].startsWith("."))
+            var such = new RegExp(tfrags[ifrag].trim(), "i");
+            if (!such.test(teststring)) {
+                return false;
+            }
+        }
+        return true;
+        */
+
     };
 
 

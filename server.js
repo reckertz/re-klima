@@ -106,7 +106,7 @@ db.all("PRAGMA table_info('KLISTATIONS')", function (err, felder) {
 */
 /**
  * Sequenz zum kompletten Löscher einer Tabelle mit ihren Indices
-*/
+ */
 /*
 db.serialize(function () {
     async.waterfall([
@@ -515,8 +515,6 @@ app.get('/getfilecontent', function (req, res) {
         res.end(smsg);
         return;
     }
-
-
     var readInterface = readline.createInterface({
         input: fs.createReadStream(fullname),
         console: false
@@ -585,6 +583,50 @@ app.get('/getfilecontent', function (req, res) {
     });
 });
 
+
+
+/**
+ * getfileasstring: fullname
+ * gibt filestring zurück in ret!
+ */
+app.get('/getfileasstring', function (req, res) {
+    if (checkSession(req, res)) return;
+    var rootdir = path.dirname(require.main.filename);
+    var fullname = "";
+    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+        fullname = req.query.fullname;
+    }
+    if (!fs.existsSync(fullname)) {
+        fullname = path.join(__dirname, fullname);
+        if (!fs.existsSync(fullname)) {
+            res.end(JSON.stringify({
+                error: true,
+                message: "Datei nicht vorhanden"
+            }));
+            return;
+        }
+    }
+    fs.readFile(fullname, 'utf8', function (err, data) {
+        if (err !== null) {
+            res.writeHead(200, {
+                'Content-Type': 'application/text',
+                "Access-Control-Allow-Origin": "*"
+            });
+            res.end(JSON.stringify({
+                error: true,
+                message: err.message
+            }));
+            return;
+        } else {
+            res.end(JSON.stringify({
+                error: false,
+                message: "Datei geladen:" + data.length,
+                filestring: data
+            }));
+            return;
+        }
+    });
+});
 
 
 
