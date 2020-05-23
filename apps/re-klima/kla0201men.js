@@ -114,6 +114,12 @@
                 module: "kla1400raw"
             },
             {
+                id: "admin0015",
+                text: "Statistik",
+                app: "re-klima",
+                module: "kla1680gra"
+            },
+            {
                 id: "admin0030",
                 text: "Codes and Keys",
                 app: "re-frame",

@@ -1364,20 +1364,27 @@
             }
         }
 
-
         var files = [];
         var predirectory = "";
         if (req.query && typeof req.query.predirectory !== "undefined" && req.query.predirectory.length > 0) {
             predirectory = req.query.predirectory;
+            if (typeof predirectory === "string" && predirectory.startsWith("{")) {
+                predirectory = JSON.parse(predirectory);
+            }
+            if (typeof predirectory === "object" && Array.isArray(predirectory)) {
+                var startdir = "";
+                for (var idir = 0; idir < predirectory.length; idir++) {
+                    startdir = path.join(startdir, predirectory[idir]);
+                }
+                predirectory = startdir;
+            }
         }
         var directory = "";
         if (req.query && typeof req.query.directory !== "undefined" && req.query.directory.length > 0) {
             directory = req.query.directory;
         }
-
         if (predirectory.startsWith(rootdir)) predirectory = predirectory.substr(rootdir.length);
         if (directory.startsWith(rootdir)) directory = directory.substr(rootdir.length);
-
 
         var filestats;
         var ret = {};

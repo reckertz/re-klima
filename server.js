@@ -1398,7 +1398,7 @@ app.post('/sql2csv', function (req, res) {
     if (checkSession(req, res)) return;
 
     var timeout = 10 * 60 * 1000; // hier: gesetzter Default, kann sehr lange dauern, je nach Filtert
-    req.body.filename;
+    //req.body.filename;
     if (req.body && typeof req.body.timeout !== "undefined" && req.body.timeout.length > 0) {
         timeout = req.body.timeout;
         req.setTimeout(parseInt(timeout));

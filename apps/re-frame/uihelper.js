@@ -1928,7 +1928,7 @@
     /**
      * Datei aus String vom Client in Server speichern
      */
-    uihelper.storeasfile = function (filename, largestring, callback) {
+    uihelper.storeasfile = function (filename, largestring, callbacksf) {
 
         var jqxhr = $.ajax({
             method: "POST",
@@ -1946,15 +1946,19 @@
                 // window.location = download_path;
                 // window.open(download_path, '_blank');
                 sysbase.putMessage(filename + " download erfolgt", 1);
+                callbacksf(j1);
+                return;
             } else {
                 sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
+                callbacksf(j1);
+                return;
             }
-            return;
         }).fail(function (err) {
             console.log("getbackasfile:" + filename + "=>" + err.message);
             sysbase.putMessage(err, 3);
+            callbacksf(j1);
             return;
-        }).always(function () {
+    }).always(function () {
             // nope
         });
     };

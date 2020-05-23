@@ -388,7 +388,7 @@
             },
             climatezone: {
                 title: "Zone",
-                type: "string", // currency, integer, datum, text, key
+                type: "text", // currency, integer, datum, text, key
                 class: "uieselectinput",
                 default: "",
                 io: "i",
@@ -502,6 +502,35 @@
                 class: "uietext",
                 default: "",
                 io: "i"
+            },
+            logic: {
+                title: "Selektionslogik",
+                type: "string", // currency, integer, datum, text, key
+                class: "uieselectinput",
+                default: "1",
+                io: "i",
+                enum: [
+                    {
+                        value: "1",
+                        text: "Beobachtungszeitraum"
+                    },
+                    {
+                        value:"2",
+                        text: "Mindestdauer 'plus'"
+                    },
+                    {
+                        value: "3",
+                        text: "nur 'neue' Stationen"
+                    },
+                    {
+                        value: "4",
+                        text: "nur 'alte' Stationen"
+                    },
+                    {
+                        value: "",
+                        text: "klassische Selektion"
+                    }
+                ]
             },
             markred: {
                 title: "inaktiv rot markieren",
@@ -707,7 +736,7 @@
                                     if (ret.error === true) {
                                         return;
                                     } else {
-                                        return
+                                        return;
                                     }
                                 }).fail(function (err) {
                                     sysbase.putMessage(err, 1);
@@ -1012,47 +1041,94 @@
          * entsprechenden Sprüngen im Bereich von-bis erzeugt
          * das wird allerdings erst später wirksam wenn die Daten u.a. ausgewertet werden!
          */
-
+        var fromyear;
+        var selfromyear;
         if (typeof selrecord.fromyear !== "undefined" && selrecord.fromyear.trim().length > 0) {
-            var fromyear = selrecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-            if (fromyear !== null && fromyear.length >= 3) {
-                if (where.length > 0) where += " AND ";
-                if (typeof fromyear[1] !== "undefined") {
-                    where += " KLIINVENTORY.fromyear " + fromyear[1] + parseInt(fromyear[2]);
-                } else {
-                    where += " KLIINVENTORY.fromyear " + ">=" + parseInt(fromyear[2]);
-                }
-                if (typeof fromyear[3] !== "undefined" && typeof fromyear[4] !== "undefined" && fromyear[3] === "-") {
-                    where += " AND ";
-                    where += " KLIINVENTORY.fromyear " + "<=" + parseInt(fromyear[4]);
-                }
-            } else {
-                cb1630B({
-                    error: true,
-                    message: "Parameterfehler"
-                });
-                return;
+            fromyear = selrecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+            if (fromyear !== null && fromyear.length >= 3 && typeof fromyear[2] !== "undefined") {
+                selfromyear = fromyear[2];
             }
         }
+        var toyear;
+        var seltoyear;
         if (typeof selrecord.toyear !== "undefined" && selrecord.toyear.trim().length > 0) {
-            var toyear = selrecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-            if (toyear !== null && toyear.length >= 3) {
-                if (where.length > 0) where += " AND ";
-                if (typeof toyear[1] !== "undefined") {
-                    where += " KLIINVENTORY.toyear " + toyear[1] + parseInt(toyear[2]);
+            toyear = selrecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+            if (toyear !== null && toyear.length >= 3 && typeof toyear[2] !== "undefined") {
+                seltoyear = toyear[2];
+            }
+        }
+        if (typeof seltoyear === "undefined" || seltoyear.length === 0 || isNaN(seltoyear)) {
+            seltoyear = new Date().toISOString().substr(0,4);
+        }
+        if (selrecord.anzyears.length === 0 || isNaN(selrecord.anzyears)) {
+            selrecord.anzyears = "1";
+        }
+        if (selrecord.logic === "1") {
+            // Beobachtungszeitraum selektieren
+            if (where.length > 0) where += " AND ";
+            where += " KLIINVENTORY.toyear >= " +  parseInt(selfromyear);
+            where += " AND ";
+            where += " KLIINVENTORY.fromyear <= " +  parseInt(seltoyear);
+        } else if (selrecord.logic === "2") {
+            // Mindestdauer spezial
+            if (where.length > 0) where += " AND (";
+            where += " KLIINVENTORY.fromyear <= " +  parseInt(selfromyear);
+            where += " AND ";
+            where += " (KLIINVENTORY.toyear - KLIINVENTORY.fromyear + 1) >= " +  parseInt(selrecord.anzyears);
+            where += " OR ";
+            where += " KLIINVENTORY.fromyear > " +  parseInt(selfromyear);
+            where += ") ";
+        } else if (selrecord.logic === "3") {
+            // nur neue Stationen
+            if (where.length > 0) where += " AND (";
+            where += " KLIINVENTORY.fromyear >= " +  parseInt(selfromyear);
+        } else if (selrecord.logic === "3") {
+            // nur alte Stationen
+            if (where.length > 0) where += " AND (";
+            where += " KLIINVENTORY.fromyear <= " +  parseInt(selfromyear);
+        } else {
+            // bisherige Logik
+            if (typeof selrecord.fromyear !== "undefined" && selrecord.fromyear.trim().length > 0) {
+                fromyear = selrecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+                if (fromyear !== null && fromyear.length >= 3) {
+                    if (where.length > 0) where += " AND ";
+                    if (typeof fromyear[1] !== "undefined") {
+                        where += " KLIINVENTORY.fromyear " + fromyear[1] + parseInt(fromyear[2]);
+                    } else {
+                        where += " KLIINVENTORY.fromyear " + ">=" + parseInt(fromyear[2]);
+                    }
+                    if (typeof fromyear[3] !== "undefined" && typeof fromyear[4] !== "undefined" && fromyear[3] === "-") {
+                        where += " AND ";
+                        where += " KLIINVENTORY.fromyear " + "<=" + parseInt(fromyear[4]);
+                    }
                 } else {
-                    where += " KLIINVENTORY.toyear " + ">=" + parseInt(toyear[2]);
+                    cb1630B({
+                        error: true,
+                        message: "Parameterfehler"
+                    });
+                    return;
                 }
-                if (typeof toyear[3] !== "undefined" && typeof toyear[4] !== "undefined" && toyear[3] === "-") {
-                    where += " AND ";
-                    where += " KLIINVENTORY.toyear " + "<=" + parseInt(toyear[4]);
+            }
+            if (typeof selrecord.toyear !== "undefined" && selrecord.toyear.trim().length > 0) {
+                var toyear = selrecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
+                if (toyear !== null && toyear.length >= 3) {
+                    if (where.length > 0) where += " AND ";
+                    if (typeof toyear[1] !== "undefined") {
+                        where += " KLIINVENTORY.toyear " + toyear[1] + parseInt(toyear[2]);
+                    } else {
+                        where += " KLIINVENTORY.toyear " + ">=" + parseInt(toyear[2]);
+                    }
+                    if (typeof toyear[3] !== "undefined" && typeof toyear[4] !== "undefined" && toyear[3] === "-") {
+                        where += " AND ";
+                        where += " KLIINVENTORY.toyear " + "<=" + parseInt(toyear[4]);
+                    }
+                } else {
+                    cb1630B({
+                        error: true,
+                        message: "Parameterfehler"
+                    });
+                    return;
                 }
-            } else {
-                cb1630B({
-                    error: true,
-                    message: "Parameterfehler"
-                });
-                return;
             }
         }
         where += ")";
@@ -1077,8 +1153,7 @@
             where += " KLISTATIONS.continent = '" + selcontinent + "'";
         }
 
-
-        if (typeof selrecord.anzyears !== "undefined" && selrecord.anzyears.trim().length > 0) {
+        if (selrecord.logic !== "2" && typeof selrecord.anzyears !== "undefined" && selrecord.anzyears.trim().length > 0) {
             if (where.length > 0) where += " AND ";
             var anzparts = selrecord.anzyears.match(/(<=|>=|<|>|=)(\d*)/);
             if (anzparts !== null && anzparts.length > 2) {
@@ -1572,17 +1647,52 @@
                      * sowie error, message und selrecord
                      */
                     kla1650ani.loop(ret1.selrecord, ret1.pearls, function (ret) {
-                        debugger;
                         if (selrecord.savecounts === true) {
-                            var fname = [];
-                            fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
-                            fname.push("kla1650ani");
-                            fname.push("counters");
-                            //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
-                            fname.push("counters.txt");
-                            var largestring = JSON.stringify(counters);
-                            uihelper.storeasfile(fname, largestring, function (ret) {
-                                sysbase.putMessage(ret.message, 1);
+                            async.waterfall([
+                                function (cb1650a) {
+                                    var fname = [];
+                                    fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                    fname.push("kla1650ani");
+                                    fname.push("counters");
+                                    //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                    fname.push("global.txt");
+                                    var largestring = JSON.stringify(counters.global);
+                                    uihelper.storeasfile(fname, largestring, function (ret) {
+                                        sysbase.putMessage(ret.message, 1);
+                                        cb1650a(null, ret);
+                                        return;
+                                    });
+                                },
+                                function (ret, cb1650b) {
+                                    var fname = [];
+                                    fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                    fname.push("kla1650ani");
+                                    fname.push("counters");
+                                    //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                    fname.push("climatezones.txt");
+                                    var largestring = JSON.stringify(counters.climatezones);
+                                    uihelper.storeasfile(fname, largestring, function (ret) {
+                                        sysbase.putMessage(ret.message, 1);
+                                        cb1650b(null, ret);
+                                        return;
+                                    });
+                                },
+                                function (ret, cb1650c) {
+                                    var fname = [];
+                                    fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                    fname.push("kla1650ani");
+                                    fname.push("counters");
+                                    //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                    fname.push("continents.txt");
+                                    var largestring = JSON.stringify(counters.continents);
+                                    uihelper.storeasfile(fname, largestring, function (ret) {
+                                        sysbase.putMessage(ret.message, 1);
+                                        cb1650c(null, ret);
+                                        return;
+                                    });
+                                }
+                            ],
+                            function(error, ret) {
                                 cb1630B3("Finish", ret);
                                 return;
                             });
@@ -1624,40 +1734,25 @@
          * aus selschema
          */
         counters = {};
-        counters.global = {
+        ctemplate = {
             count: 0,
             plusnew: 0,
             minusold: 0
         };
+        counters.global = {};  // => year => ctemplate
         counters.climatezones = {};
         for (var izone = 0; izone < selschema.entryschema.climatezone.enum.length; izone++) {
             var cz = selschema.entryschema.climatezone.enum[izone].value;
-            counters.climatezones[cz] = {
-                count: 0,
-                plusnew: 0,
-                minusold: 0
-            };
+            counters.climatezones[cz] = {};  // => year => ctemplate
         }
-        counters.climatezones["?"] = {
-            count: 0,
-            plusnew: 0,
-            minusold: 0
-        };
+        counters.climatezones["?"] = {};   // => year => ctemplate
         counters.continents = {};
         for (var icon = 0; icon < selschema.entryschema.continent.enum.length; icon++) {
             var con = selschema.entryschema.continent.enum[icon].value;
-            counters.continents[con] = {
-                count: 0,
-                plusnew: 0,
-                minusold: 0
-            };
+            counters.continents[con] = {};  // => year => ctemplate
         }
         // Sonderfall
-        counters.continents["?"] = {
-            count: 0,
-            plusnew: 0,
-            minusold: 0
-        };
+        counters.continents["?"] = {};  // => year => ctemplate
 
         try {
             var loopyears = [];
@@ -1772,6 +1867,30 @@
                                     if (pearls[ipearl].ispainted === 0) {
                                         counters.global[actyear].plusnew++;
                                     }
+                                    var cz = pearl.climatezone.substr(0,2);
+                                    if (typeof counters.climatezones[cz][actyear] === "undefined") {
+                                        counters.climatezones[cz][actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.climatezones[cz][actyear].count++;
+                                    if (pearls[ipearl].ispainted === 0) {
+                                        counters.climatezones[cz][actyear].plusnew++;
+                                    }
+
+                                    if (typeof counters.continents[pearl.continent][actyear] === "undefined") {
+                                        counters.continents[pearl.continent][actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.continents[pearl.continent][actyear].count++;
+                                    if (pearls[ipearl].ispainted === 0) {
+                                        counters.continents[pearl.continent][actyear].plusnew++;
+                                    }
                                 }
                                 pearls[ipearl].ispainted = 1;
                                 var contenthtml = pearl.stationid + " " + pearl.stationname;
@@ -1805,6 +1924,7 @@
                                 pearls[ipearl].ispainted = 9;
                                 anzdel++;
                                 if (selrecord.savecounts === true) {
+
                                     if (typeof counters.global[actyear] === "undefined") {
                                         counters.global[actyear] = {
                                             count: 0,
@@ -1812,7 +1932,25 @@
                                             minusold: 0
                                         };
                                     }
+
                                     counters.global[actyear].minusold++;
+                                    var cz = pearl.climatezone.substr(0,2);
+                                    if (typeof counters.climatezones[cz][actyear] === "undefined") {
+                                        counters.climatezones[cz][actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.climatezones[cz][actyear].minusold++;
+                                    if (typeof counters.continents[pearl.continent][actyear] === "undefined") {
+                                        counters.continents[pearl.continent][actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.continents[pearl.continent][actyear].minusold++;
                                 }
                                 if (selrecord.markred === false) {
                                     options.deletePlotKeys.push(pearl.stationid);
@@ -1836,12 +1974,30 @@
                                         };
                                     }
                                     counters.global[actyear].count++;
+                                    var cz = pearl.climatezone.substr(0,2);
+                                    if (typeof counters.climatezones[cz][actyear] === "undefined") {
+                                        counters.climatezones[cz][actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.climatezones[cz][actyear].count++;
+                                    if (typeof counters.continents[pearl.continent][actyear] === "undefined") {
+                                        counters.continents[pearl.continent][actyear] = {
+                                            count: 0,
+                                            plusnew: 0,
+                                            minusold: 0
+                                        };
+                                    }
+                                    counters.continents[pearl.continent][actyear].count++;
                                 }
                             }
                         }
                     }
-                    // Aktualisierung worldmap
+
                     /**
+                     * Aktualisierung worldmap
                      * das erste Jahr wird speziell ausgegeben
                      * mit Initialisierung der MAP, sonst Update
                      */
@@ -2056,7 +2212,6 @@
                                             reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
                                             reader.onload = function () {
                                                 var imagedata = reader.result; // data url
-                                                debugger;
                                                 var jqxhr = $.ajax({
                                                     method: "POST",
                                                     crossDomain: false,
