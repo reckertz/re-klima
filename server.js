@@ -1508,39 +1508,46 @@ app.post("/saveBase64ToGif", function (req, res) {
         return;
     }
     console.log("imagedata length:" + req.body.imagedata.length);
+
+    var filename = req.body.filename;
+    var fullpath = "";
+    var fpath = "";
+    var targetpath = path.join(__dirname, "static");
+    targetpath = path.join(targetpath, "temp");
+    if (!fs.existsSync(targetpath)) {
+        fs.mkdirSync(targetpath);
+    }
+    if (typeof filename === "object" && Array.isArray(filename)) {
+        for (var ifilename = 0; ifilename < (filename.length - 1); ifilename++) {
+            targetpath = path.join(targetpath, filename[ifilename]);
+            if (!fs.existsSync(targetpath)) {
+                fs.mkdirSync(targetpath);
+            }
+        }
+        // jetzt der echte Dateiname
+        fullpath = path.join(targetpath, filename[filename.length - 1]);
+    } else {
+        if (typeof filename === "undefined" || filename.length === 0) {
+            filename = "animated.gif";
+        }
+        fullpath = path.join(targetpath, filename);
+    }
+    fpath = fullpath.substr(fullpath.indexOf("static") + 7);
+
     // var base64Data = req.body.imagedata.replace(/^data:image\/jpeg;base64,/, "");
     var base64Data = req.body.imagedata;
     async.waterfall([
         function (callback) {
             var jahr = "" + new Date().getFullYear();
-            var fullpath64 = "";
-            var path64 = "";
-            fullpath64 = path.join(__dirname, "static");
-            path64 = "static";
-            fullpath64 = path.join(fullpath64, "temp");
-            path64 = path.join(path64, "temp");
-            if (!fs.existsSync(fullpath64)) {
-                fs.mkdirSync(fullpath64);
-            }
-            fullpath64 = path.join(fullpath64, jahr);
-            path64 = path.join(path64, jahr);
-            if (!fs.existsSync(fullpath64)) {
-                fs.mkdirSync(fullpath64);
-            }
-
-            var filnr = Math.floor(Math.random() * (999999999 - 100000000 + 1)) + 100000000;
-            var filename = "" + jahr.substr(2, 2) + filnr + ".gif";
-            var fullfilename = path.join(fullpath64, filename);
-            var fullfilenamex = path.join(fullpath64, "" + jahr.substr(2, 2) + filnr);
-            ba64.writeImage(fullfilenamex, base64Data, function (err) {
+            ba64.writeImage(fullpath, base64Data, function (err) {
                 res.writeHead(200, {
                     'Content-Type': 'application/text'
                 });
                 res.end(JSON.stringify({
                     error: false,
-                    message: filename + " bereitgestellt",
+                    message: fpath + " bereitgestellt",
                     filename: filename,
-                    fullfilename: path.join(path64, filename)
+                    fullfilename: fullpath
                 }));
                 return;
             });

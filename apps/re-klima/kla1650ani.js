@@ -670,6 +670,12 @@
                                     if (years.length > 0) years += ",";
                                     years += "" + istep;
                                 }
+                                var fname = [];
+                                fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                fname.push("kla1650ani");
+                                fname.push("hyde");
+                                fname.push(titlerecord.projectid);
+
                                 $("#kla1650anibuttons").hide();
                                 $("body").css("cursor", "progress");
                                 var jqxhr = $.ajax({
@@ -679,7 +685,8 @@
                                     data: {
                                         lats: false,
                                         selyears: years,
-                                        selvars: "popc,rurc,urb,uopp"
+                                        selvars: "popc,rurc,urb,uopp",
+                                        outdir: fname
                                     }
                                 }).done(function (r1, textStatus, jqXHR) {
                                     sysbase.checkSessionLogin(r1);
@@ -690,7 +697,7 @@
                                     if (ret.error === true) {
                                         return;
                                     } else {
-                                        return
+                                        return;
                                     }
                                 }).fail(function (err) {
                                     sysbase.putMessage(err, 1);
@@ -2208,6 +2215,19 @@
                                             /**
                                              * upload des Images
                                              */
+                                            var fname = [];
+                                            fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                            fname.push("kla1650ani");
+                                            fname.push("gifs");
+                                            fname.push(titlerecord.projectid);
+                                            var presel = actyear;
+                                            if (selrecord.climatezone.length > 0) {
+                                                presel += "_" + selrecord.climatezone;
+                                            }
+                                            if (selrecord.continent.length > 0) {
+                                                presel += "_" + selrecord.continent;
+                                            }
+                                            fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
                                             var reader = new FileReader();
                                             reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
                                             reader.onload = function () {
@@ -2217,7 +2237,8 @@
                                                     crossDomain: false,
                                                     url: sysbase.getServer("saveBase64ToGif"),
                                                     data: {
-                                                        imagedata: imagedata
+                                                        imagedata: imagedata,
+                                                        filename: fname
                                                     }
                                                 }).done(function (r1, textStatus, jqXHR) {
                                                     sysbase.checkSessionLogin(r1);

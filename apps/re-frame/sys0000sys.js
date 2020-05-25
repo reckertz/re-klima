@@ -2025,6 +2025,7 @@
          * erst mal den Baum holen
          */
         var fullname = "";
+        var outdir = [];
         var selyears = "";
         var selvars = "";
         var adbc = "AD";
@@ -2038,6 +2039,10 @@
             if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
                 fullname = req.query.fullname;
             }
+            if (req.query && typeof req.query.outdir !== "undefined" && req.query.outdir.length > 0) {
+                outdir = req.query.outdir;
+            }
+
             if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
                 selyears = req.query.selyears;
             }
@@ -2068,6 +2073,9 @@
         } else if (typeof reqparm !== "undefined" && reqparm !== null) {
             if (reqparm && typeof reqparm.fullname !== "undefined" && reqparm.fullname.length > 0) {
                 fullname = reqparm.fullname;
+            }
+            if (reqparm && typeof reqparm.outdir !== "undefined" && reqparm.fullname.outdir > 0) {
+                outdir = reqparm.outdir;
             }
             if (reqparm && typeof reqparm.selyears !== "undefined" && reqparm.selyears.length > 0) {
                 selyears = reqparm.selyears;
@@ -2150,6 +2158,12 @@
                     err.break = true;
                     return nextfile(err);
                 }
+                var ext = path.extname(fullfilename);
+                if (ext !== ".asc") {
+                    console.log("Falscher Dateityp, skipped:" + fullfilename);
+                    nextfile();
+                    return;
+                }
                 console.log(fullfilename + " Started");
                 valcounter = 0;
                 async.waterfall([
@@ -2157,9 +2171,10 @@
                             // fullfilename zerlegen für Feldname, Jahr
                             var filename = path.basename(fullfilename);
                             var fparts = filename.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
+                            var variablename = "";
                             var year;
                             if (fparts !== null) {
-                                var variablename = fparts[1];
+                                variablename = fparts[1];
                                 if (typeof hydedata.variables === "undefined") {
                                     hydedata.variables = {};
                                 }
@@ -2172,7 +2187,7 @@
                                 }
                             } else {
                                 var idis = filename.indexOf(".");
-                                var variablename = filename.substr(0, idis);
+                                variablename = filename.substr(0, idis);
                                 if (typeof hydedata.variables === "undefined") {
                                     hydedata.variables = {};
                                 }
@@ -2234,8 +2249,8 @@
                                     fld = lline.replace("cellsize", "");
                                     fld = fld.replace(/ /g, "");
                                     metafields.cellsize = Number(fld) || 0;
-                                } else if (lline.startsWith("NODATA_value")) {
-                                    fld = lline.replace("NODATA_value", "");
+                                } else if (lline.startsWith("nodata_value")) {
+                                    fld = lline.replace("nodata_value", "");
                                     fld = fld.replace(/ /g, "");
                                     metafields.NODATA_value = fld;
                                 } else {
@@ -2410,26 +2425,37 @@
             function () {
                 /**
                  * Ausgabe Ergebnisdatei(en)
+                 * no such file or directory, mkdir 'C:\Projekte\re-klima\apps\re-frame\static\temp'
                  */
-                var fullpath64 = "";
-                var path64 = "";
-                fullpath64 = path.join(rootname, "static");
-                path64 = "static";
-                fullpath64 = path.join(fullpath64, "temp");
-                path64 = path.join(path64, "temp");
-                if (!fs.existsSync(fullpath64)) {
-                    fs.mkdirSync(fullpath64);
+                var fullpath = "";
+                var fpath = "";
+                var targetpath = path.join(rootname, "static");
+                targetpath = path.join(targetpath, "temp");
+                if (!fs.existsSync(targetpath)) {
+                    fs.mkdirSync(targetpath);
                 }
-                fullpath64 = path.join(fullpath64, "hyde");
-                path64 = path.join(path64, "hyde");
-                if (!fs.existsSync(fullpath64)) {
-                    fs.mkdirSync(fullpath64);
+
+                if (typeof outdir === "object" && Array.isArray(outdir)) {
+                    for (var ifilename = 0; ifilename < outdir.length; ifilename++) {
+                        targetpath = path.join(targetpath, outdir[ifilename]);
+                        if (!fs.existsSync(targetpath)) {
+                            fs.mkdirSync(targetpath);
+                        }
+                    }
+                    fullpath = targetpath;
+                    // der echte Dateiname kommt erst später
+                } else {
+                    if (typeof outdir === "undefined" || outdir.length === 0) {
+                        outdir = "hyde";
+                    }
+                    fullpath = path.join(targetpath, outdir);
                 }
+                fpath = fullpath.substr(fullpath.indexOf("static") + 7);
                 //var filnr = Math.floor(Math.random() * (999999999 - 100000000 + 1)) + 100000000;
                 async.waterfall([
                         function (cb0000Z0) {
                             var datafilename = "hydelats.txt";
-                            var fulldatafilename = path.join(fullpath64, datafilename);
+                            var fulldatafilename = path.join(fullpath, datafilename);
                             if (lats === true) {
                                 fs.writeFile(fulldatafilename, JSON.stringify(hydedata), {
                                     encoding: 'utf8',
@@ -2443,7 +2469,7 @@
                                     cb0000Z0(null, res, {
                                         error: false,
                                         message: err || "OK",
-                                        fullpath64: fullpath64
+                                        fullpath: fullpath
                                     });
                                     return;
                                 });
@@ -2451,7 +2477,7 @@
                                 cb0000Z0(null, res, {
                                     error: false,
                                     message: "OK",
-                                    fullpath64: fullpath64
+                                    fullpath: fullpath
                                 });
                                 return;
                             }
@@ -2462,7 +2488,7 @@
                              */
                             var datafilename = "hydetot.txt";
                             if (globals === true) datafilename = "hydeglobal.txt";
-                            var fulldatafilename = path.join(ret.fullpath64, datafilename);
+                            var fulldatafilename = path.join(ret.fullpath, datafilename);
                             fs.writeFile(fulldatafilename, JSON.stringify(hydetot), {
                                 encoding: 'utf8',
                                 flag: 'w'
@@ -2475,7 +2501,7 @@
                                 cb0000Z1(null, res, {
                                     error: false,
                                     message: err || "OK",
-                                    fullpath64: ret.fullpath64
+                                    fullpath: ret.fullpath
                                 });
                                 return;
                             });
@@ -2486,7 +2512,7 @@
                              */
                             var datafilename = "hydezone.txt";
                             if (globals === true) datafilename = "hydeglobalzone.txt";
-                            var fulldatafilename = path.join(ret.fullpath64, datafilename);
+                            var fulldatafilename = path.join(ret.fullpath, datafilename);
                             fs.writeFile(fulldatafilename, JSON.stringify(hydezone), {
                                 encoding: 'utf8',
                                 flag: 'w'
@@ -2499,7 +2525,7 @@
                                 cb0000Z2("Finish", res, {
                                     error: false,
                                     message: err || "OK",
-                                    fullpath64: ret.fullpath64
+                                    fullpath: ret.fullpath
                                 });
                                 return;
                             });
