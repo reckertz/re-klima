@@ -2033,7 +2033,8 @@
         var lats = false;
         var globals = false;
         var hydetot = {}; // Vorlage für die Ausgabe
-        var hydezone = {}; // Vorlage für die Ausgabe
+        var hydezone = {}; // hyde climatezones Vorlage für die Ausgabe
+        var hydecont = {}; // hyde continents Vorlage für die Ausgabe
         var hydestation = {}; // wird bei Ausgabe differenziert
         if (typeof req !== "undefined" && req !== null) {
             if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
@@ -2312,6 +2313,30 @@
                                                 } else if (wert > maxval) {
                                                     maxval = wert;
                                                 }
+                                                /**
+                                                 * hier wird es sehr speziell, weil hydecont
+                                                 * für die Kontinente aus den Zellen berechnet wird!!!
+                                                 * 1. Bestimmung Kontinentalzone
+                                                 * 2. Addieren in Kontinentalzone
+                                                 */
+                                                var continentobj = uihelper.getContinent(longitude, latitude);
+                                                if (continentobj.error === false) {
+                                                    var continent = continentobj.continentcode;
+                                                    if (typeof hydecont[continent] === "undefined") {
+                                                        hydecont[continent] = {};
+                                                    }
+                                                    if (typeof hydecont[continent][year] === "undefined") {
+                                                        hydecont[continent][year] = {};
+                                                    }
+                                                    if (typeof hydecont[continent][year][variablename] === "undefined") {
+                                                        hydecont[continent][year][variablename] = {
+                                                            count: 0,
+                                                            summe: 0.0,
+                                                        };
+                                                    }
+                                                    hydecont[continent][year][variablename].count += 1;
+                                                    hydecont[continent][year][variablename].summe += parseFloat(wert);
+                                                }
                                             } else {
                                                 console.log(variablename + " NaN:" + wert);
                                             }
@@ -2520,9 +2545,33 @@
                                 if (err) {
                                     console.log(err);
                                 } else {
-                                    console.log("Finished-Files processed:" + filecounter);
+                                    console.log("hydezone processed:" + filecounter);
                                 }
-                                cb0000Z2("Finish", res, {
+                                cb0000Z2(null, res, {
+                                    error: false,
+                                    message: err || "OK",
+                                    fullpath: ret.fullpath
+                                });
+                                return;
+                            });
+                        },
+                        function (res, ret, cb0000Z3) {
+                            /**
+                             * neue Ausgabe hydezone.txt
+                             */
+                            var datafilename = "hydecont.txt";
+                            if (globals === true) datafilename = "hydeglobalcont.txt";
+                            var fulldatafilename = path.join(ret.fullpath, datafilename);
+                            fs.writeFile(fulldatafilename, JSON.stringify(hydecont), {
+                                encoding: 'utf8',
+                                flag: 'w'
+                            }, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log("hxdecont processed:" + filecounter);
+                                }
+                                cb0000Z3("Finish", res, {
                                     error: false,
                                     message: err || "OK",
                                     fullpath: ret.fullpath

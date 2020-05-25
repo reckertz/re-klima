@@ -659,6 +659,10 @@
                                 } else {
                                     toyear = selrecord.toyear;
                                 }
+                                if (toyear.length === 0) {
+                                    toyear = new Date().toISOString().substr(0,4);
+                                    selrecord.toyear = toyear;
+                                }
                                 var von = parseInt(fromyear);
                                 if (toyear.length === 0) {
                                     toyear = new Date().getFullYear();
