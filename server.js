@@ -162,14 +162,18 @@ db.serialize(function () {
 // bereitstellen countries.json und continents.json
 // "./data/countries.json"
 console.log("*START*");
-var coustring = fs.readFileSync("./data/countries.json");
-global.countries = JSON.parse(coustring);
-console.log(Object.keys(global.countries).length);
-
-var constring = fs.readFileSync("./data/continents.json");
-global.continents = JSON.parse(constring);
-console.log(Object.keys(global.continents).length);
-
+global.countries = {};
+if (fs.existsSync("./data/countries.json")) {
+    var coustring = fs.readFileSync("./data/countries.json");
+    global.countries = JSON.parse(coustring);
+    console.log(Object.keys(global.countries).length);
+}
+global.continents = {};
+if (fs.existsSync("./data/continents.json")) {
+    var constring = fs.readFileSync("./data/continents.json");
+    global.continents = JSON.parse(constring);
+    console.log(Object.keys(global.continents).length);
+}
 
 console.log("*EXIT*");
 
