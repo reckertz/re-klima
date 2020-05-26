@@ -1972,6 +1972,7 @@
      * stationids - optional, für liste von stationid's für die station-Auswertung, wenn vorhanden
      *              dann wird je stationid eine Datei ausgegeben
      * lats - optional, bei true Ausgabe der hydelats.txt-Datei wie bisher
+     * globals - true, dann statische Daten aus general_files auswerten
      * sonst werden die total-Auswertung und die Auswertung je Klimazone ausgegeben
      *
      *
@@ -2031,7 +2032,7 @@
         var adbc = "AD";
         var stationids = []; // aufbereitete Form, kommaseparierte Liste
         var lats = false;
-        var globals = false;
+        var globals = false; // aus general_files
         var hydetot = {}; // Vorlage für die Ausgabe
         var hydezone = {}; // hyde climatezones Vorlage für die Ausgabe
         var hydecont = {}; // hyde continents Vorlage für die Ausgabe
@@ -2112,8 +2113,12 @@
             fullname = path.join("G:", "Projekte");
             fullname = path.join(fullname, "klimadaten");
             fullname = path.join(fullname, "HYDE_lu_pop_proxy");
-            fullname = path.join(fullname, "baseline");
-            fullname = path.join(fullname, "asc");
+            if (globals === false) {
+                fullname = path.join(fullname, "baseline");
+                fullname = path.join(fullname, "asc");
+            } else {
+                fullname = path.join(fullname, "general_files");
+            }
             if (!fs.existsSync(fullname)) {
                 // hier ausweichverzeichnis prüfen
                 callbackh(res, {
@@ -2295,7 +2300,7 @@
                                         var longitude = parseFloat(metafields.xllcorner + (x * metafields.cellsize));
                                         var wert = rowcells[i];
                                         if (!wert.startsWith("-9999")) {
-                                            if (!isNaN(wert)) {
+                                            if (!isNaN(wert) && parseInt(wert) !== 0) {
                                                 icount++;
                                                 valcounter++;
                                                 if (wert.indexOf(".") >= 0) {
@@ -2325,17 +2330,28 @@
                                                     if (typeof hydecont[continent] === "undefined") {
                                                         hydecont[continent] = {};
                                                     }
-                                                    if (typeof hydecont[continent][year] === "undefined") {
-                                                        hydecont[continent][year] = {};
+                                                    if (globals === false) {
+                                                        if (typeof hydecont[continent][year] === "undefined") {
+                                                            hydecont[continent][year] = {};
+                                                        }
+                                                        if (typeof hydecont[continent][year][variablename] === "undefined") {
+                                                            hydecont[continent][year][variablename] = {
+                                                                count: 0,
+                                                                summe: 0.0,
+                                                            };
+                                                        }
+                                                        hydecont[continent][year][variablename].count += 1;
+                                                        hydecont[continent][year][variablename].summe += parseFloat(wert);
+                                                    } else {
+                                                        if (typeof hydecont[continent][variablename] === "undefined") {
+                                                            hydecont[continent][variablename] = {
+                                                                count: 0,
+                                                                summe: 0.0,
+                                                            };
+                                                        }
+                                                        hydecont[continent][variablename].count += 1;
+                                                        hydecont[continent][variablename].summe += parseFloat(wert);
                                                     }
-                                                    if (typeof hydecont[continent][year][variablename] === "undefined") {
-                                                        hydecont[continent][year][variablename] = {
-                                                            count: 0,
-                                                            summe: 0.0,
-                                                        };
-                                                    }
-                                                    hydecont[continent][year][variablename].count += 1;
-                                                    hydecont[continent][year][variablename].summe += parseFloat(wert);
                                                 }
                                             } else {
                                                 console.log(variablename + " NaN:" + wert);

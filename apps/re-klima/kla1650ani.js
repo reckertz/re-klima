@@ -678,8 +678,7 @@
                                 fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
                                 fname.push("kla1650ani");
                                 fname.push("hyde");
-                                fname.push(titlerecord.projectid);
-
+                                kla1650ani.setSubdir(fname, selrecord, titlerecord);
                                 $("#kla1650anibuttons").hide();
                                 $("body").css("cursor", "progress");
                                 var jqxhr = $.ajax({
@@ -688,6 +687,7 @@
                                     url: sysbase.getServer("transhyde"),
                                     data: {
                                         lats: false,
+                                        globals: false,
                                         selyears: years,
                                         selvars: "popc,rurc,urb,uopp",
                                         outdir: fname
@@ -717,7 +717,7 @@
 
 
                         .append($("<button/>", {
-                            html: "HYDE global",
+                            html: "HYDE 'globals'",
                             class: "kla1650anibut5",
                             css: {
                                 margin: 10
@@ -726,6 +726,8 @@
                                 evt.preventDefault();
                                 var thisbutton = this;
                                 // hier Liste der Jahre berechnen
+                                var fname = [];
+                                fname.push("hyde");
                                 uientry.fromUI2Record("#kla1650aniform", selrecord, selschema);
                                 $("#kla1650anibuttons").hide();
                                 $("body").css("cursor", "progress");
@@ -734,9 +736,10 @@
                                     crossDomain: false,
                                     url: sysbase.getServer("transhyde"),
                                     data: {
-                                        fullname: "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy\\general_files",
+                                        //fullname: "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy\\general_files",
                                         lats: false,
-                                        globals: true
+                                        globals: true,
+                                        outdir: fname
                                     }
                                 }).done(function (r1, textStatus, jqXHR) {
                                     sysbase.checkSessionLogin(r1);
@@ -1187,7 +1190,7 @@
         }
         sqlStmt += " WHERE " + where;
         sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-        if (selrecord.animatedgif === true) {
+        if (selrecord.animatedgif === true || selrecord.savesvgs === true || selrecord.savecounts === true) {
             kla1650ani.getTitlePageData(selrecord, selschema, function (ret) {
                 if (ret.error === true) {
                     cb1630B("error", ret);
@@ -1271,9 +1274,9 @@
             }
         };
         titlerecord = {};
-        titlerecord.projectid = "Studie 4711";
-        titlerecord.headertitle = "Test-Inhalt Headertitle";
-        titlerecord.subtitle = "Test-Inhalt Subtitle";
+        titlerecord.projectid = "";
+        titlerecord.headertitle = "";
+        titlerecord.subtitle = "";
         /*
          source, variablename, climatezone, continent, region, anzyears, fromyear, toyear, stepyear, height,
         */
@@ -1288,10 +1291,9 @@
         titlerecord.selection += " Bis Jahr:" + selrecord.toyear;
         titlerecord.selection += " Jahresintervalle:" + selrecord.stepyear;
         titlerecord.selection += " Höhe üdM:" + selrecord.height;
+        titlerecord.selection += " Selektionslogik:" + selrecord.logic;
 
-        titlerecord.comment = "Dies ist eine langer Kommentartext";
-        titlerecord.comment += "\nDies ist eine langer Kommentartext";
-        titlerecord.comment += "\nDies ist eine langer Kommentartext";
+        titlerecord.comment = "";
         var anchorHash = "#kla1650ani";
         var title = "";
         var pos = {
@@ -1665,6 +1667,7 @@
                                     fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
                                     fname.push("kla1650ani");
                                     fname.push("counters");
+                                    kla1650ani.setSubdir(fname, selrecord, titlerecord);
                                     //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
                                     fname.push("global.txt");
                                     var largestring = JSON.stringify(counters.global);
@@ -1679,6 +1682,7 @@
                                     fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
                                     fname.push("kla1650ani");
                                     fname.push("counters");
+                                    kla1650ani.setSubdir(fname, selrecord, titlerecord);
                                     //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
                                     fname.push("climatezones.txt");
                                     var largestring = JSON.stringify(counters.climatezones);
@@ -1693,6 +1697,7 @@
                                     fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
                                     fname.push("kla1650ani");
                                     fname.push("counters");
+                                    kla1650ani.setSubdir(fname, selrecord, titlerecord);
                                     //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
                                     fname.push("continents.txt");
                                     var largestring = JSON.stringify(counters.continents);
@@ -2128,15 +2133,8 @@
                                             fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
                                             fname.push("kla1650ani");
                                             fname.push("svgs");
-                                            fname.push(titlerecord.projectid);
-                                            var presel = actyear;
-                                            if (selrecord.climatezone.length > 0) {
-                                                presel += "_" + selrecord.climatezone;
-                                            }
-                                            if (selrecord.continent.length > 0) {
-                                                presel += "_" + selrecord.continent;
-                                            }
-                                            fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                            kla1650ani.setSubdir(fname, selrecord, titlerecord);
+                                            fname.push(new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
                                             var jqxhr = $.ajax({
                                                 method: "POST",
                                                 crossDomain: false,
@@ -2223,15 +2221,8 @@
                                             fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
                                             fname.push("kla1650ani");
                                             fname.push("gifs");
-                                            fname.push(titlerecord.projectid);
-                                            var presel = actyear;
-                                            if (selrecord.climatezone.length > 0) {
-                                                presel += "_" + selrecord.climatezone;
-                                            }
-                                            if (selrecord.continent.length > 0) {
-                                                presel += "_" + selrecord.continent;
-                                            }
-                                            fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                            kla1650ani.setSubdir(fname, selrecord, titlerecord);
+                                            fname.push(fname[fname.length-1] + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
                                             var reader = new FileReader();
                                             reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
                                             reader.onload = function () {
@@ -2393,7 +2384,22 @@
         return svgtext3;
     };
 
-
+    /**
+     * kla1650ani.setSubdir - Unterverzeichnis setzen für evtl. Studie und optionale Selektion
+     * @param {*} fname - Array mit den Subdirectories
+     * @param {*} selrecord - Selektionsvorgaben
+     * @param {*} titlerecord - Studien-Eingaben
+     * return fname mit oder ohne subdir, je nach Datenlage
+     */
+    kla1650ani.setSubdir = function (fname, selrecord, titlerecord) {
+        var subdir = titlerecord.projectid;
+        subdir += selrecord.continent;
+        subdir += selrecord.climatezone;
+        if (subdir.length > 0) {
+            fname.push(subdir);
+        }
+        return fname;
+    };
 
 
     // Klimazone
