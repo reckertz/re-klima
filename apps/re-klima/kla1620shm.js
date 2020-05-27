@@ -336,7 +336,6 @@
                     click: function (evt) {
                         evt.preventDefault();
                         // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
-
                         var canliste = $('#kla1620shmt1 tbody tr td span canvas');
                         $(canliste).each(function (index, element) {
                             var dataurl = element.toDataURL('image/png');
@@ -346,7 +345,13 @@
                             }));
                             $(element).remove();
                         });
-
+                        // Filterzeile clone und löschen
+                        // wenn hasClass u.a. hasFilters
+                        var clonerow;
+                        if ($("#kla1620shmt1").hasClass("hasFilters")) {
+                            clonerow = $("#kla1620shmt1 thead tr").eq(1).clone();
+                            $("#kla1620shmt1 thead tr").eq(1).remove();
+                        }
                         var elHtml = "";
                         elHtml += "<html>";
                         elHtml += "<head>";
@@ -361,7 +366,20 @@
                         elHtml += $("#kla1620shmt1").parent().html();
                         elHtml += "</body>";
                         elHtml += "<html>";
-
+                        // Filterzeile clone wieder einfügen
+                        if ($("#kla1620shmt1").hasClass("hasFilters")) {
+                            $("#kla1620shmt1 thead").append(clonerow);
+                            debugger;
+                            $(".tablesorter").tablesorter({
+                                theme: "blue",
+                                /* widgets: ['filter'], */
+                                widthFixed: false,
+                                widgetOptions: {
+                                    filter_hideFilters: false,
+                                    filter_ignoreCase: true
+                                }
+                            }); // so funktioniert es
+                        }
                         var filename = "sparklines.html";
                         if (elHtml.length > 100) {
                             var jqxhr = $.ajax({
