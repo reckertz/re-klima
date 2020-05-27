@@ -509,13 +509,12 @@
                 class: "uieselectinput",
                 default: "1",
                 io: "i",
-                enum: [
-                    {
+                enum: [{
                         value: "1",
                         text: "Beobachtungszeitraum"
                     },
                     {
-                        value:"2",
+                        value: "2",
                         text: "Mindestdauer 'plus'"
                     },
                     {
@@ -580,7 +579,7 @@
                 class: "uiecheckbox",
                 /* width: "100px", */
                 io: "i"
-            },
+            }
         }
     };
 
@@ -628,13 +627,34 @@
                                 var thisbutton = this;
                                 $("#kla1650anibuttons").hide();
                                 $("body").css("cursor", "progress");
-                                kla1650ani.prepanimate(function (ret) {
+                                kla1650ani.prepanimate(false, function (ret) {
                                     $("body").css("cursor", "default");
                                     $("#kla1650anibuttons").show();
                                 });
                             }
                         }))
 
+
+                        .append($("<button/>", {
+                            html: "Stationen anzeigen",
+                            class: "kla1650anibut2",
+                            css: {
+                                margin: 10
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var thisbutton = this;
+                                $("#kla1650anibuttons").hide();
+                                $("body").css("cursor", "progress");
+                                kla1650ani.prepanimate(true, function (ret) {
+                                    var tourl = "inframe.html" + "?" + "sqlStmt=" + encodeURIComponent(sqlStmt);
+                                    tourl += "&origin=kla1650ani";
+                                    tourl += "&selrecord=" + encodeURIComponent(JSON.stringify(ret.selrecord));
+                                    var idc640 = window.parent.sysbase.tabcreateiframe("Liste", "", "re-klima", "kla1610sta", tourl);
+                                    window.parent.$(".tablinks[idhash='#" + idc640 + "']").click();
+                                });
+                            }
+                        }))
 
                         .append($("<button/>", {
                             html: "HYDE laden",
@@ -660,7 +680,7 @@
                                     toyear = selrecord.toyear;
                                 }
                                 if (toyear.length === 0) {
-                                    toyear = new Date().toISOString().substr(0,4);
+                                    toyear = new Date().toISOString().substr(0, 4);
                                     selrecord.toyear = toyear;
                                 }
                                 var von = parseInt(fromyear);
@@ -1017,7 +1037,7 @@
      * aber blau für aktive Stationen und rot für erloschene Stationen
      * mit selrecord.animatedgif als Indiktor
      */
-    kla1650ani.prepanimate = function (cb1630B) {
+    kla1650ani.prepanimate = function (sqlonly, cb1630B) {
 
         if (typeof selrecord === "undefined" || typeof selrecord.source === "undefined") {
             sysbase.putMessage("Animation nur mit Selektionsvorgabe");
@@ -1072,7 +1092,7 @@
             }
         }
         if (typeof seltoyear === "undefined" || seltoyear.length === 0 || isNaN(seltoyear)) {
-            seltoyear = new Date().toISOString().substr(0,4);
+            seltoyear = new Date().toISOString().substr(0, 4);
         }
         if (selrecord.anzyears.length === 0 || isNaN(selrecord.anzyears)) {
             selrecord.anzyears = "1";
@@ -1080,26 +1100,26 @@
         if (selrecord.logic === "1") {
             // Beobachtungszeitraum selektieren
             if (where.length > 0) where += " AND ";
-            where += " KLIINVENTORY.toyear >= " +  parseInt(selfromyear);
+            where += " KLIINVENTORY.toyear >= " + parseInt(selfromyear);
             where += " AND ";
-            where += " KLIINVENTORY.fromyear <= " +  parseInt(seltoyear);
+            where += " KLIINVENTORY.fromyear <= " + parseInt(seltoyear);
         } else if (selrecord.logic === "2") {
             // Mindestdauer spezial
             if (where.length > 0) where += " AND (";
-            where += " KLIINVENTORY.fromyear <= " +  parseInt(selfromyear);
+            where += " KLIINVENTORY.fromyear <= " + parseInt(selfromyear);
             where += " AND ";
-            where += " (KLIINVENTORY.toyear - KLIINVENTORY.fromyear + 1) >= " +  parseInt(selrecord.anzyears);
+            where += " (KLIINVENTORY.toyear - KLIINVENTORY.fromyear + 1) >= " + parseInt(selrecord.anzyears);
             where += " OR ";
-            where += " KLIINVENTORY.fromyear > " +  parseInt(selfromyear);
+            where += " KLIINVENTORY.fromyear > " + parseInt(selfromyear);
             where += ") ";
         } else if (selrecord.logic === "3") {
             // nur neue Stationen
             if (where.length > 0) where += " AND (";
-            where += " KLIINVENTORY.fromyear >= " +  parseInt(selfromyear);
+            where += " KLIINVENTORY.fromyear >= " + parseInt(selfromyear);
         } else if (selrecord.logic === "3") {
             // nur alte Stationen
             if (where.length > 0) where += " AND (";
-            where += " KLIINVENTORY.fromyear <= " +  parseInt(selfromyear);
+            where += " KLIINVENTORY.fromyear <= " + parseInt(selfromyear);
         } else {
             // bisherige Logik
             if (typeof selrecord.fromyear !== "undefined" && selrecord.fromyear.trim().length > 0) {
@@ -1190,14 +1210,23 @@
         }
         sqlStmt += " WHERE " + where;
         sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
+        if (sqlonly === true) {
+            cb1630B({
+                error: false,
+                message: "sqlStmt aufgebaut",
+                sqlStmt: sqlStmt,
+                selrecord: selrecord
+            });
+            return;
+        }
         if (selrecord.animatedgif === true || selrecord.savesvgs === true || selrecord.savecounts === true) {
             kla1650ani.getTitlePageData(selrecord, selschema, function (ret) {
                 if (ret.error === true) {
-                    cb1630B("error", ret);
+                    cb1630B(ret);
                     return;
                 } else {
                     // hier execution i.e.S.
-                    cb1630B(null, ret);
+                    cb1630B(ret);
                     return;
                 }
             });
@@ -1662,56 +1691,56 @@
                     kla1650ani.loop(ret1.selrecord, ret1.pearls, function (ret) {
                         if (selrecord.savecounts === true) {
                             async.waterfall([
-                                function (cb1650a) {
-                                    var fname = [];
-                                    fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
-                                    fname.push("kla1650ani");
-                                    fname.push("counters");
-                                    kla1650ani.setSubdir(fname, selrecord, titlerecord);
-                                    //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
-                                    fname.push("global.txt");
-                                    var largestring = JSON.stringify(counters.global);
-                                    uihelper.storeasfile(fname, largestring, function (ret) {
-                                        sysbase.putMessage(ret.message, 1);
-                                        cb1650a(null, ret);
-                                        return;
-                                    });
-                                },
-                                function (ret, cb1650b) {
-                                    var fname = [];
-                                    fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
-                                    fname.push("kla1650ani");
-                                    fname.push("counters");
-                                    kla1650ani.setSubdir(fname, selrecord, titlerecord);
-                                    //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
-                                    fname.push("climatezones.txt");
-                                    var largestring = JSON.stringify(counters.climatezones);
-                                    uihelper.storeasfile(fname, largestring, function (ret) {
-                                        sysbase.putMessage(ret.message, 1);
-                                        cb1650b(null, ret);
-                                        return;
-                                    });
-                                },
-                                function (ret, cb1650c) {
-                                    var fname = [];
-                                    fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
-                                    fname.push("kla1650ani");
-                                    fname.push("counters");
-                                    kla1650ani.setSubdir(fname, selrecord, titlerecord);
-                                    //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
-                                    fname.push("continents.txt");
-                                    var largestring = JSON.stringify(counters.continents);
-                                    uihelper.storeasfile(fname, largestring, function (ret) {
-                                        sysbase.putMessage(ret.message, 1);
-                                        cb1650c(null, ret);
-                                        return;
-                                    });
-                                }
-                            ],
-                            function(error, ret) {
-                                cb1630B3("Finish", ret);
-                                return;
-                            });
+                                    function (cb1650a) {
+                                        var fname = [];
+                                        fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                        fname.push("kla1650ani");
+                                        fname.push("counters");
+                                        kla1650ani.setSubdir(fname, selrecord, titlerecord);
+                                        //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                        fname.push("global.txt");
+                                        var largestring = JSON.stringify(counters.global);
+                                        uihelper.storeasfile(fname, largestring, function (ret) {
+                                            sysbase.putMessage(ret.message, 1);
+                                            cb1650a(null, ret);
+                                            return;
+                                        });
+                                    },
+                                    function (ret, cb1650b) {
+                                        var fname = [];
+                                        fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                        fname.push("kla1650ani");
+                                        fname.push("counters");
+                                        kla1650ani.setSubdir(fname, selrecord, titlerecord);
+                                        //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                        fname.push("climatezones.txt");
+                                        var largestring = JSON.stringify(counters.climatezones);
+                                        uihelper.storeasfile(fname, largestring, function (ret) {
+                                            sysbase.putMessage(ret.message, 1);
+                                            cb1650b(null, ret);
+                                            return;
+                                        });
+                                    },
+                                    function (ret, cb1650c) {
+                                        var fname = [];
+                                        fname.push(selrecord.fromyear + "-" + selrecord.toyear + "-" + selrecord.stepyear);
+                                        fname.push("kla1650ani");
+                                        fname.push("counters");
+                                        kla1650ani.setSubdir(fname, selrecord, titlerecord);
+                                        //fname.push(presel + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                        fname.push("continents.txt");
+                                        var largestring = JSON.stringify(counters.continents);
+                                        uihelper.storeasfile(fname, largestring, function (ret) {
+                                            sysbase.putMessage(ret.message, 1);
+                                            cb1650c(null, ret);
+                                            return;
+                                        });
+                                    }
+                                ],
+                                function (error, ret) {
+                                    cb1630B3("Finish", ret);
+                                    return;
+                                });
                         } else {
                             cb1630B3("Finish", ret);
                             return;
@@ -1755,20 +1784,20 @@
             plusnew: 0,
             minusold: 0
         };
-        counters.global = {};  // => year => ctemplate
+        counters.global = {}; // => year => ctemplate
         counters.climatezones = {};
         for (var izone = 0; izone < selschema.entryschema.climatezone.enum.length; izone++) {
             var cz = selschema.entryschema.climatezone.enum[izone].value;
-            counters.climatezones[cz] = {};  // => year => ctemplate
+            counters.climatezones[cz] = {}; // => year => ctemplate
         }
-        counters.climatezones["?"] = {};   // => year => ctemplate
+        counters.climatezones["?"] = {}; // => year => ctemplate
         counters.continents = {};
         for (var icon = 0; icon < selschema.entryschema.continent.enum.length; icon++) {
             var con = selschema.entryschema.continent.enum[icon].value;
-            counters.continents[con] = {};  // => year => ctemplate
+            counters.continents[con] = {}; // => year => ctemplate
         }
         // Sonderfall
-        counters.continents["?"] = {};  // => year => ctemplate
+        counters.continents["?"] = {}; // => year => ctemplate
 
         try {
             var loopyears = [];
@@ -1883,7 +1912,7 @@
                                     if (pearls[ipearl].ispainted === 0) {
                                         counters.global[actyear].plusnew++;
                                     }
-                                    var cz = pearl.climatezone.substr(0,2);
+                                    var cz = pearl.climatezone.substr(0, 2);
                                     if (typeof counters.climatezones[cz][actyear] === "undefined") {
                                         counters.climatezones[cz][actyear] = {
                                             count: 0,
@@ -1950,7 +1979,7 @@
                                     }
 
                                     counters.global[actyear].minusold++;
-                                    var cz = pearl.climatezone.substr(0,2);
+                                    var cz = pearl.climatezone.substr(0, 2);
                                     if (typeof counters.climatezones[cz][actyear] === "undefined") {
                                         counters.climatezones[cz][actyear] = {
                                             count: 0,
@@ -1990,7 +2019,7 @@
                                         };
                                     }
                                     counters.global[actyear].count++;
-                                    var cz = pearl.climatezone.substr(0,2);
+                                    var cz = pearl.climatezone.substr(0, 2);
                                     if (typeof counters.climatezones[cz][actyear] === "undefined") {
                                         counters.climatezones[cz][actyear] = {
                                             count: 0,
@@ -2222,7 +2251,7 @@
                                             fname.push("kla1650ani");
                                             fname.push("gifs");
                                             kla1650ani.setSubdir(fname, selrecord, titlerecord);
-                                            fname.push(fname[fname.length-1] + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_"));
+                                            fname.push(fname[fname.length - 1] + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_"));
                                             var reader = new FileReader();
                                             reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
                                             reader.onload = function () {
