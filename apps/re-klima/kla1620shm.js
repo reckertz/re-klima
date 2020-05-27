@@ -310,7 +310,7 @@
                             var superParam = JSON.parse(extraParam).props;
                             kla1620shm.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
                                 // Daten in klirecords[0] und [1] wenn OK
-                                kla1620shm.paintX(selvariablename, selsource, selstationid, superParam, function(ret) {
+                                kla1620shm.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
                                     return;
                                 });
                             });
@@ -354,7 +354,7 @@
                         elHtml += "<style type='text/css'> @page { size: 29.5cm 21.0cm; margin-left: 1cm; margin-right: 1cm }</style>";
                         elHtml += "</head>";
                         elHtml += "<body style='font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px'>";
-                        elHtml += "<h2>" + "selstationid" + "</h2>";
+                        elHtml += "<h2>" + $("#kla1620shmh2").text() + "</h2>";
                         elHtml += "<p style='page-break-before: always'>";
                         var oldwidth = $("#kla1620shmt1").width();
                         $("#kla1620shmt1").width("100%");
@@ -2090,6 +2090,7 @@
                         }
                     })
                     .append($("<h2/>", {
+                        id: "kla1620shmh2",
                         text: stationdata.stationid + " " + stationdata.stationname
                     }))
                 );
@@ -2468,7 +2469,7 @@
                     outrecords.push(rowrecord);
                 }
             }
-       }
+        }
         /**
          * Bearbeitung: Ausgabe in Tabellenzeile
          */
@@ -2484,7 +2485,8 @@
                         html: rowtit
                     }))
                     .append($("<td/>", {
-                        html: rkat
+                        id: 'var' + pcount,
+                        html: rkat + "<br>" +  rowdata[0].variablename
                     }))
                     .append($("<td/>")
                         .append($("<span/>", {
@@ -2590,49 +2592,58 @@
                 });
             }
         }
-        if (rowdata.length >= 1) {
+        if (rowdata.length >= 2) {
             /**
              * Doppelzeile, wird spannend - anfügen an bestehende span-Bereiche
              * mit id aus spark, grad, inter, r2, min, max, avg und pcount als Suffix
              */
-            var html = "";
-            html = $("#grad" + pcount).html();
-            html += "<br>" + rowdata[1].gradient;
-            $("#grad" + pcount).html(html);
+            try {
+                var html = "";
 
-            html = $("#inter" + pcount).html();
-            html += "<br>" + rowdata[1].yIntercept;
-            $("#inter" + pcount).html(html);
+                html = $("#var" + pcount).html();
+                html += "<br>" + rowdata[1].variablename;
+                $("#var" + pcount).html(html);
 
-            html = $("#r2" + pcount).html();
-            html += "<br>" + rowdata[1].r2;
-            $("#r2" + pcount).html(html);
+                html = $("#grad" + pcount).html();
+                html += "<br>" + rowdata[1].gradient;
+                $("#grad" + pcount).html(html);
 
-            html = $("#min" + pcount).html();
-            html += "<br>" + rowdata[1].tmin;
-            $("#min" + pcount).html(html);
+                html = $("#inter" + pcount).html();
+                html += "<br>" + rowdata[1].yIntercept;
+                $("#inter" + pcount).html(html);
 
-            html = $("#max" + pcount).html();
-            html += "<br>" + rowdata[1].tmax;
-            $("#max" + pcount).html(html);
+                html = $("#r2" + pcount).html();
+                html += "<br>" + rowdata[1].r2;
+                $("#r2" + pcount).html(html);
 
-            html = $("#avg" + pcount).html();
-            html += "<br>" + rowdata[1].tavg;
-            $("#avg" + pcount).html(html);
+                html = $("#min" + pcount).html();
+                html += "<br>" + rowdata[1].tmin;
+                $("#min" + pcount).html(html);
 
-            var defaultpixel = 3;
-            if (rowdata[0].pearls.length > 350) defaultpixel = 2;
-            var sparkid = "#spark" + pcount;
-            $(sparkid).sparkline(rowdata[1].pearls, {
-                type: 'line',
-                height: 60,
-                fillColor: false,
-                defaultPixelsPerValue: defaultpixel,
-                chartRangeMin: totmin,
-                chartRangeMax: totmax,
-                lineColor: "blue",
-                composite: true
-            });
+                html = $("#max" + pcount).html();
+                html += "<br>" + rowdata[1].tmax;
+                $("#max" + pcount).html(html);
+
+                html = $("#avg" + pcount).html();
+                html += "<br>" + rowdata[1].tavg;
+                $("#avg" + pcount).html(html);
+
+                var defaultpixel = 3;
+                if (rowdata[0].pearls.length > 350) defaultpixel = 2;
+                var sparkid = "#spark" + pcount;
+                $(sparkid).sparkline(rowdata[1].pearls, {
+                    type: 'line',
+                    height: 60,
+                    fillColor: false,
+                    defaultPixelsPerValue: defaultpixel,
+                    chartRangeMin: totmin,
+                    chartRangeMax: totmax,
+                    lineColor: "blue",
+                    composite: true
+                });
+            } catch (err) {
+
+            }
         }
         /**
          * Vollmond als Bar-Chart zu iyear und pcount mit uihelper.moonphase

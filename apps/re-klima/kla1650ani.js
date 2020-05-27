@@ -602,9 +602,11 @@
                     selrecord.source = "GHCND";
                     selrecord.variablename = "TMAX";
                     selrecord.climatezone = "N1";
+                    selrecord.region = "germany";
                     selrecord.stepyear = "1";
-                    selrecord.anzyears = ">=150";
+                    selrecord.anzyears = ">=30";
                     selrecord.fromyear = "2018";
+                    selrecord.logic = "1";
                 }
                 uientry.fromRecord2UI("#kla1650aniform", selrecord, selschema);
                 $(".col2of2")

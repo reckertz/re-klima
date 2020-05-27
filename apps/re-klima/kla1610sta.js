@@ -182,7 +182,7 @@
 
     kla1610sta.show = function (parameters, navigatebucket) {
         // https://www.sitepoint.com/get-url-parameters-with-javascript/
-        debugger;
+
         var queryString = window.location.search;
         console.log(queryString); // ?product=shirt&color=blue&newuser&size=m
         queryString = queryString.substr(1);
