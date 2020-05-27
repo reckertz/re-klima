@@ -2222,7 +2222,7 @@
                                             fname.push("kla1650ani");
                                             fname.push("gifs");
                                             kla1650ani.setSubdir(fname, selrecord, titlerecord);
-                                            fname.push(fname[fname.length-1] + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_") + ".svg");
+                                            fname.push(fname[fname.length-1] + "_" + new Date().toISOString().replace(/:/g, "_").replace(/-/g, "_"));
                                             var reader = new FileReader();
                                             reader.readAsDataURL(blob); // converts the blob to base64 and calls onload
                                             reader.onload = function () {
@@ -2392,9 +2392,9 @@
      * return fname mit oder ohne subdir, je nach Datenlage
      */
     kla1650ani.setSubdir = function (fname, selrecord, titlerecord) {
-        var subdir = titlerecord.projectid;
-        subdir += selrecord.continent;
-        subdir += selrecord.climatezone;
+        var subdir = titlerecord.projectid || "";
+        subdir += selrecord.continent || "";
+        subdir += selrecord.climatezone || "";
         if (subdir.length > 0) {
             fname.push(subdir);
         }

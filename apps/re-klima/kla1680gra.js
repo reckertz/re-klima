@@ -1,6 +1,6 @@
 /*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
-/*global sysbase,uihelper */
+/*global sysbase,uihelper,SuperGif */
 (function () {
     var kla1680gra = {};
 
@@ -18,6 +18,7 @@
     var pearldata = {};
     var vgldata;
     var forcedata = "false";
+    var sgif;
 
     var klischema = {
         entryschema: {
@@ -594,7 +595,7 @@
                 directory: directory,
                 filterextensions: ".txt,.json,.csv,.html",
                 skipsubdirectories: "false",
-                doKLIFILES: "true",
+                doKLIFILES: "false",
                 doKLIRAWFILES: "false"
             }
         }).done(function (r1, textStatus, jqXHR) {
@@ -673,7 +674,6 @@
                 }
                 filenodes.push(filenode);
             }
-
             if ($("#kla1680grat0").hasClass("jstree")) $("#kla1680grat0").jstree(true).destroy();
             // "checkbox"
             $("#kla1680grat0").jstree({
@@ -734,9 +734,9 @@
                 url: "",
                 predirectory: predirectory,
                 directory: directory,
-                filterextensions: ".txt,.json,.svg,.csv",
+                filterextensions: ".txt,.json,.svg,.gif,.csv,.html",
                 skipsubdirectories: "false",
-                doKLIFILES: "true",
+                doKLIFILES: "false",
                 doKLIRAWFILES: "false"
             }
         }).done(function (r1, textStatus, jqXHR) {
@@ -824,7 +824,7 @@
                             });
                         }
                     }
-                  ],
+                ],
                 function (error, ret) {
                     supercallback(ret);
                     return;
@@ -846,19 +846,86 @@
                     message: "OK"
                 });
                 return;
-            } else if (kla1680gra.checkfragments(fullname, "global \.txt")) {
+            } else if (kla1680gra.checkfragments(fullname, "hydetot \.txt")) {
                 // Graphik ausgeben
-                kla1680gra.paintChart(fullname, "global", function(ret) {
+                kla1680gra.paintChart(fullname, "hydeglobal", function (ret) {
                     supercallback({
                         error: false,
                         message: "OK"
                     });
                     return;
                 });
+            } else if (kla1680gra.checkfragments(fullname, "hydecont \.txt")) {
+                // Graphik ausgeben
+                kla1680gra.paintChart(fullname, "hydecontinents", function (ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+            } else if (kla1680gra.checkfragments(fullname, "hydezone \.txt")) {
+                // Graphik ausgeben
+                kla1680gra.paintChart(fullname, "hydeclimatezones", function (ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+
+            } else if (kla1680gra.checkfragments(fullname, "global \.txt")) {
+                // Graphik ausgeben
+                kla1680gra.paintChart(fullname, "global", function (ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+
+
             } else if (kla1680gra.checkfragments(fullname, "continents \.txt")) {
                 // Graphik ausgeben
                 // {"NA1":{"2018":{"count":26,"plusnew":26,"minusold":0}
-                kla1680gra.paintChart(fullname, "continents", function(ret) {
+                kla1680gra.paintChart(fullname, "continents", function (ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+            } else if (kla1680gra.checkfragments(fullname, "climatezones \.txt")) {
+                // Graphik ausgeben
+                // {"NA1":{"2018":{"count":26,"plusnew":26,"minusold":0}
+                kla1680gra.paintChart(fullname, "climatezones", function (ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+            } else if (kla1680gra.checkfragments(fullname, "\.html")) {
+                // Graphik ausgeben
+                kla1680gra.paintHtml(fullname, "html", function (ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+            } else if (kla1680gra.checkfragments(fullname, "\.gif")) {
+                // Graphik ausgeben
+                kla1680gra.paintGif(fullname, "animatedgif", function (ret) {
+                    supercallback({
+                        error: false,
+                        message: "OK"
+                    });
+                    return;
+                });
+            } else if (kla1680gra.checkfragments(fullname, "\.svg")) {
+                // Graphik ausgeben
+                kla1680gra.paintSvg(fullname, "svg-worldmap", function (ret) {
                     supercallback({
                         error: false,
                         message: "OK"
@@ -877,6 +944,187 @@
     };
 
 
+    /**
+     * paintHtml - HTML-Datei anzeigen, Tabellen und Graphiken
+     */
+    kla1680gra.paintHtml = function (fullname, datatype, callbacksvg) {
+        $("#kla1680gra_right").empty();
+        var h = $(".col1of2").height();
+        var w = $("#kla1680gra.content").width();
+        w -= $(".col1of2").position().left;
+        w -= $(".col1of2").width();
+        w -= 40;
+        $("#kla1680gra_right")
+            .append($("<div/>", {
+                id: "kla1680graw",
+                css: {
+                    height: h,
+                    width: w,
+                    "background-color": "white"
+                }
+            }));
+        $("#kla1680graw").empty();
+        $("#kla1680graw")
+            .append($("<iframe/>", {
+                id: "kla1680grafra",
+                height: h,
+                width: w
+            }));
+
+        var idis = fullname.indexOf("temp");
+        var filename = fullname.substr(idis);
+        $("#kla1680grafra").attr("src", filename);
+
+    };
+
+
+
+    /**
+     * paintGif - Animierte Gif anzeigen
+     */
+    kla1680gra.paintGif = function (fullname, datatype, callbackgif) {
+        $("#kla1680gra_right").empty();
+        var h = $(".col1of2").height();
+        var w = $("#kla1680gra.content").width();
+        w -= $(".col1of2").position().left;
+        w -= $(".col1of2").width();
+        w -= 40;
+        $("#kla1680gra_right")
+            .append($("<div/>", {
+                id: "kla1680graw",
+                css: {
+                    height: h,
+                    width: w,
+                    "background-color": "white"
+                }
+            }));
+        $("#kla1680graw").empty();
+        $("#kla1680graw")
+            .append($("<img/>", {
+                id: "kla1680graimg"
+            }));
+        sgif = new SuperGif({
+            gif: document.getElementById("kla1680graimg"),
+            loop_mode: 'auto',
+            auto_play: true,
+            draw_while_loading: false,
+            show_progress_bar: false,
+            progressbar_height: 10,
+            progressbar_foreground_color: 'rgba(0, 255, 4, 0.1)',
+            progressbar_background_color: 'rgba(0,0,0,0.8)'
+        });
+        // kürzen des fullname auf den relativen url-Namen
+        var idis = fullname.indexOf("temp");
+        var filename = fullname.substr(idis);
+        sgif.load_url(filename, function () {
+            loaded = true;
+            sgif.pause();
+            sgif.move_to(0);
+            console.log('loaded');
+            $("#kliheatmapnav").remove();
+            $("#kla1680graw")
+                .append($("<div/>", {
+                        id: "kliheatmapnav",
+                        width: "100%"
+                    })
+                    .append($("<button/>", {
+                        html: "|<",
+                        css: {
+                            "margin": "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            sgif.move_to(0);
+                        }
+                    }))
+                    .append($("<button/>", {
+                        html: "<",
+                        css: {
+                            "margin": "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            var aktframe = sgif.get_current_frame();
+                            if (aktframe > 0) {
+                                sgif.move_relative(-1);
+                            }
+                        }
+                    }))
+                    .append($("<button/>", {
+                        html: "Stop/Go",
+                        css: {
+                            "margin": "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            var aktframe = sgif.get_current_frame();
+                            if (sgif.get_playing()) {
+                                sgif.pause();
+                            } else {
+                                sgif.play();
+                            }
+                        }
+                    }))
+                    .append($("<button/>", {
+                        html: ">",
+                        css: {
+                            "margin": "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            var aktframe = sgif.get_current_frame();
+                            if (aktframe < sgif.get_length()) {
+                                sgif.move_relative(1);
+                            }
+                        }
+                    }))
+                    .append($("<button/>", {
+                        html: ">|",
+                        css: {
+                            "margin": "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            sgif.move_to(sgif.get_length() - 1);
+                        }
+                    }))
+                );
+        });
+    };
+
+
+    /**
+     * paintSvg - SVG-Datei anzeigen, Worldmap mit Dateneinblendung
+     */
+    kla1680gra.paintSvg = function (fullname, datatype, callbacksvg) {
+        $("#kla1680gra_right").empty();
+        var h = $(".col1of2").height();
+        var w = $("#kla1680gra.content").width();
+        w -= $(".col1of2").position().left;
+        w -= $(".col1of2").width();
+        w -= 40;
+        $("#kla1680gra_right")
+            .append($("<div/>", {
+                id: "kla1680graw",
+                css: {
+                    height: h,
+                    width: w,
+                    "background-color": "white"
+                }
+            }));
+        $("#kla1680graw").empty();
+        $("#kla1680graw")
+            .append($("<img/>", {
+                id: "kla1680graimg"
+            }));
+
+        var idis = fullname.indexOf("temp");
+        var filename = fullname.substr(idis);
+        $("#kla1680graimg").attr("src", filename);
+
+    };
+
+
 
     /**
      * paintChart - mit chartJS wird eine Gesamtgraphik ausgegeben
@@ -885,225 +1133,348 @@
     kla1680gra.paintChart = function (fullname, datatype, callbackg) {
 
         async.waterfall([
-            function(callbackh1) {
-                /**
-                 * Holen der Daten
-                 */
-                var jqxhr = $.ajax({
-                    method: "GET",
-                    crossDomain: false,
-                    url: sysbase.getServer("getfileasstring"),
-                    data: {
-                        fullname: fullname
-                    }
-                }).done(function (r1, textStatus, jqXHR) {
-                    sysbase.checkSessionLogin(r1);
-                    sysbase.putMessage(r1, 1);
-                    var ret = JSON.parse(r1);
-                    // Ausgabe in Graphik rechts
-                    sysbase.putMessage(ret.message, 1);
-                    var dataobject = JSON.parse(ret.filestring);
-                    callbackh1(null, {
-                        error: false,
-                        message: "OK",
-                        dataobject: dataobject
-                    });
-                    return;
-                }).fail(function (err) {
-                    document.getElementById("kla1680gra").style.cursor = "default";
-                    sysbase.putMessage(err, 1);
-                    callbackg({
-                        error: true,
-                        message: err
-                    });
-                    return;
-                }).always(function () {
-                    // nope
-                });
-            },
-            function (ret, callbackh2) {
-                /**
-                 * Ausgabe der Graphik - ret.dataobject
-                */
-                $("#kla1680gra_right").empty();
-                var h = $(".col1of2").height();
-                var w = $("#kla1680gra.content").width();
-                w -= $(".col1of2").position().left;
-                w -= $(".col1of2").width();
-                w -= 40;
-                $("#kla1680gra_right")
-                    .append($("<div/>", {
-                            css: {
-                                height: h,
-                                width: w,
-                                "background-color": "white"
-                            }
-                        })
-                        .append($("<canvas/>", {
-                            id: "myChart",
-                            css: {
-                                height: h,
-                                width: w
-                            }
-                        }))
-                    );
-                var datasets = [];  // hält die rows
-                var labels = [];    // hält die col-headers = Years
-                var lab;
-                // bei global.txt direkt die years als keys
-                var years;
-                if (datatype === "global") {
-                    years = Object.keys(ret.dataobject);
-                    labels = years;
-                    var counts = [];
-                    var plusnews = [];
-                    var minusolds = [];
-                    for (var iyear = 0; iyear < years.length; iyear++) {
-                        counts.push(ret.dataobject[years[iyear]].count);
-                        plusnews.push(ret.dataobject[years[iyear]].plusnew);
-                        minusolds.push(ret.dataobject[years[iyear]].minusold);
-                    }
-                    datasets.push({
-                        label: "count",
-                        backgroundColor: '#00FFFF',
-                        borderColor: '#00FFFF',
-                        borderWidth: 1,
-                        pointRadius: 1,
-                        data: counts,
-                        fill: false
-                    });
-                    datasets.push({
-                        label: "plusnew",
-                        backgroundColor: '#00FFFF',
-                        borderColor: '#00FFFF',
-                        borderWidth: 1,
-                        pointRadius: 1,
-                        data: plusnews,
-                        fill: false
-                    });
-                    datasets.push({
-                        label: "minusold",
-                        backgroundColor: '#00FFFF',
-                        borderColor: '#00FFFF',
-                        borderWidth: 1,
-                        pointRadius: 1,
-                        data: minusolds,
-                        fill: false
-                    });
-                } else if (datatype === "continents") {
-                    // {"NA1":{"2018":{"count":26,"plusnew":26,"minusold":0}
-                    // erst feststellen aller Jahre!!!
-                    var tarray = [];
-                    var cons = Object.keys(ret.dataobject);
-                    var oyears = {};
-                    for (var icon = 0; icon < cons.length; icon++) {
-                        var actcon = cons[icon];
-                        var years = Object.keys(ret.dataobject[actcon]);
-                        for (var iyear = 0; iyear < years.length; iyear++) {
-                            var actyear = years[iyear];
-                            if (typeof oyears[actyear] === "undefined") {
-                                oyears[actyear] = {
-                                    year: actyear
-                                };
-                            }
-                            /*
-                            tarray.push({
-                                continent: actcon,
-                                year: actyear,
-                                count: ret.dataobject[actcon][actyear].count,
-                                plusnew: ret.dataobject[actcon][actyear].plusnew,
-                                minusold: ret.dataobject[actcon][actyear].minusold
-                            });
-                            */
+                function (callbackh1) {
+                    /**
+                     * Holen der Daten
+                     */
+                    var jqxhr = $.ajax({
+                        method: "GET",
+                        crossDomain: false,
+                        url: sysbase.getServer("getfileasstring"),
+                        data: {
+                            fullname: fullname
                         }
-                    }
-                    // oyears umsortieren
-                    //oyears = Object.keys(oyears).sort();
-                    /*
-                    oyears.sort(function (a, b) {
-                        if (a.year < b.year)
-                            return -1;
-                        if (a.year > b.year)
-                            return 1;
-                        return 0;
+                    }).done(function (r1, textStatus, jqXHR) {
+                        sysbase.checkSessionLogin(r1);
+                        sysbase.putMessage(r1, 1);
+                        var ret = JSON.parse(r1);
+                        // Ausgabe in Graphik rechts
+                        sysbase.putMessage(ret.message, 1);
+                        if (ret.error === true || typeof ret.filestring === "undefined" || ret.filestring.length === 0) {
+                            callbackh1("error", {
+                                error: true,
+                                message: ret.message
+                            });
+                            return;
+                        } else {
+                            var dataobject = JSON.parse(ret.filestring);
+                            callbackh1(null, {
+                                error: false,
+                                message: "OK",
+                                dataobject: dataobject
+                            });
+                            return;
+                        }
+                    }).fail(function (err) {
+                        document.getElementById("kla1680gra").style.cursor = "default";
+                        sysbase.putMessage(err, 1);
+                        callbackg({
+                            error: true,
+                            message: err
+                        });
+                        return;
+                    }).always(function () {
+                        // nope
                     });
-                    */
-                    years = Object.keys(oyears).sort();
-                    labels = years;
-                    for (var icon1 = 0; icon1 < cons.length; icon1++) {
-                        var conkey = cons[icon1];
-                        // Die Ausgabe erfolgt je Kontinent
+                },
+                function (ret, callbackh2) {
+                    /**
+                     * Ausgabe der Graphik - ret.dataobject
+                     */
+                    $("#kla1680gra_right").empty();
+                    var h = $(".col1of2").height();
+                    var w = $("#kla1680gra.content").width();
+                    w -= $(".col1of2").position().left;
+                    w -= $(".col1of2").width();
+                    w -= 40;
+                    $("#kla1680gra_right")
+                        .append($("<div/>", {
+                                css: {
+                                    height: h,
+                                    width: w,
+                                    "background-color": "white"
+                                }
+                            })
+                            .append($("<canvas/>", {
+                                id: "myChart",
+                                css: {
+                                    height: h,
+                                    width: w
+                                }
+                            }))
+                        );
+                    var datasets = []; // hält die rows
+                    var labels = []; // hält die col-headers = Years
+                    var lab;
+                    // bei global.txt direkt die years als keys
+                    var years;
+                    if (datatype === "global") {
+                        years = Object.keys(ret.dataobject);
+                        labels = years;
                         var counts = [];
                         var plusnews = [];
                         var minusolds = [];
                         for (var iyear = 0; iyear < years.length; iyear++) {
-                            if (typeof ret.dataobject[conkey][years[iyear]] === "undefined") {
-                                counts.push(null);
-                                plusnews.push(null);
-                                minusolds.push(null);
-                            } else {
-                                counts.push(ret.dataobject[conkey][years[iyear]].count || null);
-                                plusnews.push(ret.dataobject[conkey][years[iyear]].plusnew || null);
-                                minusolds.push(ret.dataobject[conkey][years[iyear]].minusold || null);
-                            }
+                            counts.push(ret.dataobject[years[iyear]].count);
+                            plusnews.push(ret.dataobject[years[iyear]].plusnew);
+                            minusolds.push(ret.dataobject[years[iyear]].minusold);
                         }
-                        datasets.push({
-                            label: conkey + "_count",
-                            backgroundColor: '#00FFFF',
-                            borderColor: '#00FFFF',
-                            borderWidth: 1,
-                            pointRadius: 1,
-                            data: counts,
-                            fill: false
-                        });
-                        datasets.push({
-                            label: conkey + "_plusnew",
-                            backgroundColor: '#00FFFF',
-                            borderColor: '#00FFFF',
-                            borderWidth: 1,
-                            pointRadius: 1,
-                            data: plusnews,
-                            fill: false
-                        });
-                        datasets.push({
-                            label: conkey + "_minusold",
-                            backgroundColor: '#00FFFF',
-                            borderColor: '#00FFFF',
-                            borderWidth: 1,
-                            pointRadius: 1,
-                            data: minusolds,
-                            fill: false
-                        });
-                    }
-                }
+                        if (counts.length > 0 || plusnews.length > 0 || minusolds.length > 0) {
 
-                var ctx = document.getElementById('myChart').getContext('2d');
-                Chart.defaults.global.plugins.colorschemes.override = true;
-                Chart.defaults.global.legend.display = true;
-                // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
-                var config = {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: datasets
-                    },
-                    options: {
-                        plugins: {
-                            colorschemes: {
-                                scheme: 'tableau.HueCircle19'
+                            datasets.push({
+                                label: "count",
+                                backgroundColor: '#00FFFF',
+                                borderColor: '#00FFFF',
+                                borderWidth: 1,
+                                pointRadius: 1,
+                                data: counts,
+                                fill: false
+                            });
+                            datasets.push({
+                                label: "plusnew",
+                                backgroundColor: '#00FFFF',
+                                borderColor: '#00FFFF',
+                                borderWidth: 1,
+                                pointRadius: 1,
+                                data: plusnews,
+                                fill: false
+                            });
+                            datasets.push({
+                                label: "minusold",
+                                backgroundColor: '#00FFFF',
+                                borderColor: '#00FFFF',
+                                borderWidth: 1,
+                                pointRadius: 1,
+                                data: minusolds,
+                                fill: false
+                            });
+                        }
+                    } else if (datatype === "continents") {
+                        // {"NA1":{"2018":{"count":26,"plusnew":26,"minusold":0}
+                        // erst feststellen aller Jahre!!!
+                        var tarray = [];
+                        var cons = Object.keys(ret.dataobject);
+                        var oyears = {};
+                        for (var icon = 0; icon < cons.length; icon++) {
+                            var actcon = cons[icon];
+                            var years = Object.keys(ret.dataobject[actcon]);
+                            for (var iyear = 0; iyear < years.length; iyear++) {
+                                var actyear = years[iyear];
+                                if (typeof oyears[actyear] === "undefined") {
+                                    oyears[actyear] = {
+                                        year: actyear
+                                    };
+                                }
+                            }
+                        }
+                        years = Object.keys(oyears).sort();
+                        labels = years;
+                        for (var icon1 = 0; icon1 < cons.length; icon1++) {
+                            var conkey = cons[icon1];
+                            // Die Ausgabe erfolgt je Kontinent
+                            var counts = [];
+                            var plusnews = [];
+                            var minusolds = [];
+                            for (var iyear = 0; iyear < years.length; iyear++) {
+                                if (typeof ret.dataobject[conkey][years[iyear]] === "undefined") {
+                                    counts.push(null);
+                                    plusnews.push(null);
+                                    minusolds.push(null);
+                                } else {
+                                    counts.push(ret.dataobject[conkey][years[iyear]].count || null);
+                                    plusnews.push(ret.dataobject[conkey][years[iyear]].plusnew || null);
+                                    minusolds.push(ret.dataobject[conkey][years[iyear]].minusold || null);
+                                }
+                            }
+                            if (counts.length > 0 || plusnews.length > 0 || minusolds.length > 0) {
+                                datasets.push({
+                                    label: conkey + "_count",
+                                    backgroundColor: '#00FFFF',
+                                    borderColor: '#00FFFF',
+                                    borderWidth: 1,
+                                    pointRadius: 1,
+                                    data: counts,
+                                    fill: false
+                                });
+                                datasets.push({
+                                    label: conkey + "_plusnew",
+                                    backgroundColor: '#00FFFF',
+                                    borderColor: '#00FFFF',
+                                    borderWidth: 1,
+                                    pointRadius: 1,
+                                    data: plusnews,
+                                    fill: false
+                                });
+                                datasets.push({
+                                    label: conkey + "_minusold",
+                                    backgroundColor: '#00FFFF',
+                                    borderColor: '#00FFFF',
+                                    borderWidth: 1,
+                                    pointRadius: 1,
+                                    data: minusolds,
+                                    fill: false
+                                });
+                            }
+                        }
+                    } else if (datatype === "climatezones") {
+                        // {"N0":{"2018":{"count":26,"plusnew":26,"minusold":0}
+                        // erst feststellen aller Jahre!!!
+                        var tarray = [];
+                        var cons = Object.keys(ret.dataobject);
+                        var oyears = {};
+                        for (var icon = 0; icon < cons.length; icon++) {
+                            var actcon = cons[icon];
+                            var years = Object.keys(ret.dataobject[actcon]);
+                            for (var iyear = 0; iyear < years.length; iyear++) {
+                                var actyear = years[iyear];
+                                if (typeof oyears[actyear] === "undefined") {
+                                    oyears[actyear] = {
+                                        year: actyear
+                                    };
+                                }
+                            }
+                        }
+                        years = Object.keys(oyears).sort();
+                        labels = years;
+                        for (var icon1 = 0; icon1 < cons.length; icon1++) {
+                            var conkey = cons[icon1];
+                            // Die Ausgabe erfolgt je Kontinent
+                            var counts = [];
+                            var plusnews = [];
+                            var minusolds = [];
+                            for (var iyear = 0; iyear < years.length; iyear++) {
+                                if (typeof ret.dataobject[conkey][years[iyear]] === "undefined") {
+                                    counts.push(null);
+                                    plusnews.push(null);
+                                    minusolds.push(null);
+                                } else {
+                                    counts.push(ret.dataobject[conkey][years[iyear]].count || null);
+                                    plusnews.push(ret.dataobject[conkey][years[iyear]].plusnew || null);
+                                    minusolds.push(ret.dataobject[conkey][years[iyear]].minusold || null);
+                                }
+                            }
+                            if (counts.length > 0 || plusnews.length > 0 || minusolds.length > 0) {
+
+                                datasets.push({
+                                    label: conkey + "_count",
+                                    backgroundColor: '#00FFFF',
+                                    borderColor: '#00FFFF',
+                                    borderWidth: 1,
+                                    pointRadius: 1,
+                                    data: counts,
+                                    fill: false
+                                });
+                                datasets.push({
+                                    label: conkey + "_plusnew",
+                                    backgroundColor: '#00FFFF',
+                                    borderColor: '#00FFFF',
+                                    borderWidth: 1,
+                                    pointRadius: 1,
+                                    data: plusnews,
+                                    fill: false
+                                });
+                                datasets.push({
+                                    label: conkey + "_minusold",
+                                    backgroundColor: '#00FFFF',
+                                    borderColor: '#00FFFF',
+                                    borderWidth: 1,
+                                    pointRadius: 1,
+                                    data: minusolds,
+                                    fill: false
+                                });
+                            }
+                        }
+                    } else if (datatype === "hydecontinents") {
+                        // {"EU":{"2000":{"popc_":{"count":338182,"summe":1375036974.38259},"rurc_":{"count":282150,"summe":395121173.89548236},
+                        // erst feststellen aller Jahre!!!
+                        var tarray = [];
+                        var cons = Object.keys(ret.dataobject);
+                        var oyears = {};
+                        var ovars = {}; // die Variablen sind variabel bei HYDE
+                        for (var icon = 0; icon < cons.length; icon++) {
+                            var actcon = cons[icon];
+                            var years = Object.keys(ret.dataobject[actcon]);
+                            for (var iyear = 0; iyear < years.length; iyear++) {
+                                var actyear = years[iyear];
+                                if (typeof oyears[actyear] === "undefined") {
+                                    oyears[actyear] = {
+                                        year: actyear
+                                    };
+                                }
+                                var yearvars = Object.keys(ret.dataobject[actcon][actyear]);
+                                for (var ivar = 0; ivar < yearvars.length; ivar++) {
+                                    var actvar = yearvars[ivar];
+                                    if (typeof ovars[actvar] === "undefined") {
+                                        ovars[actvar] = {
+                                            var: actvar
+                                        };
+                                    }
+                                }
+                            }
+                        }
+                        years = Object.keys(oyears).sort();
+                        var vars = Object.keys(ovars).sort();
+                        debugger;
+                        labels = years;
+
+                        for (var icon1 = 0; icon1 < cons.length; icon1++) {
+                            var conkey = cons[icon1];
+                            // Die Ausgabe erfolgt je Kontinent und Attribut als Summe
+                            var varyears = {};
+                            var ivals = 0;
+                            for (var ivar = 0; ivar < vars.length; ivar++) {
+                                var actvar = vars[ivar];
+                                varyears[actvar] = [];
+                                for (var iyear = 0; iyear < years.length; iyear++) {
+                                    if (typeof ret.dataobject[conkey][years[iyear]][actvar] === "undefined") {
+                                        varyears[actvar].push(null);
+                                    } else {
+                                        varyears[actvar].push(ret.dataobject[conkey][years[iyear]][actvar].summe || null);
+                                        ivals++;
+                                    }
+                                }
+                                if (ivals > 0) {
+                                    datasets.push({
+                                        label: conkey + "_" + actvar,
+                                        backgroundColor: '#00FFFF',
+                                        borderColor: '#00FFFF',
+                                        borderWidth: 1,
+                                        pointRadius: 1,
+                                        data: varyears[actvar],
+                                        fill: false
+                                    });
+
+                                }
                             }
                         }
                     }
-                };
-                window.chart1 = new Chart(ctx, config);
-            }
-        ],
-        function(error, ret) {
-            callbackg({
-                error: false,
-                message: "fertig"
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    Chart.defaults.global.plugins.colorschemes.override = true;
+                    Chart.defaults.global.legend.display = true;
+                    // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+                    var config = {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: datasets
+                        },
+                        options: {
+                            plugins: {
+                                colorschemes: {
+                                    scheme: 'tableau.HueCircle19'
+                                }
+                            }
+                        }
+                    };
+                    window.chart1 = new Chart(ctx, config);
+                }
+            ],
+            function (error, ret) {
+                callbackg({
+                    error: false,
+                    message: "fertig"
+                });
             });
-        });
 
 
     };
@@ -1112,7 +1483,7 @@
 
 
     kla1680gra.setResizeObserver = function () {
-
+        if (1 === 1) return;
         if (typeof ResizeObserver !== "undefined") {
             var resizeObserver = new ResizeObserver(function (entries, observer) {
                 for (var entry in entries) {

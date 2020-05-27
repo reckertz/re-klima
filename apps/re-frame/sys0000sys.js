@@ -1318,6 +1318,7 @@
      * predirectory: "/../klima1001/";
      * directory: Beispiel: "albedo"
      * root-Directory wird zugefügt
+     * wen doKLIFILES und doKLIRAWFILES === false, dann kein SQL-Abgleich, nur directories
      * var appDir = path.dirname(require.main.filename);
      */
     sys0000sys.getdirectoryfiles = function (gbldb, rootdir, fs, async, req, reqparm, res, supercallback4) {
@@ -1329,7 +1330,7 @@
         if (req.query && typeof req.query.fileopcode !== "undefined" && req.query.fileopcode.length > 0) {
             fileopcode = req.query.fileopcode;
         }
-        var tablename = "KLIFILES";
+        var tablename = "";
         /**
          * Filter für Extensions, Flag für Subdirectories, Flag für KLIFILES-Updates
          * filterextensions, skipsubdirectories, doKLIFILES, doKLIRAWFILES
@@ -1345,6 +1346,10 @@
         var doKLIFILES = "true";
         if (req.query && typeof req.query.doKLIFILES !== "undefined" && req.query.doKLIFILES.length > 0) {
             doKLIFILES = req.query.doKLIFILES;
+
+        }
+        if (doKLIFILES === "true") {
+            tablename = "KLIFILES";
         }
         var doKLIRAWFILES = "false";
         if (req.query && typeof req.query.doKLIRAWFILES !== "undefined" && req.query.doKLIRAWFILES.length > 0) {
@@ -1403,6 +1408,10 @@
 
         async.waterfall([
                 function (callback) {
+                    if (tablename.length === 0) {
+                        callback(null, ret);
+                        return;
+                    }
                     var reqparm = {
                         sel: {
                             directory: directory
@@ -1571,26 +1580,15 @@
                     /**
                      * Komplettieren oder Anlegen KLIFILES für netCDF albedo
                      */
+                    if (tablename.length === 0) {
+                        callback("Finish", ret);
+                        return;
+                    }
                     var saveret = uihelper.cloneObject(ret);
                     async.eachSeries(ret.files, function (file, nextfile) {
-
                             async.waterfall([
                                 function (callback) {
-                                    // file hat dirinfo, das wandert nach KLIFILES
-                                    /*
-                                    var reqparm = {
-                                        fileopcode: "meta",
-                                        predirectory: predirectory,
-                                        directory: directory,
-                                        filename: file.name
-                                    };
-                                    */
                                     var updfields = {};
-                                    /*
-                                    metafields: Array mit Objects
-                                    fielddescr:"Year AD, ,,AD, , speleothem, ,,N,   "
-                                    fieldname:"year"
-                                    */
                                     updfields["$set"] = file;
                                     var reqparm = {
                                         table: tablename,
@@ -2354,7 +2352,7 @@
                                                     }
                                                 }
                                             } else {
-                                                console.log(variablename + " NaN:" + wert);
+                                               if (isNaN(wert)) console.log(variablename + " NaN:" + wert);
                                             }
                                         }
                                     }
