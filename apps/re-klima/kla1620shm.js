@@ -369,16 +369,6 @@
                         // Filterzeile clone wieder einfügen
                         if ($("#kla1620shmt1").hasClass("hasFilters")) {
                             $("#kla1620shmt1 thead").append(clonerow);
-                            debugger;
-                            $(".tablesorter").tablesorter({
-                                theme: "blue",
-                                /* widgets: ['filter'], */
-                                widthFixed: false,
-                                widgetOptions: {
-                                    filter_hideFilters: false,
-                                    filter_ignoreCase: true
-                                }
-                            }); // so funktioniert es
                         }
                         var filename = "sparklines.html";
                         if (elHtml.length > 100) {
@@ -1637,7 +1627,7 @@
                 maxyv = maxyv.toFixed(2);
                 if (tcount > 0) avgy = (tsum / tcount).toFixed(2);
                 array1.push({
-                    temp: yIntercept,
+                    temp: r2,    /* yIntercept, */
                     gradient: gradient,
                     avg: avgy
                 });
@@ -1955,7 +1945,7 @@
                 maxyv = maxyv.toFixed(2);
                 var avg = (tsum / tcount).toFixed(2);
                 array1.push({
-                    temp: yIntercept,
+                    temp: r2,  /* yIntercept, */
                     gradient: gradient,
                     avg: avg
                 });
@@ -2482,6 +2472,10 @@
             rowrecord.yIntercept = yIntercept.toFixed(1);
             rowrecord.r2 = (r2).toFixed(3);
             rowrecord.points = result.points;
+            array1.push({
+                temp: r2,
+                gradient: gradient
+            });
             if (superParam.export === true) {
                 for (var irowdata = 0; irowdata < rowdata.length; irowdata++) {
                     outrecords.push(rowrecord);
