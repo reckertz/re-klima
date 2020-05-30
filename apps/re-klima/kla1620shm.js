@@ -297,7 +297,7 @@
                         var title = "Super-Sparklines";
                         var pos = {
                             left: $("#kla1620shmwrapper").offset().left,
-                            top: screen.height * .1,
+                            top: screen.height * 0.1,
                             width: $("#kla1620shmwrapper").width() * 0.60,
                             height: $("#kla1620shmwrapper").height() * 0.90
                         };
@@ -2709,17 +2709,16 @@
         /**
          * Bereitstellung der Daten
          */
-        var years = stationrecord[selvariablename].years;
+        debugger;
+        var matrix = matrix1;
+        var years = matrix1.rowheaders;
         var tarray = [];
         for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
-
             tarray.push({
                 year: matrix1.rowheaders[iyear],
-                months: matrix.data[iyear]
+                days: matrix.data[iyear]
             });
-
         }
-
         tarray.sort(function (a, b) {
             if (a.year < b.year)
                 return -1;
@@ -2754,20 +2753,20 @@
         var datasets = [];
         var labels = [];
         var lab;
-        for (var imon = 0; imon < 12; imon++) {
+        for (var iday = 0; iday < 365; iday++) {
             var rowvalues = [];
             for (var iarray = 0; iarray < tarray.length; iarray++) {
-                if (imon === 0) {
+                if (iday === 0) {
                     lab = "";
                     if (iarray % bucketlength === 0 || iarray === 0) {
                         lab = tarray[iarray].year;
                     }
                     labels.push(lab);
                 }
-                rowvalues.push(parseFloat(tarray[iarray].months[imon]));
+                rowvalues.push(parseFloat(tarray[iarray].days[iday]));
             }
             datasets.push({
-                label: "M" + ("00" + (imon + 1)).slice(-2),
+                label: "D" + ("000" + (iday + 1)).slice(-3),
                 backgroundColor: '#00FFFF',
                 borderColor: '#00FFFF',
                 borderWidth: 1,
