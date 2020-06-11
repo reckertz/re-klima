@@ -114,7 +114,7 @@
             globe.loadPlugin(lakes({
                 fill: '#000080'
             }));
-            globe.loadPlugin(planetaryjs.plugins.pings());
+            globe.loadPlugin(planetaryjs.plugins.pongs());
             globe.loadPlugin(planetaryjs.plugins.zoom({
                 scaleExtent: [100, 300]
             }));
@@ -133,7 +133,7 @@
                 var lat = Math.random() * 170 - 85;
                 var lng = Math.random() * 360 - 180;
                 var color = colors[Math.floor(Math.random() * colors.length)];
-                globe.plugins.pings.add(lng, lat, {
+                globe.plugins.pongs.add(lng, lat, {
                     color: color,
                     ttl: 2000,
                     angle: Math.random() * 10
