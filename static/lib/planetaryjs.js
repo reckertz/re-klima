@@ -334,13 +334,8 @@
             var color = d3.rgb(ping.options.color);
             color = "rgba(" + color.r + "," + color.g + "," + color.b + "," + alpha + ")";
             context.strokeStyle = color;
-            /**
-             * RE: fester Radius der circles der pings
-             */
-            // var circle = d3.geo.circle().origin([ping.lng, ping.lat])
-            //  .angle(alive / ping.options.ttl * ping.options.angle)();
             var circle = d3.geo.circle().origin([ping.lng, ping.lat])
-                .angle(1 * ping.options.angle)();
+              .angle(alive / ping.options.ttl * ping.options.angle)();
             context.beginPath();
             planet.path.context(context)(circle);
             /**
@@ -368,13 +363,15 @@
         };
     };
 
-/**
+    /**
      * pongs - kommen und bleiben bis zu hide (später)
      * addPong   - fügt neues Element hinzu, pongs.push(pong);
      * drawpongs - loop und newPongs.push(pong); sowie drawpong
      * drawpong  - macht Kreis größer bis er verschwindet
      * @param {} config
      */
+    var vglangle = 0;
+    var vglcount = 0;
     planetaryjs.plugins.pongs = function (config) {
         var pongs = [];
         config = config || {};
@@ -382,8 +379,12 @@
         var addPong = function (lng, lat, options) {
             options = options || {};
             options.color = options.color || config.color || 'white';
-            options.angle = options.angle || config.angle || 5;
-            options.ttl = options.ttl || config.ttl || 2000;
+            options.angle = 1;  // options.angle || config.angle || 5;
+            options.ttl = 2000; /// options.ttl || config.ttl || 2000;
+            vglcount ++;
+            if (vglcount === 1) {
+                console.log(options);
+            }
             var pong = {
                 time: new Date(),
                 options: options
@@ -429,16 +430,23 @@
          * @param {*} pong
          */
         var drawPong = function (planet, context, now, alive, pong) {
-            var alpha = 1 - (alive / pong.options.ttl);
-            debugger;
+            //var alpha = 1 - (alive / pong.options.ttl);
+            var alpha = .5;
             var color = d3.rgb(pong.options.color);
-            color = "rgba(" + color.r + "," + color.g + "," + color.b + "," + alpha + ")";
-            context.strokeStyle = color;
+            //color = "rgba(" + color.r + "," + color.g + "," + color.b + "," + alpha + ")";
+            color = "rgba(" + 255 + "," + 0 + "," + 0 + "," + alpha + ")";
+            //context.strokeStyle = color;
+            context.fillStyle = "rgba(255,165,0,1)";
             /**
              * RE: fester Radius der circles der pongs
              */
             // var circle = d3.geo.circle().origin([pong.lng, pong.lat])
             //  .angle(alive / pong.options.ttl * pong.options.angle)();
+            console.log("drawPong:" + pong.options.angle);
+            if (vglangle !== pong.options.angle) {
+                console.log("********:" + vglangle);
+                vglangle = pong.options.angle;
+            }
             var circle = d3.geo.circle().origin([pong.lng, pong.lat])
                 .angle(1 * pong.options.angle)();
             context.beginPath();
@@ -446,10 +454,11 @@
             /**
              * RE: Erweiterung fester Kreis mit opacity
              */
-            context.fillStyle = "rgba(0, 33, 0, 0.2)";
+            //context.fillStyle = "rgba(0, 33, 0, 0.2)";
             context.fill();
             context.lineWidth = 2;
             context.strokeStyle = '#003300';
+            context.strokeStyle =  "rgba(255,165,0,1)";
             context.stroke();
         };
 

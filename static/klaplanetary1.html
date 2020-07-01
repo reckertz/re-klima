@@ -50,7 +50,6 @@
     </div>
     <div class="content">
         <div class="col1of2">
-
         </div>
         <div class="col2of2">
             <canvas id='rotatingGlobe' width='400' height='400' style='width: 400px; height: 400px; cursor: move;'></canvas>
@@ -126,7 +125,7 @@
                     this.plugins.autorotate.resume();
                 }
             }));
-            globe.projection.scale(175).translate([175, 175]).rotate([0, -10, 0]);
+            globe.projection.scale(175).translate([175, 175]).rotate([0, -10, 22]);
 
             var colors = ['red', 'yellow', 'white', 'orange', 'green', 'cyan', 'pink'];
             setInterval(function () {
@@ -206,6 +205,30 @@
                     });
                 };
             };
+            /**
+             * Buttons
+             */
+            $(".col1of2")
+            .append($("<button/>", {
+                html: "Stop Rotation",
+                css: {
+                    margin: "10px"
+                },
+                click: function(evt) {
+                    evt.preventDefault();
+                    globe.plugins.autorotate.pause();
+                }
+            }))
+            .append($("<button/>", {
+                html: "Restart Rotation",
+                css: {
+                    margin: "10px"
+                },
+                click: function(evt) {
+                    evt.preventDefault();
+                    globe.plugins.autorotate.resume();
+                }
+            }));
         })();
     </script>
 </body>

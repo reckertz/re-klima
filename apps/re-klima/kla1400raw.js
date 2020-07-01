@@ -1804,6 +1804,7 @@
                 doKLIRAWFILES: "true"
             }
         }).done(function (r1, textStatus, jqXHR) {
+            debugger;
             sysbase.checkSessionLogin(r1);
             sysbase.putMessage(r1, 1);
             var ret = JSON.parse(r1);

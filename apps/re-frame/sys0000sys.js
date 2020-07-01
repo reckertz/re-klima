@@ -1361,7 +1361,7 @@
                 tablename = "KLIRAWFILES";
             }
         }
-        if (!fs.existsSync(rootdir)) {
+        if (typeof rootdir !== "undefined" && rootdir.length > 0 && !fs.existsSync(rootdir)) {
             rootdir = path.join("C:", "projekte");
             rootdir = path.join(rootdir, "klima1001");
             if (!fs.existsSync(rootdir)) {
@@ -1533,12 +1533,15 @@
                                         ret.files.push(dirinfo);
                                     } else if (filecontrol[dirinfo.name].oldtsfilecreated < dirinfo.tsfilecreated) {
                                         dirinfo.dorefresh = true;
+                                        ret.files.push(dirinfo);
+                                        /*
                                         var actdir = ret.files.find(function (element) {
                                             if (element.name === dirinfo.name) {
                                                 element.dorefresh = true;
                                                 return element;
                                             }
                                         });
+                                        */
                                     }
 
                                 } else {
@@ -1551,12 +1554,15 @@
                                             ret.files.push(dirinfo);
                                         } else if (filecontrol[dirinfo.name].oldtsfilecreated < dirinfo.tsfilecreated) {
                                             dirinfo.dorefresh = true;
+                                            ret.files.push(dirinfo);
+                                            /*
                                             var actdir = ret.files.find(function (element) {
                                                 if (element.name === dirinfo.name) {
                                                     element.dorefresh = true;
                                                     return element;
                                                 }
                                             });
+                                            */
                                         }
                                     }
                                 }

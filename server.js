@@ -24,6 +24,9 @@ var StreamZip = require("node-stream-zip");
 
 var csv = require("fast-csv");
 
+//var tm = require("textmining");
+var tm = require('text-miner');
+
 var regression = require("./static/lib/regression.js");
 var uihelper = require("re-frame/uihelper.js");
 
@@ -460,7 +463,14 @@ app.get('/getsql3index', function (req, res) {
  */
 app.get('/getdirectoryfiles', function (req, res) {
     if (checkSession(req, res)) return;
+    var useroot = true; // Default
+    if (req.query && typeof req.query.useroot !== "undefined" && req.query.useroot.length > 0) {
+        useroot = req.query.useroot;
+    }
     var rootdir = path.dirname(require.main.filename);
+    if (useroot === false || useroot === "false") {
+        rootdir = "";
+    }
     sys0000sys.getdirectoryfiles(db, rootdir, fs, async, req, null, res, function (res, ret) {
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
@@ -587,6 +597,119 @@ app.get('/getfilecontent', function (req, res) {
     });
 });
 
+
+
+/**
+ * textanalysis: fullname
+ * Analyse und Ergebnis in ret.result als html
+ * Blättern kann noch holprig sein
+ */
+app.get('/textanalysis', function (req, res) {
+    if (checkSession(req, res)) return;
+    var rootdir = path.dirname(require.main.filename);
+    var fullname = "";
+    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+        fullname = req.query.fullname;
+    }
+    var checklinelength = true;
+    if (req.query && typeof req.query.checklinelength !== "undefined" && req.query.checklinelength.length > 0) {
+        checklinelength = req.query.checklinelength;
+    }
+    var aktline = 0;
+    var aktbyte = 0;
+    var newline = 0;
+    var newbyte = 0;
+    var nextchunk = "";
+    var ret = {};
+    ret.error = false;
+    var smsg = "";
+    if (!fs.existsSync(fullname)) {
+        smsg = JSON.stringify({
+            error: true,
+            message: "NOT FOUND:" + fullname,
+            fullname: fullname
+        });
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    }
+    var textcontent = fs.readFileSync(fullname, {
+        encoding: 'utf8'
+    });
+
+    var my_corpus = new tm.Corpus([textcontent]);
+    my_corpus
+        .trim()
+        .toLower()
+        .clean()
+        .removeNewlines()
+        .removeInterpunctuation()
+        .removeWords(tm.STOPWORDS.EN)
+        .stem();
+
+    var terms = new tm.TermDocumentMatrix( my_corpus );
+    var vocstat = tm.weightTfIdf( terms.findFreqTerms(50) );
+
+    var vocstats = vocstat.sort(function (a, b) {
+        if (a.count > b.count) return -1;
+        else if (a.count < b.count) return 1;
+        else return 0;
+    });
+
+
+    // var vocabulary = terms.vocabulary;
+    console.log(vocstats);
+    smsg = JSON.stringify({
+        error: false,
+        message: "textanalysis:" + fullname,
+        fullname: fullname,
+        result: uihelper.iterateJSON2pretty(vocstats)
+    });
+    /*
+    // CRLF mit split nach Array
+    var textarray = textcontent.split(/\r?\n/);
+
+    // Build a Bag Of Words (automatically normalize and remove stop words in the process)
+    var bag = tm.bagOfWords(textarray, true, true);
+
+    // Sort terms by global frequency and print the top 10
+    var termsByFrequency = bag.terms.sort(function (a, b) {
+        if (a.frequency > b.frequency) return -1;
+        else if (a.frequency < b.frequency) return 1;
+        else return 0;
+    });
+    var firstx = termsByFrequency.slice(0, 10);
+    console.log(uihelper.iterateJSON2pretty(firstx, "", ""));
+    // Get terms in first verses
+    // 'frequency' (local) is the number of occurrences of that term in that specific verse
+    // 'tfidf' is the product of local frequency and IDF
+    var termsInFirstVerses = bag.documents.slice(0, 4).map(function (d) {
+        return d.terms;
+    });
+
+    console.log(uihelper.iterateJSON2pretty(termsInFirstVerses, "", ""));
+    var smsg = "";
+
+    smsg = JSON.stringify({
+        error: false,
+        message: "textanalysis:" + fullname,
+        fullname: fullname,
+        result: uihelper.iterateJSON2pretty(firstx, "", "") + "<br>" + uihelper.iterateJSON2pretty(termsInFirstVerses, "", "")
+    });
+    */
+
+
+    res.writeHead(200, {
+        'Content-Type': 'application/text',
+        "Access-Control-Allow-Origin": "*"
+    });
+    res.end(smsg);
+    return;
+
+});
 
 
 /**

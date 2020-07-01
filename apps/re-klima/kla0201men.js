@@ -114,11 +114,17 @@
                 module: "kla1400raw"
             },
             {
-                id: "admin0015",
+                id: "admin0020",
                 text: "Statistik",
                 app: "re-klima",
                 module: "kla1680gra",
                 htmlpage: "klaheatmap.html"
+            },
+            {
+                id: "admin0025",
+                text: "Textanalyse",
+                app: "re-klima",
+                module: "kla1700txt"
             },
             {
                 id: "admin0030",

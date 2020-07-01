@@ -1,0 +1,1433 @@
+<!-- saved from url=(0455)https://de.khanacademy.org/computer-programming/season-simulator/2131015999?qa_expand_key=kaencrypted_b27dcc8309807bf80ff4eda679945797_0e1e2402ce825d65e75a6bab4d649180627f7198a075a4bf5cef8390d753a4a62666152e62519ecf09cce331baced8c3875ccce42692afbf9a35367ce37f95c3bb92a8babd3501981431fa5fb69dfd73b23a4420b463d38d585e0bd49763abd60e55ff6d8f8d986bf4b328b7649bee71bce9ea78f27bf7cb4b66f51e7231dc975d4710c49e633b71bf9075f904b657261c703e3a7cb1a51000c3d86024ef3221 -->
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+</head>
+
+<body>
+    <div class="line-gutter-backdrop"></div>
+    <table>
+        <tbody>
+            <tr>
+                <td class="line-number" value="1"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="2"></td>
+                <td class="line-content"><span class="html-doctype">&lt;!DOCTYPE html&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="3"></td>
+                <td class="line-content"><span class="html-tag">&lt;html <span class="html-attribute-name">lang</span>="<span class="html-attribute-value">de</span>"</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="4"></td>
+                <td class="line-content"> <span class="html-attribute-name">itemscope</span> <span class="html-attribute-name">itemtype</span>="<span class="html-attribute-value">http://schema.org/Organization</span>"</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="5"></td>
+                <td class="line-content"> <span class="html-attribute-name">xmlns:mml</span>="<span class="html-attribute-value">http://www.w3.org/1998/Math/MathML</span>" <span class="html-attribute-name">xmlns:og</span>="<span
+                        class="html-attribute-value">http://opengraphprotocol.org/schema/</span>"</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="6"></td>
+                <td class="line-content"> <span class="html-attribute-name">xmlns:fb</span>="<span class="html-attribute-value">http://www.facebook.com/2008/fbml</span>" &gt;</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="7"></td>
+                <td class="line-content"> <span class="html-tag">&lt;head <span class="html-attribute-name">prefix</span>="<span class="html-attribute-value">og: http://ogp.me/ns# khanacademy:</span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="8"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"> http://ogp.me/ns/apps/khanacademy#</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="9"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="10"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="11"></td>
+                <td class="line-content"><span class="html-tag">&lt;script&gt;</span>window.__HEADERS__ =
+                    {"X-KA-has-any-permissions":"false","X-KA-is-phantom":"true","X-KA-Use-Render-Gateway":"false","X-KA-Published-Content-Version":"5b84a4966a12b2d499c5b84d413492d1dd96ebd3","X-KA-Lang":"de","X-KA-is-e2e":"false","X-KA-is-ios":"false","X-KA-may-be-under13":"false","X-KA-Static-Version":"200618-1635-4704a28661e2","X-KA-is-tablet":"false","X-KA-is-phone":"false","X-Fastly-Country":"DE","X-KA-is-unsupported-browser":"false","X-KA-Curriculum":"","X-KA-Locale":"de"};<span
+                        class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="12"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="13"></td>
+                <td class="line-content"><span class="html-tag">&lt;script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="14"></td>
+                <td class="line-content"> window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="15"></td>
+                <td class="line-content"><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="16"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">async</span> <span class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://www.google-analytics.com/analytics.js" rel="noreferrer noopener">https://www.google-analytics.com/analytics.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="17"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="18"></td>
+                <td class="line-content"><span class="html-comment">&lt;!-- Google Tag Manager --&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="19"></td>
+                <td class="line-content"><span class="html-tag">&lt;script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="20"></td>
+                <td class="line-content"> (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="21"></td>
+                <td class="line-content"> new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="22"></td>
+                <td class="line-content"> j=d.createElement(s),dl=l!='dataLayer'?'&amp;l='+l:'';j.async=true;j.src= </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="23"></td>
+                <td class="line-content"> 'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f); </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="24"></td>
+                <td class="line-content"> })(window,document,'script','dataLayer','GTM-WSX5PBP');</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="25"></td>
+                <td class="line-content"><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="26"></td>
+                <td class="line-content"><span class="html-comment">&lt;!-- End Google Tag Manager --&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="27"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="28"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="29"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="30"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="31"></td>
+                <td class="line-content"> <span class="html-tag">&lt;title&gt;</span>Season simulator | Programmierung | Khan Academy<span class="html-tag">&lt;/title&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="32"></td>
+                <td class="line-content"> <span class="html-tag">&lt;meta <span class="html-attribute-name">http-equiv</span>="<span class="html-attribute-value">Content-Type</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">text/html; charset=utf-8</span>" /&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="33"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="34"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="35"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="36"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="37"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="38"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="39"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="40"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="41"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="42"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="43"></td>
+                <td class="line-content"> <span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">description</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">Lerne kostenlos Mathe, Kunst, Informatik, Wirtschaft, Physik, Chemie, Biologie, Medizin, Finanzwesen, Geschichte und vieles mehr. Khan Academy ist eine Non-profit Organisation mit dem
+                            Zweck eine kostenlose, weltklasse Ausbildung für jeden Menschen auf der ganzen Welt zugänglich zu machen.</span>" /&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="44"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="45"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="46"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="47"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="48"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="49"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="50"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>="<span class="html-attribute-value">canonical</span>" <span class="html-attribute-name">href</span>="<a
+                            class="html-attribute-value html-resource-link" target="_blank" href="https://de.khanacademy.org/computer-programming/season-simulator/2131015999"
+                            rel="noreferrer noopener">https://de.khanacademy.org/computer-programming/season-simulator/2131015999</a>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="51"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="52"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="53"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="54"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="55"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="56"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="57"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="58"></td>
+                <td class="line-content"> <span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">fb:app_id</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">160249463991765</span>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="59"></td>
+                <td class="line-content"> <span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">fb:admins</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">100000121497109,1305017,100001572496923</span>"/&gt;</span> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="60"></td>
+                <td class="line-content"> <span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">og:site_name</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">Khan Academy</span>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="61"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="62"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="63"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">og:type</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">non_profit</span>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="64"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">og:title</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">Season simulator</span>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="65"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">og:url</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">https://de.khanacademy.org/computer-programming/season-simulator/2131015999</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="66"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">og:image</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">https://de.khanacademy.org/computer-programming/season-simulator/2131015999/5752142325350400.png</span>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="67"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">property</span>="<span class="html-attribute-value">fb:page_id</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">159403248441</span>" /&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="68"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="69"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="70"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="71"></td>
+                <td class="line-content"> <span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:site</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">@khanacademy</span>" /&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="72"></td>
+                <td class="line-content"> <span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:card</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">summary_large_image</span>" /&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="73"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="74"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:card</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">photo</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="75"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:url</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">https://de.khanacademy.org/computer-programming/season-simulator/2131015999</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="76"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:title</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">Season simulator</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="77"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:image</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">https://de.khanacademy.org/computer-programming/season-simulator/2131015999/5752142325350400.png</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="78"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:image:width</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">400</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="79"></td>
+                <td class="line-content"><span class="html-tag">&lt;meta <span class="html-attribute-name">name</span>="<span class="html-attribute-value">twitter:image:height</span>" <span class="html-attribute-name">content</span>="<span
+                            class="html-attribute-value">400</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="80"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="81"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="82"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="83"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="84"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="85"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="86"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="87"></td>
+                <td class="line-content"> <span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>="<span class="html-attribute-value">shortcut icon</span>" <span class="html-attribute-name">href</span>="<a
+                            class="html-attribute-value html-resource-link" target="_blank" href="https://de.khanacademy.org/favicon.ico?logo" rel="noreferrer noopener">/favicon.ico?logo</a>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="88"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="89"></td>
+                <td class="line-content"> <span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>="<span class="html-attribute-value">apple-touch-icon-precomposed</span>" <span
+                            class="html-attribute-name">sizes</span>="<span class="html-attribute-value">57x57</span>" <span class="html-attribute-name">href</span>="<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/images/apple-touch-icon-57x57-precomposed.new.png" rel="noreferrer noopener">https://cdn.kastatic.org/images/apple-touch-icon-57x57-precomposed.new.png</a>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="90"></td>
+                <td class="line-content"> <span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>="<span class="html-attribute-value">apple-touch-icon-precomposed</span>" <span
+                            class="html-attribute-name">sizes</span>="<span class="html-attribute-value">72x72</span>" <span class="html-attribute-name">href</span>="<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/images/apple-touch-icon-72x72-precomposed.new.png" rel="noreferrer noopener">https://cdn.kastatic.org/images/apple-touch-icon-72x72-precomposed.new.png</a>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="91"></td>
+                <td class="line-content"> <span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>="<span class="html-attribute-value">apple-touch-icon-precomposed</span>" <span
+                            class="html-attribute-name">sizes</span>="<span class="html-attribute-value">114x114</span>" <span class="html-attribute-name">href</span>="<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/images/apple-touch-icon-114x114-precomposed.new.png" rel="noreferrer noopener">https://cdn.kastatic.org/images/apple-touch-icon-114x114-precomposed.new.png</a>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="92"></td>
+                <td class="line-content"> <span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>="<span class="html-attribute-value">apple-touch-icon-precomposed</span>" <span
+                            class="html-attribute-name">sizes</span>="<span class="html-attribute-value">144x144</span>" <span class="html-attribute-name">href</span>="<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/images/apple-touch-icon-144x144-precomposed.new.png" rel="noreferrer noopener">https://cdn.kastatic.org/images/apple-touch-icon-144x144-precomposed.new.png</a>"/&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="93"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="94"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="95"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="96"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/ef51404934aee86faaf2654970b8b466.062dda97237c53fc2083.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/ef51404934aee86faaf2654970b8b466.062dda97237c53fc2083.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="97"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/d74fa7edd4bb07312a32a5a5292d2978.f7f2a30ec23219757282.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/d74fa7edd4bb07312a32a5a5292d2978.f7f2a30ec23219757282.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="98"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/3cedc17addf2051345adeaba174f80e5.37400df994d7e4109aa9.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/3cedc17addf2051345adeaba174f80e5.37400df994d7e4109aa9.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="99"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/d5bfae7e2ac485a9af5cbb3126b36506.7ca591fd4387f231cbb9.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/d5bfae7e2ac485a9af5cbb3126b36506.7ca591fd4387f231cbb9.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="100"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/6129e3f75e0e1f0a87f9c41514cbfc3c.e5fc51c0815927158700.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/6129e3f75e0e1f0a87f9c41514cbfc3c.e5fc51c0815927158700.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="101"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/e780c9a476358fb609b0dc36a114f770.f21fff771805477e8879.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/e780c9a476358fb609b0dc36a114f770.f21fff771805477e8879.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="102"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/0c26ece843f0c6cb594109cdc9d4b3cc.51f3171588ef3bbae4ce.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/0c26ece843f0c6cb594109cdc9d4b3cc.51f3171588ef3bbae4ce.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="103"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/63081905aa191f9d22ff4605cf04d963.6c6416ace108b66f4e47.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/63081905aa191f9d22ff4605cf04d963.6c6416ace108b66f4e47.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="104"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="105"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/dc4f1cea1e731c1f7f8e0ff07b58da2b.8db5d598f11a07f48ab2.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/dc4f1cea1e731c1f7f8e0ff07b58da2b.8db5d598f11a07f48ab2.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="106"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/stylesheets/intro-package/intro.d0fe2d3794d2a5d4f67f.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/stylesheets/intro-package/intro.d0fe2d3794d2a5d4f67f.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="107"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="108"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/6a52e4ec324b6b1796e5f1abca6760e0.e08be2fdde4e5cf8e80b.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/6a52e4ec324b6b1796e5f1abca6760e0.e08be2fdde4e5cf8e80b.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="109"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="110"></td>
+                <td class="line-content"><span class="html-tag">&lt;link <span class="html-attribute-name">rel</span>='<span class="html-attribute-value">stylesheet</span>' <span class="html-attribute-name">type</span>='<span
+                            class="html-attribute-value">text/css</span>' <span class="html-attribute-name">href</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/5daa4cec15a86c56bcd0f1d273b45483.5d136bf486ee0aee520a.css"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/5daa4cec15a86c56bcd0f1d273b45483.5d136bf486ee0aee520a.css</a>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="111"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="112"></td>
+                <td class="line-content"><span class="html-tag">&lt;style&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="113"></td>
+                <td class="line-content">#page_sub_nav {</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="114"></td>
+                <td class="line-content"> display: none;</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="115"></td>
+                <td class="line-content">}</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="116"></td>
+                <td class="line-content"><span class="html-tag">&lt;/style&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="117"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="118"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="119"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="120"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="121"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="122"></td>
+                <td class="line-content"><span class="html-tag">&lt;/head&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="123"></td>
+                <td class="line-content"> <span class="html-tag">&lt;body <span class="html-attribute-name">class</span>="<span class="html-attribute-value">lang-de </span>" &gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="124"></td>
+                <td class="line-content"><span class="html-comment">&lt;!-- Google Tag Manager (noscript) --&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="125"></td>
+                <td class="line-content"><span class="html-tag">&lt;noscript&gt;</span>&lt;iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WSX5PBP"</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="126"></td>
+                <td class="line-content">height="0" width="0" style="display:none;visibility:hidden"&gt;&lt;/iframe&gt;<span class="html-tag">&lt;/noscript&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="127"></td>
+                <td class="line-content"><span class="html-comment">&lt;!-- End Google Tag Manager (noscript) --&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="128"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="129"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="130"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="131"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="132"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">class</span>="<span class="html-attribute-value">external-styles-missing</span>" <span
+                            class="html-attribute-name">style</span>='<span class="html-attribute-value"><br></span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="133"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"> background: #f2dede;</span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="134"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"> font: 14px "Helvetica Neue", Arial, Helvetica;</span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="135"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"> margin-bottom: 40px;</span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="136"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"> padding: 10px 20px;</span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="137"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"> </span>'&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="138"></td>
+                <td class="line-content"> <span class="html-tag">&lt;p&gt;</span>If you&amp;#39;re seeing this message, it means we&amp;#39;re having trouble loading external resources on our website.<span class="html-tag">&lt;/p&gt;</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="139"></td>
+                <td class="line-content"> <span class="html-tag">&lt;p&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="140"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="141"></td>
+                <td class="line-content"> Wenn du hinter einem Webfilter bist, stelle sicher, dass die Domänen <span class="html-tag">&lt;strong&gt;</span>*. kastatic.org<span class="html-tag">&lt;/strong&gt;</span> und <span
+                        class="html-tag">&lt;strong&gt;</span>*. kasandbox.org<span class="html-tag">&lt;/strong&gt;</span> nicht blockiert sind.</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="142"></td>
+                <td class="line-content"> <span class="html-tag">&lt;span <span class="html-attribute-name">id</span>="<span class="html-attribute-value">inaccurate-clock-warning</span>"&gt;</span><span class="html-tag">&lt;/span&gt;</span>
+                </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="143"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="144"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/p&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="145"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="146"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">id</span>="<span class="html-attribute-value">outer-wrapper</span>" <span class="html-attribute-name">style</span>="<span
+                            class="html-attribute-value">position:relative;z-index:0;</span>" <span class="html-attribute-name">class</span>="<span class="html-attribute-value">clearfix bibliotron-header </span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="147"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"><br></span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="148"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"> white-outer-wrapper</span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="149"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"><br></span></span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="150"></td>
+                <td class="line-content"><span class="html-tag"><span class="html-attribute-value"></span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="151"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="152"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="153"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="154"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="155"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="156"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="157"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">id</span>="<span class="html-attribute-value">top-header-container</span>"&gt;</span><span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="158"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="159"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="160"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="161"></td>
+                <td class="line-content"> <span class="html-tag">&lt;nav <span class="html-attribute-name">id</span>="<span class="html-attribute-value">page_sub_nav</span>" <span class="html-attribute-name">class</span>="<span
+                            class="html-attribute-value">clearfix athena-big-menu</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="162"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="163"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="164"></td>
+                <td class="line-content"> <span class="html-tag">&lt;b&gt;</span><span class="html-tag">&lt;/b&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="165"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="166"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/nav&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="167"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="168"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="169"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="170"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="171"></td>
+                <td class="line-content"> <span class="html-tag">&lt;span <span class="html-attribute-name">id</span>="<span class="html-attribute-value">main-content</span>" <span class="html-attribute-name">class</span>="<span
+                            class="html-attribute-value">sr-only</span>" <span class="html-attribute-name">tabindex</span>="<span class="html-attribute-value">-1</span>"&gt;</span>Hauptinhalt<span class="html-tag">&lt;/span&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="172"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="173"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">id</span>="<span class="html-attribute-value">page-container</span>" <span class="html-attribute-name">class</span>="<span
+                            class="html-attribute-value">full-bleed</span>" <span class="html-attribute-name">role</span>="<span class="html-attribute-value">main</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="174"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">id</span>="<span class="html-attribute-value">page-container-inner</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="175"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="176"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">id</span>="<span class="html-attribute-value">fb-root</span>"&gt;</span><span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="177"></td>
+                <td class="line-content"> <span class="html-tag">&lt;noscript&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="178"></td>
+                <td class="line-content"> &lt;div class="noscript-warning"&gt;</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="179"></td>
+                <td class="line-content"> &lt;p&gt;&lt;i class="icon-warning-sign"&gt;&lt;/i&gt; Um dich einloggen und alle Funktionen der Khan Academy nutzen zu können, aktiviere bitte JavaScript in deinem Browser.&lt;/p&gt;</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="180"></td>
+                <td class="line-content"> &lt;/div&gt;</td>
+            </tr>
+            <tr>
+                <td class="line-number" value="181"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/noscript&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="182"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="183"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="184"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="185"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="186"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="187"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="188"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="189"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="190"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">class</span>="<span class="html-attribute-value">box-sizing-border-box-reset</span>"&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="191"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">id</span>="<span class="html-attribute-value">tutorial-content</span>"&gt;</span><span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="192"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="193"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="194"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="195"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="196"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="197"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="198"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="199"></td>
+                <td class="line-content"> <span class="html-tag">&lt;script&gt;</span>window["./javascript/page-template-package/infra-entry.js"] = {}<span class="html-tag">&lt;/script&gt;</span><span class="html-tag">&lt;script <span
+                            class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span class="html-attribute-name">src</span>='<a
+                            class="html-attribute-value html-resource-link" target="_blank" href="https://cdn.kastatic.org/genwebpack/prod/de/runtime.42a835d599941a04ffb6.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/runtime.42a835d599941a04ffb6.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="200"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank" href="https://cdn.kastatic.org/genwebpack/prod/de/corelibs.2a93ccc678a94f260875.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/corelibs.2a93ccc678a94f260875.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="201"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank" href="https://cdn.kastatic.org/genwebpack/prod/de/shared-intl.ad1c5ceb103a846008aa.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/shared-intl.ad1c5ceb103a846008aa.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="202"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank" href="https://cdn.kastatic.org/genwebpack/prod/de/shared.c640efb98094ad71d9b8.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/shared.c640efb98094ad71d9b8.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="203"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/vendors~./javascript/about-package/about-entry~./javascript/about-package/careers-entry~./javascript~725b9b3d.0784fe660994507f3bd2.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/vendors~./javascript/about-package/about-entry~./javascript/about-package/careers-entry~./javascript~725b9b3d.0784fe660994507f3bd2.js</a>'&gt;</span><span
+                        class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="204"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/javascript/about-package/about-entry~./javascript/about-package/careers-entry~./javascript/about-p~f76d66f8.4bc1d1885d143fef7151.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/javascript/about-package/about-entry~./javascript/about-package/careers-entry~./javascript/about-p~f76d66f8.4bc1d1885d143fef7151.js</a>'&gt;</span><span
+                        class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="205"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/8500289e1c255e1f0c7a296727f6d240.363aa8213938f82fd53e.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/8500289e1c255e1f0c7a296727f6d240.363aa8213938f82fd53e.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="206"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/21e1cb0452119349880a493f5d1e6147.bb79fde963d4ee8b98ac.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/21e1cb0452119349880a493f5d1e6147.bb79fde963d4ee8b98ac.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="207"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/e60f8ba46d780a1df403cf97b3e1c45e.8795e8b8f28ef2cd0595.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/e60f8ba46d780a1df403cf97b3e1c45e.8795e8b8f28ef2cd0595.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="208"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/d1ace8bff5da0cf37d4d37850b6e3ba8.c3d888385c311b082925.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/d1ace8bff5da0cf37d4d37850b6e3ba8.c3d888385c311b082925.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="209"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/javascript/page-template-package/infra-entry.975e28757558fe0ea610.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/javascript/page-template-package/infra-entry.975e28757558fe0ea610.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="210"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="211"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="212"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="213"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="214"></td>
+                <td class="line-content"> <span class="html-tag">&lt;div <span class="html-attribute-name">id</span>="<span class="html-attribute-value">footer</span>"&gt;</span><span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="215"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="216"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="217"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/div&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="218"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="219"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="220"></td>
+                <td class="line-content"> <span class="html-tag">&lt;script&gt;</span>window["./javascript/page-package/footer-entry.js"] = {"dataCache":null,"initialState":null,"isRehydrate":false,"props":{},"styleClassNames":[]}<span
+                        class="html-tag">&lt;/script&gt;</span><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span
+                            class="html-attribute-value">anonymous</span>' <span class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/shared-components.3814d48910007069c15c.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/shared-components.3814d48910007069c15c.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="221"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank" href="https://cdn.kastatic.org/genwebpack/prod/de/wonder-blocks.95991964a9ad969af296.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/wonder-blocks.95991964a9ad969af296.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="222"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/e998fe2ded6d0b3626dd430891cc0f28.0e052c04a8670cc011c2.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/e998fe2ded6d0b3626dd430891cc0f28.0e052c04a8670cc011c2.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="223"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/1d98b6a9fc42d53264bd3fb2b545faa5.a02daeb2c459c1cea95f.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/1d98b6a9fc42d53264bd3fb2b545faa5.a02daeb2c459c1cea95f.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="224"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/javascript/page-package/footer-entry.5b0e190c6053412c4e0b.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/javascript/page-package/footer-entry.5b0e190c6053412c4e0b.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span><span
+                        class="html-tag">&lt;script&gt;</span>window["./javascript/tutorial-scratchpad-package/scratchpad-page-entry.js"] =
+                    {"dataCache":null,"initialState":null,"isRehydrate":false,"props":{"ancestorFeedbackType":"comment","breadcrumbs":[{"href":"/computing/computer-programming","title":"Programmierung"}],"domain":"computing","embedded":false,"scratchpad":{"TRANSLATED_CATEGORIES":["documentation"],"byChild":false,"canvasOnly":true,"category":"official","changedAnything":true,"contentKind":"Scratchpad","contentKindCode":"p","created":"2013-10-01T15:47:21Z","date":"2017-08-02T22:00:50Z","defaultUrlPath":null,"definitelyNotSpam":true,"description":"Why
+                    are there seasons? Why are there no seasons near the
+                    equator?","difficulty":10,"docsUrlPath":"/computer-programming/pjs-documentation","editSlug":"edit/p/season-simulator","flags":[],"forkedFromTopic":null,"hasCustomThumbnail":true,"height":400,"hideFromHotlist":false,"id":2131015999,"imagePath":"/computer-programming/season-simulator/2131015999/5752142325350400.png","imageUrl":"https://de.khanacademy.org/computer-programming/season-simulator/2131015999/5752142325350400.png","isChallenge":false,"isDocumentation":false,"isFlagged":false,"isFlaggedForAbuse":false,"isHiddenByFlags":false,"isHighlyFlagged":false,"isProject":false,"isProjectOrFork":false,"isPublished":true,"isSpinOff":true,"isTutorial":false,"isUserProgram":false,"kaid":"kaid_1128810778687926889052316","key":"ag5zfmtoYW4tYWNhZGVteXIUCxIKU2NyYXRjaHBhZBi_8pL4Bww","kind":"Scratchpad","kindName":"Scratchpad","latestRevisionKey":"ag5zfmtoYW4tYWNhZGVteXIzCxIKU2NyYXRjaHBhZBi_8pL4BwwLEhJTY3JhdGNocGFkUmV2aXNpb24YgICAgLDxmwoM","modifiedDatetime":"2017-08-02T22:00:50Z","newUrlPath":"/computer-programming/new/pjs","nextSteps":null,"nodeSlug":"p/season-simulator","nodeType":"scratchpad","originIsProject":false,"originRevisionId":111001,"originScratchpadId":1946032261,"originSimilarity":0.3802764288382518,"projectEval":null,"projectEvalTips":null,"relativeUrl":"/computer-programming/season-simulator/2131015999","revision":{"audioId":null,"code":"/*********************************************************\n
+                    * Why are there seasons?\n * Why are there no seasons near the equator?\n**********************************************************/\n// Scale down image to fit on screen\nvar scalingFactor = 0.5;\nvar speed = 12; //
+                    Change in hours per update\nvar resolution = 20; // How accurate orbit speed is\nvar running = true;\n\n// Poistion of windows\nvar divX = 200;\nvar divY = 190;\n\n// Sun parameters\nvar sunX = 100;\nvar sunY = 104;\nvar
+                    sunR = 21;\nvar flare = 3;\nvar flareA = 10;\n\nvar earthData = {\n name: \"Earth\",\n size: 15,\n colour: color(61, 100, 255),\n perihelion: 147, // million km\n aperihelion: 152, // million km\n peri_longitude: 102, //
+                    degrees\n asc_longitude: 348.7, // degrees\n inclination: 0, // degrees (by defintion)\n year: 365.25, // earth days\n mass: 5.97 // 10^24 kg\n};\n\nvar earthTilt = 23.4; // degrees\nvar SUNLIGHT = color(255, 255, 0,
+                    80);\n\nvar Planet = function(data, angle) {\n this.name = data.name;\n this.year = data.year;\n this.r = data.size;\n this.colour = data.colour;\n \n // Distance from ellipse centre to sun\n var focusDist =
+                    scalingFactor * (data.aperihelion - data.perihelion) / 2;\n \n // Ellipse axes\n var major = scalingFactor * data.aperihelion - focusDist;\n var minor = sqrt(major * major - focusDist * focusDist);\n \n // Store these to
+                    save repeatedly calculating them\n var phi = data.peri_longitude;\n var cosPhi = cos(phi);\n var sinPhi = sin(phi);\n \n // Center of ellipse\n var cx = sunX - focusDist * cosPhi;\n var cy = sunY + focusDist * sinPhi;\n
+                    \n // Handy properties for calculations\n var eccentricity = focusDist / major;\n var angleConstant = 360 * major * minor / data.year;\n \n this.findPosition = function(angle) {\n angle -= phi;\n \n // Radius of ellipse
+                    at this angle\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(angle));\n \n // Position based on non-rotated ellipse\n var x = r * cos(angle) + focusDist;\n var y = r * sin(angle);\n \n //
+                    Rotate based on ellipse rotation\n return [cx + x * cosPhi - y * sinPhi,\n cy - x * sinPhi - y * cosPhi];\n };\n \n // Set planet's position using its angle\n this.setPosition = function(angle) {\n if (angle !==
+                    undefined) {\n // Angle relative the perihelion\n this.angle = angle - phi;\n }\n \n // Radius of ellipse at this angle\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n
+                    // Position based on non-rotated ellipse\n var x = r * cos(this.angle) + focusDist;\n var y = r * sin(this.angle);\n \n // Rotate based on ellipse rotation\n this.x = cx + x * cosPhi - y * sinPhi;\n this.y = cy - x *
+                    sinPhi - y * cosPhi;\n };\n this.setPosition(angle);\n \n // Add a numbers of days to the orbit\n this.update = function(hours) { \n var sign = hours &lt; 0 ? -1 / resolution : 1 / resolution;\n sign /= 24;\n\n for (var
+                    d = 0; d &lt; abs(hours) * resolution; d++) {\n // Distance from sun\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n // Update angle around sun\n this.angle += sign *
+                    angleConstant / (r * r);\n }\n this.setPosition();\n };\n \n this.draw = function(x, y, r) {\n var x = x || this.x;\n var y = y || this.y;\n var r = r || data.size;\n noStroke();\n fill(this.colour);\n ellipse(x, y, r,
+                    r);\n };\n \n this.drawCycle = function() {\n translate(cx, cy);\n rotate(phi);\n ellipse(0, 0, major*2, minor*2);\n resetMatrix();\n };\n \n this.drawCenter = function() {\n noFill();\n strokeWeight(1);\n stroke(80);\n
+                    var dx = major * cosPhi;\n var dy = major * sinPhi;\n line(cx + dx, cy - dy, cx - dx, cy + dy);\n \n strokeWeight(2);\n this.drawCycle();\n \n /*\n fill(255);\n textSize(11);\n textAlign(RIGHT, BASELINE);\n
+                    text(\"Perihelion\", cx + (major + 2) * cosPhi - 6, cy - (major + 2) * sinPhi);\n textAlign(LEFT, BASELINE);\n text(\"Aperihelion\", cx - (major + 10) * cosPhi + 6, cy + (major + 10) * sinPhi);\n */\n\n };\n \n
+                    this.mouseOverCycle = function() {\n var d = dist(mouseX, mouseY, sunX, sunY);\n return d &gt;= minor - this.r &amp;&amp; d &lt;= major + this.r;\n };\n};\n\n// Create the Earth\n// At 6pm 28th August 2003, Earth and
+                    Mars in opposition\nvar _year = 2003;\nvar _day = 239.75;\nvar earthAngle = 335.6;\nvar earth = new Planet(earthData, earthAngle);\n\nvar drawPlayButton = function() {\n // Play / Pause\n var r = 18;\n var x = 14;\n var
+                    y = 14;\n var c;\n \n if (dist(mouseX, mouseY, x, y) &lt;= r) {\n c = color(250, 250, 250);\n } else {\n c = color(160, 160, 160);\n }\n \n noFill();\n stroke(c);\n strokeWeight(2);\n ellipse(x, y, r, r);\n \n
+                    noStroke();\n fill(c);\n if (running) {\n rect(x - 4, y - 5, 3, 10, 5);\n rect(x + 1, y - 5, 3, 10, 5);\n } else {\n triangle(x - 3, y - 5, x - 3, y + 5, x + 6, y);\n }\n};\n\nvar drawSun = function() {\n noStroke();\n
+                    fill(255, 204, 0);\n ellipse(sunX, sunY, sunR, sunR);\n fill(255, 151, 33, 200);\n \n beginShape();\n curveVertex(sunX + sunR/2 + flare, sunY);\n var up = true;\n for (var i = 0; i &lt;= 360; i += flareA) {\n var r = up
+                    ? sunR/2 + flare : sunR/2;\n curveVertex(sunX + r * cos(i),\n sunY + r * sin(i));\n up = !up;\n }\n curveVertex(sunX + sunR/2, sunY);\n endShape();\n};\n\n/*\nvar drawEarth = function() {\n noStroke();\n fill(0, 16,
+                    32);\n var a = atan2(earthY - sunY, earthX - sunX);\n translate(earthX, earthY);\n rotate(a);\n ellipse(1, 0, earthR*2, earthR*2);\n //image(earthImage, -earthR, -earthR-2);\n resetMatrix();\n};\n\nvar getSphereImage =
+                    function(r, theta, col, colT) {\n var img = createGraphics(r*2+2, r*2+2, JAVA2D);\n img.beginDraw();\n img.background(0, 0, 0, 0);\n \n var r2 = r*r;\n var s = 90 /r;\n \n for (var y = -r; y &lt;= r; y++) {\n var d =
+                    sqrt(r2 - y*y);\n var rd = round(d);\n var light1 = cos(s * y);\n var w = 90 / d;\n \n for (var x = -rd-1; x &lt;= rd+1; x++) {\n var p = light1 * cos(theta + (x / d) * 90);\n if (p &gt;= 0 &amp;&amp; p &lt;= 1) {\n if
+                    (x &lt; -rd || x &gt; rd) {\n p *= d + 0.5 - rd;\n } \n var c = lerpColor(colT, col, p);\n img.stroke(c);\n img.point(r+x+1, r+y+1); \n }\n }\n }\n \n return
+                    img;\n};\n*/\n\n/*******************************************************\n * Date functions\n*******************************************************/\n\nvar months = {\n January: 31,\n February: 28,\n March: 31,\n April:
+                    30,\n May: 31,\n June: 30,\n July: 31,\n August: 31,\n September: 30,\n October: 31,\n November: 30,\n December: 31\n};\n\nvar isLeapYear = function(y) {\n return (y % 4 === 0 &amp;&amp; (y % 100 !== 0 || y % 400 ===
+                    0));\n};\n\nvar dayToDate = function(d, y) {\n for (var m in months) {\n var days = months[m];\n if (m === 'February' &amp;&amp; isLeapYear(y)) {\n days++;\n }\n if (d &lt;= days) {\n return [d, m];\n } else {\n d -=
+                    days;\n }\n }\n return [d, m];\n};\n\nvar convertDayToYear = function(days) {\n var y = 0;\n \n if (days &gt; 365) {\n while (true) {\n var n = 365 + isLeapYear(_year + y);\n if (days &gt; n) {\n days -= n;\n y++;\n }
+                    else {\n break;\n }\n } \n } else if (days &lt; 0) {\n while (true) {\n if (days &lt; 0) {\n var n = 365 + isLeapYear(_year - 1 - y);\n days += n;\n y--; \n } else {\n break;\n }\n }\n }\n \n return [y, days];\n};\n\nvar
+                    updateDate = function(days) {\n _day += days;\n var y = convertDayToYear(_day);\n _day = y[1];\n _year += y[0];\n};\n\nvar getKM = function(d) {\n return round(10 * d / scalingFactor) / 10;\n};\n\nvar getAU = function(d)
+                    {\n return round(1000 * d / scalingFactor / 149.597871) / 1000;\n};\n\n/*******************************************************\n * Draw functions\n*******************************************************/\nvar
+                    drawEarthInSunlight = function(x, y, w, h) {\n var d = 25;\n var r = h - d * 2;\n var cx = x + w - r/2 - 10;\n var cy = y + h - r/2 - d;\n \n // Axis\n strokeWeight(2);\n stroke(255);\n var length = 20;\n var ct = cos(90
+                    - earthTilt);\n var st = sin(90 - earthTilt);\n var dy1 = r/2 * st;\n var dy2 = (r/2 + length) * st;\n var r1 = r/2 * ct;\n var r2 = (r/2 + length) * ct;\n \n var angle = atan2(earth.y - sunY, earth.x - sunX) - 90;\n r1
+                    *= cos(angle);\n r2 *= cos(angle);\n\n // Change order so either top or bottom axis is partly obscured\n if (abs(angle + 90) &lt; 90) {\n // Top axis\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n \n // Earth\n
+                    noStroke();\n fill(earth.colour);\n ellipse(cx, cy, r, r);\n \n // Bottom axis\n strokeWeight(2);\n stroke(255);\n line(cx + r1, cy + dy1, cx + r2, cy + dy2);\n } else {\n // Bottom axis\n line(cx + r1, cy + dy1, cx +
+                    r2, cy + dy2);\n \n // Earth\n noStroke();\n fill(earth.colour);\n ellipse(cx, cy, r, r);\n \n // Top axis\n strokeWeight(2);\n stroke(255);\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n }\n \n strokeWeight(1);\n
+                    stroke(255, 255, 255, 220);\n noFill();\n \n translate(cx, cy);\n rotate(-earthTilt * cos(angle));\n \n // Equator\n arc(0, 0, r-1, r/2 * ct * sin(angle), 0, 180);\n \n // Tropics\n stroke(255, 255, 255, 100);\n arc(0,
+                    r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n arc(0, -r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n \n // Arctic and Antarctic circles\n arc(0, r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle), 0,
+                    180);\n arc(0, -r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle), 0, 180);\n \n textAlign(RIGHT, CENTER);\n fill(255);\n text(\"A\", -r * ct / 2 - 5, -r/2 * st);\n text(\"C\", -dy1 - 3, -r/2 * ct);\n text(\"E\", -r/2 -3,
+                    0);\n \n resetMatrix();\n \n // Sunlight\n noStroke();\n fill(SUNLIGHT);\n rect(x, d-1, cx -x, r);\n \n fill(255);\n textSize(14);\n textAlign(LEFT, TOP);\n text(\"N\", cx - min(r1, r2) + 3, cy - r/2 - 17);\n text(\"S\",
+                    cx + max(r1, r2) + 3, cy + r/2 + 3);\n};\n\nvar drawSunIntensity = function(x, y, w, h) {\n var places = [\"(A) Arctic\",\n \"(C) Tropic\\nof Cancer\",\n \"(E) Equator\"];\n var degrees = [66.6, 23.4, 0];\n var angle =
+                    atan2(earth.y - sunY, earth.x - sunX); \n\n var d = 8;\n var boxH = round((h - 12 - d * 5) / 3);\n var barWidth = (w - 4 * d) / 24;\n var barHeight = boxH - 10;\n\n // Ground and light positions\n var gx = 365;\n var
+                    length = 20;\n var lx = gx - 45;\n\n fill(250);\n textSize(14);\n textAlign(LEFT, TOP);\n text(\"Light intensity\", 4, y + 4);\n text(\"Light angle\", lx, y + 4);\n \n // Hours\n textAlign(CENTER, BASELINE);\n
+                    textSize(10);\n for (var i = 0; i &lt;= 24; i += 2) {\n text(i, x + d*2 + barWidth*i, y + h - 15);\n }\n textSize(11);\n text(\"Hours of the day\", x + d + w/2, y + h - 4);\n\n var c1 = color(20, 20, 250);\n var c2 =
+                    color(200, 20, 20);\n\n for (var i in places) {\n var y = divY + d + i * (boxH + d);\n var theta = sin(angle) * earthTilt;\n var groundAngle = theta - degrees[i];\n var intensity = cos(groundAngle);\n var hours =
+                    sin(theta) * sin(degrees[i]) / cos(degrees[i]);\n var dawn = 6 * (1 - hours);\n var dusk = 6 * (3 + hours);\n var dayLength = dusk - dawn;\n \n noStroke();\n // Draw bars\n for (var h = round(dawn); h &lt;= round(dusk);
+                    h++) {\n var strength = intensity * cos(180*(12 - h) / dayLength);\n if (strength &lt; 0) { continue; }\n \n fill(lerpColor(c1, c2, strength));\n rect(x + d*2 + (h - 0.5) * barWidth,\n y + 1 + boxH - barHeight *
+                    strength,\n barWidth-1,\n barHeight * strength);\n }\n \n // Axis\n stroke(255);\n strokeWeight(1);\n line(x + d, y + boxH + 1, x + w - d, y + boxH + 1);\n \n // Place labels and mid-bar label\n fill(255);\n
+                    textSize(10);\n textAlign(CENTER, BOTTOM);\n text(round(intensity * 100),\n x + d*2 + 12 * barWidth,\n y + boxH - barHeight * intensity);\n textSize(12);\n textAlign(LEFT, CENTER);\n text(places[i], x + d, y + boxH/2);\n
+                    \n // Ground angle\n var gy = y + boxH/2 + 5;\n var dx = length * sin(groundAngle);\n var dy = length * cos(groundAngle);\n \n noStroke();\n fill(250, 250, 0, 200);\n quad(lx, gy - dy, lx, gy + dy,\n gx + dx, gy + dy, gx
+                    - dx, gy - dy);\n \n strokeWeight(3);\n stroke(lerpColor(c1, c2, intensity));\n line(gx + dx, gy + dy, gx - dx, gy - dy);\n \n fill(255);\n textSize(10);\n textAlign(CENTER, TOP);\n text(round(90-abs(groundAngle)) +
+                    \"°\", gx, gy + dy + 3);\n }\n};\n\nvar drawEarthAxis = function() {\n var axisLength = 8;\n strokeWeight(1);\n stroke(250);\n line(earth.x, earth.y - sin(earthTilt) * earth.r/2,\n earth.x, earth.y - axisLength);\n
+                    line(earth.x, earth.y + earth.r/2, earth.x, earth.y + axisLength);\n};\n\nvar drawArrowToEarth = function() {\n // Draw arrow\n stroke(220, 220, 0);\n strokeWeight(5);\n var angle = atan2(earth.y - sunY, earth.x -
+                    sunX);\n \n var x1 = sunX + scalingFactor * 95 * cos(angle);\n var y1 = sunY + scalingFactor * 95 * sin(angle);\n line(sunX + 20 * cos(angle), sunY + 20 * sin(angle), x1 , y1);\n \n translate(x1, y1);\n rotate(angle -
+                    90);\n // Arrowhead\n noStroke();\n fill(220, 220, 0);\n triangle(-5, -3, 5, -3, 0, 12);\n \n // Distance label\n fill(255, 255, 255);\n textSize(10);\n textAlign(CENTER, CENTER);\n var distance = dist(sunX, sunY,
+                    earth.x, earth.y);\n if (abs(angle) &gt; 90) {\n rotate(270);\n text(getAU(distance) + \" AU\", 10, -12);\n } else {\n rotate(90);\n text(getAU(distance) + \" AU\", -10, -12);\n }\n \n resetMatrix();\n \n // Draw
+                    sunlight\n fill(SUNLIGHT);\n noStroke();\n arc(earth.x, earth.y, earth.r, earth.r, angle+90, angle+270);\n \n};\n\nvar drawOrbit = function() {\n earth.drawCenter();\n earth.draw();\n \n drawEarthAxis();\n
+                    drawArrowToEarth();\n \n // Draw earth marker where mouse is\n if (earth.mouseOverCycle()) {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n var coord = earth.findPosition(angle);\n fill(255, 255, 255, 80);\n
+                    ellipse(coord[0], coord[1], earth.r + 2, earth.r + 2);\n }\n \n drawSun();\n};\n\nvar draw = function() {\n if (running) {\n for (var i = 0; i&lt;speed; i++) {\n updateDate(1 / 24);\n earth.update(1);\n }\n }\n \n
+                    background(0);\n \n // Grid\n strokeWeight(1);\n stroke(120);\n line(0, divY, 400, divY);\n line(divX, 0, divX, divY);\n \n // Labels\n fill(255);\n textSize(13);\n textAlign(LEFT, TOP);\n var _date = dayToDate(_day);\n
+                    text(_date[1] + \" \" + ceil(_date[0]), 30, 5);\n \n\n drawOrbit();\n drawPlayButton();\n drawEarthInSunlight(divX, -1, 400 - divX, divY);\n drawSunIntensity(5, divY, 400 - 104, 400 - divY);\n};\n\n// Spacebar toggles
+                    animation\nvar keyPressed = function() {\n if (keyCode === 32) { running = !running; }\n};\n\nvar mouseReleased = function() {\n // Play / Pause\n if (dist(mouseX, mouseY, 14, 14) &lt;= sunR / 2) {\n running =
+                    !running;\n }\n \n // Pick position\n if (earth.mouseOverCycle()) {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n earth.setPosition(angle);\n _day = (angle - earthData.peri_longitude + 360) * 365 / 360;\n _day %=
+                    365;\n running = false;\n
+                    }\n};","configVersion":3,"created":"2017-08-02T22:00:50Z","editorType":"ace_pjs","folds":[],"hasAudio":false,"id":5752142325350400,"kaid":"kaid_793081664775613255842983","kind":"ScratchpadRevision","mp3Url":"","playback":"","tests":"","translatedMp3Url":"","translatedMp3Urls":null,"userKey":"ag5zfmtoYW4tYWNhZGVteXIuCxIIVXNlckRhdGEiIHVzZXJfZW1haWxfa2V5X2plcmVzaWdAZ21haWwuY29tDA","youtubeId":null},"rootScratchpadKey":"ag5zfmtoYW4tYWNhZGVteXIUCxIKU2NyYXRjaHBhZBi3yJubBQw","searchKind":"Program","sendToPeers":false,"slug":"season-simulator","sortIndex":null,"spinoffCount":92,"sumVotesIncremented":485,"tags":[],"termMap":{"new":"New
+                    program","restart":"Neustart"},"tests":"","thumbnailUrls":{},"title":"Season simulator","topicIds":["x45aed616","xffde7c31"],"topicUrlPath":"/computer-programming","translatedDescription":"Why are there seasons? Why are
+                    there no seasons near the equator?","translatedNextSteps":null,"translatedProjectEval":null,"translatedProjectEvalTips":null,"translatedTitle":"Season
+                    simulator","trustedRevision":{"audioId":0,"code":"/*********************************************************\n * Why are there seasons?\n * Why are there no seasons near the
+                    equator?\n**********************************************************/\n// Scale down image to fit on screen\nvar scalingFactor = 0.5;\nvar speed = 12; // Change in hours per update\nvar resolution = 20; // How accurate
+                    orbit speed is\nvar running = true;\n\n// Poistion of windows\nvar divX = 200;\nvar divY = 190;\n\n// Sun parameters\nvar sunX = 100;\nvar sunY = 104;\nvar sunR = 21;\nvar flare = 3;\nvar flareA = 10;\n\nvar earthData =
+                    {\n name: \"Earth\",\n size: 15,\n colour: color(61, 100, 255),\n perihelion: 147, // million km\n aperihelion: 152, // million km\n peri_longitude: 102, // degrees\n asc_longitude: 348.7, // degrees\n inclination: 0, //
+                    degrees (by defintion)\n year: 365.25, // earth days\n mass: 5.97 // 10^24 kg\n};\n\nvar earthTilt = 23.4; // degrees\nvar SUNLIGHT = color(255, 255, 0, 80);\n\nvar Planet = function(data, angle) {\n this.name =
+                    data.name;\n this.year = data.year;\n this.r = data.size;\n this.colour = data.colour;\n \n // Distance from ellipse centre to sun\n var focusDist = scalingFactor * (data.aperihelion - data.perihelion) / 2;\n \n //
+                    Ellipse axes\n var major = scalingFactor * data.aperihelion - focusDist;\n var minor = sqrt(major * major - focusDist * focusDist);\n \n // Store these to save repeatedly calculating them\n var phi =
+                    data.peri_longitude;\n var cosPhi = cos(phi);\n var sinPhi = sin(phi);\n \n // Center of ellipse\n var cx = sunX - focusDist * cosPhi;\n var cy = sunY + focusDist * sinPhi;\n \n // Handy properties for calculations\n var
+                    eccentricity = focusDist / major;\n var angleConstant = 360 * major * minor / data.year;\n \n this.findPosition = function(angle) {\n angle -= phi;\n \n // Radius of ellipse at this angle\n var r = major * (1 -
+                    eccentricity * eccentricity) /\n (1 + eccentricity * cos(angle));\n \n // Position based on non-rotated ellipse\n var x = r * cos(angle) + focusDist;\n var y = r * sin(angle);\n \n // Rotate based on ellipse rotation\n
+                    return [cx + x * cosPhi - y * sinPhi,\n cy - x * sinPhi - y * cosPhi];\n };\n \n // Set planet's position using its angle\n this.setPosition = function(angle) {\n if (angle !== undefined) {\n // Angle relative the
+                    perihelion\n this.angle = angle - phi;\n }\n \n // Radius of ellipse at this angle\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n // Position based on non-rotated
+                    ellipse\n var x = r * cos(this.angle) + focusDist;\n var y = r * sin(this.angle);\n \n // Rotate based on ellipse rotation\n this.x = cx + x * cosPhi - y * sinPhi;\n this.y = cy - x * sinPhi - y * cosPhi;\n };\n
+                    this.setPosition(angle);\n \n // Add a numbers of days to the orbit\n this.update = function(hours) { \n var sign = hours &lt; 0 ? -1 / resolution : 1 / resolution;\n sign /= 24;\n\n for (var d = 0; d &lt; abs(hours) *
+                    resolution; d++) {\n // Distance from sun\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n // Update angle around sun\n this.angle += sign * angleConstant / (r * r);\n
+                    }\n this.setPosition();\n };\n \n this.draw = function(x, y, r) {\n var x = x || this.x;\n var y = y || this.y;\n var r = r || data.size;\n noStroke();\n fill(this.colour);\n ellipse(x, y, r, r);\n };\n \n this.drawCycle
+                    = function() {\n translate(cx, cy);\n rotate(phi);\n ellipse(0, 0, major*2, minor*2);\n resetMatrix();\n };\n \n this.drawCenter = function() {\n noFill();\n strokeWeight(1);\n stroke(80);\n var dx = major * cosPhi;\n
+                    var dy = major * sinPhi;\n line(cx + dx, cy - dy, cx - dx, cy + dy);\n \n strokeWeight(2);\n this.drawCycle();\n \n /*\n fill(255);\n textSize(11);\n textAlign(RIGHT, BASELINE);\n text(\"Perihelion\", cx + (major + 2) *
+                    cosPhi - 6, cy - (major + 2) * sinPhi);\n textAlign(LEFT, BASELINE);\n text(\"Aperihelion\", cx - (major + 10) * cosPhi + 6, cy + (major + 10) * sinPhi);\n */\n\n };\n \n this.mouseOverCycle = function() {\n var d =
+                    dist(mouseX, mouseY, sunX, sunY);\n return d &gt;= minor - this.r &amp;&amp; d &lt;= major + this.r;\n };\n};\n\n// Create the Earth\n// At 6pm 28th August 2003, Earth and Mars in opposition\nvar _year = 2003;\nvar _day
+                    = 239.75;\nvar earthAngle = 335.6;\nvar earth = new Planet(earthData, earthAngle);\n\nvar drawPlayButton = function() {\n // Play / Pause\n var r = 18;\n var x = 14;\n var y = 14;\n var c;\n \n if (dist(mouseX, mouseY,
+                    x, y) &lt;= r) {\n c = color(250, 250, 250);\n } else {\n c = color(160, 160, 160);\n }\n \n noFill();\n stroke(c);\n strokeWeight(2);\n ellipse(x, y, r, r);\n \n noStroke();\n fill(c);\n if (running) {\n rect(x - 4, y -
+                    5, 3, 10, 5);\n rect(x + 1, y - 5, 3, 10, 5);\n } else {\n triangle(x - 3, y - 5, x - 3, y + 5, x + 6, y);\n }\n};\n\nvar drawSun = function() {\n noStroke();\n fill(255, 204, 0);\n ellipse(sunX, sunY, sunR, sunR);\n
+                    fill(255, 151, 33, 200);\n \n beginShape();\n curveVertex(sunX + sunR/2 + flare, sunY);\n var up = true;\n for (var i = 0; i &lt;= 360; i += flareA) {\n var r = up ? sunR/2 + flare : sunR/2;\n curveVertex(sunX + r *
+                    cos(i),\n sunY + r * sin(i));\n up = !up;\n }\n curveVertex(sunX + sunR/2, sunY);\n endShape();\n};\n\n/*\nvar drawEarth = function() {\n noStroke();\n fill(0, 16, 32);\n var a = atan2(earthY - sunY, earthX - sunX);\n
+                    translate(earthX, earthY);\n rotate(a);\n ellipse(1, 0, earthR*2, earthR*2);\n //image(earthImage, -earthR, -earthR-2);\n resetMatrix();\n};\n\nvar getSphereImage = function(r, theta, col, colT) {\n var img =
+                    createGraphics(r*2+2, r*2+2, JAVA2D);\n img.beginDraw();\n img.background(0, 0, 0, 0);\n \n var r2 = r*r;\n var s = 90 /r;\n \n for (var y = -r; y &lt;= r; y++) {\n var d = sqrt(r2 - y*y);\n var rd = round(d);\n var
+                    light1 = cos(s * y);\n var w = 90 / d;\n \n for (var x = -rd-1; x &lt;= rd+1; x++) {\n var p = light1 * cos(theta + (x / d) * 90);\n if (p &gt;= 0 &amp;&amp; p &lt;= 1) {\n if (x &lt; -rd || x &gt; rd) {\n p *= d + 0.5 -
+                    rd;\n } \n var c = lerpColor(colT, col, p);\n img.stroke(c);\n img.point(r+x+1, r+y+1); \n }\n }\n }\n \n return img;\n};\n*/\n\n/*******************************************************\n * Date
+                    functions\n*******************************************************/\n\nvar months = {\n January: 31,\n February: 28,\n March: 31,\n April: 30,\n May: 31,\n June: 30,\n July: 31,\n August: 31,\n September: 30,\n October:
+                    31,\n November: 30,\n December: 31\n};\n\nvar isLeapYear = function(y) {\n return (y % 4 === 0 &amp;&amp; (y % 100 !== 0 || y % 400 === 0));\n};\n\nvar dayToDate = function(d, y) {\n for (var m in months) {\n var days =
+                    months[m];\n if (m === 'February' &amp;&amp; isLeapYear(y)) {\n days++;\n }\n if (d &lt;= days) {\n return [d, m];\n } else {\n d -= days;\n }\n }\n return [d, m];\n};\n\nvar convertDayToYear = function(days) {\n var y =
+                    0;\n \n if (days &gt; 365) {\n while (true) {\n var n = 365 + isLeapYear(_year + y);\n if (days &gt; n) {\n days -= n;\n y++;\n } else {\n break;\n }\n } \n } else if (days &lt; 0) {\n while (true) {\n if (days &lt; 0)
+                    {\n var n = 365 + isLeapYear(_year - 1 - y);\n days += n;\n y--; \n } else {\n break;\n }\n }\n }\n \n return [y, days];\n};\n\nvar updateDate = function(days) {\n _day += days;\n var y = convertDayToYear(_day);\n _day =
+                    y[1];\n _year += y[0];\n};\n\nvar getKM = function(d) {\n return round(10 * d / scalingFactor) / 10;\n};\n\nvar getAU = function(d) {\n return round(1000 * d / scalingFactor / 149.597871) /
+                    1000;\n};\n\n/*******************************************************\n * Draw functions\n*******************************************************/\nvar drawEarthInSunlight = function(x, y, w, h) {\n var d = 25;\n var r =
+                    h - d * 2;\n var cx = x + w - r/2 - 10;\n var cy = y + h - r/2 - d;\n \n // Axis\n strokeWeight(2);\n stroke(255);\n var length = 20;\n var ct = cos(90 - earthTilt);\n var st = sin(90 - earthTilt);\n var dy1 = r/2 *
+                    st;\n var dy2 = (r/2 + length) * st;\n var r1 = r/2 * ct;\n var r2 = (r/2 + length) * ct;\n \n var angle = atan2(earth.y - sunY, earth.x - sunX) - 90;\n r1 *= cos(angle);\n r2 *= cos(angle);\n\n // Change order so either
+                    top or bottom axis is partly obscured\n if (abs(angle + 90) &lt; 90) {\n // Top axis\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n \n // Earth\n noStroke();\n fill(earth.colour);\n ellipse(cx, cy, r, r);\n \n // Bottom
+                    axis\n strokeWeight(2);\n stroke(255);\n line(cx + r1, cy + dy1, cx + r2, cy + dy2);\n } else {\n // Bottom axis\n line(cx + r1, cy + dy1, cx + r2, cy + dy2);\n \n // Earth\n noStroke();\n fill(earth.colour);\n
+                    ellipse(cx, cy, r, r);\n \n // Top axis\n strokeWeight(2);\n stroke(255);\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n }\n \n strokeWeight(1);\n stroke(255, 255, 255, 220);\n noFill();\n \n translate(cx, cy);\n
+                    rotate(-earthTilt * cos(angle));\n \n // Equator\n arc(0, 0, r-1, r/2 * ct * sin(angle), 0, 180);\n \n // Tropics\n stroke(255, 255, 255, 100);\n arc(0, r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n arc(0,
+                    -r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n \n // Arctic and Antarctic circles\n arc(0, r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle), 0, 180);\n arc(0, -r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle),
+                    0, 180);\n \n textAlign(RIGHT, CENTER);\n fill(255);\n text(\"A\", -r * ct / 2 - 5, -r/2 * st);\n text(\"C\", -dy1 - 3, -r/2 * ct);\n text(\"E\", -r/2 -3, 0);\n \n resetMatrix();\n \n // Sunlight\n noStroke();\n
+                    fill(SUNLIGHT);\n rect(x, d-1, cx -x, r);\n \n fill(255);\n textSize(14);\n textAlign(LEFT, TOP);\n text(\"N\", cx - min(r1, r2) + 3, cy - r/2 - 17);\n text(\"S\", cx + max(r1, r2) + 3, cy + r/2 + 3);\n};\n\nvar
+                    drawSunIntensity = function(x, y, w, h) {\n var places = [\"(A) Arctic\",\n \"(C) Tropic\\nof Cancer\",\n \"(E) Equator\"];\n var degrees = [66.6, 23.4, 0];\n var angle = atan2(earth.y - sunY, earth.x - sunX); \n\n var d
+                    = 8;\n var boxH = round((h - 12 - d * 5) / 3);\n var barWidth = (w - 4 * d) / 24;\n var barHeight = boxH - 10;\n\n // Ground and light positions\n var gx = 365;\n var length = 20;\n var lx = gx - 45;\n\n fill(250);\n
+                    textSize(14);\n textAlign(LEFT, TOP);\n text(\"Light intensity\", 4, y + 4);\n text(\"Light angle\", lx, y + 4);\n \n // Hours\n textAlign(CENTER, BASELINE);\n textSize(10);\n for (var i = 0; i &lt;= 24; i += 2) {\n
+                    text(i, x + d*2 + barWidth*i, y + h - 15);\n }\n textSize(11);\n text(\"Hours of the day\", x + d + w/2, y + h - 4);\n\n var c1 = color(20, 20, 250);\n var c2 = color(200, 20, 20);\n\n for (var i in places) {\n var y =
+                    divY + d + i * (boxH + d);\n var theta = sin(angle) * earthTilt;\n var groundAngle = theta - degrees[i];\n var intensity = cos(groundAngle);\n var hours = sin(theta) * sin(degrees[i]) / cos(degrees[i]);\n var dawn = 6 *
+                    (1 - hours);\n var dusk = 6 * (3 + hours);\n var dayLength = dusk - dawn;\n \n noStroke();\n // Draw bars\n for (var h = round(dawn); h &lt;= round(dusk); h++) {\n var strength = intensity * cos(180*(12 - h) /
+                    dayLength);\n if (strength &lt; 0) { continue; }\n \n fill(lerpColor(c1, c2, strength));\n rect(x + d*2 + (h - 0.5) * barWidth,\n y + 1 + boxH - barHeight * strength,\n barWidth-1,\n barHeight * strength);\n }\n \n //
+                    Axis\n stroke(255);\n strokeWeight(1);\n line(x + d, y + boxH + 1, x + w - d, y + boxH + 1);\n \n // Place labels and mid-bar label\n fill(255);\n textSize(10);\n textAlign(CENTER, BOTTOM);\n text(round(intensity *
+                    100),\n x + d*2 + 12 * barWidth,\n y + boxH - barHeight * intensity);\n textSize(12);\n textAlign(LEFT, CENTER);\n text(places[i], x + d, y + boxH/2);\n \n // Ground angle\n var gy = y + boxH/2 + 5;\n var dx = length *
+                    sin(groundAngle);\n var dy = length * cos(groundAngle);\n \n noStroke();\n fill(250, 250, 0, 200);\n quad(lx, gy - dy, lx, gy + dy,\n gx + dx, gy + dy, gx - dx, gy - dy);\n \n strokeWeight(3);\n stroke(lerpColor(c1, c2,
+                    intensity));\n line(gx + dx, gy + dy, gx - dx, gy - dy);\n \n fill(255);\n textSize(10);\n textAlign(CENTER, TOP);\n text(round(90-abs(groundAngle)) + \"°\", gx, gy + dy + 3);\n }\n};\n\nvar drawEarthAxis = function()
+                    {\n var axisLength = 8;\n strokeWeight(1);\n stroke(250);\n line(earth.x, earth.y - sin(earthTilt) * earth.r/2,\n earth.x, earth.y - axisLength);\n line(earth.x, earth.y + earth.r/2, earth.x, earth.y +
+                    axisLength);\n};\n\nvar drawArrowToEarth = function() {\n // Draw arrow\n stroke(220, 220, 0);\n strokeWeight(5);\n var angle = atan2(earth.y - sunY, earth.x - sunX);\n \n var x1 = sunX + scalingFactor * 95 *
+                    cos(angle);\n var y1 = sunY + scalingFactor * 95 * sin(angle);\n line(sunX + 20 * cos(angle), sunY + 20 * sin(angle), x1 , y1);\n \n translate(x1, y1);\n rotate(angle - 90);\n // Arrowhead\n noStroke();\n fill(220, 220,
+                    0);\n triangle(-5, -3, 5, -3, 0, 12);\n \n // Distance label\n fill(255, 255, 255);\n textSize(10);\n textAlign(CENTER, CENTER);\n var distance = dist(sunX, sunY, earth.x, earth.y);\n if (abs(angle) &gt; 90) {\n
+                    rotate(270);\n text(getAU(distance) + \" AU\", 10, -12);\n } else {\n rotate(90);\n text(getAU(distance) + \" AU\", -10, -12);\n }\n \n resetMatrix();\n \n // Draw sunlight\n fill(SUNLIGHT);\n noStroke();\n arc(earth.x,
+                    earth.y, earth.r, earth.r, angle+90, angle+270);\n \n};\n\nvar drawOrbit = function() {\n earth.drawCenter();\n earth.draw();\n \n drawEarthAxis();\n drawArrowToEarth();\n \n // Draw earth marker where mouse is\n if
+                    (earth.mouseOverCycle()) {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n var coord = earth.findPosition(angle);\n fill(255, 255, 255, 80);\n ellipse(coord[0], coord[1], earth.r + 2, earth.r + 2);\n }\n \n
+                    drawSun();\n};\n\nvar draw = function() {\n if (running) {\n for (var i = 0; i&lt;speed; i++) {\n updateDate(1 / 24);\n earth.update(1);\n }\n }\n \n background(0);\n \n // Grid\n strokeWeight(1);\n stroke(120);\n
+                    line(0, divY, 400, divY);\n line(divX, 0, divX, divY);\n \n // Labels\n fill(255);\n textSize(13);\n textAlign(LEFT, TOP);\n var _date = dayToDate(_day);\n text(_date[1] + \" \" + ceil(_date[0]), 30, 5);\n \n\n
+                    drawOrbit();\n drawPlayButton();\n drawEarthInSunlight(divX, -1, 400 - divX, divY);\n drawSunIntensity(5, divY, 400 - 104, 400 - divY);\n};\n\n// Spacebar toggles animation\nvar keyPressed = function() {\n if (keyCode
+                    === 32) { running = !running; }\n};\n\nvar mouseReleased = function() {\n // Play / Pause\n if (dist(mouseX, mouseY, 14, 14) &lt;= sunR / 2) {\n running = !running;\n }\n \n // Pick position\n if (earth.mouseOverCycle())
+                    {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n earth.setPosition(angle);\n _day = (angle - earthData.peri_longitude + 360) * 365 / 360;\n _day %= 365;\n running = false;\n
+                    }\n};","configVersion":3,"created":"2014-01-13T15:43:42Z","editorType":null,"folds":null,"hasAudio":false,"id":5713144022302720,"kaid":null,"kind":"ScratchpadRevision","mp3Url":"","playback":null,"tests":"","translatedMp3Url":"","translatedMp3Urls":null,"userKey":null,"youtubeId":null},"type":"scratchpad","uniqueEnough":true,"url":"https://de.khanacademy.org/computer-programming/season-simulator/2131015999","userAuthoredContentType":"pjs","userId":"http://googleid.khanacademy.org/102003717741146057691","userKey":"ag5zfmtoYW4tYWNhZGVteXIgCxIIVXNlckRhdGEiEnBldGVyLmNvbGxpbmdyaWRnZQw","userStatus":10,"userVisibleDeleted":null,"userVisibleFlaggedBy":null,"userVisibleRevision":{"code":"/*********************************************************\n
+                    * Why are there seasons?\n * Why are there no seasons near the equator?\n**********************************************************/\n// Scale down image to fit on screen\nvar scalingFactor = 0.5;\nvar speed = 12; //
+                    Change in hours per update\nvar resolution = 20; // How accurate orbit speed is\nvar running = true;\n\n// Poistion of windows\nvar divX = 200;\nvar divY = 190;\n\n// Sun parameters\nvar sunX = 100;\nvar sunY = 104;\nvar
+                    sunR = 21;\nvar flare = 3;\nvar flareA = 10;\n\nvar earthData = {\n name: \"Earth\",\n size: 15,\n colour: color(61, 100, 255),\n perihelion: 147, // million km\n aperihelion: 152, // million km\n peri_longitude: 102, //
+                    degrees\n asc_longitude: 348.7, // degrees\n inclination: 0, // degrees (by defintion)\n year: 365.25, // earth days\n mass: 5.97 // 10^24 kg\n};\n\nvar earthTilt = 23.4; // degrees\nvar SUNLIGHT = color(255, 255, 0,
+                    80);\n\nvar Planet = function(data, angle) {\n this.name = data.name;\n this.year = data.year;\n this.r = data.size;\n this.colour = data.colour;\n \n // Distance from ellipse centre to sun\n var focusDist =
+                    scalingFactor * (data.aperihelion - data.perihelion) / 2;\n \n // Ellipse axes\n var major = scalingFactor * data.aperihelion - focusDist;\n var minor = sqrt(major * major - focusDist * focusDist);\n \n // Store these to
+                    save repeatedly calculating them\n var phi = data.peri_longitude;\n var cosPhi = cos(phi);\n var sinPhi = sin(phi);\n \n // Center of ellipse\n var cx = sunX - focusDist * cosPhi;\n var cy = sunY + focusDist * sinPhi;\n
+                    \n // Handy properties for calculations\n var eccentricity = focusDist / major;\n var angleConstant = 360 * major * minor / data.year;\n \n this.findPosition = function(angle) {\n angle -= phi;\n \n // Radius of ellipse
+                    at this angle\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(angle));\n \n // Position based on non-rotated ellipse\n var x = r * cos(angle) + focusDist;\n var y = r * sin(angle);\n \n //
+                    Rotate based on ellipse rotation\n return [cx + x * cosPhi - y * sinPhi,\n cy - x * sinPhi - y * cosPhi];\n };\n \n // Set planet's position using its angle\n this.setPosition = function(angle) {\n if (angle !==
+                    undefined) {\n // Angle relative the perihelion\n this.angle = angle - phi;\n }\n \n // Radius of ellipse at this angle\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n
+                    // Position based on non-rotated ellipse\n var x = r * cos(this.angle) + focusDist;\n var y = r * sin(this.angle);\n \n // Rotate based on ellipse rotation\n this.x = cx + x * cosPhi - y * sinPhi;\n this.y = cy - x *
+                    sinPhi - y * cosPhi;\n };\n this.setPosition(angle);\n \n // Add a numbers of days to the orbit\n this.update = function(hours) { \n var sign = hours &lt; 0 ? -1 / resolution : 1 / resolution;\n sign /= 24;\n\n for (var
+                    d = 0; d &lt; abs(hours) * resolution; d++) {\n // Distance from sun\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n // Update angle around sun\n this.angle += sign *
+                    angleConstant / (r * r);\n }\n this.setPosition();\n };\n \n this.draw = function(x, y, r) {\n var x = x || this.x;\n var y = y || this.y;\n var r = r || data.size;\n noStroke();\n fill(this.colour);\n ellipse(x, y, r,
+                    r);\n };\n \n this.drawCycle = function() {\n translate(cx, cy);\n rotate(phi);\n ellipse(0, 0, major*2, minor*2);\n resetMatrix();\n };\n \n this.drawCenter = function() {\n noFill();\n strokeWeight(1);\n stroke(80);\n
+                    var dx = major * cosPhi;\n var dy = major * sinPhi;\n line(cx + dx, cy - dy, cx - dx, cy + dy);\n \n strokeWeight(2);\n this.drawCycle();\n \n /*\n fill(255);\n textSize(11);\n textAlign(RIGHT, BASELINE);\n
+                    text(\"Perihelion\", cx + (major + 2) * cosPhi - 6, cy - (major + 2) * sinPhi);\n textAlign(LEFT, BASELINE);\n text(\"Aperihelion\", cx - (major + 10) * cosPhi + 6, cy + (major + 10) * sinPhi);\n */\n\n };\n \n
+                    this.mouseOverCycle = function() {\n var d = dist(mouseX, mouseY, sunX, sunY);\n return d &gt;= minor - this.r &amp;&amp; d &lt;= major + this.r;\n };\n};\n\n// Create the Earth\n// At 6pm 28th August 2003, Earth and
+                    Mars in opposition\nvar _year = 2003;\nvar _day = 239.75;\nvar earthAngle = 335.6;\nvar earth = new Planet(earthData, earthAngle);\n\nvar drawPlayButton = function() {\n // Play / Pause\n var r = 18;\n var x = 14;\n var
+                    y = 14;\n var c;\n \n if (dist(mouseX, mouseY, x, y) &lt;= r) {\n c = color(250, 250, 250);\n } else {\n c = color(160, 160, 160);\n }\n \n noFill();\n stroke(c);\n strokeWeight(2);\n ellipse(x, y, r, r);\n \n
+                    noStroke();\n fill(c);\n if (running) {\n rect(x - 4, y - 5, 3, 10, 5);\n rect(x + 1, y - 5, 3, 10, 5);\n } else {\n triangle(x - 3, y - 5, x - 3, y + 5, x + 6, y);\n }\n};\n\nvar drawSun = function() {\n noStroke();\n
+                    fill(255, 204, 0);\n ellipse(sunX, sunY, sunR, sunR);\n fill(255, 151, 33, 200);\n \n beginShape();\n curveVertex(sunX + sunR/2 + flare, sunY);\n var up = true;\n for (var i = 0; i &lt;= 360; i += flareA) {\n var r = up
+                    ? sunR/2 + flare : sunR/2;\n curveVertex(sunX + r * cos(i),\n sunY + r * sin(i));\n up = !up;\n }\n curveVertex(sunX + sunR/2, sunY);\n endShape();\n};\n\n/*\nvar drawEarth = function() {\n noStroke();\n fill(0, 16,
+                    32);\n var a = atan2(earthY - sunY, earthX - sunX);\n translate(earthX, earthY);\n rotate(a);\n ellipse(1, 0, earthR*2, earthR*2);\n //image(earthImage, -earthR, -earthR-2);\n resetMatrix();\n};\n\nvar getSphereImage =
+                    function(r, theta, col, colT) {\n var img = createGraphics(r*2+2, r*2+2, JAVA2D);\n img.beginDraw();\n img.background(0, 0, 0, 0);\n \n var r2 = r*r;\n var s = 90 /r;\n \n for (var y = -r; y &lt;= r; y++) {\n var d =
+                    sqrt(r2 - y*y);\n var rd = round(d);\n var light1 = cos(s * y);\n var w = 90 / d;\n \n for (var x = -rd-1; x &lt;= rd+1; x++) {\n var p = light1 * cos(theta + (x / d) * 90);\n if (p &gt;= 0 &amp;&amp; p &lt;= 1) {\n if
+                    (x &lt; -rd || x &gt; rd) {\n p *= d + 0.5 - rd;\n } \n var c = lerpColor(colT, col, p);\n img.stroke(c);\n img.point(r+x+1, r+y+1); \n }\n }\n }\n \n return
+                    img;\n};\n*/\n\n/*******************************************************\n * Date functions\n*******************************************************/\n\nvar months = {\n January: 31,\n February: 28,\n March: 31,\n April:
+                    30,\n May: 31,\n June: 30,\n July: 31,\n August: 31,\n September: 30,\n October: 31,\n November: 30,\n December: 31\n};\n\nvar isLeapYear = function(y) {\n return (y % 4 === 0 &amp;&amp; (y % 100 !== 0 || y % 400 ===
+                    0));\n};\n\nvar dayToDate = function(d, y) {\n for (var m in months) {\n var days = months[m];\n if (m === 'February' &amp;&amp; isLeapYear(y)) {\n days++;\n }\n if (d &lt;= days) {\n return [d, m];\n } else {\n d -=
+                    days;\n }\n }\n return [d, m];\n};\n\nvar convertDayToYear = function(days) {\n var y = 0;\n \n if (days &gt; 365) {\n while (true) {\n var n = 365 + isLeapYear(_year + y);\n if (days &gt; n) {\n days -= n;\n y++;\n }
+                    else {\n break;\n }\n } \n } else if (days &lt; 0) {\n while (true) {\n if (days &lt; 0) {\n var n = 365 + isLeapYear(_year - 1 - y);\n days += n;\n y--; \n } else {\n break;\n }\n }\n }\n \n return [y, days];\n};\n\nvar
+                    updateDate = function(days) {\n _day += days;\n var y = convertDayToYear(_day);\n _day = y[1];\n _year += y[0];\n};\n\nvar getKM = function(d) {\n return round(10 * d / scalingFactor) / 10;\n};\n\nvar getAU = function(d)
+                    {\n return round(1000 * d / scalingFactor / 149.597871) / 1000;\n};\n\n/*******************************************************\n * Draw functions\n*******************************************************/\nvar
+                    drawEarthInSunlight = function(x, y, w, h) {\n var d = 25;\n var r = h - d * 2;\n var cx = x + w - r/2 - 10;\n var cy = y + h - r/2 - d;\n \n // Axis\n strokeWeight(2);\n stroke(255);\n var length = 20;\n var ct = cos(90
+                    - earthTilt);\n var st = sin(90 - earthTilt);\n var dy1 = r/2 * st;\n var dy2 = (r/2 + length) * st;\n var r1 = r/2 * ct;\n var r2 = (r/2 + length) * ct;\n \n var angle = atan2(earth.y - sunY, earth.x - sunX) - 90;\n r1
+                    *= cos(angle);\n r2 *= cos(angle);\n\n // Change order so either top or bottom axis is partly obscured\n if (abs(angle + 90) &lt; 90) {\n // Top axis\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n \n // Earth\n
+                    noStroke();\n fill(earth.colour);\n ellipse(cx, cy, r, r);\n \n // Bottom axis\n strokeWeight(2);\n stroke(255);\n line(cx + r1, cy + dy1, cx + r2, cy + dy2);\n } else {\n // Bottom axis\n line(cx + r1, cy + dy1, cx +
+                    r2, cy + dy2);\n \n // Earth\n noStroke();\n fill(earth.colour);\n ellipse(cx, cy, r, r);\n \n // Top axis\n strokeWeight(2);\n stroke(255);\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n }\n \n strokeWeight(1);\n
+                    stroke(255, 255, 255, 220);\n noFill();\n \n translate(cx, cy);\n rotate(-earthTilt * cos(angle));\n \n // Equator\n arc(0, 0, r-1, r/2 * ct * sin(angle), 0, 180);\n \n // Tropics\n stroke(255, 255, 255, 100);\n arc(0,
+                    r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n arc(0, -r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n \n // Arctic and Antarctic circles\n arc(0, r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle), 0,
+                    180);\n arc(0, -r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle), 0, 180);\n \n textAlign(RIGHT, CENTER);\n fill(255);\n text(\"A\", -r * ct / 2 - 5, -r/2 * st);\n text(\"C\", -dy1 - 3, -r/2 * ct);\n text(\"E\", -r/2 -3,
+                    0);\n \n resetMatrix();\n \n // Sunlight\n noStroke();\n fill(SUNLIGHT);\n rect(x, d-1, cx -x, r);\n \n fill(255);\n textSize(14);\n textAlign(LEFT, TOP);\n text(\"N\", cx - min(r1, r2) + 3, cy - r/2 - 17);\n text(\"S\",
+                    cx + max(r1, r2) + 3, cy + r/2 + 3);\n};\n\nvar drawSunIntensity = function(x, y, w, h) {\n var places = [\"(A) Arctic\",\n \"(C) Tropic\\nof Cancer\",\n \"(E) Equator\"];\n var degrees = [66.6, 23.4, 0];\n var angle =
+                    atan2(earth.y - sunY, earth.x - sunX); \n\n var d = 8;\n var boxH = round((h - 12 - d * 5) / 3);\n var barWidth = (w - 4 * d) / 24;\n var barHeight = boxH - 10;\n\n // Ground and light positions\n var gx = 365;\n var
+                    length = 20;\n var lx = gx - 45;\n\n fill(250);\n textSize(14);\n textAlign(LEFT, TOP);\n text(\"Light intensity\", 4, y + 4);\n text(\"Light angle\", lx, y + 4);\n \n // Hours\n textAlign(CENTER, BASELINE);\n
+                    textSize(10);\n for (var i = 0; i &lt;= 24; i += 2) {\n text(i, x + d*2 + barWidth*i, y + h - 15);\n }\n textSize(11);\n text(\"Hours of the day\", x + d + w/2, y + h - 4);\n\n var c1 = color(20, 20, 250);\n var c2 =
+                    color(200, 20, 20);\n\n for (var i in places) {\n var y = divY + d + i * (boxH + d);\n var theta = sin(angle) * earthTilt;\n var groundAngle = theta - degrees[i];\n var intensity = cos(groundAngle);\n var hours =
+                    sin(theta) * sin(degrees[i]) / cos(degrees[i]);\n var dawn = 6 * (1 - hours);\n var dusk = 6 * (3 + hours);\n var dayLength = dusk - dawn;\n \n noStroke();\n // Draw bars\n for (var h = round(dawn); h &lt;= round(dusk);
+                    h++) {\n var strength = intensity * cos(180*(12 - h) / dayLength);\n if (strength &lt; 0) { continue; }\n \n fill(lerpColor(c1, c2, strength));\n rect(x + d*2 + (h - 0.5) * barWidth,\n y + 1 + boxH - barHeight *
+                    strength,\n barWidth-1,\n barHeight * strength);\n }\n \n // Axis\n stroke(255);\n strokeWeight(1);\n line(x + d, y + boxH + 1, x + w - d, y + boxH + 1);\n \n // Place labels and mid-bar label\n fill(255);\n
+                    textSize(10);\n textAlign(CENTER, BOTTOM);\n text(round(intensity * 100),\n x + d*2 + 12 * barWidth,\n y + boxH - barHeight * intensity);\n textSize(12);\n textAlign(LEFT, CENTER);\n text(places[i], x + d, y + boxH/2);\n
+                    \n // Ground angle\n var gy = y + boxH/2 + 5;\n var dx = length * sin(groundAngle);\n var dy = length * cos(groundAngle);\n \n noStroke();\n fill(250, 250, 0, 200);\n quad(lx, gy - dy, lx, gy + dy,\n gx + dx, gy + dy, gx
+                    - dx, gy - dy);\n \n strokeWeight(3);\n stroke(lerpColor(c1, c2, intensity));\n line(gx + dx, gy + dy, gx - dx, gy - dy);\n \n fill(255);\n textSize(10);\n textAlign(CENTER, TOP);\n text(round(90-abs(groundAngle)) +
+                    \"°\", gx, gy + dy + 3);\n }\n};\n\nvar drawEarthAxis = function() {\n var axisLength = 8;\n strokeWeight(1);\n stroke(250);\n line(earth.x, earth.y - sin(earthTilt) * earth.r/2,\n earth.x, earth.y - axisLength);\n
+                    line(earth.x, earth.y + earth.r/2, earth.x, earth.y + axisLength);\n};\n\nvar drawArrowToEarth = function() {\n // Draw arrow\n stroke(220, 220, 0);\n strokeWeight(5);\n var angle = atan2(earth.y - sunY, earth.x -
+                    sunX);\n \n var x1 = sunX + scalingFactor * 95 * cos(angle);\n var y1 = sunY + scalingFactor * 95 * sin(angle);\n line(sunX + 20 * cos(angle), sunY + 20 * sin(angle), x1 , y1);\n \n translate(x1, y1);\n rotate(angle -
+                    90);\n // Arrowhead\n noStroke();\n fill(220, 220, 0);\n triangle(-5, -3, 5, -3, 0, 12);\n \n // Distance label\n fill(255, 255, 255);\n textSize(10);\n textAlign(CENTER, CENTER);\n var distance = dist(sunX, sunY,
+                    earth.x, earth.y);\n if (abs(angle) &gt; 90) {\n rotate(270);\n text(getAU(distance) + \" AU\", 10, -12);\n } else {\n rotate(90);\n text(getAU(distance) + \" AU\", -10, -12);\n }\n \n resetMatrix();\n \n // Draw
+                    sunlight\n fill(SUNLIGHT);\n noStroke();\n arc(earth.x, earth.y, earth.r, earth.r, angle+90, angle+270);\n \n};\n\nvar drawOrbit = function() {\n earth.drawCenter();\n earth.draw();\n \n drawEarthAxis();\n
+                    drawArrowToEarth();\n \n // Draw earth marker where mouse is\n if (earth.mouseOverCycle()) {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n var coord = earth.findPosition(angle);\n fill(255, 255, 255, 80);\n
+                    ellipse(coord[0], coord[1], earth.r + 2, earth.r + 2);\n }\n \n drawSun();\n};\n\nvar draw = function() {\n if (running) {\n for (var i = 0; i&lt;speed; i++) {\n updateDate(1 / 24);\n earth.update(1);\n }\n }\n \n
+                    background(0);\n \n // Grid\n strokeWeight(1);\n stroke(120);\n line(0, divY, 400, divY);\n line(divX, 0, divX, divY);\n \n // Labels\n fill(255);\n textSize(13);\n textAlign(LEFT, TOP);\n var _date = dayToDate(_day);\n
+                    text(_date[1] + \" \" + ceil(_date[0]), 30, 5);\n \n\n drawOrbit();\n drawPlayButton();\n drawEarthInSunlight(divX, -1, 400 - divX, divY);\n drawSunIntensity(5, divY, 400 - 104, 400 - divY);\n};\n\n// Spacebar toggles
+                    animation\nvar keyPressed = function() {\n if (keyCode === 32) { running = !running; }\n};\n\nvar mouseReleased = function() {\n // Play / Pause\n if (dist(mouseX, mouseY, 14, 14) &lt;= sunR / 2) {\n running =
+                    !running;\n }\n \n // Pick position\n if (earth.mouseOverCycle()) {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n earth.setPosition(angle);\n _day = (angle - earthData.peri_longitude + 360) * 365 / 360;\n _day %=
+                    365;\n running = false;\n
+                    }\n};","configVersion":3,"created":"2017-08-02T22:00:50Z","editorType":"ace_pjs","folds":[],"hasAudio":false,"id":5752142325350400,"mp3Url":"","playback":"","tests":"","translatedMp3Url":"","youtubeId":null},"userVisibleTrustedRevision":{"code":"/*********************************************************\n
+                    * Why are there seasons?\n * Why are there no seasons near the equator?\n**********************************************************/\n// Scale down image to fit on screen\nvar scalingFactor = 0.5;\nvar speed = 12; //
+                    Change in hours per update\nvar resolution = 20; // How accurate orbit speed is\nvar running = true;\n\n// Poistion of windows\nvar divX = 200;\nvar divY = 190;\n\n// Sun parameters\nvar sunX = 100;\nvar sunY = 104;\nvar
+                    sunR = 21;\nvar flare = 3;\nvar flareA = 10;\n\nvar earthData = {\n name: \"Earth\",\n size: 15,\n colour: color(61, 100, 255),\n perihelion: 147, // million km\n aperihelion: 152, // million km\n peri_longitude: 102, //
+                    degrees\n asc_longitude: 348.7, // degrees\n inclination: 0, // degrees (by defintion)\n year: 365.25, // earth days\n mass: 5.97 // 10^24 kg\n};\n\nvar earthTilt = 23.4; // degrees\nvar SUNLIGHT = color(255, 255, 0,
+                    80);\n\nvar Planet = function(data, angle) {\n this.name = data.name;\n this.year = data.year;\n this.r = data.size;\n this.colour = data.colour;\n \n // Distance from ellipse centre to sun\n var focusDist =
+                    scalingFactor * (data.aperihelion - data.perihelion) / 2;\n \n // Ellipse axes\n var major = scalingFactor * data.aperihelion - focusDist;\n var minor = sqrt(major * major - focusDist * focusDist);\n \n // Store these to
+                    save repeatedly calculating them\n var phi = data.peri_longitude;\n var cosPhi = cos(phi);\n var sinPhi = sin(phi);\n \n // Center of ellipse\n var cx = sunX - focusDist * cosPhi;\n var cy = sunY + focusDist * sinPhi;\n
+                    \n // Handy properties for calculations\n var eccentricity = focusDist / major;\n var angleConstant = 360 * major * minor / data.year;\n \n this.findPosition = function(angle) {\n angle -= phi;\n \n // Radius of ellipse
+                    at this angle\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(angle));\n \n // Position based on non-rotated ellipse\n var x = r * cos(angle) + focusDist;\n var y = r * sin(angle);\n \n //
+                    Rotate based on ellipse rotation\n return [cx + x * cosPhi - y * sinPhi,\n cy - x * sinPhi - y * cosPhi];\n };\n \n // Set planet's position using its angle\n this.setPosition = function(angle) {\n if (angle !==
+                    undefined) {\n // Angle relative the perihelion\n this.angle = angle - phi;\n }\n \n // Radius of ellipse at this angle\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n
+                    // Position based on non-rotated ellipse\n var x = r * cos(this.angle) + focusDist;\n var y = r * sin(this.angle);\n \n // Rotate based on ellipse rotation\n this.x = cx + x * cosPhi - y * sinPhi;\n this.y = cy - x *
+                    sinPhi - y * cosPhi;\n };\n this.setPosition(angle);\n \n // Add a numbers of days to the orbit\n this.update = function(hours) { \n var sign = hours &lt; 0 ? -1 / resolution : 1 / resolution;\n sign /= 24;\n\n for (var
+                    d = 0; d &lt; abs(hours) * resolution; d++) {\n // Distance from sun\n var r = major * (1 - eccentricity * eccentricity) /\n (1 + eccentricity * cos(this.angle));\n \n // Update angle around sun\n this.angle += sign *
+                    angleConstant / (r * r);\n }\n this.setPosition();\n };\n \n this.draw = function(x, y, r) {\n var x = x || this.x;\n var y = y || this.y;\n var r = r || data.size;\n noStroke();\n fill(this.colour);\n ellipse(x, y, r,
+                    r);\n };\n \n this.drawCycle = function() {\n translate(cx, cy);\n rotate(phi);\n ellipse(0, 0, major*2, minor*2);\n resetMatrix();\n };\n \n this.drawCenter = function() {\n noFill();\n strokeWeight(1);\n stroke(80);\n
+                    var dx = major * cosPhi;\n var dy = major * sinPhi;\n line(cx + dx, cy - dy, cx - dx, cy + dy);\n \n strokeWeight(2);\n this.drawCycle();\n \n /*\n fill(255);\n textSize(11);\n textAlign(RIGHT, BASELINE);\n
+                    text(\"Perihelion\", cx + (major + 2) * cosPhi - 6, cy - (major + 2) * sinPhi);\n textAlign(LEFT, BASELINE);\n text(\"Aperihelion\", cx - (major + 10) * cosPhi + 6, cy + (major + 10) * sinPhi);\n */\n\n };\n \n
+                    this.mouseOverCycle = function() {\n var d = dist(mouseX, mouseY, sunX, sunY);\n return d &gt;= minor - this.r &amp;&amp; d &lt;= major + this.r;\n };\n};\n\n// Create the Earth\n// At 6pm 28th August 2003, Earth and
+                    Mars in opposition\nvar _year = 2003;\nvar _day = 239.75;\nvar earthAngle = 335.6;\nvar earth = new Planet(earthData, earthAngle);\n\nvar drawPlayButton = function() {\n // Play / Pause\n var r = 18;\n var x = 14;\n var
+                    y = 14;\n var c;\n \n if (dist(mouseX, mouseY, x, y) &lt;= r) {\n c = color(250, 250, 250);\n } else {\n c = color(160, 160, 160);\n }\n \n noFill();\n stroke(c);\n strokeWeight(2);\n ellipse(x, y, r, r);\n \n
+                    noStroke();\n fill(c);\n if (running) {\n rect(x - 4, y - 5, 3, 10, 5);\n rect(x + 1, y - 5, 3, 10, 5);\n } else {\n triangle(x - 3, y - 5, x - 3, y + 5, x + 6, y);\n }\n};\n\nvar drawSun = function() {\n noStroke();\n
+                    fill(255, 204, 0);\n ellipse(sunX, sunY, sunR, sunR);\n fill(255, 151, 33, 200);\n \n beginShape();\n curveVertex(sunX + sunR/2 + flare, sunY);\n var up = true;\n for (var i = 0; i &lt;= 360; i += flareA) {\n var r = up
+                    ? sunR/2 + flare : sunR/2;\n curveVertex(sunX + r * cos(i),\n sunY + r * sin(i));\n up = !up;\n }\n curveVertex(sunX + sunR/2, sunY);\n endShape();\n};\n\n/*\nvar drawEarth = function() {\n noStroke();\n fill(0, 16,
+                    32);\n var a = atan2(earthY - sunY, earthX - sunX);\n translate(earthX, earthY);\n rotate(a);\n ellipse(1, 0, earthR*2, earthR*2);\n //image(earthImage, -earthR, -earthR-2);\n resetMatrix();\n};\n\nvar getSphereImage =
+                    function(r, theta, col, colT) {\n var img = createGraphics(r*2+2, r*2+2, JAVA2D);\n img.beginDraw();\n img.background(0, 0, 0, 0);\n \n var r2 = r*r;\n var s = 90 /r;\n \n for (var y = -r; y &lt;= r; y++) {\n var d =
+                    sqrt(r2 - y*y);\n var rd = round(d);\n var light1 = cos(s * y);\n var w = 90 / d;\n \n for (var x = -rd-1; x &lt;= rd+1; x++) {\n var p = light1 * cos(theta + (x / d) * 90);\n if (p &gt;= 0 &amp;&amp; p &lt;= 1) {\n if
+                    (x &lt; -rd || x &gt; rd) {\n p *= d + 0.5 - rd;\n } \n var c = lerpColor(colT, col, p);\n img.stroke(c);\n img.point(r+x+1, r+y+1); \n }\n }\n }\n \n return
+                    img;\n};\n*/\n\n/*******************************************************\n * Date functions\n*******************************************************/\n\nvar months = {\n January: 31,\n February: 28,\n March: 31,\n April:
+                    30,\n May: 31,\n June: 30,\n July: 31,\n August: 31,\n September: 30,\n October: 31,\n November: 30,\n December: 31\n};\n\nvar isLeapYear = function(y) {\n return (y % 4 === 0 &amp;&amp; (y % 100 !== 0 || y % 400 ===
+                    0));\n};\n\nvar dayToDate = function(d, y) {\n for (var m in months) {\n var days = months[m];\n if (m === 'February' &amp;&amp; isLeapYear(y)) {\n days++;\n }\n if (d &lt;= days) {\n return [d, m];\n } else {\n d -=
+                    days;\n }\n }\n return [d, m];\n};\n\nvar convertDayToYear = function(days) {\n var y = 0;\n \n if (days &gt; 365) {\n while (true) {\n var n = 365 + isLeapYear(_year + y);\n if (days &gt; n) {\n days -= n;\n y++;\n }
+                    else {\n break;\n }\n } \n } else if (days &lt; 0) {\n while (true) {\n if (days &lt; 0) {\n var n = 365 + isLeapYear(_year - 1 - y);\n days += n;\n y--; \n } else {\n break;\n }\n }\n }\n \n return [y, days];\n};\n\nvar
+                    updateDate = function(days) {\n _day += days;\n var y = convertDayToYear(_day);\n _day = y[1];\n _year += y[0];\n};\n\nvar getKM = function(d) {\n return round(10 * d / scalingFactor) / 10;\n};\n\nvar getAU = function(d)
+                    {\n return round(1000 * d / scalingFactor / 149.597871) / 1000;\n};\n\n/*******************************************************\n * Draw functions\n*******************************************************/\nvar
+                    drawEarthInSunlight = function(x, y, w, h) {\n var d = 25;\n var r = h - d * 2;\n var cx = x + w - r/2 - 10;\n var cy = y + h - r/2 - d;\n \n // Axis\n strokeWeight(2);\n stroke(255);\n var length = 20;\n var ct = cos(90
+                    - earthTilt);\n var st = sin(90 - earthTilt);\n var dy1 = r/2 * st;\n var dy2 = (r/2 + length) * st;\n var r1 = r/2 * ct;\n var r2 = (r/2 + length) * ct;\n \n var angle = atan2(earth.y - sunY, earth.x - sunX) - 90;\n r1
+                    *= cos(angle);\n r2 *= cos(angle);\n\n // Change order so either top or bottom axis is partly obscured\n if (abs(angle + 90) &lt; 90) {\n // Top axis\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n \n // Earth\n
+                    noStroke();\n fill(earth.colour);\n ellipse(cx, cy, r, r);\n \n // Bottom axis\n strokeWeight(2);\n stroke(255);\n line(cx + r1, cy + dy1, cx + r2, cy + dy2);\n } else {\n // Bottom axis\n line(cx + r1, cy + dy1, cx +
+                    r2, cy + dy2);\n \n // Earth\n noStroke();\n fill(earth.colour);\n ellipse(cx, cy, r, r);\n \n // Top axis\n strokeWeight(2);\n stroke(255);\n line(cx - r1, cy - dy1, cx - r2, cy - dy2);\n }\n \n strokeWeight(1);\n
+                    stroke(255, 255, 255, 220);\n noFill();\n \n translate(cx, cy);\n rotate(-earthTilt * cos(angle));\n \n // Equator\n arc(0, 0, r-1, r/2 * ct * sin(angle), 0, 180);\n \n // Tropics\n stroke(255, 255, 255, 100);\n arc(0,
+                    r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n arc(0, -r/2 * ct, dy1 * 2 - 1, dy1 * ct * sin(angle), 0, 180);\n \n // Arctic and Antarctic circles\n arc(0, r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle), 0,
+                    180);\n arc(0, -r/2 * st, r * ct - 1, r/2 * ct * ct * sin(angle), 0, 180);\n \n textAlign(RIGHT, CENTER);\n fill(255);\n text(\"A\", -r * ct / 2 - 5, -r/2 * st);\n text(\"C\", -dy1 - 3, -r/2 * ct);\n text(\"E\", -r/2 -3,
+                    0);\n \n resetMatrix();\n \n // Sunlight\n noStroke();\n fill(SUNLIGHT);\n rect(x, d-1, cx -x, r);\n \n fill(255);\n textSize(14);\n textAlign(LEFT, TOP);\n text(\"N\", cx - min(r1, r2) + 3, cy - r/2 - 17);\n text(\"S\",
+                    cx + max(r1, r2) + 3, cy + r/2 + 3);\n};\n\nvar drawSunIntensity = function(x, y, w, h) {\n var places = [\"(A) Arctic\",\n \"(C) Tropic\\nof Cancer\",\n \"(E) Equator\"];\n var degrees = [66.6, 23.4, 0];\n var angle =
+                    atan2(earth.y - sunY, earth.x - sunX); \n\n var d = 8;\n var boxH = round((h - 12 - d * 5) / 3);\n var barWidth = (w - 4 * d) / 24;\n var barHeight = boxH - 10;\n\n // Ground and light positions\n var gx = 365;\n var
+                    length = 20;\n var lx = gx - 45;\n\n fill(250);\n textSize(14);\n textAlign(LEFT, TOP);\n text(\"Light intensity\", 4, y + 4);\n text(\"Light angle\", lx, y + 4);\n \n // Hours\n textAlign(CENTER, BASELINE);\n
+                    textSize(10);\n for (var i = 0; i &lt;= 24; i += 2) {\n text(i, x + d*2 + barWidth*i, y + h - 15);\n }\n textSize(11);\n text(\"Hours of the day\", x + d + w/2, y + h - 4);\n\n var c1 = color(20, 20, 250);\n var c2 =
+                    color(200, 20, 20);\n\n for (var i in places) {\n var y = divY + d + i * (boxH + d);\n var theta = sin(angle) * earthTilt;\n var groundAngle = theta - degrees[i];\n var intensity = cos(groundAngle);\n var hours =
+                    sin(theta) * sin(degrees[i]) / cos(degrees[i]);\n var dawn = 6 * (1 - hours);\n var dusk = 6 * (3 + hours);\n var dayLength = dusk - dawn;\n \n noStroke();\n // Draw bars\n for (var h = round(dawn); h &lt;= round(dusk);
+                    h++) {\n var strength = intensity * cos(180*(12 - h) / dayLength);\n if (strength &lt; 0) { continue; }\n \n fill(lerpColor(c1, c2, strength));\n rect(x + d*2 + (h - 0.5) * barWidth,\n y + 1 + boxH - barHeight *
+                    strength,\n barWidth-1,\n barHeight * strength);\n }\n \n // Axis\n stroke(255);\n strokeWeight(1);\n line(x + d, y + boxH + 1, x + w - d, y + boxH + 1);\n \n // Place labels and mid-bar label\n fill(255);\n
+                    textSize(10);\n textAlign(CENTER, BOTTOM);\n text(round(intensity * 100),\n x + d*2 + 12 * barWidth,\n y + boxH - barHeight * intensity);\n textSize(12);\n textAlign(LEFT, CENTER);\n text(places[i], x + d, y + boxH/2);\n
+                    \n // Ground angle\n var gy = y + boxH/2 + 5;\n var dx = length * sin(groundAngle);\n var dy = length * cos(groundAngle);\n \n noStroke();\n fill(250, 250, 0, 200);\n quad(lx, gy - dy, lx, gy + dy,\n gx + dx, gy + dy, gx
+                    - dx, gy - dy);\n \n strokeWeight(3);\n stroke(lerpColor(c1, c2, intensity));\n line(gx + dx, gy + dy, gx - dx, gy - dy);\n \n fill(255);\n textSize(10);\n textAlign(CENTER, TOP);\n text(round(90-abs(groundAngle)) +
+                    \"°\", gx, gy + dy + 3);\n }\n};\n\nvar drawEarthAxis = function() {\n var axisLength = 8;\n strokeWeight(1);\n stroke(250);\n line(earth.x, earth.y - sin(earthTilt) * earth.r/2,\n earth.x, earth.y - axisLength);\n
+                    line(earth.x, earth.y + earth.r/2, earth.x, earth.y + axisLength);\n};\n\nvar drawArrowToEarth = function() {\n // Draw arrow\n stroke(220, 220, 0);\n strokeWeight(5);\n var angle = atan2(earth.y - sunY, earth.x -
+                    sunX);\n \n var x1 = sunX + scalingFactor * 95 * cos(angle);\n var y1 = sunY + scalingFactor * 95 * sin(angle);\n line(sunX + 20 * cos(angle), sunY + 20 * sin(angle), x1 , y1);\n \n translate(x1, y1);\n rotate(angle -
+                    90);\n // Arrowhead\n noStroke();\n fill(220, 220, 0);\n triangle(-5, -3, 5, -3, 0, 12);\n \n // Distance label\n fill(255, 255, 255);\n textSize(10);\n textAlign(CENTER, CENTER);\n var distance = dist(sunX, sunY,
+                    earth.x, earth.y);\n if (abs(angle) &gt; 90) {\n rotate(270);\n text(getAU(distance) + \" AU\", 10, -12);\n } else {\n rotate(90);\n text(getAU(distance) + \" AU\", -10, -12);\n }\n \n resetMatrix();\n \n // Draw
+                    sunlight\n fill(SUNLIGHT);\n noStroke();\n arc(earth.x, earth.y, earth.r, earth.r, angle+90, angle+270);\n \n};\n\nvar drawOrbit = function() {\n earth.drawCenter();\n earth.draw();\n \n drawEarthAxis();\n
+                    drawArrowToEarth();\n \n // Draw earth marker where mouse is\n if (earth.mouseOverCycle()) {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n var coord = earth.findPosition(angle);\n fill(255, 255, 255, 80);\n
+                    ellipse(coord[0], coord[1], earth.r + 2, earth.r + 2);\n }\n \n drawSun();\n};\n\nvar draw = function() {\n if (running) {\n for (var i = 0; i&lt;speed; i++) {\n updateDate(1 / 24);\n earth.update(1);\n }\n }\n \n
+                    background(0);\n \n // Grid\n strokeWeight(1);\n stroke(120);\n line(0, divY, 400, divY);\n line(divX, 0, divX, divY);\n \n // Labels\n fill(255);\n textSize(13);\n textAlign(LEFT, TOP);\n var _date = dayToDate(_day);\n
+                    text(_date[1] + \" \" + ceil(_date[0]), 30, 5);\n \n\n drawOrbit();\n drawPlayButton();\n drawEarthInSunlight(divX, -1, 400 - divX, divY);\n drawSunIntensity(5, divY, 400 - 104, 400 - divY);\n};\n\n// Spacebar toggles
+                    animation\nvar keyPressed = function() {\n if (keyCode === 32) { running = !running; }\n};\n\nvar mouseReleased = function() {\n // Play / Pause\n if (dist(mouseX, mouseY, 14, 14) &lt;= sunR / 2) {\n running =
+                    !running;\n }\n \n // Pick position\n if (earth.mouseOverCycle()) {\n var angle = -atan2(mouseY - sunY, mouseX - sunX);\n earth.setPosition(angle);\n _day = (angle - earthData.peri_longitude + 360) * 365 / 360;\n _day %=
+                    365;\n running = false;\n
+                    }\n};","configVersion":3,"created":"2014-01-13T15:43:42Z","editorType":null,"folds":null,"hasAudio":false,"id":5713144022302720,"mp3Url":"","playback":null,"tests":"","translatedMp3Url":"","youtubeId":null},"width":400,"youtubeId":null},"topic":{"authorKey":"ag5zfmtoYW4tYWNhZGVteXJaCxIIVXNlckRhdGEiTHVzZXJfaWRfa2V5X2h0dHA6Ly9ub3VzZXJpZC5raGFuYWNhZGVteS5vcmcvNGFkNTZkNzFhYjlmOGM2ZjIzZmJjMGI1YzIxNDNiZWIM","backgroundImageCaption":"","backgroundImageUrl":"","brandingImageUrl":"","childData":[{"id":"x05187c3c","kind":"Topic"},{"id":"x7441c73b","kind":"Topic"},{"id":"xcffdaa1f","kind":"Topic"},{"id":"x89af0e82","kind":"Topic"},{"id":"xc9115e5d","kind":"Topic"},{"id":"xb254f8dc","kind":"Topic"},{"id":"x7d10e7ab","kind":"Topic"},{"id":"x076d758b321a30f5","kind":"Topic"},{"id":"xf409033d","kind":"Topic"},{"id":"x5e3717e0","kind":"Topic"},{"id":"xf9c6be8d","kind":"Topic"},{"id":"x76ccd5a5","kind":"Topic"},{"id":"x3dea311d","kind":"Topic"}],"conceptTags":[],"contentId":"xffde7c31","contentKind":"Topic","creationDate":"2020-06-09T20:36:00Z","curation":{"blacklist":["Topic:xf409033d","Topic:x5e3717e0","Topic:xf9c6be8d","Topic:x76ccd5a5","Topic:x3dea311d","Topic:xde9be2087fa2350c"],"hideRecommended":true,"modules":[{"actions":[{"contentDescriptor":"Topic:xffde7c31","text":"New
+                    JavaScript Program","url":"/computer-programming/new/pjs"},{"contentDescriptor":"Topic:xffde7c31","text":"New webpage","url":"/computer-programming/new/webpage"},{"contentDescriptor":"Topic:xffde7c31","text":"New SQL
+                    Script","url":"/computer-programming/new/sql"}],"kind":"ActionList","title":"Create a new program"},{"callToAction":"Meet the professionals","description":"Meet a professional - everyone from mobile health app developers
+                    to product managers to physics programmers. Learn how they got into the industry, what they do for their job, what they do for fun, and what advice they have for
+                    you.","kind":"SubjectIntro","link":"Video:x2c143ebd","title":"What can you do with a career in computing?"},{"actions":[{"contentDescriptor":"Topic:xffde7c31","text":"Help
+                    requests","url":"/computing/computer-programming/projectfeedback"},{"contentDescriptor":"Topic:xffde7c31","text":"Project
+                    evaluations","url":"/computing/computer-programming/projectfeedback#projecteval"},{"contentDescriptor":"Topic:xffde7c31","text":"Community
+                    questions","url":"/computing/computer-programming/d"}],"kind":"ActionList","title":"Community"},{"kind":"BrowseProjects"},{"actions":[{"contentDescriptor":"Topic:x301707a0","text":"Computer
+                    Science","url":"/computing/computer-science"},{"contentDescriptor":"Topic:x54f76d4b","text":"Hour of Code","url":"/computing/hour-of-code"},{"contentDescriptor":"Topic:x9efc9f4b","text":"Pixar in a
+                    Box","url":"/partner-content/pixar"}],"kind":"ActionList","title":"Learn More
+                    Computing"}]},"currentRevisionKey":"3d7c888cfdd7b359b064e760f6046d107859f6c3","curriculumKey":null,"customDescriptionTag":"","customTitleTag":"","dateModified":"2020-06-09T21:39:03Z","deleted":false,"deletedModTime":null,"description":"Learn
+                    how to program drawings, animations, and games using JavaScript &amp; ProcessingJS, or learn how to create webpages with HTML &amp; CSS. You can share whatever you create, explore what others have created and learn from
+                    each
+                    other!","doNotPublish":false,"domainSlug":"computing","enableFpmMastery":false,"endorsement":null,"extendedSlug":"computing/computer-programming","facebookUrl":"","gplusUrl":"","hasPeerReviewedProjects":true,"hasTopicQuiz":false,"hasTopicUnitTest":false,"hasUserAuthoredContentTypes":true,"hide":false,"iconSrc":"","id":"xffde7c31","importable":true,"importedFromSha":"fd4b67b24e4a0bd161a6583c0e01a7b8d4fb39e6","inKnowledgeMap":false,"kaUrl":"https://de.khanacademy.org/computing/computer-programming","kind":"Topic","listed":true,"listedLocales":["fr","bg","pt","sr","bn","de","ko","it","da","tr","nb","pl","he"],"logoImageUrl":"","lowerToc":false,"nodeSlug":"computer-programming","relativeUrl":"/computing/computer-programming","renderType":"Subject","sha":"3d7c888cfdd7b359b064e760f6046d107859f6c3","showTopicsModule":false,"slug":"computer-programming","sourceLanguage":"en","sponsored":false,"standaloneTitle":"Computer
+                    programming","tags":[],"title":"Computer
+                    programming","topicPageUrl":"/computing/computer-programming","translatedCuration":{"blacklist":["Topic:xf409033d","Topic:x5e3717e0","Topic:xf9c6be8d","Topic:x76ccd5a5","Topic:x3dea311d","Topic:xde9be2087fa2350c"],"hideRecommended":true,"modules":[{"actions":[{"contentDescriptor":"Topic:xffde7c31","text":"New
+                    JavaScript Program","url":"/computer-programming/new/pjs"},{"contentDescriptor":"Topic:xffde7c31","text":"New webpage","url":"/computer-programming/new/webpage"},{"contentDescriptor":"Topic:xffde7c31","text":"Neue
+                    SQL-Skript","url":"/computer-programming/new/sql"}],"kind":"ActionList","title":"Ein neues Programm erstellen"},{"callToAction":"Triff die Spezialisten","description":"Lerne einen professionellen Entwickler von mobilen
+                    Gesundheitsapps\n, Produktmanager oder Programmierer der Physik kennen. Lerne, wie sie in dieser Industrie gelandet sind, was sie bei ihrer Arbeit tun, was ihre Hobbys sind und welchen Rat sie für dich
+                    haben.","kind":"SubjectIntro","link":"Video:x2c143ebd","title":"Was kann ich mit einer Karriere in der Computerindustrie machen?"},{"actions":[{"contentDescriptor":"Topic:xffde7c31","text":"Help
+                    requests","url":"/computing/computer-programming/projectfeedback"},{"contentDescriptor":"Topic:xffde7c31","text":"Project
+                    evaluations","url":"/computing/computer-programming/projectfeedback#projecteval"},{"contentDescriptor":"Topic:xffde7c31","text":"Fragen aus der
+                    Community","url":"/computing/computer-programming/d"}],"kind":"ActionList","title":"Community"},{"kind":"BrowseProjects"},{"actions":[{"contentDescriptor":"Topic:x301707a0","text":"Computer
+                    Science","url":"/computing/computer-science"},{"contentDescriptor":"Topic:x54f76d4b","text":"Hour of Code","url":"/computing/hour-of-code"},{"contentDescriptor":"Topic:x9efc9f4b","text":"Pixar in einer Box
+                    ","url":"/partner-content/pixar"}],"kind":"ActionList","title":"Lerne mehr über Computing"}]},"translatedCustomDescriptionTag":"","translatedCustomTitleTag":"","translatedDescription":"Lerne, wie du Zeichnungen,
+                    Animationen und Spiele mit JavaScript &amp; ProcessingJS programmieren kannst. Oder lerne, wie du Webseiten mit HTML &amp; CSS erstellen kannst. Du kannst all deine Programme teilen, erforschen, was andere erstellt haben
+                    und gegenseitig voneinander
+                    lernen!","translatedStandaloneTitle":"Programmierung","translatedTitle":"Programmierung","twitterUrl":"","userAuthoredContentTypes":["pjs","sql","webpage"],"userAuthoredContentTypesInfo":[{"new":"New
+                    program","type":"pjs"},{"new":"New SQL script","type":"sql"},{"new":"New webpage","type":"webpage"}],"webUrl":"","xPos":0.0,"yPos":0.0}},"styleClassNames":[]}<span class="html-tag">&lt;/script&gt;</span><span
+                        class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/d2d956a9d26c34a2a8904cf9f1d0197e.f8e4c928a1e28e2dd2cb.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/d2d956a9d26c34a2a8904cf9f1d0197e.f8e4c928a1e28e2dd2cb.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="225"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/javascript/tutorial-scratchpad-package/scratchpad-page-entry.ad00bd00ea86190d577e.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/javascript/tutorial-scratchpad-package/scratchpad-page-entry.ad00bd00ea86190d577e.js</a>'&gt;</span><span
+                        class="html-tag">&lt;/script&gt;</span><span class="html-tag">&lt;script&gt;</span>window["./javascript/page-package/header-entry.js"] =
+                    {"dataCache":null,"initialState":null,"isRehydrate":false,"props":{"backgroundColor":"darkBlue"},"styleClassNames":[]}<span class="html-tag">&lt;/script&gt;</span><span class="html-tag">&lt;script <span
+                            class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span class="html-attribute-name">src</span>='<a
+                            class="html-attribute-value html-resource-link" target="_blank" href="https://cdn.kastatic.org/genwebpack/prod/de/fe72bd6bb0d4336abd5ea5d4e4ecddb5.c9b8b0cb1f68f39e159e.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/fe72bd6bb0d4336abd5ea5d4e4ecddb5.c9b8b0cb1f68f39e159e.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="226"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/e240671caa994b2b8afcad901865ad29.7e3aa07c9edfe5c63101.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/e240671caa994b2b8afcad901865ad29.7e3aa07c9edfe5c63101.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="227"></td>
+                <td class="line-content"><span class="html-tag">&lt;script <span class="html-attribute-name">defer</span> <span class="html-attribute-name">crossorigin</span>='<span class="html-attribute-value">anonymous</span>' <span
+                            class="html-attribute-name">src</span>='<a class="html-attribute-value html-resource-link" target="_blank"
+                            href="https://cdn.kastatic.org/genwebpack/prod/de/javascript/page-package/header-entry.985986fdd3b43775b5fa.js"
+                            rel="noreferrer noopener">https://cdn.kastatic.org/genwebpack/prod/de/javascript/page-package/header-entry.985986fdd3b43775b5fa.js</a>'&gt;</span><span class="html-tag">&lt;/script&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="228"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="229"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="230"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="231"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="232"></td>
+                <td class="line-content"> </td>
+            </tr>
+            <tr>
+                <td class="line-number" value="233"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="234"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="235"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="236"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="237"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="238"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="239"></td>
+                <td class="line-content"><br></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="240"></td>
+                <td class="line-content"> <span class="html-tag">&lt;/body&gt;</span></td>
+            </tr>
+            <tr>
+                <td class="line-number" value="241"></td>
+                <td class="line-content"><span class="html-tag">&lt;/html&gt;</span><span class="html-end-of-file"></span></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+
+</html>

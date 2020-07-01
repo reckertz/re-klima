@@ -1,0 +1,2528 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <meta name="author" content="Tutiempo Network, S.L." />
+    <meta name="distribution" content="global" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <link rel="shortcut icon" type="image/ico" href="/favicon.ico" />
+    <link rel="apple-touch-icon" sizes="57x57" href="/Browser/apple-icon-57x57.png" />
+    <link rel="apple-touch-icon" sizes="60x60" href="/Browser/apple-icon-60x60.png" />
+    <link rel="apple-touch-icon" sizes="72x72" href="/Browser/apple-icon-72x72.png" />
+    <link rel="apple-touch-icon" sizes="76x76" href="/Browser/apple-icon-76x76.png" />
+    <link rel="apple-touch-icon" sizes="114x114" href="/Browser/apple-icon-114x114.png" />
+    <link rel="apple-touch-icon" sizes="120x120" href="/Browser/apple-icon-120x120.png" />
+    <link rel="apple-touch-icon" sizes="144x144" href="/Browser/apple-icon-144x144.png" />
+    <link rel="apple-touch-icon" sizes="152x152" href="/Browser/apple-icon-152x152.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/Browser/apple-icon-180x180.png" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/Browser/android-icon-192x192.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/Browser/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="96x96" href="/Browser/favicon-96x96.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/Browser/favicon-16x16.png" />
+    <link rel="dns-prefetch" href="//oc.tutiempo.net" />
+    <link rel="manifest" href="/Browser/manifest.json" />
+    <meta name="msapplication-TileColor" content="#ffffff" />
+    <meta name="msapplication-TileImage" content="/Browser/ms-icon-144x144.png" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:site_name" content="www.tutiempo.net" />
+    <meta property="fb:app_id" content="102940906524080" />
+    <meta property="og:title" content="Position von Sonne, Erde und Mond - 3D-Simulator" />
+    <meta property="og:type" content="website" />
+    <meta property="og:description"
+        content="Mit diesem Simulator des lokalen Sonnensystems mit Daten von der Erde, der Sonne und dem Mond können Sie die genaue Position des Mondes und der Sonne in Bezug auf die Erde für jedes Datum kennen. Auf der Erde ist der Bereich, in dem es Nacht ist, dunkler gezeichnet." />
+    <meta property="og:url" content="https://www.tutiempo.net/astronomia/sol-tierra-luna.html" />
+    <meta property="og:image" content="https://oc.tutiempo.net/astronomia/simulador/i/share-simulador.png" />
+    <meta property="og:image:width" content="1000" />
+    <meta property="og:image:height" content="525" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@tutiemponet" />
+    <meta name="twitter:title" content="Position von Sonne, Erde und Mond - 3D-Simulator" />
+    <meta name="twitter:description"
+        content="Mit diesem Simulator des lokalen Sonnensystems mit Daten von der Erde, der Sonne und dem Mond können Sie die genaue Position des Mondes und der Sonne in Bezug auf die Erde für jedes Datum kennen. Auf der Erde ist der Bereich, in dem es Nacht ist, dunkler gezeichnet." />
+    <meta name="twitter:creator" content="@tutiemponet" />
+    <meta name="twitter:image:src" content="https://oc.tutiempo.net/astronomia/simulador/i/share-simulador.png" />
+    <meta name="twitter:domain" content="tutiempo.net" />
+    <title>Position von Sonne, Erde und Mond - 3D-Simulator</title>
+    <meta name="description"
+        content="Mit diesem Simulator des lokalen Sonnensystems mit Daten von der Erde, der Sonne und dem Mond können Sie die genaue Position des Mondes und der Sonne in Bezug auf die Erde für jedes Datum kennen. Auf der Erde ist der Bereich, in dem es Nacht ist, dunkler gezeichnet." />
+    <meta name="keywords" content="Erde, Sonne, Mond, Simulator, Erde bewegen, Mond bewegen, Sonnenposition, Mondposition, Erdposition, Tag, Nacht, Finsternisse" />
+    <meta name="lang" content="de" />
+    <link rel="alternate" hreflang="es" href="https://www.tutiempo.net/astronomia/sol-tierra-luna-3d.html" />
+    <link rel="alternate" hreflang="en" href="https://en.tutiempo.net/astronomy/sun-earth-moon-3d.html" />
+    <link rel="alternate" hreflang="fr" href="https://fr.tutiempo.net/astronomie/soleil-terre-lune-3d.html" />
+    <link rel="alternate" hreflang="pt" href="https://pt.tutiempo.net/astronomia/sol-terra-lua-3d.html" />
+    <link rel="alternate" hreflang="de" href="https://de.tutiempo.net/astronomie/sonne-erde-mond-3d.html" />
+    <link rel="alternate" hreflang="it" href="https://it.tutiempo.net/astronomia/sole-terra-luna-3d.html" />
+    <link rel="canonical" href="https://de.tutiempo.net/astronomie/sonne-erde-mond-3d.html" />
+    <style>
+        body,
+        html {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden
+        }
+
+        * {
+            position: relative
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: sans-serif, Arial, Helvetica;
+            font-size: 14px;
+            color: #000;
+            background: #000
+        }
+
+        a {
+            text-decoration: none;
+            color: #399ee1
+        }
+
+        a:hover {
+            color: #000
+        }
+
+        img {
+            border-width: 0
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%
+        }
+
+        canvas.minimap {
+            width: 550px;
+            height: 275px
+        }
+
+        #Draw3d {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            overflow: hidden
+        }
+
+        #Draw3d canvas {
+            width: 100%;
+            height: auto
+        }
+
+        .noselect {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        #Pagina {
+            z-index: 2;
+            position: absolute;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            width: 95%;
+            height: 90px;
+            bottom: 0;
+            background-color: #fff;
+            -webkit-border-top-left-radius: 5px;
+            -webkit-border-top-right-radius: 5px;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px
+        }
+
+        .ResizePage {
+            height: 40px;
+            border-bottom: 1px solid #bbc0c4;
+            cursor: n-resize;
+            background-image: url(https://oc.tutiempo.net/astronomia/simulador/i/resize-arrows.png);
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+            background-color: #eff0f1;
+            -webkit-border-top-left-radius: 5px;
+            -webkit-border-top-right-radius: 5px;
+            -moz-border-radius-topleft: 5px;
+            -moz-border-radius-topright: 5px;
+            border-top-left-radius: 5px;
+            border-top-right-radius: 5px
+        }
+
+        #UpDown {
+            z-index: 2;
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-left: 1px solid #bbc0c4;
+            position: absolute;
+            right: 0;
+            top: 0;
+            cursor: pointer;
+            text-align: center;
+            line-height: 40px;
+            color: #656565;
+            font-size: 16px
+        }
+
+        .Contenido {
+            padding: 10px;
+            overflow-y: auto;
+            height: calc(100% - 61px)
+        }
+
+        .mt10 {
+            margin-top: 10px
+        }
+
+        .Contenido h1 {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 18px;
+            font-weight: 400
+        }
+
+        .Contenido h2 {
+            margin: 0;
+            padding: 0;
+            padding-top: 10px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 18px;
+            font-weight: 400
+        }
+
+        .Contenido p {
+            margin: 0;
+            padding: 0;
+            padding-top: 5px
+        }
+
+        .botones {
+            text-align: center;
+            position: absolute;
+            left: 0;
+            right: 0;
+            margin: 0 auto;
+            top: -55px;
+            width: 300px;
+            height: 40px;
+            overflow: hidden
+        }
+
+        .botones span {
+            color: #fff;
+            font-size: 16px;
+            cursor: pointer;
+            text-align: center;
+            line-height: 38px;
+            display: inline-block;
+            height: 38px;
+            border: 1px solid #fff;
+            width: 40px;
+            margin-left: 10px;
+            background-color: rgba(0, 0, 0, .4)
+        }
+
+        .botones span:first-child {
+            margin-left: 0
+        }
+
+        .botones span.periodsel {
+            width: auto;
+            width: 110px;
+            padding-right: 31px
+        }
+
+        .botones span.periodsel::after {
+            content: "\25BC";
+            font-size: 12px;
+            display: inline-block;
+            width: 30px;
+            height: 38px;
+            border-left: 1px solid #fff;
+            position: absolute;
+            right: 0
+        }
+
+        #MinDate {
+            position: absolute;
+            left: 50%;
+            top: 50px;
+            margin-left: -120px;
+            width: 240px;
+            height: 25px;
+            line-height: 25px;
+            color: #fff;
+            text-shadow: 0 0 5px #000;
+            font-size: 20px;
+            text-align: center;
+            z-index: 1
+        }
+
+        .pselector {
+            display: none;
+            width: 141px;
+            z-index: 3;
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            border: 1px solid #fff;
+            background-color: rgba(0, 0, 0, .7)
+        }
+
+        .pselector span {
+            display: block;
+            line-height: 40px;
+            border-top: 1px solid #fff;
+            color: #fff;
+            cursor: pointer;
+            text-align: center
+        }
+
+        .pselector span:first-child {
+            border-top: 0
+        }
+
+        .FirefoxFix {
+            clear: both;
+            height: 0
+        }
+
+        .MapDateForm {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #999
+        }
+
+        .MapDateForm select {
+            padding: 5px;
+            line-height: 30px;
+            font-size: 18px;
+            border-color: #999;
+            color: #999
+        }
+
+        .MapDateForm input[type=number] {
+            line-height: 32px;
+            text-indent: 5px;
+            padding: 0;
+            font-size: 18px;
+            border: 1px solid #999;
+            color: #999;
+            background: #fff
+        }
+
+        .MapDateForm .LineDate div {
+            float: left;
+            margin-left: 10px
+        }
+
+        .MapDateForm .LineDate div:first-child {
+            margin: 0
+        }
+
+        .MapDateForm .LineDate div span {
+            display: block;
+            line-height: 25px;
+            padding-bottom: 5px
+        }
+
+        .MapDateForm .LineDate div.divapli {
+            height: 64px
+        }
+
+        .MapDateForm .LineDate div span.aplidate {
+            position: absolute;
+            bottom: 0;
+            width: 90px;
+            text-align: center;
+            line-height: 34px;
+            height: 34px;
+            padding: 0 15px;
+            cursor: pointer;
+            color: #fff;
+            background: #2196f3
+        }
+
+        .tresdicon {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            width: 40px;
+            height: 40px;
+            z-index: 1
+        }
+
+        .logo {
+            position: absolute;
+            left: 5px;
+            top: 5px;
+            display: inline-block;
+            z-index: 1
+        }
+
+        .container {
+            display: block;
+            position: relative;
+            padding-left: 35px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 25px;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none
+        }
+
+        .container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0
+        }
+
+        .checkmark {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #dbdbdb
+        }
+
+        .container:hover input~.checkmark {
+            background-color: #ccc
+        }
+
+        .container input:checked~.checkmark {
+            background-color: #2196f3
+        }
+
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none
+        }
+
+        .container input:checked~.checkmark:after {
+            display: block
+        }
+
+        .container .checkmark:after {
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid #fff;
+            border-width: 0 3px 3px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg)
+        }
+
+        .redibujar {
+            display: inline-block;
+            color: #fff;
+            background: #2196f3;
+            padding: 10px 20px;
+            cursor: pointer
+        }
+
+        .eventos {
+            cursor: pointer;
+            display: block;
+            color: #2196f3;
+            padding: 5px 0
+        }
+
+        .eventos:hover {
+            color: #000
+        }
+
+        @media screen and (max-width:400px) {
+            #Pagina {
+                width: 98%
+            }
+
+            .Contenido {
+                padding: 5px
+            }
+        }
+
+        .sharebuttom,
+        .sharefb,
+        .sharepint,
+        .sharetw,
+        .sharewhat {
+            top: 70px;
+            cursor: pointer;
+            position: absolute;
+            display: block;
+            width: 40px;
+            height: 40px;
+            color: #fff;
+            text-align: center;
+            line-height: 40px;
+            font-size: 30px;
+            background-color: rgba(0, 0, 0, .6);
+            -webkit-border-radius: 4px;
+            -moz-border-radius: 4px;
+            border-radius: 4px;
+            background-repeat: no-repeat;
+            background-position: 50% 50%;
+            background-size: auto 26px
+        }
+
+        .sharebuttom:hover,
+        .sharefb:hover,
+        .sharepint:hover,
+        .sharetw:hover,
+        .sharewhat:hover {
+            background-color: rgba(0, 0, 0, .8)
+        }
+
+        .sharebuttom {
+            left: 5px
+        }
+
+        .sharefb {
+            left: 55px
+        }
+
+        .sharetw {
+            left: 105px
+        }
+
+        .sharepint {
+            left: 155px
+        }
+
+        .sharewhat {
+            left: 205px
+        }
+
+        .shshare {
+            display: none
+        }
+
+        .iw-facebook {
+            background-image: url(https://oc.tutiempo.net/i/css/soc-facebook.png)
+        }
+
+        .iw-twitter {
+            background-image: url(https://oc.tutiempo.net/i/css/soc-twitter.png)
+        }
+
+        .iw-share {
+            background-image: url(https://oc.tutiempo.net/i/css/soc-share.png)
+        }
+
+        .iw-whatshap {
+            background-image: url(https://oc.tutiempo.net/i/css/soc-whatshap.png)
+        }
+
+        .iw-pinterest {
+            background-image: url(https://oc.tutiempo.net/i/icos/Pinterest.png)
+        }
+    </style>
+    <script src="https://oc.tutiempo.net/js/jquery.min.js"></script>
+    <script src="https://oc.tutiempo.net/astronomia/simulador/js/three.min.js"></script>
+    <script src="https://oc.tutiempo.net/astronomia/simulador/js/orbit_controls.js"></script>
+</head>
+
+<body class="noselect">
+    <div id="Draw3d"></div><img class="tresdicon" src="https://oc.tutiempo.net/astronomia/simulador/i/sphere-orbital.png" width="200" height="200" alt="Sistema orbital 3D"></img><a class="logo" href="https://www.tutiempo.net"><img
+            src="https://oc.tutiempo.net/astronomia/simulador/i/LogoAstro.png" width="216" height="40" alt="Tutiempo.net" /></a>
+    <div id="MinDate">---</div>
+    <div class="pselector noselect"><span onclick="SelectMinutes('1 Minute',1);">1 Minute</span><span onclick="SelectMinutes('10 Minuten',10);">10 Minuten</span><span onclick="SelectMinutes('30 Minuten',30);">30 Minuten</span><span
+            onclick="SelectMinutes('1 Stunde',60);">1 Stunde</span><span onclick="SelectMinutes('10 Stunden',600);">10 Stunden</span><span onclick="SelectMinutes('1 Tag',1440);">1 Tag</span></div><span class="sharebuttom iw-share"></span><a
+        href="" target="_blank" rel="external" class="sharefb iw-facebook shshare"></a><a href="" target="_blank" rel="external" class="sharetw iw-twitter shshare"></a><a href="" target="_blank" rel="external"
+        class="sharepint iw-pinterest shshare"></a><a href="" target="_blank" rel="external" class="sharewhat iw-whatshap shshare"></a>
+    <div id="Pagina" class="noselect">
+        <div id="ResizePanel" class="ResizePage"></div><span id="UpDown" class="updown">&#x25B2;</span>
+        <div class="botones"><span onclick="ResMin();">&#x25C4;</span><span class="periodsel">10 Minuten</span><span onclick="SumMin();">&#x25BA;</span></div>
+        <div class="Contenido">
+            <h1>Position von Sonne, Erde und Mond - 3D-Simulator</h1>
+            <p>Mit diesem Simulator des lokalen Sonnensystems mit Daten von der Erde, der Sonne und dem Mond können Sie die genaue Position des Mondes und der Sonne in Bezug auf die Erde für jedes Datum kennen. Auf der Erde ist der Bereich,
+                in dem es Nacht ist, dunkler gezeichnet.</p>
+            <h2>Aktuelles Simulationsdatum</h2>
+            <p id="FechaHora"></p>
+            <p id="FechaHoraLocal"></p>
+            <p>Die Berechnungen erfolgen in Universalzeit (UTC). Die Ortszeit basiert auf dem Zeitunterschied, den Ihr Betriebssystem bereitstellt.</p>
+            <h2>Aktuelles Datum und Uhrzeit</h2>
+            <p>Klicken Sie auf die folgende Schaltfläche, um die Position von Mond und Sonne in Bezug auf die Erde und die Gebiete bei Nacht oder Tag zu sehen.</p>
+            <p><span class="redibujar" onclick="MostrarFechaHoraAhora();">Zeig jetzt</span></p>
+            <h2>Wählen Sie ein anderes Datum</h2>
+            <p>Wählen Sie das Datum aus, an dem Sie die Position des Mondes und der Sonne in Bezug auf die Erde wissen möchten. Datum und Uhrzeit müssen im universellen UTC-Format eingegeben werden. Das Jahr muss größer als 1000 und kleiner
+                als 3000 sein.</p>
+            <div class="MapDateForm">
+                <div class="LineDate">
+                    <div><span>Jahr</span><input style="width:72px;" onchange="ValidarFechasMapa();" id="AnioUsr" value="1990" type="number" min="1000" max="3000" name="anio"></div>
+                    <div><span>Monat</span><select style="width:110px;" onchange="ValidarFechasMapa();" id="MesUsr" size="1" name="mes">
+                            <option value="1" selected="selected">Januar</option>
+                            <option value="2">Februar</option>
+                            <option value="3">März</option>
+                            <option value="4">April</option>
+                            <option value="5">Mai</option>
+                            <option value="6">Juni</option>
+                            <option value="7">Juli</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">Oktober</option>
+                            <option value="11">November</option>
+                            <option value="12">Dezember</option>
+                        </select></div>
+                    <div><span>Tag</span><select onchange="ValidarFechasMapa();" size="1" name="dia" id="DiaUsr">
+                            <option>1</option>
+                            <option>2</option>
+                            <option>3</option>
+                            <option>4</option>
+                            <option>5</option>
+                            <option>6</option>
+                            <option>7</option>
+                            <option>8</option>
+                            <option>9</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                            <option>13</option>
+                            <option>14</option>
+                            <option>15</option>
+                            <option>16</option>
+                            <option>17</option>
+                            <option>18</option>
+                            <option>19</option>
+                            <option>20</option>
+                            <option>21</option>
+                            <option>22</option>
+                            <option>23</option>
+                            <option>24</option>
+                            <option>25</option>
+                            <option>26</option>
+                            <option>27</option>
+                            <option>28</option>
+                            <option>29</option>
+                            <option>30</option>
+                            <option>31</option>
+                        </select></div>
+                </div>
+                <div class="FirefoxFix"></div>
+                <div class="LineDate mt10">
+                    <div><span>Stunde</span><select style="width:60px;" size="1" name="hora" id="MapHour">
+                            <option>00</option>
+                            <option>01</option>
+                            <option>02</option>
+                            <option>03</option>
+                            <option>04</option>
+                            <option>05</option>
+                            <option>06</option>
+                            <option>07</option>
+                            <option>08</option>
+                            <option>09</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                            <option>13</option>
+                            <option>14</option>
+                            <option>15</option>
+                            <option>16</option>
+                            <option>17</option>
+                            <option>18</option>
+                            <option>19</option>
+                            <option>20</option>
+                            <option>21</option>
+                            <option>22</option>
+                            <option>23</option>
+                        </select></div>
+                    <div><span>Minute</span><select style="width:60px;" size="1" name="minuto" id="MapMinute">
+                            <option>00</option>
+                            <option>01</option>
+                            <option>02</option>
+                            <option>03</option>
+                            <option>04</option>
+                            <option>05</option>
+                            <option>06</option>
+                            <option>07</option>
+                            <option>08</option>
+                            <option>09</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                            <option>13</option>
+                            <option>14</option>
+                            <option>15</option>
+                            <option>16</option>
+                            <option>17</option>
+                            <option>18</option>
+                            <option>19</option>
+                            <option>20</option>
+                            <option>21</option>
+                            <option>22</option>
+                            <option>23</option>
+                            <option>24</option>
+                            <option>25</option>
+                            <option>26</option>
+                            <option>27</option>
+                            <option>28</option>
+                            <option>29</option>
+                            <option>30</option>
+                            <option>31</option>
+                            <option>32</option>
+                            <option>33</option>
+                            <option>34</option>
+                            <option>35</option>
+                            <option>36</option>
+                            <option>37</option>
+                            <option>38</option>
+                            <option>39</option>
+                            <option>40</option>
+                            <option>41</option>
+                            <option>42</option>
+                            <option>43</option>
+                            <option>44</option>
+                            <option>45</option>
+                            <option>46</option>
+                            <option>47</option>
+                            <option>48</option>
+                            <option>49</option>
+                            <option>50</option>
+                            <option>51</option>
+                            <option>52</option>
+                            <option>53</option>
+                            <option>54</option>
+                            <option>55</option>
+                            <option>56</option>
+                            <option>57</option>
+                            <option>58</option>
+                            <option>59</option>
+                        </select></div>
+                    <div class="divapli"><span class="aplidate" onclick="SetTimeForm();">Anwenden</span></div>
+                </div>
+                <div class="FirefoxFix"></div>
+            </div>
+            <div class="FirefoxFix"></div>
+            <h2>Optionen</h2>
+            <p>Um die Verwendung des Simulators zu erleichtern, wurden mehrere Anzeigeoptionen hinzugefügt.</p>
+            <h2>Entfernung von der Sonne</h2>
+            <p>Die durchschnittliche Entfernung von der Sonne zur Erde beträgt 149,6 Millionen km. Für den Simulator haben wir die Sonne bisher nicht bewegt, da es fast unmöglich wäre, sie in dieser Entfernung darzustellen. Wenn Sie
+                möchten, können Sie auch etwas mehr hineinzoomen, um es besser sehen zu können. Obwohl wir die Entfernung nicht respektieren, zeigt sie sich immer auf ihrem Höhepunkt in Bezug auf die Erde.</p>
+            <p style="padding-top:10px;"><label class="container">Bring die Sonne näher<input id="SolDistance" onclick="DistanciaSol();" type="checkbox"><span class="checkmark"></span></label></p>
+            <h2>Befestigen Sie die Erde an der Kamera</h2>
+            <p>Durch Ändern des Anzeigedatums wird standardmäßig die gesamte Szene neu gezeichnet und Sie können die Rotation der Erde in Bezug auf die Sonne sehen. Wenn Sie es vorziehen, können Sie die Erde an der Kamera befestigen, und es
+                scheint, dass sich die Sonne um die Erde dreht, aber Sie verlieren nicht den aktuellen Blickwinkel.</p>
+            <p style="padding-top:10px;"><label class="container">Erde reparieren<input id="TierraFijada" onclick="CallFijarTierra();" type="checkbox"><span class="checkmark"></span></label></p>
+            <h2>Neu zeichnen</h2>
+            <p>Beim Zeichnen des Universums werden die Erde, die Sonne und der Mond entsprechend der Größe Ihres Browserfensters erstellt. Wenn sich aus irgendeinem Grund die Größe des Fensters ändert (Sie haben die Größe des Browsers
+                geändert oder das Gerät gedreht), gehen möglicherweise die Proportionen der Anzeige verloren. Verwenden Sie in diesem Fall die folgende Option, um den gesamten Inhalt neu zu zeichnen, ohne die Seite aktualisieren zu müssen.
+            </p>
+            <p><span class="redibujar" onclick="RedibujarTodo();">Neu zeichnen</span></p>
+            <h2>Beispieldaten</h2>
+            <p>Wir hinterlassen Ihnen einige Beispiele für Daten und Zeiten mit einer besonderen astronomischen Bedeutung.</p>
+            <p><span class="eventos" onclick="CargarFecha(2021,4,26,11,20);">Totale Mondfinsternis 26. Mai 2021</span></p>
+            <p><span class="eventos" onclick="CargarFecha(2024,3,8,19,23);">Totale Sonnenfinsternis 8. April 2024</span></p>
+            <p><span class="eventos" onclick="CargarFecha(2026,7,12,18,32);">Totale Sonnenfinsternis 12. August 2026</span></p>
+            <h2>Andere Daten</h2>
+            <p>Wenn Sie andere Daten mit astronomischen Ereignissen erfahren möchten, können Sie diese unter folgender Adresse anzeigen:</p>
+            <p><a class="eventos" href="https://de.tutiempo.net/sonnenfinsternisse/">Alle Sonnenfinsternisse des 21. Jahrhunderts</a></p>
+            <p><a class="eventos" href="https://de.tutiempo.net/sonnenfinsternisse/totale.html">Totale Sonnenfinsternisse</a></p>
+            <p><a class="eventos" href="https://de.tutiempo.net/sonnenfinsternisse/ringformige.html">Ringförmige Sonnenfinsternisse</a></p>
+            <p><a class="eventos" href="https://www.tutiempo.net/eclipses-lunares/">Alle Mondfinsternisse des 21. Jahrhunderts</a></p>
+            <p><a class="eventos" href="https://www.tutiempo.net/meteorologia/equinoccios-solsticios.html">Datum und Uhrzeit der Sonnenwende und Tagundnachtgleiche</a></p>
+            <h2>Es könnte dich interessieren</h2>
+            <p><a class="eventos" href="https://de.tutiempo.net/mond/mondphasen.htm">Mondphasenkalender</a></p>
+            <p><a class="eventos" href="https://www.tutiempo.net/luna/luna.htm">Mond- und Sonneninformationen</a></p>
+            <p><a class="eventos" href="https://www.tutiempo.net/astronomia/sistema-solar.html">3D Komplettes Sonnensystem</a></p>
+            <p><a class="eventos" href="https://de.tutiempo.net/">Wetter auf Erden</a></p>
+            <p><a class="eventos" href="https://de.tutiempo.net/mars-planet.html">Wetter auf dem Planeten Mars</a></p>
+            <h2>Simulator</h2>
+            <p>Dieser Simulator ist so konzipiert, dass er jederzeit die genaue Position der drei Sterne (Sonne, Erde und Mond) kennt. Mit dem Orbitalnavigationssystem können Sie die drei Sterne im Universum nach Belieben bewegen, um die
+                Perspektive zu finden, die Ihnen am besten gefällt.</p>
+            <p>Zum Navigieren ziehen Sie einfach Ihren Finger oder Ihre Maus auf den Bildschirm, um die Sterne zu drehen. Zum Vergrößern das Mausrad verwenden oder mit den Fingern vergrößern.</p>
+        </div>
+    </div><canvas class="minimap" height="550" id="map" width="1100" style="display:none;"></canvas>
+    <script>
+        var LangGlob = "DE",
+            hloctxt = "Ortszeit",
+            hutctxt = "Weltzeit",
+            meses = new Array("Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"),
+            diasSemana = new Array("Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag");
+        var _0xfbd1 = ["\x55\x52\x4C", "\x3A\x2F\x2F\x77\x77\x77\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74", "\x69\x6E\x64\x65\x78\x4F\x66", "\x3A\x2F\x2F\x65\x6E\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74",
+            "\x3A\x2F\x2F\x66\x72\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74", "\x3A\x2F\x2F\x70\x74\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74",
+            "\x3A\x2F\x2F\x64\x65\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74", "\x3A\x2F\x2F\x69\x74\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74",
+            "\x3A\x2F\x2F\x6F\x63\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74", "\x68\x72\x65\x66", "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x77\x77\x77\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74",
+            "\x3C\x61\x20\x68\x72\x65\x66\x3D\x22\x68\x74\x74\x70\x73\x3A\x2F\x2F\x77\x77\x77\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74\x22\x3E\x3C\x68\x31\x3E\x54\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74\x3C\x2F\x68\x31\x3E\x3C\x2F\x61\x3E",
+            "\x77\x72\x69\x74\x65", "\x67\x65\x74\x55\x54\x43\x46\x75\x6C\x6C\x59\x65\x61\x72", "\x67\x65\x74\x55\x54\x43\x4D\x6F\x6E\x74\x68", "\x67\x65\x74\x55\x54\x43\x44\x61\x74\x65", "\x67\x65\x74\x55\x54\x43\x48\x6F\x75\x72\x73",
+            "\x67\x65\x74\x55\x54\x43\x4D\x69\x6E\x75\x74\x65\x73", "", "\x68\x61\x73\x68", "\x6C\x6F\x63\x61\x74\x69\x6F\x6E", "\x23", "\x72\x65\x70\x6C\x61\x63\x65", "\x6C\x65\x6E\x67\x74\x68", "\x55", "\x63\x68\x61\x72\x41\x74",
+            "\x54", "\x43", "\x54\x65\x78\x74\x75\x72\x65\x4C\x6F\x61\x64\x65\x72", "\x50\x61\x67\x69\x6E\x61", "\x67\x65\x74\x45\x6C\x65\x6D\x65\x6E\x74\x42\x79\x49\x64", "\x52\x65\x73\x69\x7A\x65\x50\x61\x6E\x65\x6C",
+            "\x68\x69\x64\x65", "\x2E\x70\x73\x65\x6C\x65\x63\x74\x6F\x72", "\x74\x61\x72\x67\x65\x74\x54\x6F\x75\x63\x68\x65\x73", "\x63\x6C\x69\x65\x6E\x74\x59", "\x74\x6F\x75\x63\x68\x65\x73", "\x79", "\x68\x65\x69\x67\x68\x74",
+            "\x6F\x70\x65\x6E", "\x61\x64\x64\x43\x6C\x61\x73\x73", "\x23\x55\x70\x44\x6F\x77\x6E", "\x26\x23\x78\x32\x35\x42\x43", "\x68\x74\x6D\x6C", "\x72\x65\x6D\x6F\x76\x65\x43\x6C\x61\x73\x73", "\x26\x23\x78\x32\x35\x42\x32\x3B",
+            "\x69\x6E\x6E\x65\x72\x48\x65\x69\x67\x68\x74", "\x73\x74\x79\x6C\x65", "\x70\x78", "\x6D\x6F\x75\x73\x65\x64\x6F\x77\x6E", "\x6F\x66\x66\x73\x65\x74\x59", "\x6D\x6F\x75\x73\x65\x6D\x6F\x76\x65",
+            "\x61\x64\x64\x45\x76\x65\x6E\x74\x4C\x69\x73\x74\x65\x6E\x65\x72", "\x6D\x6F\x75\x73\x65\x75\x70", "\x72\x65\x6D\x6F\x76\x65\x45\x76\x65\x6E\x74\x4C\x69\x73\x74\x65\x6E\x65\x72", "\x74\x6F\x75\x63\x68\x73\x74\x61\x72\x74",
+            "\x70\x72\x65\x76\x65\x6E\x74\x44\x65\x66\x61\x75\x6C\x74", "\x74\x6F\x75\x63\x68\x6D\x6F\x76\x65", "\x74\x6F\x75\x63\x68\x65\x6E\x64", "\x75\x6E\x62\x69\x6E\x64", "\x63\x68\x69\x6C\x64\x72\x65\x6E",
+            "\x23\x52\x65\x73\x69\x7A\x65\x50\x61\x6E\x65\x6C", "\x68\x61\x73\x43\x6C\x61\x73\x73", "\x61\x6E\x69\x6D\x61\x74\x65", "\x23\x50\x61\x67\x69\x6E\x61", "\x63\x6C\x69\x63\x6B", "\x62\x6C\x6F\x63\x6B",
+            "\x64\x69\x73\x70\x6C\x61\x79", "\x63\x73\x73", "\x74\x6F\x70", "\x6F\x66\x66\x73\x65\x74", "\x6C\x65\x66\x74", "\x77\x69\x64\x74\x68", "\x73\x68\x6F\x77", "\x2E\x70\x65\x72\x69\x6F\x64\x73\x65\x6C", "\x35\x30\x70\x78",
+            "\x67\x65\x74\x54\x69\x6D\x65", "\x67\x65\x74\x44\x61\x74\x65", "\x76\x61\x6C", "\x23\x41\x6E\x69\x6F\x55\x73\x72", "\x23\x4D\x65\x73\x55\x73\x72", "\x23\x44\x69\x61\x55\x73\x72", "\x3C\x6F\x70\x74\x69\x6F\x6E\x3E",
+            "\x3C\x2F\x6F\x70\x74\x69\x6F\x6E\x3E", "\x23\x4D\x61\x70\x48\x6F\x75\x72", "\x23\x4D\x61\x70\x4D\x69\x6E\x75\x74\x65", "\x63\x68\x65\x63\x6B\x65\x64", "\x70\x72\x6F\x70",
+            "\x23\x54\x69\x65\x72\x72\x61\x46\x69\x6A\x61\x64\x61", "\x23\x53\x6F\x6C\x44\x69\x73\x74\x61\x6E\x63\x65", "\x44\x72\x61\x77\x33\x64", "\x69\x6E\x6E\x65\x72\x57\x69\x64\x74\x68", "\x53\x63\x65\x6E\x65", "\x61\x64\x64",
+            "\x73\x65\x74", "\x70\x6F\x73\x69\x74\x69\x6F\x6E", "\x73\x65\x74\x53\x69\x7A\x65", "\x69\x6E\x6E\x65\x72\x48\x54\x4D\x4C", "\x64\x6F\x6D\x45\x6C\x65\x6D\x65\x6E\x74", "\x61\x70\x70\x65\x6E\x64\x43\x68\x69\x6C\x64",
+            "\x6D\x69\x6E\x44\x69\x73\x74\x61\x6E\x63\x65", "\x6D\x61\x78\x44\x69\x73\x74\x61\x6E\x63\x65", "\x6D\x61\x70", "\x63\x72\x6F\x73\x73\x4F\x72\x69\x67\x69\x6E", "\x61\x6E\x6F\x6E\x79\x6D\x6F\x75\x73",
+            "\x74\x6F\x44\x61\x74\x61\x55\x52\x4C", "\x4D\x65\x73\x68\x50\x68\x6F\x6E\x67\x4D\x61\x74\x65\x72\x69\x61\x6C", "\x6C\x6F\x61\x64", "\x49\x6D\x61\x67\x65\x55\x74\x69\x6C\x73",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x6F\x63\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74\x2F\x61\x73\x74\x72\x6F\x6E\x6F\x6D\x69\x61\x2F\x73\x69\x6D\x75\x6C\x61\x64\x6F\x72\x2F\x69\x2F\x67\x61\x6C\x61\x78\x79\x5F\x73\x74\x61\x72\x66\x69\x65\x6C\x64\x2E\x70\x6E\x67",
+            "\x6C\x6F\x61\x64\x54\x65\x78\x74\x75\x72\x65", "\x42\x61\x63\x6B\x53\x69\x64\x65",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x6F\x63\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74\x2F\x61\x73\x74\x72\x6F\x6E\x6F\x6D\x69\x61\x2F\x73\x69\x6D\x75\x6C\x61\x64\x6F\x72\x2F\x69\x2F\x6D\x6F\x6F\x6E\x5F\x74\x65\x78\x74\x75\x72\x65\x2E\x6A\x70\x67",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x6F\x63\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74\x2F\x61\x73\x74\x72\x6F\x6E\x6F\x6D\x69\x61\x2F\x73\x69\x6D\x75\x6C\x61\x64\x6F\x72\x2F\x69\x2F\x73\x75\x6E\x2E\x6A\x70\x67",
+            "\x6C\x6F\x6F\x6B\x41\x74", "\x72\x65\x6E\x64\x65\x72", "\x72\x6F\x74\x61\x74\x69\x6F\x6E", "\x50\x49", "\x63\x6F\x73", "\x73\x69\x6E", "\x78", "\x7A", "\x72\x65\x73\x69\x7A\x65", "\x6F\x6E", "\x74\x69\x74\x6C\x65",
+            "\x75\x6E\x64\x65\x66\x69\x6E\x65\x64",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x6F\x63\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74\x2F\x61\x73\x74\x72\x6F\x6E\x6F\x6D\x69\x61\x2F\x73\x69\x6D\x75\x6C\x61\x64\x6F\x72\x2F\x69\x2F\x73\x68\x61\x72\x65\x2D\x73\x69\x6D\x75\x6C\x61\x64\x6F\x72\x2E\x70\x6E\x67",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x70\x69\x6E\x74\x65\x72\x65\x73\x74\x2E\x63\x6F\x6D\x2F\x70\x69\x6E\x2F\x63\x72\x65\x61\x74\x65\x2F\x62\x75\x74\x74\x6F\x6E\x2F\x3F\x75\x72\x6C\x3D", "\x26\x6D\x65\x64\x69\x61\x3D",
+            "\x26\x64\x65\x73\x63\x72\x69\x70\x74\x69\x6F\x6E\x3D",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x77\x77\x77\x2E\x66\x61\x63\x65\x62\x6F\x6F\x6B\x2E\x63\x6F\x6D\x2F\x73\x68\x61\x72\x65\x72\x2F\x73\x68\x61\x72\x65\x72\x2E\x70\x68\x70\x3F\x75\x3D", "\x61\x74\x74\x72",
+            "\x2E\x73\x68\x61\x72\x65\x66\x62", "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x74\x77\x69\x74\x74\x65\x72\x2E\x63\x6F\x6D\x2F\x69\x6E\x74\x65\x6E\x74\x2F\x74\x77\x65\x65\x74\x3F\x75\x72\x6C\x3D", "\x26\x74\x65\x78\x74\x3D",
+            "\x2E\x73\x68\x61\x72\x65\x74\x77", "\x2E\x73\x68\x61\x72\x65\x70\x69\x6E\x74", "\x6D\x61\x74\x63\x68", "\x75\x73\x65\x72\x41\x67\x65\x6E\x74",
+            "\x77\x68\x61\x74\x73\x61\x70\x70\x3A\x2F\x2F\x73\x65\x6E\x64\x3F\x74\x65\x78\x74\x3D", "\x20\u2013\x20", "\x2E\x73\x68\x61\x72\x65\x77\x68\x61\x74",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x77\x65\x62\x2E\x77\x68\x61\x74\x73\x61\x70\x70\x2E\x63\x6F\x6D\x2F\x73\x65\x6E\x64\x3F\x74\x65\x78\x74\x3D", "\x74\x6F\x67\x67\x6C\x65", "\x2E\x73\x68\x73\x68\x61\x72\x65",
+            "\x2E\x73\x68\x61\x72\x65\x62\x75\x74\x74\x6F\x6D", "\x74\x61\x6E", "\x66\x6C\x6F\x6F\x72", "\x67\x65\x74\x46\x75\x6C\x6C\x59\x65\x61\x72", "\x67\x65\x74\x4D\x6F\x6E\x74\x68", "\x67\x65\x74\x48\x6F\x75\x72\x73",
+            "\x67\x65\x74\x4D\x69\x6E\x75\x74\x65\x73", "\x67\x65\x74\x53\x65\x63\x6F\x6E\x64\x73", "\x67\x65\x74\x54\x69\x6D\x65\x7A\x6F\x6E\x65\x4F\x66\x66\x73\x65\x74", "\x73\x65\x74\x54\x69\x6D\x65", "\x20\x55\x54\x43\x20\x2B",
+            "\x6D\x69\x6E", "\x20\x55\x54\x43\x20\x2D", "\x20\x55\x54\x43", "\x30", "\x55\x54\x43", "\x3C\x73\x74\x72\x6F\x6E\x67\x3E", "\x3C\x2F\x73\x74\x72\x6F\x6E\x67\x3E\x3A\x20", "\x67\x65\x74\x44\x61\x79", "\x2C\x20",
+            "\x20\x64\x65\x20", "\x20\x61\x20\x6C\x61\x73\x20", "\x3A", "\x20\x28\x55\x54\x43\x29", "\x45\x4E", "\x20", "\x20\x61\x74\x20", "\x46\x52", "\x20\xE0\x20", "\x50\x54", "\x20\xE0\x73\x20", "\x44\x45", "\x2E\x20",
+            "\x20\x75\x6D\x20", "\x20\x55\x68\x72\x20\x28\x55\x54\x43\x29", "\x49\x54", "\x20\x61\x6C\x6C\x65\x20", "\x46\x65\x63\x68\x61\x48\x6F\x72\x61", "\x2F", "\x20\x2D\x20", "\x23\x4D\x69\x6E\x44\x61\x74\x65",
+            "\x20\x28\x4C\x6F\x63\x61\x6C\x29\x20\x2D", "\x20\x55\x68\x72\x20\x28\x4C\x6F\x63\x61\x6C\x29\x20\x2D", "\x46\x65\x63\x68\x61\x48\x6F\x72\x61\x4C\x6F\x63\x61\x6C",
+            "\x20\x30\x20\x30\x20\x30\x20\x30\x20\x31\x2D\x31\x37\x31\x39\x39\x36\x2D\x31\x37\x34\x2E\x32\x20\x39\x32\x30\x32\x35\x20\x38\x2E\x39\x20",
+            "\x20\x30\x20\x30\x20\x32\x2D\x32\x20\x32\x20\x2D\x31\x33\x31\x38\x37\x20\x20\x2D\x31\x2E\x36\x20\x20\x35\x37\x33\x36\x2D\x33\x2E\x31\x20",
+            "\x20\x30\x20\x30\x20\x32\x20\x30\x20\x32\x20\x20\x2D\x32\x32\x37\x34\x20\x20\x2D\x30\x2E\x32\x20\x20\x20\x39\x37\x37\x2D\x30\x2E\x35\x20",
+            "\x20\x30\x20\x30\x20\x30\x20\x30\x20\x32\x20\x20\x20\x32\x30\x36\x32\x20\x20\x20\x30\x2E\x32\x20\x20\x2D\x38\x39\x35\x20\x30\x2E\x35\x20",
+            "\x20\x30\x2D\x31\x20\x30\x20\x30\x20\x30\x20\x20\x2D\x31\x34\x32\x36\x20\x20\x20\x33\x2E\x34\x20\x20\x20\x20\x35\x34\x2D\x30\x2E\x31\x20",
+            "\x20\x31\x20\x30\x20\x30\x20\x30\x20\x30\x20\x20\x20\x20\x37\x31\x32\x20\x20\x20\x30\x2E\x31\x20\x20\x20\x20\x2D\x37\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x32\x2D\x32\x20\x32\x20\x20\x20\x2D\x35\x31\x37\x20\x20\x20\x31\x2E\x32\x20\x20\x20\x32\x32\x34\x2D\x30\x2E\x36\x20",
+            "\x20\x30\x20\x30\x20\x32\x20\x30\x20\x31\x20\x20\x20\x2D\x33\x38\x36\x20\x20\x2D\x30\x2E\x34\x20\x20\x20\x32\x30\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x20\x30\x20\x32\x20\x20\x20\x2D\x33\x30\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x31\x32\x39\x2D\x30\x2E\x31\x20",
+            "\x20\x30\x2D\x31\x20\x32\x2D\x32\x20\x32\x20\x20\x20\x20\x32\x31\x37\x20\x20\x2D\x30\x2E\x35\x20\x20\x20\x2D\x39\x35\x20\x30\x2E\x33\x20",
+            "\x2D\x31\x20\x30\x20\x30\x20\x32\x20\x30\x20\x20\x20\x20\x31\x35\x38\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x2D\x32\x20\x31\x20\x20\x20\x20\x31\x32\x39\x20\x20\x20\x30\x2E\x31\x20\x20\x20\x2D\x37\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x31\x32\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x2D\x35\x33\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x30\x20\x30\x20\x31\x20\x20\x20\x20\x20\x36\x33\x20\x20\x20\x30\x2E\x31\x20\x20\x20\x2D\x33\x33\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x30\x20\x32\x20\x30\x20\x20\x20\x20\x20\x36\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x32\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x32\x20\x32\x20\x32\x20\x20\x20\x20\x2D\x35\x39\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x32\x36\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x30\x20\x30\x20\x31\x20\x20\x20\x20\x2D\x35\x38\x20\x20\x2D\x30\x2E\x31\x20\x20\x20\x20\x33\x32\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x20\x30\x20\x31\x20\x20\x20\x20\x2D\x35\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x32\x37\x20\x30\x2E\x30\x20",
+            "\x2D\x32\x20\x30\x20\x30\x20\x32\x20\x30\x20\x20\x20\x20\x2D\x34\x38\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x2D\x32\x20\x30\x20\x32\x20\x30\x20\x31\x20\x20\x20\x20\x20\x34\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x2D\x32\x34\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x20\x32\x20\x32\x20\x20\x20\x20\x2D\x33\x38\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x31\x36\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x2D\x33\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x31\x33\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x30\x20\x30\x20\x30\x20\x20\x20\x20\x20\x32\x39\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x2D\x32\x20\x32\x20\x20\x20\x20\x20\x32\x39\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x2D\x31\x32\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x20\x30\x20\x30\x20\x20\x20\x20\x20\x32\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x2D\x32\x20\x30\x20\x20\x20\x20\x2D\x32\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x32\x20\x30\x20\x31\x20\x20\x20\x20\x20\x32\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x2D\x31\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x32\x20\x30\x20\x30\x20\x30\x20\x20\x20\x20\x20\x31\x37\x20\x20\x2D\x30\x2E\x31\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x32\x20\x32\x2D\x32\x20\x32\x20\x20\x20\x20\x2D\x31\x36\x20\x20\x20\x30\x2E\x31\x20\x20\x20\x20\x20\x37\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x30\x20\x32\x20\x31\x20\x20\x20\x20\x20\x31\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x38\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x30\x20\x30\x20\x31\x20\x20\x20\x20\x2D\x31\x35\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x39\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x30\x2D\x32\x20\x31\x20\x20\x20\x20\x2D\x31\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x37\x20\x30\x2E\x30\x20",
+            "\x20\x30\x2D\x31\x20\x30\x20\x30\x20\x31\x20\x20\x20\x20\x2D\x31\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x36\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x2D\x32\x20\x30\x20\x30\x20\x20\x20\x20\x20\x31\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x32\x20\x32\x20\x31\x20\x20\x20\x20\x2D\x31\x30\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x35\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x20\x32\x20\x32\x20\x20\x20\x20\x20\x2D\x38\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x30\x2D\x31\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x20\x2D\x37\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x20\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x37\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x31\x20\x30\x2D\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x37\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x20\x20\x37\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x33\x20\x30\x2E\x30\x20",
+            "\x2D\x32\x20\x30\x20\x30\x20\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x30\x20\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x32\x2D\x32\x20\x32\x20\x20\x20\x20\x20\x20\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x33\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x30\x20\x32\x20\x30\x20\x20\x20\x20\x20\x20\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x20\x36\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x33\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x30\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x35\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x30\x2D\x31\x20\x32\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x35\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x32\x20\x30\x20\x31\x20\x20\x20\x20\x20\x2D\x35\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x33\x20\x30\x2E\x30\x20",
+            "\x20\x31\x2D\x31\x20\x30\x20\x30\x20\x30\x20\x20\x20\x20\x20\x20\x35\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x30\x2D\x31\x20\x30\x20\x20\x20\x20\x20\x2D\x34\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x30\x20\x31\x20\x30\x20\x20\x20\x20\x20\x2D\x34\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x30\x2D\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x34\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x2D\x32\x20\x30\x20\x30\x20\x20\x20\x20\x20\x20\x34\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x30\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x20\x34\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x32\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x32\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x20\x34\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x32\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x31\x20\x30\x20\x30\x20\x30\x20\x20\x20\x20\x20\x2D\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x2D\x31\x20\x30\x2D\x31\x20\x30\x20\x20\x20\x20\x20\x2D\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x2D\x31\x20\x32\x20\x32\x20\x32\x20\x20\x20\x20\x20\x2D\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x30\x2D\x31\x20\x32\x20\x32\x20\x32\x20\x20\x20\x20\x20\x2D\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x31\x2D\x31\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x20\x2D\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x33\x20\x30\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x20\x2D\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x2D\x32\x20\x30\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x20\x2D\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x20\x30\x20\x30\x20\x20\x20\x20\x20\x20\x33\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x32\x20\x34\x20\x32\x20\x20\x20\x20\x20\x2D\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x30\x20\x30\x20\x32\x20\x20\x20\x20\x20\x2D\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x32\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x30\x2D\x32\x20\x32\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x2D\x32\x20\x30\x20\x30\x20\x30\x20\x31\x20\x20\x20\x20\x20\x2D\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x30\x20\x30\x20\x31\x20\x20\x20\x20\x20\x20\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x33\x20\x30\x20\x30\x20\x30\x20\x30\x20\x20\x20\x20\x20\x20\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x31\x20\x32\x20\x30\x20\x32\x20\x20\x20\x20\x20\x20\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x20\x31\x20\x32\x20\x20\x20\x20\x20\x20\x32\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x30\x20\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x20\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x31\x20\x30\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x30\x20\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x32\x2D\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x2D\x32\x20\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x2D\x32\x20\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x2D\x32\x2D\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x32\x2D\x32\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x30\x20\x30\x2D\x34\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x30\x2D\x34\x20\x30\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x20\x34\x20\x32\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x32\x2D\x31\x20\x32\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x32\x20\x30\x20\x32\x20\x34\x20\x32\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x31\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x32\x20\x32\x20\x32\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x2D\x31\x20\x32\x20\x30\x20\x31\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x2D\x32\x20\x30\x20\x31\x20\x20\x20\x20\x20\x2D\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x20\x34\x2D\x32\x20\x32\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x30\x20\x30\x20\x32\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x20\x31\x20\x32\x2D\x32\x20\x32\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x33\x20\x30\x20\x32\x2D\x32\x20\x32\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x32\x20\x30\x20\x32\x20\x32\x20\x32\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x30\x20\x30\x20\x32\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x30\x2D\x32\x20\x32\x20\x31\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x32\x20\x30\x20\x31\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x34\x20\x30\x20\x32\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x31\x20\x30\x2D\x32\x20\x30\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x30\x20\x32\x20\x30\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x20\x32\x2D\x32\x20\x31\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x2D\x31\x20\x30\x2E\x30\x20",
+            "\x20\x32\x20\x30\x2D\x32\x20\x30\x20\x31\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x31\x2D\x31\x20\x30\x2D\x32\x20\x30\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x20\x30\x20\x30\x20\x31\x20\x31\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x2D\x31\x2D\x31\x20\x30\x20\x32\x20\x31\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20",
+            "\x20\x30\x20\x31\x20\x30\x20\x31\x20\x30\x20\x20\x20\x20\x20\x20\x31\x20\x20\x20\x30\x2E\x30\x20\x20\x20\x20\x20\x30\x20\x30\x2E\x30\x20", "\x73\x75\x62\x73\x74\x72\x69\x6E\x67",
+            "\x20\x30\x20\x30\x20\x30\x20\x30\x20\x31\x2D\x37\x32\x35\x20\x34\x31\x37\x20\x32\x31\x33\x20\x32\x32\x34\x20", "\x20\x30\x20\x31\x20\x30\x20\x30\x20\x30\x20\x35\x32\x33\x20\x20\x36\x31\x20\x32\x30\x38\x20\x2D\x32\x34\x20",
+            "\x20\x30\x20\x30\x20\x32\x2D\x32\x20\x32\x20\x31\x30\x32\x2D\x31\x31\x38\x20\x2D\x34\x31\x20\x2D\x34\x37\x20", "\x20\x30\x20\x30\x20\x32\x20\x30\x20\x32\x20\x2D\x38\x31\x20\x20\x20\x30\x20\x20\x33\x32\x20\x20\x20\x30\x20",
+            "\x61\x74\x61\x6E\x32", "\x61\x73\x69\x6E", "\x61\x62\x73", "\x62\x65\x67\x69\x6E\x50\x61\x74\x68", "\x61\x72\x63", "\x63\x6C\x6F\x73\x65\x50\x61\x74\x68", "\x66\x69\x6C\x6C\x53\x74\x79\x6C\x65", "\x66\x69\x6C\x6C",
+            "\x73\x74\x72\x6F\x6B\x65", "\x32\x64", "\x67\x65\x74\x43\x6F\x6E\x74\x65\x78\x74", "\x64\x72\x61\x77\x49\x6D\x61\x67\x65", "\x72\x67\x62\x61\x28\x30\x2C\x20\x30\x2C\x20\x30\x2C\x20\x30\x2E\x37\x29", "\x61\x63\x6F\x73",
+            "\x66\x69\x6C\x6C\x52\x65\x63\x74", "\x73\x65\x74\x41\x74\x74\x72\x69\x62\x75\x74\x65", "\x6F\x6E\x6C\x6F\x61\x64", "\x73\x72\x63",
+            "\x68\x74\x74\x70\x73\x3A\x2F\x2F\x6F\x63\x2E\x74\x75\x74\x69\x65\x6D\x70\x6F\x2E\x6E\x65\x74\x2F\x61\x73\x74\x72\x6F\x6E\x6F\x6D\x69\x61\x2F\x73\x69\x6D\x75\x6C\x61\x64\x6F\x72\x2F\x69\x2F\x6D\x61\x70\x61\x2D\x32\x30\x30\x30\x2E\x6A\x70\x67"
+        ];
+        var curl = document[_0xfbd1[0]],
+            SalidaOK = 0;
+        if (0 < curl[_0xfbd1[2]](_0xfbd1[1]) || 0 < curl[_0xfbd1[2]](_0xfbd1[3]) || 0 < curl[_0xfbd1[2]](_0xfbd1[4]) || 0 < curl[_0xfbd1[2]](_0xfbd1[5]) || 0 < curl[_0xfbd1[2]](_0xfbd1[6]) || 0 < curl[_0xfbd1[2]](_0xfbd1[7]) || 0 < curl[
+                _0xfbd1[2]](_0xfbd1[8])) {
+            SalidaOK = 1
+        };
+        1 > SalidaOK && (location[_0xfbd1[9]] = _0xfbd1[10], document[_0xfbd1[12]](_0xfbd1[11]));
+        var sumresmin = 10,
+            mapdate, fijartierra = 0;
+
+        function TimeAhora() {
+            var _0x671bx7 = new Date;
+            cnyear = _0x671bx7[_0xfbd1[13]]();
+            cnmonth = _0x671bx7[_0xfbd1[14]]();
+            cnday = _0x671bx7[_0xfbd1[15]]();
+            cnhour = _0x671bx7[_0xfbd1[16]]();
+            cnminute = _0x671bx7[_0xfbd1[17]]();
+            mapdate = new Date(cnyear, cnmonth, cnday, cnhour, cnminute, 0, 0)
+        }
+        TimeAhora();
+
+        function isNumeric(_0x671bx7) {
+            return !isNaN(_0x671bx7)
+        }
+        if (_0xfbd1[18] != document[_0xfbd1[20]][_0xfbd1[19]]) {
+            var FechaHash = document[_0xfbd1[20]][_0xfbd1[19]][_0xfbd1[22]](_0xfbd1[21], _0xfbd1[18]);
+            16 == FechaHash[_0xfbd1[23]] && _0xfbd1[24] == FechaHash[_0xfbd1[25]](0) && _0xfbd1[26] == FechaHash[_0xfbd1[25]](1) && _0xfbd1[27] == FechaHash[_0xfbd1[25]](2) && _0xfbd1[26] == FechaHash[_0xfbd1[25]](11) && (nlyear =
+                FechaHash[_0xfbd1[25]](3) + FechaHash[_0xfbd1[25]](4) + FechaHash[_0xfbd1[25]](5) + FechaHash[_0xfbd1[25]](6), nlmonth = FechaHash[_0xfbd1[25]](7) + FechaHash[_0xfbd1[25]](8), nlday = FechaHash[_0xfbd1[25]](9) +
+                FechaHash[_0xfbd1[25]](10), nlhour = FechaHash[_0xfbd1[25]](12) + FechaHash[_0xfbd1[25]](13), nlminute = FechaHash[_0xfbd1[25]](14) + FechaHash[_0xfbd1[25]](15), isNumeric(nlyear) && 999 < nlyear && 3001 > nlyear &&
+                isNumeric(nlmonth) && 0 < nlmonth && 13 > nlmonth && (--nlmonth, isNumeric(nlday) && 0 < nlday && 32 > nlday && isNumeric(nlhour) && 0 <= nlhour && 24 > nlhour && isNumeric(nlminute) && 0 <= nlminute && 60 > nlminute &&
+                    (mapdate = new Date(nlyear, nlmonth, nlday, nlhour, nlminute, 0, 0))))
+        };
+
+        function CargarFecha(_0x671bx7, _0x671bxb, _0x671bxc, _0x671bxd, _0x671bxe) {
+            ForzarBajarPagina();
+            mapdate = new Date(_0x671bx7, _0x671bxb, _0x671bxc, _0x671bxd, _0x671bxe, 0, 0);
+            drawDayNightMap()
+        }
+        var xsol = 0,
+            ysol = 0,
+            xluna = 0,
+            yluna = 0,
+            material, camera, earth, spotLight, moon, sol, loader = new THREE[_0xfbd1[28]],
+            IsDrawEarth = 0,
+            DibujarSolCerca = 0,
+            AnioCalc = 1900,
+            MesCalc = 1,
+            DiaCalc = 1,
+            AnioJsActual = 0,
+            MesJsActual = 0,
+            BORDER_SIZE = 40,
+            panel = document[_0xfbd1[30]](_0xfbd1[29]),
+            BarraResize = document[_0xfbd1[30]](_0xfbd1[31]),
+            m_pos;
+
+        function PosPagina(_0x671bx7) {
+            $(_0xfbd1[33])[_0xfbd1[32]]();
+            if (_0x671bx7[_0xfbd1[34]]) {
+                var _0x671bxb = m_pos - _0x671bx7[_0xfbd1[36]][0][_0xfbd1[35]];
+                m_pos = _0x671bx7[_0xfbd1[36]][0][_0xfbd1[35]]
+            } else {
+                _0x671bxb = m_pos - _0x671bx7[_0xfbd1[37]], m_pos = _0x671bx7[_0xfbd1[37]]
+            };
+            _0x671bx7 = parseInt(getComputedStyle(panel, _0xfbd1[18])[_0xfbd1[38]]) + _0x671bxb;
+            90 < _0x671bx7 ? ($(_0xfbd1[41])[_0xfbd1[40]](_0xfbd1[39]), $(_0xfbd1[41])[_0xfbd1[43]](_0xfbd1[42])) : ($(_0xfbd1[41])[_0xfbd1[44]](_0xfbd1[39]), $(_0xfbd1[41])[_0xfbd1[43]](_0xfbd1[45]));
+            _0x671bx7 < window[_0xfbd1[46]] - 10 && 50 < _0x671bx7 && (panel[_0xfbd1[47]][_0xfbd1[38]] = _0x671bx7 + _0xfbd1[48])
+        }
+        BarraResize[_0xfbd1[52]](_0xfbd1[49], function (_0x671bx7) {
+            _0x671bx7[_0xfbd1[50]] < BORDER_SIZE && (m_pos = _0x671bx7[_0xfbd1[37]], document[_0xfbd1[52]](_0xfbd1[51], PosPagina, !1))
+        }, !1);
+        document[_0xfbd1[52]](_0xfbd1[53], function () {
+            document[_0xfbd1[54]](_0xfbd1[51], PosPagina, !1)
+        }, !1);
+        BarraResize[_0xfbd1[52]](_0xfbd1[55], function (_0x671bx7) {
+            _0x671bx7[_0xfbd1[56]]();
+            m_pos = _0x671bx7[_0xfbd1[36]][0][_0xfbd1[35]];
+            document[_0xfbd1[52]](_0xfbd1[57], PosPagina, !1)
+        }, !1);
+        document[_0xfbd1[52]](_0xfbd1[58], function () {
+            document[_0xfbd1[54]](_0xfbd1[57], PosPagina, !1)
+        }, !1);
+        $(_0xfbd1[61])[_0xfbd1[60]]()[_0xfbd1[59]]();
+        $(_0xfbd1[41])[_0xfbd1[65]](function (_0x671bx7) {
+            _0x671bx7[_0xfbd1[56]]();
+            $(_0xfbd1[41])[_0xfbd1[62]](_0xfbd1[39]) ? ($(_0xfbd1[41])[_0xfbd1[44]](_0xfbd1[39]), $(_0xfbd1[64])[_0xfbd1[63]]({
+                height: 50
+            }, 300, function () {
+                $(_0xfbd1[41])[_0xfbd1[43]](_0xfbd1[45])
+            })) : ($(_0xfbd1[41])[_0xfbd1[40]](_0xfbd1[39]), _0x671bx7 = window[_0xfbd1[46]] - 10, $(_0xfbd1[64])[_0xfbd1[63]]({
+                height: _0x671bx7
+            }, 300, function () {
+                $(_0xfbd1[41])[_0xfbd1[43]](_0xfbd1[42])
+            }))
+        });
+        $(_0xfbd1[74])[_0xfbd1[65]](function (_0x671bx7) {
+            if (_0xfbd1[66] == $(_0xfbd1[33])[_0xfbd1[68]](_0xfbd1[67])) {
+                $(_0xfbd1[33])[_0xfbd1[32]]()
+            } else {
+                _0x671bx7 = $(this)[_0xfbd1[70]]()[_0xfbd1[69]];
+                var _0x671bxb = $(this)[_0xfbd1[70]]()[_0xfbd1[71]];
+                $(this)[_0xfbd1[72]]();
+                var _0x671bxc = $(_0xfbd1[33])[_0xfbd1[38]]();
+                _0x671bxc = _0x671bx7 - _0x671bxc;
+                0 > _0x671bxc && (_0x671bxc = _0x671bx7 + 39);
+                $(_0xfbd1[33])[_0xfbd1[68]]({
+                    top: _0x671bxc,
+                    left: _0x671bxb
+                });
+                $(_0xfbd1[33])[_0xfbd1[73]]()
+            }
+        });
+
+        function SelectMinutes(_0x671bx7, _0x671bxb) {
+            sumresmin = _0x671bxb;
+            $(_0xfbd1[74])[_0xfbd1[43]](_0x671bx7);
+            $(_0xfbd1[33])[_0xfbd1[32]]()
+        }
+
+        function ForzarBajarPagina() {
+            $(_0xfbd1[41])[_0xfbd1[62]](_0xfbd1[39]) && ($(_0xfbd1[41])[_0xfbd1[44]](_0xfbd1[39]), $(_0xfbd1[41])[_0xfbd1[43]](_0xfbd1[45]), $(_0xfbd1[64])[_0xfbd1[68]](_0xfbd1[38], _0xfbd1[75]))
+        }
+
+        function MostrarFechaHoraAhora() {
+            TimeAhora();
+            ForzarBajarPagina();
+            drawDayNightMap()
+        }
+
+        function ResMin() {
+            mapdate = new Date(mapdate[_0xfbd1[76]]() + -6E4 * sumresmin);
+            drawDayNightMap()
+        }
+
+        function SumMin() {
+            mapdate = new Date(mapdate[_0xfbd1[76]]() + 6E4 * sumresmin);
+            drawDayNightMap()
+        }
+
+        function daysInMonth(_0x671bx7, _0x671bxb) {
+            return (new Date(_0x671bxb, _0x671bx7, 0))[_0xfbd1[77]]()
+        }
+
+        function ValidarFechasMapa() {
+            var _0x671bx7 = $(_0xfbd1[79])[_0xfbd1[78]](),
+                _0x671bxb = $(_0xfbd1[80])[_0xfbd1[78]](),
+                _0x671bxc = $(_0xfbd1[81])[_0xfbd1[78]](),
+                _0x671bxd = 0;
+            _0x671bx7 != AnioJsActual && ($(_0xfbd1[81])[_0xfbd1[43]](_0xfbd1[18]), _0x671bxd = 1, AnioJsActual = _0x671bx7);
+            _0x671bxb != MesJsActual && ($(_0xfbd1[81])[_0xfbd1[43]](_0xfbd1[18]), _0x671bxd = 1, MesJsActual = _0x671bxb);
+            if (_0x671bx7) {
+                if (1 == _0x671bxd) {
+                    _0x671bxd = _0xfbd1[18];
+                    _0x671bxc = daysInMonth(_0x671bxb, _0x671bx7);
+                    for (i = 1; i <= _0x671bxc; i++) {
+                        _0x671bxd += _0xfbd1[82] + i + _0xfbd1[83]
+                    };
+                    $(_0xfbd1[81])[_0xfbd1[43]](_0x671bxd);
+                    _0x671bxc = 1;
+                    AnioJsActual = _0x671bx7
+                };
+                AnioCalc = _0x671bx7;
+                MesCalc = _0x671bxb;
+                DiaCalc = _0x671bxc
+            }
+        }
+
+        function RedibujarTodo() {
+            ForzarBajarPagina();
+            DrawEarth()
+        }
+
+        function SetTimeForm() {
+            var _0x671bx7 = $(_0xfbd1[79])[_0xfbd1[78]](),
+                _0x671bxb = $(_0xfbd1[80])[_0xfbd1[78]](),
+                _0x671bxc = $(_0xfbd1[81])[_0xfbd1[78]](),
+                _0x671bxd = $(_0xfbd1[84])[_0xfbd1[78]](),
+                _0x671bxe = $(_0xfbd1[85])[_0xfbd1[78]]();
+            999 < _0x671bx7 && 3001 > _0x671bx7 && (ForzarBajarPagina(), mapdate = new Date(_0x671bx7, _0x671bxb - 1, _0x671bxc, _0x671bxd, _0x671bxe, 0, 0), drawDayNightMap())
+        }
+
+        function ChangeDate() {
+            mapdate = new Date(2020, 0, 12, 18, 32, 0, 0);
+            drawDayNightMap()
+        }
+
+        function CallFijarTierra() {
+            fijartierra = $(_0xfbd1[88])[_0xfbd1[87]](_0xfbd1[86]) ? 1 : 0
+        }
+
+        function DistanciaSol() {
+            ForzarBajarPagina();
+            $(_0xfbd1[89])[_0xfbd1[87]](_0xfbd1[86]) ? AcercarSol() : AlejarSol()
+        }
+
+        function AcercarSol() {
+            DibujarSolCerca = 1;
+            ReposicionarAstro()
+        }
+
+        function AlejarSol() {
+            DibujarSolCerca = 0;
+            ReposicionarAstro()
+        }
+
+        function DrawEarth() {
+            var _0x671bx7 = document[_0xfbd1[30]](_0xfbd1[90]),
+                _0x671bxb = window[_0xfbd1[91]],
+                _0x671bxc = window[_0xfbd1[46]],
+                _0x671bxd = new THREE[_0xfbd1[92]];
+            camera = new THREE.PerspectiveCamera(45, _0x671bxb / _0x671bxc, 1, 2E3);
+            _0x671bxd[_0xfbd1[93]](camera);
+            camera[_0xfbd1[95]][_0xfbd1[94]](0, 50, 190);
+            var _0x671bxe = new THREE.WebGLRenderer({
+                antialias: !0
+            });
+            _0x671bxe[_0xfbd1[96]](_0x671bxb, _0x671bxc);
+            _0x671bx7[_0xfbd1[97]] = _0xfbd1[18];
+            _0x671bx7[_0xfbd1[99]](_0x671bxe[_0xfbd1[98]]);
+            _0x671bx7 = new THREE.OrbitControls(camera, _0x671bxe[_0xfbd1[98]]);
+            _0x671bx7[_0xfbd1[100]] = 40;
+            _0x671bx7[_0xfbd1[101]] = 300;
+            _0x671bx7 = new THREE.AmbientLight(15856113);
+            _0x671bxd[_0xfbd1[93]](_0x671bx7);
+            spotLight = new THREE.DirectionalLight(16777215, 0.8);
+            spotLight[_0xfbd1[95]][_0xfbd1[94]](50, 50, 50);
+            _0x671bxd[_0xfbd1[93]](spotLight);
+            _0x671bx7 = document[_0xfbd1[30]](_0xfbd1[102]);
+            _0x671bx7[_0xfbd1[103]] = _0xfbd1[104];
+            _0x671bx7 = _0x671bx7[_0xfbd1[105]]();
+            _0x671bxb = new THREE.SphereGeometry(10, 50, 50);
+            material = new THREE[_0xfbd1[106]];
+            earth = new THREE.Mesh(_0x671bxb, material);
+            loader[_0xfbd1[107]](_0x671bx7, function (_0x671bx7) {
+                material[_0xfbd1[102]] = _0x671bx7;
+                _0x671bxd[_0xfbd1[93]](earth)
+            });
+            THREE[_0xfbd1[108]][_0xfbd1[103]] = _0xfbd1[18];
+            _0x671bx7 = new THREE.SphereGeometry(1E3, 50, 50);
+            _0x671bxb = new THREE.MeshPhongMaterial({
+                map: THREE[_0xfbd1[108]][_0xfbd1[110]](_0xfbd1[109]),
+                side: THREE[_0xfbd1[111]],
+                shininess: 0
+            });
+            _0x671bx7 = new THREE.Mesh(_0x671bx7, _0x671bxb);
+            _0x671bxd[_0xfbd1[93]](_0x671bx7);
+            THREE[_0xfbd1[108]][_0xfbd1[103]] = _0xfbd1[18];
+            _0x671bx7 = new THREE.SphereGeometry(2.5, 50, 50);
+            _0x671bxb = new THREE.MeshPhongMaterial({
+                map: THREE[_0xfbd1[108]][_0xfbd1[110]](_0xfbd1[112])
+            });
+            moon = new THREE.Mesh(_0x671bx7, _0x671bxb);
+            moon[_0xfbd1[95]][_0xfbd1[94]](25, 0, 0);
+            _0x671bxd[_0xfbd1[93]](moon);
+            _0x671bx7 = new THREE.SphereGeometry(30, 50, 50);
+            _0x671bxb = new THREE.MeshPhongMaterial({
+                map: THREE[_0xfbd1[108]][_0xfbd1[110]](_0xfbd1[113])
+            });
+            sol = new THREE.Mesh(_0x671bx7, _0x671bxb);
+            sol[_0xfbd1[95]][_0xfbd1[94]](-400, 0, 0);
+            _0x671bxd[_0xfbd1[93]](sol);
+            var _0x671bx35 = new THREE.Vector3(0, 0, 0),
+                _0x671bx36 = function () {
+                    camera[_0xfbd1[114]](_0x671bx35);
+                    _0x671bxe[_0xfbd1[115]](_0x671bxd, camera);
+                    requestAnimationFrame(_0x671bx36)
+                };
+            _0x671bx36();
+            ReposicionarAstro();
+            IsDrawEarth = 1
+        }
+
+        function ReposicionarAstro() {
+            var _0x671bx7 = document[_0xfbd1[30]](_0xfbd1[102])[_0xfbd1[105]]();
+            loader[_0xfbd1[107]](_0x671bx7, function (_0x671bx7) {
+                material[_0xfbd1[102]] = _0x671bx7
+            });
+            earth[_0xfbd1[116]][_0xfbd1[37]] = 0;
+            var _0x671bxb = xsol,
+                _0x671bxc = ysol,
+                _0x671bxd = xluna,
+                _0x671bxe = yluna;
+            _0x671bx7 = 800;
+            var _0x671bx35 = 216;
+            1 == DibujarSolCerca && (_0x671bx35 = 27, _0x671bx7 = 100);
+            var _0x671bx36 = 0;
+            512 > _0x671bxc ? _0x671bx36 = 0.009765625 * (512 - _0x671bxc) : 512 < _0x671bxc && (_0x671bx36 = -0.009765625 * (_0x671bxc - 512));
+            sol[_0xfbd1[95]][_0xfbd1[37]] = _0x671bx36 * _0x671bx35;
+            _0x671bxc = 0;
+            512 > _0x671bxe ? _0x671bxc = 0.009765625 * (512 - _0x671bxe) : 512 < _0x671bxe && (_0x671bxc = -0.009765625 * (_0x671bxe - 512));
+            moon[_0xfbd1[95]][_0xfbd1[37]] = 7 * _0x671bxc;
+            _0x671bxe = 0;
+            1024 > _0x671bxd ? _0x671bxe = 0.9765625 * (1024 - _0x671bxd) : 1024 < _0x671bxd && (_0x671bxe = -0.9765625 * (_0x671bxd - 1024));
+            _0x671bxe = _0x671bxe * Math[_0xfbd1[117]] / 1E3;
+            _0x671bxd = 25 * Math[_0xfbd1[118]](_0x671bxe);
+            _0x671bxc = 25 * Math[_0xfbd1[119]](_0x671bxe);
+            moon[_0xfbd1[95]][_0xfbd1[120]] = _0x671bxd;
+            moon[_0xfbd1[95]][_0xfbd1[121]] = _0x671bxc;
+            _0x671bxe = 0;
+            1024 > _0x671bxb ? _0x671bxe = 0.9765625 * (1024 - _0x671bxb) : 1024 < _0x671bxb && (_0x671bxe = -0.9765625 * (_0x671bxb - 1024));
+            _0x671bxb = _0x671bxe * Math[_0xfbd1[117]] / 1E3;
+            _0x671bxd = _0x671bx7 * Math[_0xfbd1[118]](_0x671bxb);
+            _0x671bxc = _0x671bx7 * Math[_0xfbd1[119]](_0x671bxb);
+            sol[_0xfbd1[95]][_0xfbd1[120]] = _0x671bxd;
+            sol[_0xfbd1[95]][_0xfbd1[121]] = _0x671bxc;
+            spotLight[_0xfbd1[95]][_0xfbd1[94]](_0x671bxd, _0x671bx36 * _0x671bx35, _0x671bxc);
+            1 > IsDrawEarth ? (_0x671bx7 = (_0x671bxe - 300) * Math[_0xfbd1[117]] / 1E3, _0x671bxd = 80 * Math[_0xfbd1[118]](_0x671bx7), _0x671bxc = 80 * Math[_0xfbd1[119]](_0x671bx7), camera[_0xfbd1[95]][_0xfbd1[120]] = _0x671bxd, camera[
+                _0xfbd1[95]][_0xfbd1[121]] = _0x671bxc) : 1 > fijartierra && (_0x671bx7 = (_0x671bxe - 300) * Math[_0xfbd1[117]] / 1E3, _0x671bxd = 80 * Math[_0xfbd1[118]](_0x671bx7), _0x671bxc = 80 * Math[_0xfbd1[119]](_0x671bx7),
+                camera[_0xfbd1[95]][_0xfbd1[120]] = _0x671bxd, camera[_0xfbd1[95]][_0xfbd1[121]] = _0x671bxc)
+        }
+        $(window)[_0xfbd1[123]](_0xfbd1[122], function () {
+            $(_0xfbd1[33])[_0xfbd1[32]]();
+            ForzarBajarPagina()
+        });
+
+        function OpcionesComparir() {
+            var _0x671bx7 = encodeURIComponent(document.URL),
+                _0x671bxb = encodeURIComponent(document[_0xfbd1[124]]),
+                _0x671bxc = encodeURIComponent(_0xfbd1[125] === typeof imgpinterest ? _0xfbd1[126] : imgpinterest);
+            _0x671bxc = _0xfbd1[127] + _0x671bx7 + _0xfbd1[128] + _0x671bxc + _0xfbd1[129] + _0x671bxb;
+            $(_0xfbd1[132])[_0xfbd1[131]](_0xfbd1[9], _0xfbd1[130] + _0x671bx7);
+            $(_0xfbd1[135])[_0xfbd1[131]](_0xfbd1[9], _0xfbd1[133] + _0x671bx7 + _0xfbd1[134] + _0x671bxb);
+            $(_0xfbd1[136])[_0xfbd1[131]](_0xfbd1[9], _0x671bxc);
+            navigator[_0xfbd1[138]][_0xfbd1[137]](/Android|iPhone/i) && !navigator[_0xfbd1[138]][_0xfbd1[137]](/iPod|iPad/i) ? $(_0xfbd1[141])[_0xfbd1[131]](_0xfbd1[9], _0xfbd1[139] + _0x671bxb + _0xfbd1[140] + _0x671bx7) : $(_0xfbd1[141])[
+                _0xfbd1[131]](_0xfbd1[9], _0xfbd1[142] + _0x671bxb + _0xfbd1[140] + _0x671bx7)
+        }
+        $(_0xfbd1[145])[_0xfbd1[65]](function () {
+            $(_0xfbd1[144])[_0xfbd1[143]]()
+        });
+        var mapImage, lunaImage, solImage, ttImage, myInterval, mapWidth = 2048,
+            mapHeight = 1024,
+            dtr = Math[_0xfbd1[117]] / 180;
+
+        function sind(_0x671bx7) {
+            return Math[_0xfbd1[119]](dtr * _0x671bx7)
+        }
+
+        function cosd(_0x671bx7) {
+            return Math[_0xfbd1[118]](dtr * _0x671bx7)
+        }
+
+        function tand(_0x671bx7) {
+            return Math[_0xfbd1[146]](dtr * _0x671bx7)
+        }
+
+        function trunc(_0x671bx7) {
+            return 360 * (_0x671bx7 / 360 - Math[_0xfbd1[147]](_0x671bx7 / 360))
+        }
+
+        function performCalculations(_0x671bx7) {
+            year = _0x671bx7[_0xfbd1[148]]();
+            month = _0x671bx7[_0xfbd1[149]]() + 1;
+            day = _0x671bx7[_0xfbd1[77]]();
+            hour = _0x671bx7[_0xfbd1[150]]();
+            minute = _0x671bx7[_0xfbd1[151]]();
+            second = _0x671bx7[_0xfbd1[152]]();
+            deltaT = 0;
+            dayfraction = (hour + minute / 60 + second / 3600) / 24;
+            var _0x671bxb = new Date;
+            var _0x671bxc = _0x671bx7[_0xfbd1[153]]();
+            0 > _0x671bxc ? (_0x671bxb[_0xfbd1[154]](_0x671bx7[_0xfbd1[76]]() + -6E4 * _0x671bxc), _0x671bxc = _0xfbd1[155] + -1 * _0x671bxc + _0xfbd1[156]) : 0 < _0x671bxc ? (_0x671bxb[_0xfbd1[154]](_0x671bx7[_0xfbd1[76]]() - 6E4 *
+                _0x671bxc), _0x671bxc = _0xfbd1[157] + _0x671bxc + _0xfbd1[156]) : (_0x671bxb[_0xfbd1[154]](_0x671bx7[_0xfbd1[76]]()), _0x671bxc = _0xfbd1[158]);
+            Lyear = _0x671bxb[_0xfbd1[148]]();
+            Lmonth = _0x671bxb[_0xfbd1[149]]() + 1;
+            Lday = _0x671bxb[_0xfbd1[77]]();
+            Lhour = _0x671bxb[_0xfbd1[150]]();
+            Lminute = _0x671bxb[_0xfbd1[151]]();
+            var _0x671bxd = minute.toString();
+            1 == _0x671bxd[_0xfbd1[23]] && (_0x671bxd = _0xfbd1[159] + _0x671bxd);
+            var _0x671bxe = Lminute.toString();
+            1 == _0x671bxe[_0xfbd1[23]] && (_0x671bxe = _0xfbd1[159] + _0x671bxe);
+            var _0x671bx35 = year.toString(),
+                _0x671bx36 = month.toString();
+            1 == _0x671bx36[_0xfbd1[23]] && (_0x671bx36 = _0xfbd1[159] + _0x671bx36);
+            var _0x671bx46 = day.toString();
+            1 == _0x671bx46[_0xfbd1[23]] && (_0x671bx46 = _0xfbd1[159] + _0x671bx46);
+            var _0x671bx47 = hour.toString();
+            1 == _0x671bx47[_0xfbd1[23]] && (_0x671bx47 = _0xfbd1[159] + _0x671bx47);
+            var _0x671bx48 = minute.toString();
+            1 == _0x671bx48[_0xfbd1[23]] && (_0x671bx48 = _0xfbd1[159] + _0x671bx48);
+            document[_0xfbd1[20]][_0xfbd1[19]] = _0xfbd1[160] + _0x671bx35 + _0x671bx36 + _0x671bx46 + _0xfbd1[26] + _0x671bx47 + _0x671bx48;
+            OpcionesComparir();
+            _0x671bx35 = _0xfbd1[161] + hutctxt + _0xfbd1[162] + diasSemana[_0x671bx7[_0xfbd1[163]]()] + _0xfbd1[164] + _0x671bx7[_0xfbd1[77]]() + _0xfbd1[165] + meses[_0x671bx7[_0xfbd1[149]]()] + _0xfbd1[165] + _0x671bx7[_0xfbd1[148]]() +
+                _0xfbd1[166] + hour + _0xfbd1[167] + _0x671bxd + _0xfbd1[168];
+            _0xfbd1[169] == LangGlob ? _0x671bx35 = _0xfbd1[161] + hutctxt + _0xfbd1[162] + diasSemana[_0x671bx7[_0xfbd1[163]]()] + _0xfbd1[164] + meses[_0x671bx7[_0xfbd1[149]]()] + _0xfbd1[170] + _0x671bx7[_0xfbd1[77]]() + _0xfbd1[164] +
+                _0x671bx7[_0xfbd1[148]]() + _0xfbd1[171] + hour + _0xfbd1[167] + _0x671bxd + _0xfbd1[168] : _0xfbd1[172] == LangGlob ? _0x671bx35 = _0xfbd1[161] + hutctxt + _0xfbd1[162] + diasSemana[_0x671bx7[_0xfbd1[163]]()] + _0xfbd1[
+                170] + _0x671bx7[_0xfbd1[77]]() + _0xfbd1[170] + meses[_0x671bx7[_0xfbd1[149]]()] + _0xfbd1[170] + _0x671bx7[_0xfbd1[148]]() + _0xfbd1[173] + hour + _0xfbd1[167] + _0x671bxd + _0xfbd1[168] : _0xfbd1[174] == LangGlob ?
+                _0x671bx35 = _0xfbd1[161] + hutctxt + _0xfbd1[162] + diasSemana[_0x671bx7[_0xfbd1[163]]()] + _0xfbd1[164] + _0x671bx7[_0xfbd1[77]]() + _0xfbd1[165] + meses[_0x671bx7[_0xfbd1[149]]()] + _0xfbd1[165] + _0x671bx7[_0xfbd1[148]]
+                () + _0xfbd1[175] + hour + _0xfbd1[167] + _0x671bxd + _0xfbd1[168] : _0xfbd1[176] == LangGlob ? _0x671bx35 = _0xfbd1[161] + hutctxt + _0xfbd1[162] + diasSemana[_0x671bx7[_0xfbd1[163]]()] + _0xfbd1[164] + _0x671bx7[_0xfbd1[
+                    77]]() + _0xfbd1[177] + meses[_0x671bx7[_0xfbd1[149]]()] + _0xfbd1[170] + _0x671bx7[_0xfbd1[148]]() + _0xfbd1[178] + hour + _0xfbd1[167] + _0x671bxd + _0xfbd1[179] : _0xfbd1[180] == LangGlob && (_0x671bx35 = _0xfbd1[
+                    161] + hutctxt + _0xfbd1[162] + diasSemana[_0x671bx7[_0xfbd1[163]]()] + _0xfbd1[170] + _0x671bx7[_0xfbd1[77]]() + _0xfbd1[170] + meses[_0x671bx7[_0xfbd1[149]]()] + _0xfbd1[170] + _0x671bx7[_0xfbd1[148]]() + _0xfbd1[
+                    181] + hour + _0xfbd1[167] + _0x671bxd + _0xfbd1[168]);
+            document[_0xfbd1[30]](_0xfbd1[182])[_0xfbd1[97]] = _0x671bx35;
+            _0x671bx7 = day + _0xfbd1[183] + month + _0xfbd1[183] + year + _0xfbd1[184] + hour + _0xfbd1[167] + _0x671bxd + _0xfbd1[168];
+            $(_0xfbd1[185])[_0xfbd1[43]](_0x671bx7);
+            _0x671bx7 = Lhour.toString();
+            1 == _0x671bx7[_0xfbd1[23]] && (_0x671bx7 = _0xfbd1[159] + _0x671bx7);
+            _0x671bxd = _0xfbd1[161] + hloctxt + _0xfbd1[162] + diasSemana[_0x671bxb[_0xfbd1[163]]()] + _0xfbd1[164] + _0x671bxb[_0xfbd1[77]]() + _0xfbd1[165] + meses[_0x671bxb[_0xfbd1[149]]()] + _0xfbd1[165] + _0x671bxb[_0xfbd1[148]]() +
+                _0xfbd1[166] + _0x671bx7 + _0xfbd1[167] + _0x671bxe + _0xfbd1[186] + _0x671bxc;
+            _0xfbd1[169] == LangGlob ? _0x671bxd = _0xfbd1[161] + hloctxt + _0xfbd1[162] + diasSemana[_0x671bxb[_0xfbd1[163]]()] + _0xfbd1[164] + meses[_0x671bxb[_0xfbd1[149]]()] + _0xfbd1[170] + _0x671bxb[_0xfbd1[77]]() + _0xfbd1[164] +
+                _0x671bxb[_0xfbd1[148]]() + _0xfbd1[171] + _0x671bx7 + _0xfbd1[167] + _0x671bxe + _0xfbd1[186] + _0x671bxc : _0xfbd1[172] == LangGlob ? _0x671bxd = _0xfbd1[161] + hloctxt + _0xfbd1[162] + diasSemana[_0x671bxb[_0xfbd1[163]]
+                ()] + _0xfbd1[170] + _0x671bxb[_0xfbd1[77]]() + _0xfbd1[170] + meses[_0x671bxb[_0xfbd1[149]]()] + _0xfbd1[170] + _0x671bxb[_0xfbd1[148]]() + _0xfbd1[173] + _0x671bx7 + _0xfbd1[167] + _0x671bxe + _0xfbd1[186] + _0x671bxc :
+                _0xfbd1[174] == LangGlob ? _0x671bxd = _0xfbd1[161] + hloctxt + _0xfbd1[162] + diasSemana[_0x671bxb[_0xfbd1[163]]()] + _0xfbd1[164] + _0x671bxb[_0xfbd1[77]]() + _0xfbd1[165] + meses[_0x671bxb[_0xfbd1[149]]()] + _0xfbd1[
+                165] + _0x671bxb[_0xfbd1[148]]() + _0xfbd1[175] + _0x671bx7 + _0xfbd1[167] + _0x671bxe + _0xfbd1[186] + _0x671bxc : _0xfbd1[176] == LangGlob ? _0x671bxd = _0xfbd1[161] + hloctxt + _0xfbd1[162] + diasSemana[_0x671bxb[_0xfbd1[
+                    163]]()] + _0xfbd1[164] + _0x671bxb[_0xfbd1[77]]() + _0xfbd1[177] + meses[_0x671bxb[_0xfbd1[149]]()] + _0xfbd1[170] + _0x671bxb[_0xfbd1[148]]() + _0xfbd1[178] + _0x671bx7 + _0xfbd1[167] + _0x671bxe + _0xfbd1[187] +
+                _0x671bxc : _0xfbd1[180] == LangGlob && (_0x671bxd = _0xfbd1[161] + hloctxt + _0xfbd1[162] + diasSemana[_0x671bxb[_0xfbd1[163]]()] + _0xfbd1[170] + _0x671bxb[_0xfbd1[77]]() + _0xfbd1[170] + meses[_0x671bxb[_0xfbd1[149]]()] +
+                    _0xfbd1[170] + _0x671bxb[_0xfbd1[148]]() + _0xfbd1[181] + _0x671bx7 + _0xfbd1[167] + _0x671bxe + _0xfbd1[186] + _0x671bxc);
+            document[_0xfbd1[30]](_0xfbd1[188])[_0xfbd1[97]] = _0x671bxd;
+            TimeMeasures();
+            Nutation();
+            Aries();
+            Sun();
+            Moon()
+        }
+
+        function TimeMeasures() {
+            2 >= month && (--year, month += 12);
+            var _0x671bx7 = Math[_0xfbd1[147]](year / 100);
+            JD0h = Math[_0xfbd1[147]](365.25 * (year + 4716)) + Math[_0xfbd1[147]](30.6001 * (month + 1)) + day + (2 - _0x671bx7 + Math[_0xfbd1[147]](_0x671bx7 / 4)) - 1524.5;
+            JD = JD0h + dayfraction;
+            T = (JD - 2451545) / 36525;
+            T2 = T * T;
+            T3 = T * T2;
+            T4 = T * T3;
+            T5 = T * T4;
+            JDE = JD + deltaT / 86400;
+            TE = (JDE - 2451545) / 36525;
+            TE2 = TE * TE;
+            TE3 = TE * TE2;
+            TE4 = TE * TE3;
+            TE5 = TE * TE4;
+            Tau = 0.1 * TE;
+            Tau2 = Tau * Tau;
+            Tau3 = Tau * Tau2;
+            Tau4 = Tau * Tau3;
+            Tau5 = Tau * Tau4
+        }
+
+        function Nutation() {
+            var _0x671bx7 = 134.962981389 + 198.867398056 * TE + trunc(477E3 * TE) + 0.008697222222 * TE2 + TE3 / 56250,
+                _0x671bxb = 357.527723333 + 359.05034 * TE + trunc(35640 * TE) - 1.602777778E-4 * TE2 - TE3 / 3E5,
+                _0x671bxc = 93.271910277 + 82.017538055 * TE + trunc(483120 * TE) - 0.0036825 * TE2 + TE3 / 327272.7273,
+                _0x671bxd = 297.850363055 + 307.11148 * TE + trunc(444960 * TE) - 0.001914166667 * TE2 + TE3 / 189473.6842,
+                _0x671bxe = 125.044522222 - 134.136260833 * TE - trunc(1800 * TE) + 0.002070833333 * TE2 + TE3 / 45E4,
+                _0x671bx35 = Array(106);
+            _0x671bx35[0] = _0xfbd1[189];
+            _0x671bx35[1] = _0xfbd1[190];
+            _0x671bx35[2] = _0xfbd1[191];
+            _0x671bx35[3] = _0xfbd1[192];
+            _0x671bx35[4] = _0xfbd1[193];
+            _0x671bx35[5] = _0xfbd1[194];
+            _0x671bx35[6] = _0xfbd1[195];
+            _0x671bx35[7] = _0xfbd1[196];
+            _0x671bx35[8] = _0xfbd1[197];
+            _0x671bx35[9] = _0xfbd1[198];
+            _0x671bx35[10] = _0xfbd1[199];
+            _0x671bx35[11] = _0xfbd1[200];
+            _0x671bx35[12] = _0xfbd1[201];
+            _0x671bx35[13] = _0xfbd1[202];
+            _0x671bx35[14] = _0xfbd1[203];
+            _0x671bx35[15] = _0xfbd1[204];
+            _0x671bx35[16] = _0xfbd1[205];
+            _0x671bx35[17] = _0xfbd1[206];
+            _0x671bx35[18] = _0xfbd1[207];
+            _0x671bx35[19] = _0xfbd1[208];
+            _0x671bx35[20] = _0xfbd1[209];
+            _0x671bx35[21] = _0xfbd1[210];
+            _0x671bx35[22] = _0xfbd1[211];
+            _0x671bx35[23] = _0xfbd1[212];
+            _0x671bx35[24] = _0xfbd1[213];
+            _0x671bx35[25] = _0xfbd1[214];
+            _0x671bx35[26] = _0xfbd1[215];
+            _0x671bx35[27] = _0xfbd1[216];
+            _0x671bx35[28] = _0xfbd1[217];
+            _0x671bx35[29] = _0xfbd1[218];
+            _0x671bx35[30] = _0xfbd1[219];
+            _0x671bx35[31] = _0xfbd1[220];
+            _0x671bx35[32] = _0xfbd1[221];
+            _0x671bx35[33] = _0xfbd1[222];
+            _0x671bx35[34] = _0xfbd1[223];
+            _0x671bx35[35] = _0xfbd1[224];
+            _0x671bx35[36] = _0xfbd1[225];
+            _0x671bx35[37] = _0xfbd1[226];
+            _0x671bx35[38] = _0xfbd1[227];
+            _0x671bx35[39] = _0xfbd1[228];
+            _0x671bx35[40] = _0xfbd1[229];
+            _0x671bx35[41] = _0xfbd1[230];
+            _0x671bx35[42] = _0xfbd1[231];
+            _0x671bx35[43] = _0xfbd1[232];
+            _0x671bx35[44] = _0xfbd1[233];
+            _0x671bx35[45] = _0xfbd1[234];
+            _0x671bx35[46] = _0xfbd1[235];
+            _0x671bx35[47] = _0xfbd1[236];
+            _0x671bx35[48] = _0xfbd1[237];
+            _0x671bx35[49] = _0xfbd1[238];
+            _0x671bx35[50] = _0xfbd1[239];
+            _0x671bx35[51] = _0xfbd1[240];
+            _0x671bx35[52] = _0xfbd1[241];
+            _0x671bx35[53] = _0xfbd1[242];
+            _0x671bx35[54] = _0xfbd1[243];
+            _0x671bx35[55] = _0xfbd1[244];
+            _0x671bx35[56] = _0xfbd1[245];
+            _0x671bx35[57] = _0xfbd1[246];
+            _0x671bx35[58] = _0xfbd1[247];
+            _0x671bx35[59] = _0xfbd1[248];
+            _0x671bx35[60] = _0xfbd1[249];
+            _0x671bx35[61] = _0xfbd1[250];
+            _0x671bx35[62] = _0xfbd1[251];
+            _0x671bx35[63] = _0xfbd1[252];
+            _0x671bx35[64] = _0xfbd1[253];
+            _0x671bx35[65] = _0xfbd1[254];
+            _0x671bx35[66] = _0xfbd1[255];
+            _0x671bx35[67] = _0xfbd1[256];
+            _0x671bx35[68] = _0xfbd1[257];
+            _0x671bx35[69] = _0xfbd1[258];
+            _0x671bx35[70] = _0xfbd1[259];
+            _0x671bx35[71] = _0xfbd1[260];
+            _0x671bx35[72] = _0xfbd1[261];
+            _0x671bx35[73] = _0xfbd1[262];
+            _0x671bx35[74] = _0xfbd1[263];
+            _0x671bx35[75] = _0xfbd1[264];
+            _0x671bx35[76] = _0xfbd1[265];
+            _0x671bx35[77] = _0xfbd1[266];
+            _0x671bx35[78] = _0xfbd1[267];
+            _0x671bx35[79] = _0xfbd1[268];
+            _0x671bx35[80] = _0xfbd1[269];
+            _0x671bx35[81] = _0xfbd1[270];
+            _0x671bx35[82] = _0xfbd1[271];
+            _0x671bx35[83] = _0xfbd1[272];
+            _0x671bx35[84] = _0xfbd1[273];
+            _0x671bx35[85] = _0xfbd1[274];
+            _0x671bx35[86] = _0xfbd1[275];
+            _0x671bx35[87] = _0xfbd1[276];
+            _0x671bx35[88] = _0xfbd1[277];
+            _0x671bx35[89] = _0xfbd1[278];
+            _0x671bx35[90] = _0xfbd1[279];
+            _0x671bx35[91] = _0xfbd1[280];
+            _0x671bx35[92] = _0xfbd1[281];
+            _0x671bx35[93] = _0xfbd1[282];
+            _0x671bx35[94] = _0xfbd1[283];
+            _0x671bx35[95] = _0xfbd1[284];
+            _0x671bx35[96] = _0xfbd1[285];
+            _0x671bx35[97] = _0xfbd1[286];
+            _0x671bx35[98] = _0xfbd1[287];
+            _0x671bx35[99] = _0xfbd1[288];
+            _0x671bx35[100] = _0xfbd1[289];
+            _0x671bx35[101] = _0xfbd1[290];
+            _0x671bx35[102] = _0xfbd1[291];
+            _0x671bx35[103] = _0xfbd1[292];
+            _0x671bx35[104] = _0xfbd1[293];
+            _0x671bx35[105] = _0xfbd1[294];
+            var _0x671bx36 = 0,
+                _0x671bx46 = 0;
+            for (x = 0; 105 > x; x++) {
+                var _0x671bx47 = eval(_0x671bx35[x][_0xfbd1[295]](0, 2));
+                var _0x671bx48 = eval(_0x671bx35[x][_0xfbd1[295]](2, 4));
+                var _0x671bx4b = eval(_0x671bx35[x][_0xfbd1[295]](4, 6));
+                var _0x671bx4c = eval(_0x671bx35[x][_0xfbd1[295]](6, 8));
+                var _0x671bx4d = eval(_0x671bx35[x][_0xfbd1[295]](8, 10));
+                _0x671bx36 += (eval(_0x671bx35[x][_0xfbd1[295]](10, 17)) + TE * eval(_0x671bx35[x][_0xfbd1[295]](17, 23))) * sind(_0x671bx4c * _0x671bxd + _0x671bx48 * _0x671bxb + _0x671bx47 * _0x671bx7 + _0x671bx4b * _0x671bxc +
+                    _0x671bx4d * _0x671bxe);
+                _0x671bx46 += (eval(_0x671bx35[x][_0xfbd1[295]](23, 29)) + TE * eval(_0x671bx35[x][_0xfbd1[295]](29, 33))) * cosd(_0x671bx4c * _0x671bxd + _0x671bx48 * _0x671bxb + _0x671bx47 * _0x671bx7 + _0x671bx4b * _0x671bxc +
+                    _0x671bx4d * _0x671bxe)
+            };
+            _0x671bx35 = Array(4);
+            _0x671bx35[0] = _0xfbd1[296];
+            _0x671bx35[1] = _0xfbd1[297];
+            _0x671bx35[2] = _0xfbd1[298];
+            _0x671bx35[3] = _0xfbd1[299];
+            for (x = 0; 4 > x; x++) {
+                _0x671bx47 = eval(_0x671bx35[x][_0xfbd1[295]](0, 2)), _0x671bx48 = eval(_0x671bx35[x][_0xfbd1[295]](2, 4)), _0x671bx4b = eval(_0x671bx35[x][_0xfbd1[295]](4, 6)), _0x671bx4c = eval(_0x671bx35[x][_0xfbd1[295]](6, 8)),
+                    _0x671bx4d = eval(_0x671bx35[x][_0xfbd1[295]](8, 10)), _0x671bx36 += 0.1 * (eval(_0x671bx35[x][_0xfbd1[295]](10, 14)) * sind(_0x671bx4c * _0x671bxd + _0x671bx48 * _0x671bxb + _0x671bx47 * _0x671bx7 + _0x671bx4b *
+                        _0x671bxc + _0x671bx4d * _0x671bxe) + eval(_0x671bx35[x][_0xfbd1[295]](14, 18)) * cosd(_0x671bx4c * _0x671bxd + _0x671bx48 * _0x671bxb + _0x671bx47 * _0x671bx7 + _0x671bx4b * _0x671bxc + _0x671bx4d * _0x671bxe)),
+                    _0x671bx46 += 0.1 * (eval(_0x671bx35[x][_0xfbd1[295]](18, 22)) * cosd(_0x671bx4c * _0x671bxd + _0x671bx48 * _0x671bxb + _0x671bx47 * _0x671bx7 + _0x671bx4b * _0x671bxc + _0x671bx4d * _0x671bxe) + eval(_0x671bx35[x][
+                        _0xfbd1[295]
+                    ](22, 26)) * sind(_0x671bx4c * _0x671bxd + _0x671bx48 * _0x671bxb + _0x671bx47 * _0x671bx7 + _0x671bx4b * _0x671bxc + _0x671bx4d * _0x671bxe))
+            };
+            delta_psi = _0x671bx36 / 36E6;
+            delta_eps = _0x671bx46 / 36E6;
+            eps0 = (84381.448 - 46.815 * TE - 5.9E-4 * TE2 + 0.001813 * TE3) / 3600;
+            eps = eps0 + delta_eps
+        }
+
+        function Aries() {
+            var _0x671bx7 = trunc(280.46061837 + 360.98564736629 * (JD - 2451545) + 3.87933E-4 * T2 - T3 / 3871E4);
+            GHAAtrue = trunc(_0x671bx7 + delta_psi * cosd(eps))
+        }
+
+        function Sun() {
+            var _0x671bx7 = 175347046 + 3341656 * Math[_0xfbd1[118]](4.6692568 + 6283.07585 * Tau);
+            _0x671bx7 += 34894 * Math[_0xfbd1[118]](4.6261 + 12566.1517 * Tau);
+            _0x671bx7 += 3497 * Math[_0xfbd1[118]](2.7441 + 5753.3849 * Tau);
+            _0x671bx7 += 3418 * Math[_0xfbd1[118]](2.8289 + 3.5231 * Tau);
+            _0x671bx7 += 3136 * Math[_0xfbd1[118]](3.6277 + 77713.7715 * Tau);
+            _0x671bx7 += 2676 * Math[_0xfbd1[118]](4.4181 + 7860.4194 * Tau);
+            _0x671bx7 += 2343 * Math[_0xfbd1[118]](6.1352 + 3930.2097 * Tau);
+            _0x671bx7 += 1324 * Math[_0xfbd1[118]](0.7425 + 11506.7698 * Tau);
+            _0x671bx7 += 1273 * Math[_0xfbd1[118]](2.0371 + 529.691 * Tau);
+            _0x671bx7 += 1199 * Math[_0xfbd1[118]](1.1096 + 1577.3435 * Tau);
+            _0x671bx7 += 990 * Math[_0xfbd1[118]](5.233 + 5884.927 * Tau);
+            _0x671bx7 += 902 * Math[_0xfbd1[118]](2.045 + 26.298 * Tau);
+            _0x671bx7 += 857 * Math[_0xfbd1[118]](3.508 + 398.149 * Tau);
+            _0x671bx7 += 780 * Math[_0xfbd1[118]](1.179 + 5223.694 * Tau);
+            _0x671bx7 += 753 * Math[_0xfbd1[118]](2.533 + 5507.553 * Tau);
+            _0x671bx7 += 505 * Math[_0xfbd1[118]](4.583 + 18849.228 * Tau);
+            _0x671bx7 += 492 * Math[_0xfbd1[118]](4.205 + 775.523 * Tau);
+            _0x671bx7 += 357 * Math[_0xfbd1[118]](2.92 + 0.067 * Tau);
+            _0x671bx7 += 317 * Math[_0xfbd1[118]](5.849 + 11790.629 * Tau);
+            _0x671bx7 += 284 * Math[_0xfbd1[118]](1.899 + 796.298 * Tau);
+            _0x671bx7 += 271 * Math[_0xfbd1[118]](0.315 + 10977.079 * Tau);
+            _0x671bx7 += 243 * Math[_0xfbd1[118]](0.345 + 5486.778 * Tau);
+            _0x671bx7 += 206 * Math[_0xfbd1[118]](4.806 + 2544.314 * Tau);
+            _0x671bx7 += 205 * Math[_0xfbd1[118]](1.869 + 5573.143 * Tau);
+            _0x671bx7 += 202 * Math[_0xfbd1[118]](2.458 + 6069.777 * Tau);
+            _0x671bx7 += 156 * Math[_0xfbd1[118]](0.833 + 213.299 * Tau);
+            _0x671bx7 += 132 * Math[_0xfbd1[118]](3.411 + 2942.463 * Tau);
+            _0x671bx7 += 126 * Math[_0xfbd1[118]](1.083 + 20.775 * Tau);
+            _0x671bx7 += 115 * Math[_0xfbd1[118]](0.645 + 0.98 * Tau);
+            _0x671bx7 += 103 * Math[_0xfbd1[118]](0.636 + 4694.003 * Tau);
+            _0x671bx7 += 102 * Math[_0xfbd1[118]](0.976 + 15720.839 * Tau);
+            _0x671bx7 += 102 * Math[_0xfbd1[118]](4.267 + 7.114 * Tau);
+            _0x671bx7 += 99 * Math[_0xfbd1[118]](6.21 + 2146.17 * Tau);
+            _0x671bx7 += 98 * Math[_0xfbd1[118]](0.68 + 155.42 * Tau);
+            _0x671bx7 += 86 * Math[_0xfbd1[118]](5.98 + 161000.69 * Tau);
+            _0x671bx7 += 85 * Math[_0xfbd1[118]](1.3 + 6275.96 * Tau);
+            _0x671bx7 += 85 * Math[_0xfbd1[118]](3.67 + 71430.7 * Tau);
+            _0x671bx7 += 80 * Math[_0xfbd1[118]](1.81 + 17260.15 * Tau);
+            _0x671bx7 += 79 * Math[_0xfbd1[118]](3.04 + 12036.46 * Tau);
+            _0x671bx7 += 75 * Math[_0xfbd1[118]](1.76 + 5088.63 * Tau);
+            _0x671bx7 += 74 * Math[_0xfbd1[118]](3.5 + 3154.69 * Tau);
+            _0x671bx7 += 74 * Math[_0xfbd1[118]](4.68 + 801.82 * Tau);
+            _0x671bx7 += 70 * Math[_0xfbd1[118]](0.83 + 9437.76 * Tau);
+            _0x671bx7 += 62 * Math[_0xfbd1[118]](3.98 + 8827.39 * Tau);
+            _0x671bx7 += 61 * Math[_0xfbd1[118]](1.82 + 7084.9 * Tau);
+            _0x671bx7 += 57 * Math[_0xfbd1[118]](2.78 + 6286.6 * Tau);
+            _0x671bx7 += 56 * Math[_0xfbd1[118]](4.39 + 14143.5 * Tau);
+            _0x671bx7 += 56 * Math[_0xfbd1[118]](3.47 + 6279.55 * Tau);
+            _0x671bx7 += 52 * Math[_0xfbd1[118]](0.19 + 12139.55 * Tau);
+            _0x671bx7 += 52 * Math[_0xfbd1[118]](1.33 + 1748.02 * Tau);
+            _0x671bx7 += 51 * Math[_0xfbd1[118]](0.28 + 5856.48 * Tau);
+            _0x671bx7 += 49 * Math[_0xfbd1[118]](0.49 + 1194.45 * Tau);
+            _0x671bx7 += 41 * Math[_0xfbd1[118]](5.37 + 8429.24 * Tau);
+            _0x671bx7 += 41 * Math[_0xfbd1[118]](2.4 + 19651.05 * Tau);
+            _0x671bx7 += 39 * Math[_0xfbd1[118]](6.17 + 10447.39 * Tau);
+            _0x671bx7 += 37 * Math[_0xfbd1[118]](6.04 + 10213.29 * Tau);
+            _0x671bx7 += 37 * Math[_0xfbd1[118]](2.57 + 1059.38 * Tau);
+            _0x671bx7 += 36 * Math[_0xfbd1[118]](1.71 + 2352.87 * Tau);
+            _0x671bx7 += 36 * Math[_0xfbd1[118]](1.78 + 6812.77 * Tau);
+            _0x671bx7 += 33 * Math[_0xfbd1[118]](0.59 + 17789.85 * Tau);
+            _0x671bx7 += 30 * Math[_0xfbd1[118]](0.44 + 83996.85 * Tau);
+            _0x671bx7 += 30 * Math[_0xfbd1[118]](2.74 + 1349.87 * Tau);
+            _0x671bx7 += 25 * Math[_0xfbd1[118]](3.16 + 4690.48 * Tau);
+            var _0x671bxb = 628331966747 + 206059 * Math[_0xfbd1[118]](2.678235 + 6283.07585 * Tau);
+            _0x671bxb += 4303 * Math[_0xfbd1[118]](2.6351 + 12566.1517 * Tau);
+            _0x671bxb += 425 * Math[_0xfbd1[118]](1.59 + 3.523 * Tau);
+            _0x671bxb += 119 * Math[_0xfbd1[118]](5.796 + 26.298 * Tau);
+            _0x671bxb += 109 * Math[_0xfbd1[118]](2.966 + 1577.344 * Tau);
+            _0x671bxb += 93 * Math[_0xfbd1[118]](2.59 + 18849.23 * Tau);
+            _0x671bxb += 72 * Math[_0xfbd1[118]](1.14 + 529.69 * Tau);
+            _0x671bxb += 68 * Math[_0xfbd1[118]](1.87 + 398.15 * Tau);
+            _0x671bxb += 67 * Math[_0xfbd1[118]](4.41 + 5507.55 * Tau);
+            _0x671bxb += 59 * Math[_0xfbd1[118]](2.89 + 5223.69 * Tau);
+            _0x671bxb += 56 * Math[_0xfbd1[118]](2.17 + 155.42 * Tau);
+            _0x671bxb += 45 * Math[_0xfbd1[118]](0.4 + 796.3 * Tau);
+            _0x671bxb += 36 * Math[_0xfbd1[118]](0.47 + 775.52 * Tau);
+            _0x671bxb += 29 * Math[_0xfbd1[118]](2.65 + 7.11 * Tau);
+            _0x671bxb += 21 * Math[_0xfbd1[118]](5.34 + 0.98 * Tau);
+            _0x671bxb += 19 * Math[_0xfbd1[118]](1.85 + 5486.78 * Tau);
+            _0x671bxb += 19 * Math[_0xfbd1[118]](4.97 + 213.3 * Tau);
+            _0x671bxb += 17 * Math[_0xfbd1[118]](2.99 + 6275.96 * Tau);
+            _0x671bxb += 16 * Math[_0xfbd1[118]](0.03 + 2544.31 * Tau);
+            _0x671bxb += 16 * Math[_0xfbd1[118]](1.43 + 2146.17 * Tau);
+            _0x671bxb += 15 * Math[_0xfbd1[118]](1.21 + 10977.08 * Tau);
+            _0x671bxb += 12 * Math[_0xfbd1[118]](2.83 + 1748.02 * Tau);
+            _0x671bxb += 12 * Math[_0xfbd1[118]](3.26 + 5088.63 * Tau);
+            _0x671bxb += 12 * Math[_0xfbd1[118]](5.27 + 1194.45 * Tau);
+            _0x671bxb += 12 * Math[_0xfbd1[118]](2.08 + 4694 * Tau);
+            _0x671bxb += 11 * Math[_0xfbd1[118]](0.77 + 553.57 * Tau);
+            _0x671bxb += 10 * Math[_0xfbd1[118]](1.3 + 6286.6 * Tau);
+            _0x671bxb += 10 * Math[_0xfbd1[118]](4.24 + 1349.87 * Tau);
+            _0x671bxb += 9 * Math[_0xfbd1[118]](2.7 + 242.73 * Tau);
+            _0x671bxb += 9 * Math[_0xfbd1[118]](5.64 + 951.72 * Tau);
+            _0x671bxb += 8 * Math[_0xfbd1[118]](5.3 + 2352.87 * Tau);
+            _0x671bxb += 6 * Math[_0xfbd1[118]](2.65 + 9437.76 * Tau);
+            _0x671bxb += 6 * Math[_0xfbd1[118]](4.67 + 4690.48 * Tau);
+            var _0x671bxc = 52919 + 8720 * Math[_0xfbd1[118]](1.0721 + 6283.0758 * Tau);
+            _0x671bxc += 309 * Math[_0xfbd1[118]](0.867 + 12566.152 * Tau);
+            _0x671bxc += 27 * Math[_0xfbd1[118]](0.05 + 3.52 * Tau);
+            _0x671bxc += 16 * Math[_0xfbd1[118]](5.19 + 26.3 * Tau);
+            _0x671bxc += 16 * Math[_0xfbd1[118]](3.68 + 155.42 * Tau);
+            _0x671bxc += 10 * Math[_0xfbd1[118]](0.76 + 18849.23 * Tau);
+            _0x671bxc += 9 * Math[_0xfbd1[118]](2.06 + 77713.77 * Tau);
+            _0x671bxc += 7 * Math[_0xfbd1[118]](0.83 + 775.52 * Tau);
+            _0x671bxc += 5 * Math[_0xfbd1[118]](4.66 + 1577.34 * Tau);
+            _0x671bxc += 4 * Math[_0xfbd1[118]](1.03 + 7.11 * Tau);
+            _0x671bxc += 4 * Math[_0xfbd1[118]](3.44 + 5573.14 * Tau);
+            _0x671bxc += 3 * Math[_0xfbd1[118]](5.14 + 796.3 * Tau);
+            _0x671bxc += 3 * Math[_0xfbd1[118]](6.05 + 5507.55 * Tau);
+            _0x671bxc += 3 * Math[_0xfbd1[118]](1.19 + 242.73 * Tau);
+            _0x671bxc += 3 * Math[_0xfbd1[118]](6.12 + 529.69 * Tau);
+            _0x671bxc += 3 * Math[_0xfbd1[118]](0.31 + 398.15 * Tau);
+            _0x671bxc += 3 * Math[_0xfbd1[118]](2.28 + 553.57 * Tau);
+            _0x671bxc += 2 * Math[_0xfbd1[118]](4.38 + 5223.69 * Tau);
+            _0x671bxc += 2 * Math[_0xfbd1[118]](3.75 + 0.98 * Tau);
+            var _0x671bxd = 289 * Math[_0xfbd1[118]](5.844 + 6283.076 * Tau);
+            _0x671bxd = _0x671bxd + 35 + 17 * Math[_0xfbd1[118]](5.49 + 12566.15 * Tau);
+            _0x671bxd += 3 * Math[_0xfbd1[118]](5.2 + 155.42 * Tau);
+            _0x671bxd += 1 * Math[_0xfbd1[118]](4.72 + 3.52 * Tau);
+            _0x671bxd += 1 * Math[_0xfbd1[118]](5.3 + 18849.23 * Tau);
+            _0x671bxd += 1 * Math[_0xfbd1[118]](5.97 + 242.73 * Tau);
+            var _0x671bxe = 114 * Math[_0xfbd1[118]](3.142);
+            _0x671bxe += 8 * Math[_0xfbd1[118]](4.13 + 6283.08 * Tau);
+            _0x671bxe += 1 * Math[_0xfbd1[118]](3.84 + 12566.15 * Tau);
+            var _0x671bx35 = 1 * Math[_0xfbd1[118]](3.14);
+            trunc(280.4664567 + 360007.6982779 * Tau + 0.03032028 * Tau2 + Tau3 / 49931 - Tau4 / 15299 - Tau5 / 1988E3);
+            _0x671bxb = trunc((_0x671bx7 + _0x671bxb * Tau + _0x671bxc * Tau2 + _0x671bxd * Tau3 + _0x671bxe * Tau4 + _0x671bx35 * Tau5) / 1E8 / dtr);
+            Lsun_true = trunc(_0x671bxb + 180 - 2.5E-5);
+            _0x671bx7 = 280 * Math[_0xfbd1[118]](3.199 + 84334.662 * Tau);
+            _0x671bx7 += 102 * Math[_0xfbd1[118]](5.422 + 5507.553 * Tau);
+            _0x671bx7 += 80 * Math[_0xfbd1[118]](3.88 + 5223.69 * Tau);
+            _0x671bx7 += 44 * Math[_0xfbd1[118]](3.7 + 2352.87 * Tau);
+            _0x671bx7 += 32 * Math[_0xfbd1[118]](4 + 1577.34 * Tau);
+            _0x671bxc = 9 * Math[_0xfbd1[118]](3.9 + 5507.55 * Tau);
+            _0x671bxc += 6 * Math[_0xfbd1[118]](1.73 + 5223.69 * Tau);
+            _0x671bx7 = trunc(-((_0x671bx7 + _0x671bxc * Tau) / 1E8 / dtr));
+            Lsun_prime = trunc(_0x671bxb + 180 - 1.397 * TE - 3.1E-4 * TE2);
+            _0x671bx7 += 1.1E-5 * (cosd(Lsun_prime) - sind(Lsun_prime));
+            _0x671bxb = 100013989 + 1670700 * Math[_0xfbd1[118]](3.0984635 + 6283.07585 * Tau);
+            _0x671bxb += 13956 * Math[_0xfbd1[118]](3.05525 + 12566.1517 * Tau);
+            _0x671bxb += 3084 * Math[_0xfbd1[118]](5.1985 + 77713.7715 * Tau);
+            _0x671bxb += 1628 * Math[_0xfbd1[118]](1.1739 + 5753.3849 * Tau);
+            _0x671bxb += 1576 * Math[_0xfbd1[118]](2.8469 + 7860.4194 * Tau);
+            _0x671bxb += 925 * Math[_0xfbd1[118]](5.453 + 11506.77 * Tau);
+            _0x671bxb += 542 * Math[_0xfbd1[118]](4.564 + 3930.21 * Tau);
+            _0x671bxb += 472 * Math[_0xfbd1[118]](3.661 + 5884.927 * Tau);
+            _0x671bxb += 346 * Math[_0xfbd1[118]](0.964 + 5507.553 * Tau);
+            _0x671bxb += 329 * Math[_0xfbd1[118]](5.9 + 5223.694 * Tau);
+            _0x671bxb += 307 * Math[_0xfbd1[118]](0.299 + 5573.143 * Tau);
+            _0x671bxb += 243 * Math[_0xfbd1[118]](4.273 + 11790.629 * Tau);
+            _0x671bxb += 212 * Math[_0xfbd1[118]](5.847 + 1577.344 * Tau);
+            _0x671bxb += 186 * Math[_0xfbd1[118]](5.022 + 10977.079 * Tau);
+            _0x671bxb += 175 * Math[_0xfbd1[118]](3.012 + 18849.228 * Tau);
+            _0x671bxb += 110 * Math[_0xfbd1[118]](5.055 + 5486.778 * Tau);
+            _0x671bxb += 98 * Math[_0xfbd1[118]](0.89 + 6069.78 * Tau);
+            _0x671bxb += 86 * Math[_0xfbd1[118]](5.69 + 15720.84 * Tau);
+            _0x671bxb += 86 * Math[_0xfbd1[118]](1.27 + 161000.69 * Tau);
+            _0x671bxb += 65 * Math[_0xfbd1[118]](0.27 + 17260.15 * Tau);
+            _0x671bxb += 63 * Math[_0xfbd1[118]](0.92 + 529.69 * Tau);
+            _0x671bxb += 57 * Math[_0xfbd1[118]](2.01 + 83996.85 * Tau);
+            _0x671bxb += 56 * Math[_0xfbd1[118]](5.24 + 71430.7 * Tau);
+            _0x671bxb += 49 * Math[_0xfbd1[118]](3.25 + 2544.31 * Tau);
+            _0x671bxb += 47 * Math[_0xfbd1[118]](2.58 + 775.52 * Tau);
+            _0x671bxb += 45 * Math[_0xfbd1[118]](5.54 + 9437.76 * Tau);
+            _0x671bxb += 43 * Math[_0xfbd1[118]](6.01 + 6275.96 * Tau);
+            _0x671bxb += 39 * Math[_0xfbd1[118]](5.36 + 4694 * Tau);
+            _0x671bxb += 38 * Math[_0xfbd1[118]](2.39 + 8827.39 * Tau);
+            _0x671bxb += 37 * Math[_0xfbd1[118]](0.83 + 19651.05 * Tau);
+            _0x671bxb += 37 * Math[_0xfbd1[118]](4.9 + 12139.55 * Tau);
+            _0x671bxb += 36 * Math[_0xfbd1[118]](1.67 + 12036.46 * Tau);
+            _0x671bxb += 35 * Math[_0xfbd1[118]](1.84 + 2942.46 * Tau);
+            _0x671bxb += 33 * Math[_0xfbd1[118]](0.24 + 7084.9 * Tau);
+            _0x671bxb += 32 * Math[_0xfbd1[118]](0.18 + 5088.63 * Tau);
+            _0x671bxb += 32 * Math[_0xfbd1[118]](1.78 + 398.15 * Tau);
+            _0x671bxb += 28 * Math[_0xfbd1[118]](1.21 + 6286.6 * Tau);
+            _0x671bxb += 28 * Math[_0xfbd1[118]](1.9 + 6279.55 * Tau);
+            _0x671bxb += 26 * Math[_0xfbd1[118]](4.59 + 10447.39 * Tau);
+            _0x671bxc = 103019 * Math[_0xfbd1[118]](1.10749 + 6283.07585 * Tau);
+            _0x671bxc += 1721 * Math[_0xfbd1[118]](1.0644 + 12566.1517 * Tau);
+            _0x671bxc += 702 * Math[_0xfbd1[118]](3.142);
+            _0x671bxc += 32 * Math[_0xfbd1[118]](1.02 + 18849.23 * Tau);
+            _0x671bxc += 31 * Math[_0xfbd1[118]](2.84 + 5507.55 * Tau);
+            _0x671bxc += 25 * Math[_0xfbd1[118]](1.32 + 5223.69 * Tau);
+            _0x671bxc += 18 * Math[_0xfbd1[118]](1.42 + 1577.34 * Tau);
+            _0x671bxc += 10 * Math[_0xfbd1[118]](5.91 + 10977.08 * Tau);
+            _0x671bxc += 9 * Math[_0xfbd1[118]](1.42 + 6275.96 * Tau);
+            _0x671bxc += 9 * Math[_0xfbd1[118]](0.27 + 5486.78 * Tau);
+            _0x671bxd = 4359 * Math[_0xfbd1[118]](5.7846 + 6283.0758 * Tau);
+            _0x671bxd += 124 * Math[_0xfbd1[118]](5.579 + 12566.152 * Tau);
+            _0x671bxd += 12 * Math[_0xfbd1[118]](3.14);
+            _0x671bxd += 9 * Math[_0xfbd1[118]](3.63 + 77713.77 * Tau);
+            _0x671bxd += 6 * Math[_0xfbd1[118]](1.87 + 5573.14 * Tau);
+            _0x671bxd += 3 * Math[_0xfbd1[118]](5.47 + 18849.23 * Tau);
+            _0x671bxe = 145 * Math[_0xfbd1[118]](4.273 + 6283.076 * Tau);
+            _0x671bxe += 7 * Math[_0xfbd1[118]](3.92 + 12566.15 * Tau);
+            R = (_0x671bxb + _0x671bxc * Tau + _0x671bxd * Tau2 + _0x671bxe * Tau3 + 4 * Math[_0xfbd1[118]](2.56 + 6283.08 * Tau) * Tau4) / 1E8;
+            lambda = trunc(Lsun_true + delta_psi - 0.005691611 / R);
+            RAsun = trunc(Math[_0xfbd1[300]](sind(lambda) * cosd(eps) - tand(_0x671bx7) * sind(eps), cosd(lambda)) / dtr);
+            SHAsun = 360 - RAsun;
+            Dsun = DECsun = Math[_0xfbd1[301]](sind(_0x671bx7) * cosd(eps) + cosd(_0x671bx7) * sind(eps) * sind(lambda)) / dtr;
+            GHAsun = trunc(GHAAtrue - RAsun);
+            SDsun = 959.63 / R;
+            HPsun = 8.794 / R;
+            EOT = 4 * GHAsun + 720 - 1440 * dayfraction;
+            20 < EOT && (EOT -= 1440); - 20 > EOT && (EOT += 1440)
+        }
+
+        function Moon() {
+            Lmoon_mean = trunc(218.3164591 + 481267.88134236 * TE - 0.0013268 * TE2 + TE3 / 538841 - TE4 / 65194E3);
+            D = trunc(297.8502042 + 445267.1115168 * TE - 0.00163 * TE2 + TE3 / 545868 - TE4 / 113065E3);
+            Msun_mean = trunc(357.5291092 + 35999.0502909 * TE - 1.536E-4 * TE2 + TE3 / 2449E4);
+            Mmoon_mean = trunc(134.9634114 + 477198.8676313 * TE + 0.008997 * TE2 + TE3 / 69699 - TE4 / 14712E3);
+            F = trunc(93.2720993 + 483202.0175273 * TE - 0.0034029 * TE2 - TE3 / 3526E3 + TE4 / 86331E4);
+            A1 = 119.75 + 131.849 * TE;
+            A1 = 360 * (A1 / 360 - Math[_0xfbd1[147]](A1 / 360));
+            A2 = 53.09 + 479264.29 * TE;
+            A2 = 360 * (A2 / 360 - Math[_0xfbd1[147]](A2 / 360));
+            A3 = 313.45 + 481266.484 * TE;
+            A3 = 360 * (A3 / 360 - Math[_0xfbd1[147]](A3 / 360));
+            fE = 1 - 0.002516 * TE - 7.4E-6 * TE2;
+            fE2 = fE * fE;
+            fD = Array(60);
+            fMms = Array(60);
+            fMmm = Array(60);
+            fF = Array(60);
+            coeffs = Array(60);
+            coeffc = Array(60);
+            fD[0] = 0;
+            fMms[0] = 0;
+            fMmm[0] = 1;
+            fF[0] = 0;
+            coeffs[0] = 6288774;
+            coeffc[0] = -20905355;
+            fD[1] = 2;
+            fMms[1] = 0;
+            fMmm[1] = -1;
+            fF[1] = 0;
+            coeffs[1] = 1274027;
+            coeffc[1] = -3699111;
+            fD[2] = 2;
+            fMms[2] = 0;
+            fMmm[2] = 0;
+            fF[2] = 0;
+            coeffs[2] = 658314;
+            coeffc[2] = -2955968;
+            fD[3] = 0;
+            fMms[3] = 0;
+            fMmm[3] = 2;
+            fF[3] = 0;
+            coeffs[3] = 213618;
+            coeffc[3] = -569925;
+            fD[4] = 0;
+            fMms[4] = 1;
+            fMmm[4] = 0;
+            fF[4] = 0;
+            coeffs[4] = -185116;
+            coeffc[4] = 48888;
+            fD[5] = 0;
+            fMms[5] = 0;
+            fMmm[5] = 0;
+            fF[5] = 2;
+            coeffs[5] = -114332;
+            coeffc[5] = -3149;
+            fD[6] = 2;
+            fMms[6] = 0;
+            fMmm[6] = -2;
+            fF[6] = 0;
+            coeffs[6] = 58793;
+            coeffc[6] = 246158;
+            fD[7] = 2;
+            fMms[7] = -1;
+            fMmm[7] = -1;
+            fF[7] = 0;
+            coeffs[7] = 57066;
+            coeffc[7] = -152138;
+            fD[8] = 2;
+            fMms[8] = 0;
+            fMmm[8] = 1;
+            fF[8] = 0;
+            coeffs[8] = 53322;
+            coeffc[8] = -170733;
+            fD[9] = 2;
+            fMms[9] = -1;
+            fMmm[9] = 0;
+            fF[9] = 0;
+            coeffs[9] = 45758;
+            coeffc[9] = -204586;
+            fD[10] = 0;
+            fMms[10] = 1;
+            fMmm[10] = -1;
+            fF[10] = 0;
+            coeffs[10] = -40923;
+            coeffc[10] = -129620;
+            fD[11] = 1;
+            fMms[11] = 0;
+            fMmm[11] = 0;
+            fF[11] = 0;
+            coeffs[11] = -34720;
+            coeffc[11] = 108743;
+            fD[12] = 0;
+            fMms[12] = 1;
+            fMmm[12] = 1;
+            fF[12] = 0;
+            coeffs[12] = -30383;
+            coeffc[12] = 104755;
+            fD[13] = 2;
+            fMms[13] = 0;
+            fMmm[13] = 0;
+            fF[13] = -2;
+            coeffs[13] = 15327;
+            coeffc[13] = 10321;
+            fD[14] = 0;
+            fMms[14] = 0;
+            fMmm[14] = 1;
+            fF[14] = 2;
+            coeffs[14] = -12528;
+            coeffc[14] = 0;
+            fD[15] = 0;
+            fMms[15] = 0;
+            fMmm[15] = 1;
+            fF[15] = -2;
+            coeffs[15] = 10980;
+            coeffc[15] = 79661;
+            fD[16] = 4;
+            fMms[16] = 0;
+            fMmm[16] = -1;
+            fF[16] = 0;
+            coeffs[16] = 10675;
+            coeffc[16] = -34782;
+            fD[17] = 0;
+            fMms[17] = 0;
+            fMmm[17] = 3;
+            fF[17] = 0;
+            coeffs[17] = 10034;
+            coeffc[17] = -23210;
+            fD[18] = 4;
+            fMms[18] = 0;
+            fMmm[18] = -2;
+            fF[18] = 0;
+            coeffs[18] = 8548;
+            coeffc[18] = -21636;
+            fD[19] = 2;
+            fMms[19] = 1;
+            fMmm[19] = -1;
+            fF[19] = 0;
+            coeffs[19] = -7888;
+            coeffc[19] = 24208;
+            fD[20] = 2;
+            fMms[20] = 1;
+            fMmm[20] = 0;
+            fF[20] = 0;
+            coeffs[20] = -6766;
+            coeffc[20] = 30824;
+            fD[21] = 1;
+            fMms[21] = 0;
+            fMmm[21] = -1;
+            fF[21] = 0;
+            coeffs[21] = -5163;
+            coeffc[21] = -8379;
+            fD[22] = 1;
+            fMms[22] = 1;
+            fMmm[22] = 0;
+            fF[22] = 0;
+            coeffs[22] = 4987;
+            coeffc[22] = -16675;
+            fD[23] = 2;
+            fMms[23] = -1;
+            fMmm[23] = 1;
+            fF[23] = 0;
+            coeffs[23] = 4036;
+            coeffc[23] = -12831;
+            fD[24] = 2;
+            fMms[24] = 0;
+            fMmm[24] = 2;
+            fF[24] = 0;
+            coeffs[24] = 3994;
+            coeffc[24] = -10445;
+            fD[25] = 4;
+            fMms[25] = 0;
+            fMmm[25] = 0;
+            fF[25] = 0;
+            coeffs[25] = 3861;
+            coeffc[25] = -11650;
+            fD[26] = 2;
+            fMms[26] = 0;
+            fMmm[26] = -3;
+            fF[26] = 0;
+            coeffs[26] = 3665;
+            coeffc[26] = 14403;
+            fD[27] = 0;
+            fMms[27] = 1;
+            fMmm[27] = -2;
+            fF[27] = 0;
+            coeffs[27] = -2689;
+            coeffc[27] = -7003;
+            fD[28] = 2;
+            fMms[28] = 0;
+            fMmm[28] = -1;
+            fF[28] = 2;
+            coeffs[28] = -2602;
+            coeffc[28] = 0;
+            fD[29] = 2;
+            fMms[29] = -1;
+            fMmm[29] = -2;
+            fF[29] = 0;
+            coeffs[29] = 2390;
+            coeffc[29] = 10056;
+            fD[30] = 1;
+            fMms[30] = 0;
+            fMmm[30] = 1;
+            fF[30] = 0;
+            coeffs[30] = -2348;
+            coeffc[30] = 6322;
+            fD[31] = 2;
+            fMms[31] = -2;
+            fMmm[31] = 0;
+            fF[31] = 0;
+            coeffs[31] = 2236;
+            coeffc[31] = -9884;
+            fD[32] = 0;
+            fMms[32] = 1;
+            fMmm[32] = 2;
+            fF[32] = 0;
+            coeffs[32] = -2120;
+            coeffc[32] = 5751;
+            fD[33] = 0;
+            fMms[33] = 2;
+            fMmm[33] = 0;
+            fF[33] = 0;
+            coeffs[33] = -2069;
+            coeffc[33] = 0;
+            fD[34] = 2;
+            fMms[34] = -2;
+            fMmm[34] = -1;
+            fF[34] = 0;
+            coeffs[34] = 2048;
+            coeffc[34] = -4950;
+            fD[35] = 2;
+            fMms[35] = 0;
+            fMmm[35] = 1;
+            fF[35] = -2;
+            coeffs[35] = -1773;
+            coeffc[35] = 4130;
+            fD[36] = 2;
+            fMms[36] = 0;
+            fMmm[36] = 0;
+            fF[36] = 2;
+            coeffs[36] = -1595;
+            coeffc[36] = 0;
+            fD[37] = 4;
+            fMms[37] = -1;
+            fMmm[37] = -1;
+            fF[37] = 0;
+            coeffs[37] = 1215;
+            coeffc[37] = -3958;
+            fD[38] = 0;
+            fMms[38] = 0;
+            fMmm[38] = 2;
+            fF[38] = 2;
+            coeffs[38] = -1110;
+            coeffc[38] = 0;
+            fD[39] = 3;
+            fMms[39] = 0;
+            fMmm[39] = -1;
+            fF[39] = 0;
+            coeffs[39] = -892;
+            coeffc[39] = 3258;
+            fD[40] = 2;
+            fMms[40] = 1;
+            fMmm[40] = 1;
+            fF[40] = 0;
+            coeffs[40] = -810;
+            coeffc[40] = 2616;
+            fD[41] = 4;
+            fMms[41] = -1;
+            fMmm[41] = -2;
+            fF[41] = 0;
+            coeffs[41] = 759;
+            coeffc[41] = -1897;
+            fD[42] = 0;
+            fMms[42] = 2;
+            fMmm[42] = -1;
+            fF[42] = 0;
+            coeffs[42] = -713;
+            coeffc[42] = -2117;
+            fD[43] = 2;
+            fMms[43] = 2;
+            fMmm[43] = -1;
+            fF[43] = 0;
+            coeffs[43] = -700;
+            coeffc[43] = 2354;
+            fD[44] = 2;
+            fMms[44] = 1;
+            fMmm[44] = -2;
+            fF[44] = 0;
+            coeffs[44] = 691;
+            coeffc[44] = 0;
+            fD[45] = 2;
+            fMms[45] = -1;
+            fMmm[45] = 0;
+            fF[45] = -2;
+            coeffs[45] = 596;
+            coeffc[45] = 0;
+            fD[46] = 4;
+            fMms[46] = 0;
+            fMmm[46] = 1;
+            fF[46] = 0;
+            coeffs[46] = 549;
+            coeffc[46] = -1423;
+            fD[47] = 0;
+            fMms[47] = 0;
+            fMmm[47] = 4;
+            fF[47] = 0;
+            coeffs[47] = 537;
+            coeffc[47] = -1117;
+            fD[48] = 4;
+            fMms[48] = -1;
+            fMmm[48] = 0;
+            fF[48] = 0;
+            coeffs[48] = 520;
+            coeffc[48] = -1571;
+            fD[49] = 1;
+            fMms[49] = 0;
+            fMmm[49] = -2;
+            fF[49] = 0;
+            coeffs[49] = -487;
+            coeffc[49] = -1739;
+            fD[50] = 2;
+            fMms[50] = 1;
+            fMmm[50] = 0;
+            fF[50] = -2;
+            coeffs[50] = -399;
+            coeffc[50] = 0;
+            fD[51] = 0;
+            fMms[51] = 0;
+            fMmm[51] = 2;
+            fF[51] = -2;
+            coeffs[51] = -381;
+            coeffc[51] = -4421;
+            fD[52] = 1;
+            fMms[52] = 1;
+            fMmm[52] = 1;
+            fF[52] = 0;
+            coeffs[52] = 351;
+            coeffc[52] = 0;
+            fD[53] = 3;
+            fMms[53] = 0;
+            fMmm[53] = -2;
+            fF[53] = 0;
+            coeffs[53] = -340;
+            coeffc[53] = 0;
+            fD[54] = 4;
+            fMms[54] = 0;
+            fMmm[54] = -3;
+            fF[54] = 0;
+            coeffs[54] = 330;
+            coeffc[54] = 0;
+            fD[55] = 2;
+            fMms[55] = -1;
+            fMmm[55] = 2;
+            fF[55] = 0;
+            coeffs[55] = 327;
+            coeffc[55] = 0;
+            fD[56] = 0;
+            fMms[56] = 2;
+            fMmm[56] = 1;
+            fF[56] = 0;
+            coeffs[56] = -323;
+            coeffc[56] = 1165;
+            fD[57] = 1;
+            fMms[57] = 1;
+            fMmm[57] = -1;
+            fF[57] = 0;
+            coeffs[57] = 299;
+            coeffc[57] = 0;
+            fD[58] = 2;
+            fMms[58] = 0;
+            fMmm[58] = 3;
+            fF[58] = 0;
+            coeffs[58] = 294;
+            coeffc[58] = 0;
+            fD[59] = 2;
+            fMms[59] = 0;
+            fMmm[59] = -1;
+            fF[59] = -2;
+            coeffs[59] = 0;
+            coeffc[59] = 8752;
+            fD2 = Array(60);
+            fMms2 = Array(60);
+            fMmm2 = Array(60);
+            fF2 = Array(60);
+            coeffs2 = Array(60);
+            fD2[0] = 0;
+            fMms2[0] = 0;
+            fMmm2[0] = 0;
+            fF2[0] = 1;
+            coeffs2[0] = 5128122;
+            fD2[1] = 0;
+            fMms2[1] = 0;
+            fMmm2[1] = 1;
+            fF2[1] = 1;
+            coeffs2[1] = 280602;
+            fD2[2] = 0;
+            fMms2[2] = 0;
+            fMmm2[2] = 1;
+            fF2[2] = -1;
+            coeffs2[2] = 277693;
+            fD2[3] = 2;
+            fMms2[3] = 0;
+            fMmm2[3] = 0;
+            fF2[3] = -1;
+            coeffs2[3] = 173237;
+            fD2[4] = 2;
+            fMms2[4] = 0;
+            fMmm2[4] = -1;
+            fF2[4] = 1;
+            coeffs2[4] = 55413;
+            fD2[5] = 2;
+            fMms2[5] = 0;
+            fMmm2[5] = -1;
+            fF2[5] = -1;
+            coeffs2[5] = 46271;
+            fD2[6] = 2;
+            fMms2[6] = 0;
+            fMmm2[6] = 0;
+            fF2[6] = 1;
+            coeffs2[6] = 32573;
+            fD2[7] = 0;
+            fMms2[7] = 0;
+            fMmm2[7] = 2;
+            fF2[7] = 1;
+            coeffs2[7] = 17198;
+            fD2[8] = 2;
+            fMms2[8] = 0;
+            fMmm2[8] = 1;
+            fF2[8] = -1;
+            coeffs2[8] = 9266;
+            fD2[9] = 0;
+            fMms2[9] = 0;
+            fMmm2[9] = 2;
+            fF2[9] = -1;
+            coeffs2[9] = 8822;
+            fD2[10] = 2;
+            fMms2[10] = -1;
+            fMmm2[10] = 0;
+            fF2[10] = -1;
+            coeffs2[10] = 8216;
+            fD2[11] = 2;
+            fMms2[11] = 0;
+            fMmm2[11] = -2;
+            fF2[11] = -1;
+            coeffs2[11] = 4324;
+            fD2[12] = 2;
+            fMms2[12] = 0;
+            fMmm2[12] = 1;
+            fF2[12] = 1;
+            coeffs2[12] = 4200;
+            fD2[13] = 2;
+            fMms2[13] = 1;
+            fMmm2[13] = 0;
+            fF2[13] = -1;
+            coeffs2[13] = -3359;
+            fD2[14] = 2;
+            fMms2[14] = -1;
+            fMmm2[14] = -1;
+            fF2[14] = 1;
+            coeffs2[14] = 2463;
+            fD2[15] = 2;
+            fMms2[15] = -1;
+            fMmm2[15] = 0;
+            fF2[15] = 1;
+            coeffs2[15] = 2211;
+            fD2[16] = 2;
+            fMms2[16] = -1;
+            fMmm2[16] = -1;
+            fF2[16] = -1;
+            coeffs2[16] = 2065;
+            fD2[17] = 0;
+            fMms2[17] = 1;
+            fMmm2[17] = -1;
+            fF2[17] = -1;
+            coeffs2[17] = -1870;
+            fD2[18] = 4;
+            fMms2[18] = 0;
+            fMmm2[18] = -1;
+            fF2[18] = -1;
+            coeffs2[18] = 1828;
+            fD2[19] = 0;
+            fMms2[19] = 1;
+            fMmm2[19] = 0;
+            fF2[19] = 1;
+            coeffs2[19] = -1794;
+            fD2[20] = 0;
+            fMms2[20] = 0;
+            fMmm2[20] = 0;
+            fF2[20] = 3;
+            coeffs2[20] = -1749;
+            fD2[21] = 0;
+            fMms2[21] = 1;
+            fMmm2[21] = -1;
+            fF2[21] = 1;
+            coeffs2[21] = -1565;
+            fD2[22] = 1;
+            fMms2[22] = 0;
+            fMmm2[22] = 0;
+            fF2[22] = 1;
+            coeffs2[22] = -1491;
+            fD2[23] = 0;
+            fMms2[23] = 1;
+            fMmm2[23] = 1;
+            fF2[23] = 1;
+            coeffs2[23] = -1475;
+            fD2[24] = 0;
+            fMms2[24] = 1;
+            fMmm2[24] = 1;
+            fF2[24] = -1;
+            coeffs2[24] = -1410;
+            fD2[25] = 0;
+            fMms2[25] = 1;
+            fMmm2[25] = 0;
+            fF2[25] = -1;
+            coeffs2[25] = -1344;
+            fD2[26] = 1;
+            fMms2[26] = 0;
+            fMmm2[26] = 0;
+            fF2[26] = -1;
+            coeffs2[26] = -1335;
+            fD2[27] = 0;
+            fMms2[27] = 0;
+            fMmm2[27] = 3;
+            fF2[27] = 1;
+            coeffs2[27] = 1107;
+            fD2[28] = 4;
+            fMms2[28] = 0;
+            fMmm2[28] = 0;
+            fF2[28] = -1;
+            coeffs2[28] = 1021;
+            fD2[29] = 4;
+            fMms2[29] = 0;
+            fMmm2[29] = -1;
+            fF2[29] = 1;
+            coeffs2[29] = 833;
+            fD2[30] = 0;
+            fMms2[30] = 0;
+            fMmm2[30] = 1;
+            fF2[30] = -3;
+            coeffs2[30] = 777;
+            fD2[31] = 4;
+            fMms2[31] = 0;
+            fMmm2[31] = -2;
+            fF2[31] = 1;
+            coeffs2[31] = 671;
+            fD2[32] = 2;
+            fMms2[32] = 0;
+            fMmm2[32] = 0;
+            fF2[32] = -3;
+            coeffs2[32] = 607;
+            fD2[33] = 2;
+            fMms2[33] = 0;
+            fMmm2[33] = 2;
+            fF2[33] = -1;
+            coeffs2[33] = 596;
+            fD2[34] = 2;
+            fMms2[34] = -1;
+            fMmm2[34] = 1;
+            fF2[34] = -1;
+            coeffs2[34] = 491;
+            fD2[35] = 2;
+            fMms2[35] = 0;
+            fMmm2[35] = -2;
+            fF2[35] = 1;
+            coeffs2[35] = -451;
+            fD2[36] = 0;
+            fMms2[36] = 0;
+            fMmm2[36] = 3;
+            fF2[36] = -1;
+            coeffs2[36] = 439;
+            fD2[37] = 2;
+            fMms2[37] = 0;
+            fMmm2[37] = 2;
+            fF2[37] = 1;
+            coeffs2[37] = 422;
+            fD2[38] = 2;
+            fMms2[38] = 0;
+            fMmm2[38] = -3;
+            fF2[38] = -1;
+            coeffs2[38] = 421;
+            fD2[39] = 2;
+            fMms2[39] = 1;
+            fMmm2[39] = -1;
+            fF2[39] = 1;
+            coeffs2[39] = -366;
+            fD2[40] = 2;
+            fMms2[40] = 1;
+            fMmm2[40] = 0;
+            fF2[40] = 1;
+            coeffs2[40] = -351;
+            fD2[41] = 4;
+            fMms2[41] = 0;
+            fMmm2[41] = 0;
+            fF2[41] = 1;
+            coeffs2[41] = 331;
+            fD2[42] = 2;
+            fMms2[42] = -1;
+            fMmm2[42] = 1;
+            fF2[42] = 1;
+            coeffs2[42] = 315;
+            fD2[43] = 2;
+            fMms2[43] = -2;
+            fMmm2[43] = 0;
+            fF2[43] = -1;
+            coeffs2[43] = 302;
+            fD2[44] = 0;
+            fMms2[44] = 0;
+            fMmm2[44] = 1;
+            fF2[44] = 3;
+            coeffs2[44] = -283;
+            fD2[45] = 2;
+            fMms2[45] = 1;
+            fMmm2[45] = 1;
+            fF2[45] = -1;
+            coeffs2[45] = -229;
+            fD2[46] = 1;
+            fMms2[46] = 1;
+            fMmm2[46] = 0;
+            fF2[46] = -1;
+            coeffs2[46] = 223;
+            fD2[47] = 1;
+            fMms2[47] = 1;
+            fMmm2[47] = 0;
+            fF2[47] = 1;
+            coeffs2[47] = 223;
+            fD2[48] = 0;
+            fMms2[48] = 1;
+            fMmm2[48] = -2;
+            fF2[48] = -1;
+            coeffs2[48] = -220;
+            fD2[49] = 2;
+            fMms2[49] = 1;
+            fMmm2[49] = -1;
+            fF2[49] = -1;
+            coeffs2[49] = -220;
+            fD2[50] = 1;
+            fMms2[50] = 0;
+            fMmm2[50] = 1;
+            fF2[50] = 1;
+            coeffs2[50] = -185;
+            fD2[51] = 2;
+            fMms2[51] = -1;
+            fMmm2[51] = -2;
+            fF2[51] = -1;
+            coeffs2[51] = 181;
+            fD2[52] = 0;
+            fMms2[52] = 1;
+            fMmm2[52] = 2;
+            fF2[52] = 1;
+            coeffs2[52] = -177;
+            fD2[53] = 4;
+            fMms2[53] = 0;
+            fMmm2[53] = -2;
+            fF2[53] = -1;
+            coeffs2[53] = 176;
+            fD2[54] = 4;
+            fMms2[54] = -1;
+            fMmm2[54] = -1;
+            fF2[54] = -1;
+            coeffs2[54] = 166;
+            fD2[55] = 1;
+            fMms2[55] = 0;
+            fMmm2[55] = 1;
+            fF2[55] = -1;
+            coeffs2[55] = -164;
+            fD2[56] = 4;
+            fMms2[56] = 0;
+            fMmm2[56] = 1;
+            fF2[56] = -1;
+            coeffs2[56] = 132;
+            fD2[57] = 1;
+            fMms2[57] = 0;
+            fMmm2[57] = -1;
+            fF2[57] = -1;
+            coeffs2[57] = -119;
+            fD2[58] = 4;
+            fMms2[58] = -1;
+            fMmm2[58] = 0;
+            fF2[58] = -1;
+            coeffs2[58] = 115;
+            fD2[59] = 2;
+            fMms2[59] = -2;
+            fMmm2[59] = 0;
+            fF2[59] = 1;
+            coeffs2[59] = 107;
+            var _0x671bx7 = 0,
+                _0x671bxb = 0,
+                _0x671bxc = 0;
+            for (x = 0; 60 > x; x++) {
+                var _0x671bxd = 1;
+                1 == Math[_0xfbd1[302]](fMms[x]) && (_0x671bxd = fE);
+                2 == Math[_0xfbd1[302]](fMms[x]) && (_0x671bxd = fE2);
+                _0x671bx7 += _0x671bxd * coeffs[x] * sind(fD[x] * D + fMms[x] * Msun_mean + fMmm[x] * Mmoon_mean + fF[x] * F);
+                _0x671bxb += _0x671bxd * coeffc[x] * cosd(fD[x] * D + fMms[x] * Msun_mean + fMmm[x] * Mmoon_mean + fF[x] * F);
+                _0x671bxd = 1;
+                1 == Math[_0xfbd1[302]](fMms2[x]) && (_0x671bxd = fE);
+                2 == Math[_0xfbd1[302]](fMms2[x]) && (_0x671bxd = fE2);
+                _0x671bxc += _0x671bxd * coeffs2[x] * sind(fD2[x] * D + fMms2[x] * Msun_mean + fMmm2[x] * Mmoon_mean + fF2[x] * F)
+            };
+            _0x671bx7 = _0x671bx7 + 3958 * sind(A1) + 1962 * sind(Lmoon_mean - F) + 318 * sind(A2);
+            _0x671bxc = _0x671bxc - 2235 * sind(Lmoon_mean) + 382 * sind(A3) + 175 * sind(A1 - F) + 175 * sind(A1 + F) + 127 * sind(Lmoon_mean - Mmoon_mean) - 115 * sind(Lmoon_mean + Mmoon_mean);
+            lambdaMm = trunc(Lmoon_mean + _0x671bx7 / 1E6);
+            betaM = _0x671bxc / 1E6;
+            dEM = 385000.56 + _0x671bxb / 1E3;
+            lambdaMapp = lambdaMm + delta_psi;
+            RAmoon = trunc(Math[_0xfbd1[300]](sind(lambdaMapp) * cosd(eps) - tand(betaM) * sind(eps), cosd(lambdaMapp)) / dtr);
+            SHAmoon = 360 - RAmoon;
+            Dmoon = DECmoon = Math[_0xfbd1[301]](sind(betaM) * cosd(eps) + cosd(betaM) * sind(eps) * sind(lambdaMapp)) / dtr;
+            GHAmoon = trunc(GHAAtrue - RAmoon)
+        }
+
+        function adjustParameters() {
+            pixelDegW = 360 / mapWidth;
+            pixelDegH = 180 / mapHeight;
+            edgeOffset = 0;
+            centerDegW = mapWidth / 2 * pixelDegW - edgeOffset;
+            centerDegH = mapHeight / 2 * pixelDegH
+        }
+
+        function pixelX(_0x671bx7) {
+            return (_0x671bx7 < centerDegW ? centerDegW - _0x671bx7 : 360 - _0x671bx7 + centerDegW) / pixelDegW
+        }
+
+        function pixelY(_0x671bx7) {
+            return (centerDegH - _0x671bx7) / pixelDegH
+        }
+
+        function pixelLambda(_0x671bx7) {
+            _0x671bx7 *= pixelDegW;
+            return _0x671bx7 < centerDegW ? centerDegW - _0x671bx7 : 360 - _0x671bx7 + centerDegW
+        }
+
+        function pixelPhi(_0x671bx7, _0x671bxb) {
+            return centerDegH - _0x671bx7 * pixelDegH
+        }
+
+        function drawCircle(_0x671bx7, _0x671bxb, _0x671bxc, _0x671bxd, _0x671bxe) {
+            _0x671bx7[_0xfbd1[303]]();
+            _0x671bx7[_0xfbd1[304]](_0x671bxb, _0x671bxc, _0x671bxd, 0, 2 * Math[_0xfbd1[117]], !0);
+            _0x671bx7[_0xfbd1[305]]();
+            _0x671bx7[_0xfbd1[306]] = _0x671bxe;
+            _0x671bx7[_0xfbd1[307]]();
+            _0x671bx7[_0xfbd1[308]]()
+        }
+
+        function drawDayNightMap() {
+            var _0x671bx7 = document[_0xfbd1[30]](_0xfbd1[102]);
+            _0x671bx7[_0xfbd1[72]] = mapWidth;
+            _0x671bx7[_0xfbd1[38]] = mapHeight;
+            _0x671bx7 = _0x671bx7[_0xfbd1[310]](_0xfbd1[309]);
+            _0x671bx7[_0xfbd1[311]](mapImage, 0, 0);
+            performCalculations(mapdate);
+            var _0x671bxb = 0 <= DECsun,
+                _0x671bxc = _0x671bxb ? 0 : mapHeight - 1,
+                _0x671bxd = _0x671bxb ? 1 : -1;
+            _0x671bx7[_0xfbd1[306]] = _0xfbd1[312];
+            for (var _0x671bxe = 0; _0x671bxe < mapWidth; ++_0x671bxe) {
+                for (var _0x671bx35 = _0x671bxc; _0x671bxb ? _0x671bx35 < mapHeight : 0 <= _0x671bx35; _0x671bx35 += _0x671bxd) {
+                    var _0x671bx36 = pixelLambda(_0x671bxe),
+                        _0x671bx46 = pixelPhi(_0x671bx35) + 0.5 * (_0x671bxb ? -1 : 1);
+                    _0x671bx36 = sind(_0x671bx46) * sind(DECsun) + cosd(_0x671bx46) * cosd(DECsun) * cosd(GHAsun - _0x671bx36);
+                    _0x671bx36 = Math[_0xfbd1[313]](_0x671bx36);
+                    if (_0x671bx36 > Math[_0xfbd1[117]] / 2) {
+                        _0x671bx36 = _0x671bxb ? _0x671bx35 : 0;
+                        _0x671bx7[_0xfbd1[314]](_0x671bxe, _0x671bx36, 1, _0x671bxb ? mapHeight - _0x671bx36 : _0x671bx35 + 1);
+                        break
+                    }
+                }
+            };
+            xsol = pixelX(GHAsun);
+            ysol = pixelY(DECsun);
+            xluna = pixelX(GHAmoon);
+            yluna = pixelY(DECmoon);
+            1 == IsDrawEarth ? ReposicionarAstro() : DrawEarth()
+        }
+
+        function init() {
+            adjustParameters();
+            mapImage = new Image;
+            mapImage[_0xfbd1[315]](_0xfbd1[103], _0xfbd1[104]);
+            mapImage[_0xfbd1[316]] = function () {
+                drawDayNightMap()
+            };
+            mapImage[_0xfbd1[317]] = _0xfbd1[318]
+        }
+        init()
+    </script>
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o), m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-261803-1', 'auto', {
+            'allowLinker': true
+        });
+        ga('require', 'linker');
+        ga('linker:autoLink', ['www.tutiempo.net', 'en.tutiempo.net', 'fr.tutiempo.net', 'pt.tutiempo.net', 'de.tutiempo.net', 'it.tutiempo.net', 'mapa.tutiempo.net', 'tierra.tutiempo.net', 'blog.tutiempo.net', 'terremotos.tutiempo.net']);
+        ga('send', 'pageview');
+        setInterval(function () {
+            console.clear();
+        }, 5000);
+    </script>
+</body>
+
+</html>
