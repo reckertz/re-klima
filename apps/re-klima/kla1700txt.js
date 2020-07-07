@@ -1,6 +1,6 @@
 /*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
-/*global sysbase,uihelper,SuperGif */
+/*global sysbase,uihelper,SuperGif,WordCloud */
 (function () {
     var kla1700txt = {};
 
@@ -10,9 +10,15 @@
 
     var actprjname = "";
     var actfullname = "";
+    var actresult = "";
+    var poprecord = {};
     var aktsource = "";
     var fulldatafilename = "";
     var datafilename = "";
+
+
+
+
 
     kla1700txt.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
@@ -87,12 +93,67 @@
                                 evt.preventDefault();
                                 var fullname = actfullname;
                                 var target = "#kla1700txt_rightw";
-                                kla1700txt.textanalysis(fullname, target, function (ret) {
+                                $(target).empty();
+                                var options = {};
+                                kla1700txt.textanalysis(fullname, target, options, function (ret) {
                                     // Ausgabe
                                 });
 
                             }
                         }))
+
+
+                        .append($("<li/>", {
+                            class: "dropdown-menuepoint",
+                            html: "Word-Cloud",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var fullname = actfullname;
+                                var target = "#kla1700txt_rightw";
+                                $(target).empty();
+                                if (typeof actresult !== "object" || Object.keys(actresult).length === 0) {
+                                    sysbase.putMessage("Erst Textanalyse, dann Word-Cloud aufrufen", 3);
+                                    return;
+                                }
+
+                                $(target)
+                                    .append($("<canvas/>", {
+                                        id: "kla1700txtcanvas",
+                                        css: {
+                                            border: "1px solid"
+                                        }
+                                    }));
+                                var canvas = document.getElementById("kla1700txtcanvas");
+                                canvas.width = $("#kla1700txt_rightw").width() * .9;
+                                canvas.height = $("#kla1700txt_rightw").height() * .9;
+
+
+                                // where list is an array that look like this: [['foo', 12], ['bar', 6]]
+                                var wordarray = [];
+                                for (var iword = 0; iword < actresult.vocstats.length; iword++) {
+                                    wordarray.push([
+                                        actresult.vocstats[iword].word,
+                                        actresult.vocstats[iword].count,
+                                    ])
+                                }
+                                WordCloud(document.getElementById('kla1700txtcanvas'), {
+                                    list: wordarray,
+                                    /* gridSize: 18, */
+                                    /* weightFactor: 3, */
+                                    drawOutOfBound: false,
+                                    shrinkToFit: true,
+                                    fontFamily: 'Finger Paint, cursive, sans-serif',
+                                    color: '#f0f0c0',
+                                    hover: window.drawBox,
+                                    click: function (item) {
+                                        alert(item[0] + ': ' + item[1]);
+                                    },
+                                    backgroundColor: '#001f00'
+                                });
+                            }
+                        }))
+
+
 
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
@@ -258,7 +319,6 @@
                     },
                     click: function (evt) {
                         evt.preventDefault();
-                        debugger;
                         kla1700txt.showfiles("list", "", "", "", function (ret) {
                             if (ret.error === true) {
                                 var newdirectory = ["C:", "projekte", "klimadaten", "BOOKS"];
@@ -288,6 +348,120 @@
                     }
                 }))
                 .append($("<br/>"))
+
+
+
+
+
+                .append($("<button/>", {
+                    html: "Textanalyse",
+                    title: "Bereinigung, Stemming, Auszählung",
+                    css: {
+                        float: "left",
+                        "margin-left": "10px",
+                        "background-color": "navyblue"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        /**
+                         *
+                         * kla1700txt - Prompt;
+                         */
+                        var username = uihelper.getUsername();
+                        poprecord = {
+                            toplimit: 10,
+                            language: "EN"
+                        }
+                        var popschema = {
+                            entryschema: {
+                                /*
+                                props: {
+                                    title: "Abrufparameter Textanalyse",
+                                    description: "",
+                                    type: "object", // currency, integer, datum, text, key, object
+                                    class: "uiefieldset",
+                                    properties: {
+                                */
+                                toplimit: {
+                                    title: "Anzahl Top-Statistik",
+                                    type: "string", // currency, integer, datum, text, key
+                                    class: "uietext",
+                                    width: "100px",
+                                    io: "i"
+                                },
+                                language: {
+                                    title: "Sprache",
+                                    type: "string", // currency, integer, datum, text, key
+                                    class: "uieselectinput",
+                                    width: "100px",
+                                    default: "EN",
+                                    io: "i",
+                                    enum: [
+                                        "DE",
+                                        "EN"
+                                    ]
+                                },
+                                contextwords: {
+                                    title: "Kontextanalyse",
+                                    type: "string", // currency, integer, datum, text, key
+                                    class: "uiestring",
+                                    width: "100px",
+                                    io: "i"
+                                },
+                                comment: {
+                                    title: "Kommentar",
+                                    type: "string", // currency, integer, datum, text, key
+                                    class: "uietext",
+                                    width: "100px",
+                                    default: "",
+                                    io: "i"
+                                }
+                            }
+                            /*
+                                }
+                            }
+                            */
+                        };
+                        var anchorHash = "#kla1700txt_rightw";
+                        var title = "Super-Textanalyse";
+                        /*
+                        var pos = {
+                            left: $("#kla1700txt_rightw").offset().left,
+                            top: screen.height * 0.1,
+                            width: $("#kla1700txt_rightw").width() * 0.80,
+                            height: $("#kla1700txt_rightw").height() * 0.90
+                        };
+                        */
+                        var pos = {
+                            left: $("#kla1700txt_rightw").offset().left,
+                            top: screen.height / 2,
+                            width: $("#kla1700txt_rightw").width() * 0.60,
+                        };
+                        //Math.ceil($(this).offset().top + $(this).height() + 20)
+                        $(document).on('popupok', function (evt, extraParam) {
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                            evt.stopImmediatePropagation();
+                            console.log(extraParam);
+                            var superParam = JSON.parse(extraParam);
+                            var fullname = actfullname;
+                            var target = "#kla1700txt_rightw";
+                            $(target).empty();
+                            kla1700txt.textanalysis(fullname, target, superParam, function (ret) {
+                                // Ausgabe
+                                return;
+                            });
+                        });
+                        uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
+                            if (ret.error === false) {
+                                // outrec.isactive = "false"; // true oder false wenn gelöscht
+                            } else {
+                                sysbase.putMessage("Kein Abruf Textanalyse", 1);
+                                return;
+                            }
+                        });
+                    }
+                }))
                 .append($("<br/>"))
             );
 
@@ -531,12 +705,12 @@
 
                 });
             });
-            callbacksf (ret);
+            callbacksf(ret);
             return;
         }).fail(function (err) {
             document.getElementById("kla1700txt").style.cursor = "default";
             sysbase.putMessage(err, 1);
-            callbacksf ({
+            callbacksf({
                 error: true,
                 message: err
             });
@@ -928,7 +1102,7 @@
     /**
      * textanalysis - Analyse Textdatei im Server und Anzeige Ergebnis
      */
-    kla1700txt.textanalysis = function (fullname, target, callbackf) {
+    kla1700txt.textanalysis = function (fullname, target, options, callbackf) {
         if (typeof target === "undefined" || target.length === 0) {
             target = "#kla1700txt_rightw";
         }
@@ -970,7 +1144,9 @@
             crossDomain: false,
             url: sysbase.getServer("textanalysis"),
             data: {
-                fullname: fullname
+                fullname: fullname,
+                language: options.language || "EN",
+                toplimit: options.toplimit || 10
             }
         }).done(function (r1, textStatus, jqXHR) {
             sysbase.checkSessionLogin(r1);
@@ -979,13 +1155,98 @@
             // Ausgabe in Map rechts
             sysbase.putMessage(ret.message, 1);
             $(target).empty();
+            actresult = ret.result;
             $(target)
-                .append($("<span/>", {
-                    html: ret.result,
+                .append($("<div/>", {
+                        css: {
+                            width: "100%"
+                        }
+                    })
+                    .append($("<button/>", {
+                        css: {
+                            "margin-left": "10px"
+                        },
+                        html: "Download Tabelle",
+                        click: function (evt) {
+                            evt.preventDefault();
+                            //uihelper.downloadHtmlTable ("#kla1700txtwords", "Extrakt", options);
+                            uihelper.downloadHtmlTableSelected ("#kla1700txtwords", "Extract.html");
+                        }
+                    }))
+                );
+            var htmltable = "";
+            var staformat = {
+                pos: {
+                    title: "Nr",
+                    width: "8%",
+                    align: "center"
+                },
+                word: {
+                    title: "Word",
+                    width: "25%",
+                    align: "lewt",
                     css: {
-                        width: "100%"
+                        "word-wrap": "break-word"
                     }
+                },
+                count: {
+                    title: "Anzahl",
+                    width: "10%",
+                    align: "center"
+                },
+                oper: {
+                    title: "Operation",
+                    width: "10%",
+                    align: "center"
+                },
+                results: {
+                    title: "Ergebnisse",
+                    width: "45%",
+                    align: "left"
+                }
+            };
+            // for (irec = 0; irec < ret.records.length; irec++) {
+            // actresult.vocstats
+            var irec = 0;
+            for (var iword = 0; iword < actresult.vocstats.length; iword++) {
+
+                var record = actresult.vocstats[iword];
+                irec++;
+                var starec = {
+                    pos: irec,
+                    word: record.word,
+                    count: record.count,
+                    oper: "",
+                    results: ""
+                };
+                var line = uihelper.transformJSON2TableTR(starec, irec - 1, staformat, "", "tablesorter-ignoreRow");
+                htmltable += line;
+            }
+            htmltable += "</body>";
+            htmltable += "</table>";
+            $(target)
+                .append($("<table/>", {
+                    id: "kla1700txtwords",
+                    class: "tablesorter", // wichtig
+                    width: "95%",
+                    border: "2",
+                    rules: "all",
+                    css: {
+                        layout: "fixed"
+                    },
+                    html: htmltable
                 }));
+
+            $(".tablesorter").tablesorter({
+                theme: "blue",
+                widgets: ['filter'],
+                widthFixed: true,
+                widgetOptions: {
+                    filter_hideFilters: false,
+                    filter_ignoreCase: true
+                }
+            });
+
             kla1700txt.setResizeObserver();
             document.getElementById("kla1700txt").style.cursor = "default";
             callbackf();

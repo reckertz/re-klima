@@ -928,7 +928,6 @@
             );
         return idcode;
     };
-
     /**
      * modulecheck - prüft modul
      * mit dynamischem Nachladen
