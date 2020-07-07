@@ -611,9 +611,13 @@ app.get('/textanalysis', function (req, res) {
     if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
         fullname = req.query.fullname;
     }
-    var checklinelength = true;
-    if (req.query && typeof req.query.checklinelength !== "undefined" && req.query.checklinelength.length > 0) {
-        checklinelength = req.query.checklinelength;
+    var toplimit = 10;
+    if (req.query && typeof req.query.toplimit !== "undefined" && req.query.toplimit.length > 0) {
+        toplimit = parseInt(req.query.toplimit);
+    }
+    var language = "DE";
+    if (req.query && typeof req.query.language !== "undefined" && req.query.language.length > 0) {
+        language = req.query.language;
     }
     var aktline = 0;
     var aktbyte = 0;
@@ -640,18 +644,29 @@ app.get('/textanalysis', function (req, res) {
         encoding: 'utf8'
     });
 
-    var my_corpus = new tm.Corpus([textcontent]);
+    // Experiment: jeder Satz sein eigenes Dokument
+    // oder
+
+    // https://www.npmjs.com/package/text-miner
+    // removeInterpunctuation wurde erweitert
+    // var textcontent1 = uihelper.normalizeString (textcontent, false);
+    var textcontent1 = textcontent.replace(/[^a-z0-9äöüß]/gmi, " ").replace(/\s+/g, " ");
+
+    var my_corpus = new tm.Corpus([textcontent1]);
+    var stops = tm.STOPWORDS[language];
     my_corpus
         .trim()
         .toLower()
         .clean()
         .removeNewlines()
         .removeInterpunctuation()
-        .removeWords(tm.STOPWORDS.EN)
+        .removeDigits()
+        .removeWords(stops)
         .stem();
 
     var terms = new tm.TermDocumentMatrix( my_corpus );
-    var vocstat = tm.weightTfIdf( terms.findFreqTerms(50) );
+    var termmat = terms.findFreqTerms(toplimit);
+    var vocstat = tm.weightTfIdf(termmat);
 
     var vocstats = vocstat.sort(function (a, b) {
         if (a.count > b.count) return -1;
@@ -659,48 +674,17 @@ app.get('/textanalysis', function (req, res) {
         else return 0;
     });
 
-
     // var vocabulary = terms.vocabulary;
     console.log(vocstats);
+    var result = {
+        vocstats: vocstats
+    };
     smsg = JSON.stringify({
         error: false,
         message: "textanalysis:" + fullname,
         fullname: fullname,
-        result: uihelper.iterateJSON2pretty(vocstats)
+        result: result
     });
-    /*
-    // CRLF mit split nach Array
-    var textarray = textcontent.split(/\r?\n/);
-
-    // Build a Bag Of Words (automatically normalize and remove stop words in the process)
-    var bag = tm.bagOfWords(textarray, true, true);
-
-    // Sort terms by global frequency and print the top 10
-    var termsByFrequency = bag.terms.sort(function (a, b) {
-        if (a.frequency > b.frequency) return -1;
-        else if (a.frequency < b.frequency) return 1;
-        else return 0;
-    });
-    var firstx = termsByFrequency.slice(0, 10);
-    console.log(uihelper.iterateJSON2pretty(firstx, "", ""));
-    // Get terms in first verses
-    // 'frequency' (local) is the number of occurrences of that term in that specific verse
-    // 'tfidf' is the product of local frequency and IDF
-    var termsInFirstVerses = bag.documents.slice(0, 4).map(function (d) {
-        return d.terms;
-    });
-
-    console.log(uihelper.iterateJSON2pretty(termsInFirstVerses, "", ""));
-    var smsg = "";
-
-    smsg = JSON.stringify({
-        error: false,
-        message: "textanalysis:" + fullname,
-        fullname: fullname,
-        result: uihelper.iterateJSON2pretty(firstx, "", "") + "<br>" + uihelper.iterateJSON2pretty(termsInFirstVerses, "", "")
-    });
-    */
-
 
     res.writeHead(200, {
         'Content-Type': 'application/text',

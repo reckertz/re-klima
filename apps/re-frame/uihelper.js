@@ -1783,11 +1783,12 @@
         return res;
     };
 
-    uihelper.normalizeString = function (instring) {
+    uihelper.normalizeString = function (instring, doumlaute) {
         /**
          * toLowerCase, Sonderzeichen raus, Umlaute auflösen
          * nur ein Blank zwischen Worten
          */
+        var convumlaute = doumlaute || true;
         var fragvgl = instring.toLowerCase();
         // html-Tags entfernen
         fragvgl = fragvgl.replace(/<\/?[^>]+(>|$)/g, "");
@@ -1799,10 +1800,12 @@
         fragvgl = fragvgl.replace(/&/g, " ");
         fragvgl = fragvgl.replace(/\s\s+/g, ' ');
         // Umlaute
-        fragvgl = fragvgl.replace(/ä/g, "ae");
-        fragvgl = fragvgl.replace(/ö/g, "oe");
-        fragvgl = fragvgl.replace(/ü/g, "ue");
-        fragvgl = fragvgl.replace(/ß/g, "ss");
+        if (convumlaute === true) {
+            fragvgl = fragvgl.replace(/ä/g, "ae");
+            fragvgl = fragvgl.replace(/ö/g, "oe");
+            fragvgl = fragvgl.replace(/ü/g, "ue");
+            fragvgl = fragvgl.replace(/ß/g, "ss");
+        }
         return fragvgl;
     };
 
@@ -1958,7 +1961,7 @@
             sysbase.putMessage(err, 3);
             callbacksf(j1);
             return;
-    }).always(function () {
+        }).always(function () {
             // nope
         });
     };
@@ -2108,43 +2111,43 @@
             continents.push({
                 value: "SA",
                 text: "South America",
-                lat: new Array(1.25,   1.25,  15,  15, -60, -60, 1.25),
-                lon: new Array(-105, -82.5,  -75, -30, -30, -105, -105)
+                lat: new Array(1.25, 1.25, 15, 15, -60, -60, 1.25),
+                lon: new Array(-105, -82.5, -75, -30, -30, -105, -105)
             });
 
             continents.push({
                 value: "EU",
                 text: "Europa",
-                lat: new Array(90,   90,  42.5, 42.5, 40.79, 41, 40.55, 40.40, 40.05, 39.17, 35.46, 33,   38,  35.42, 28.25, 15,  57.5,  78.13, 90),
-                lon: new Array(-10, 77.5, 48.8, 30,   28.81, 29, 27.31, 26.75, 26.36, 25.19, 27.91, 27.5, 10, -10,  -13,   -30, -37.5, -10, -10)
+                lat: new Array(90, 90, 42.5, 42.5, 40.79, 41, 40.55, 40.40, 40.05, 39.17, 35.46, 33, 38, 35.42, 28.25, 15, 57.5, 78.13, 90),
+                lon: new Array(-10, 77.5, 48.8, 30, 28.81, 29, 27.31, 26.75, 26.36, 25.19, 27.91, 27.5, 10, -10, -13, -30, -37.5, -10, -10)
             });
 
             continents.push({
                 value: "AF",
                 text: "Afrika",
-                lat: new Array(15,  28.25 ,35.42 ,38 ,33   ,31.74 ,29.54 ,27.78 ,11.3 ,12.5 ,-60 ,-60, 15),
-                lon: new Array(-30 ,-13   ,-10 ,10 ,27.5 ,34.58 ,34.92 ,34.46 ,44.3 ,52    ,75 ,-30, -30)
+                lat: new Array(15, 28.25, 35.42, 38, 33, 31.74, 29.54, 27.78, 11.3, 12.5, -60, -60, 15),
+                lon: new Array(-30, -13, -10, 10, 27.5, 34.58, 34.92, 34.46, 44.3, 52, 75, -30, -30)
             });
 
             continents.push({
                 value: "AU",
                 text: "Australien",
-                lat: new Array(-11.88, -10.27, -10 ,-30    ,-52.5 ,-31.88, -11.88),
-                lon: new Array(110,      140  ,145 ,161.25 ,142.5  ,110, 110)
+                lat: new Array(-11.88, -10.27, -10, -30, -52.5, -31.88, -11.88),
+                lon: new Array(110, 140, 145, 161.25, 142.5, 110, 110)
             });
 
             continents.push({
                 value: "AS1",
                 text: "Asien1",
-                lat: new Array(90   ,42.5 ,42.5 ,40.79 ,41 ,40.55 ,40.4  ,40.05 ,39.17 ,35.46 ,33   , 31.74 ,29.54 ,27.78 ,11.3 ,12.5 ,-60 ,-60 ,-31.88 ,-11.88 ,-10.27 ,33.13 ,51    ,60  ,90, 90),
-                lon: new Array(77.5 ,48.8 ,30   ,28.81 ,29 ,27.31 ,26.75 ,26.36 ,25.19 ,27.91 ,27.5 , 34.58 ,34.92 ,34.46 ,44.3 ,52   ,75  ,110  ,110   ,110    ,140    ,140   ,166.6 ,180 ,180, 77.5)
+                lat: new Array(90, 42.5, 42.5, 40.79, 41, 40.55, 40.4, 40.05, 39.17, 35.46, 33, 31.74, 29.54, 27.78, 11.3, 12.5, -60, -60, -31.88, -11.88, -10.27, 33.13, 51, 60, 90, 90),
+                lon: new Array(77.5, 48.8, 30, 28.81, 29, 27.31, 26.75, 26.36, 25.19, 27.91, 27.5, 34.58, 34.92, 34.46, 44.3, 52, 75, 110, 110, 110, 140, 140, 166.6, 180, 180, 77.5)
             });
 
             continents.push({
                 value: "AS2",
                 text: "Asien2",
-                lat: new Array(90    ,90      ,60      ,60, 90),
-                lon: new Array(-180 ,-168.75 ,-168.75 ,-180, -180)
+                lat: new Array(90, 90, 60, 60, 90),
+                lon: new Array(-180, -168.75, -168.75, -180, -180)
             });
 
             continents.push({
@@ -2460,58 +2463,59 @@
         return true;
     };
 
- /**
+    /**
      * Klimazone abrufen aus latitude
      */
     uihelper.getClimateZone = function (latitude) {
         var czones = [{
-            from: 60,
-            to: 90.01,
-            value: "N0",
-            text: "North Cold 60-90"
-        },
-        {
-            from: 40,
-            to: 60,
-            value: "N1",
-            text: "North Moderate 40-60"
-        },
-        {
-            from: 23.5,
-            to: 40,
-            value: "N2",
-            text: "North Subtrop 23,5-40"
-        },
-        {
-            from: 0,
-            to: 23.5,
-            value: "N3",
-            text: "North Tropic 0-23,5"
-        },
-        {
-            from: -100,
-            to: -60,
-            value: "S0",
-            text: "South Cold 60-90"
-        },
-        {
-            from: -60,
-            to: -40,
-            value: "S1",
-            text: "South Moderate 40-60"
-        },
-        {
-            from: -40,
-            to: -23.5,
-            value: "S2",
-            text: "South Subtrop 23,5-40"
-        },
-        {
-            from: -23.5,
-            to: 0,
-            value: "S3",
-            text: "South Tropic 0-23,5"
-        }];
+                from: 60,
+                to: 90.01,
+                value: "N0",
+                text: "North Cold 60-90"
+            },
+            {
+                from: 40,
+                to: 60,
+                value: "N1",
+                text: "North Moderate 40-60"
+            },
+            {
+                from: 23.5,
+                to: 40,
+                value: "N2",
+                text: "North Subtrop 23,5-40"
+            },
+            {
+                from: 0,
+                to: 23.5,
+                value: "N3",
+                text: "North Tropic 0-23,5"
+            },
+            {
+                from: -100,
+                to: -60,
+                value: "S0",
+                text: "South Cold 60-90"
+            },
+            {
+                from: -60,
+                to: -40,
+                value: "S1",
+                text: "South Moderate 40-60"
+            },
+            {
+                from: -40,
+                to: -23.5,
+                value: "S2",
+                text: "South Subtrop 23,5-40"
+            },
+            {
+                from: -23.5,
+                to: 0,
+                value: "S3",
+                text: "South Tropic 0-23,5"
+            }
+        ];
         var rlat = parseFloat(latitude);
         for (var izone = 0; izone < czones.length; izone++) {
             if (latitude >= czones[izone].from && latitude <= czones[izone].to) {
@@ -2670,6 +2674,79 @@
         return erg;
     };
 
+    /**
+     * copyseltable2clipboard für tablesorter-Tabellen
+     * Übergabe id, id mit # oder jQuery-Objekt
+     */
+    uihelper.downloadHtmlTableSelected = function (tableid, filename) {
+        // "kla1700txtwords"
+        var tablecontrol;
+        if (typeof tableid === "string") {
+            if (tableid.startsWith("#")) {
+                tablecontrol = $(tableid);
+            } else {
+                tablecontrol = $("#" + tableid);
+            }
+        } else if (typeof tableid === "object") {
+            tablecontrol = tableid;
+        }
+        var clipid = "T" + Math.floor(Math.random() * 100000) + 1;
+        $("body")
+            .append($("<table/>", {
+                    id: clipid,
+                    css: {
+                        visibility: "hidden"
+                    }
+                })
+                .append($("<thead/>", {
+                    id: clipid + "H"
+                }))
+                .append($("<tbody/>", {
+                    id: clipid + "B"
+                }))
+            );
+        clipid = "#" + clipid;
+        var row = $(tablecontrol).find("thead tr:first").html();
+        $(clipid + "H").append('<tr>' + row + '</tr>');
+
+        $(tablecontrol).find("tbody tr").map(function () {
+            if (!$(this).hasClass('filtered')) {
+                var rowhtml = $(this).html();
+                $(clipid + "B").append('<tr>' + rowhtml + '</tr>');
+            }
+        });
+        var copytext = $(clipid).html();
+        uihelper.copy2clipboard(copytext);
+        uihelper.downloadHtmlTable(clipid, filename);
+        $("#" + clipid).remove();
+    };
+
+
+
+    uihelper.copy2clipboard = function (cliptext) {
+        var clipid = "T" + Math.floor(Math.random() * 100000) + 1;
+        $("body")
+            .append($("<input/>", {
+                id: clipid,
+                type: "text",
+                value: cliptext,
+                css: {
+                    position: "absolute",
+                    left: "-1000px",
+                    top: "-1000px"
+                  }
+            }));
+        var copyText = document.getElementById(clipid);
+        /* Select the text field */
+        copyText.select();
+        copyText.setSelectionRange(0, cliptext.length-1); /*For mobile devices*/
+        /* Copy the text inside the text field */
+        document.execCommand("copy");
+        /* Alert the copied text */
+        sysbase.putMessage("Text copied to clipboard:" + cliptext.length);
+        $("#" + clipid).remove();
+        return;
+    };
 
     uihelper.getScrollbarHeight = function (el) {
 

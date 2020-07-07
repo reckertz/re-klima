@@ -124,7 +124,8 @@
                 id: "admin0025",
                 text: "Textanalyse",
                 app: "re-klima",
-                module: "kla1700txt"
+                module: "kla1700txt",
+                htmlpage: "klatext.html"
             },
             {
                 id: "admin0030",

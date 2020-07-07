@@ -1377,8 +1377,8 @@
                 predirectory = JSON.parse(predirectory);
             }
             if (typeof predirectory === "object" && Array.isArray(predirectory)) {
-                var startdir = "";
-                for (var idir = 0; idir < predirectory.length; idir++) {
+                var startdir = predirectory[0] || "";
+                for (var idir = 1; idir < predirectory.length; idir++) {
                     startdir = path.join(startdir, predirectory[idir]);
                 }
                 predirectory = startdir;
@@ -1486,8 +1486,15 @@
                      * sichern initiale Parameter
                      */
                     if (!fs.existsSync(ret.directory)) {
-                        fs.mkdirSync(ret.directory);
-                        console.log("ANGELEGT:" + ret.directory);
+                        try {
+                            fs.mkdirSync(ret.directory);
+                            console.log("ANGELEGT:" + ret.directory);
+                        } catch(err) {
+                            ret.error = true;
+                            ret.message = "Verzeichnis konnte nicht angelegt werden:" + ret.directory + " " + err;
+                            callback("Error", ret);
+                            return;
+                        }
                     }
                     console.log("Start getDirectories:" + ret.directory);
                     callback(null, ret);
