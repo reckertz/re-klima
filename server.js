@@ -665,6 +665,9 @@ app.get('/textanalysis', function (req, res) {
         .stem();
 
     var terms = new tm.TermDocumentMatrix( my_corpus );
+
+    
+
     var termmat = terms.findFreqTerms(toplimit);
     var vocstat = tm.weightTfIdf(termmat);
 
@@ -683,7 +686,8 @@ app.get('/textanalysis', function (req, res) {
         error: false,
         message: "textanalysis:" + fullname,
         fullname: fullname,
-        result: result
+        result: result,
+        text: my_corpus.documents[0].text
     });
 
     res.writeHead(200, {

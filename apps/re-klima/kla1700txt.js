@@ -15,10 +15,7 @@
     var aktsource = "";
     var fulldatafilename = "";
     var datafilename = "";
-
-
-
-
+    var acttext = "";
 
     kla1700txt.show = function (parameters, navigatebucket) {
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
@@ -126,7 +123,6 @@
                                 var canvas = document.getElementById("kla1700txtcanvas");
                                 canvas.width = $("#kla1700txt_rightw").width() * .9;
                                 canvas.height = $("#kla1700txt_rightw").height() * .9;
-
 
                                 // where list is an array that look like this: [['foo', 12], ['bar', 6]]
                                 var wordarray = [];
@@ -1156,6 +1152,7 @@
             sysbase.putMessage(ret.message, 1);
             $(target).empty();
             actresult = ret.result;
+            acttext = ret.text;
             $(target)
                 .append($("<div/>", {
                         css: {
@@ -1183,8 +1180,9 @@
                 },
                 word: {
                     title: "Word",
+                    name: "word",
                     width: "25%",
-                    align: "lewt",
+                    align: "left",
                     css: {
                         "word-wrap": "break-word"
                     }
@@ -1209,7 +1207,6 @@
             // actresult.vocstats
             var irec = 0;
             for (var iword = 0; iword < actresult.vocstats.length; iword++) {
-
                 var record = actresult.vocstats[iword];
                 irec++;
                 var starec = {
@@ -1219,7 +1216,7 @@
                     oper: "",
                     results: ""
                 };
-                var line = uihelper.transformJSON2TableTR(starec, irec - 1, staformat, "", "tablesorter-ignoreRow");
+                var line = uihelper.transformJSON2TableTR(starec, irec - 1, staformat, "", "kla1700txttrclick tablesorter-ignoreRow");
                 htmltable += line;
             }
             htmltable += "</body>";
@@ -1260,6 +1257,11 @@
             // nope
         });
     };
+
+    $(document).on("click", ".kla1700txttrclick", function(evt){
+        alert($(this).find("td[name=word]").text());
+    });
+    
 
 
 
