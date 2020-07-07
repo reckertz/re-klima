@@ -49,11 +49,17 @@
         //var idc1 = sysbase.tabcreateiframe("Klima-Rohdaten", "", "re-klima", "kla1400raw");
         //window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
 
-        var idc1 = sysbase.tabcreateiframe("Stationsanalyse", "", "re-klima", "kla1610sta");
+        //var idc1 = sysbase.tabcreateiframe("Stationsanalyse", "", "re-klima", "kla1610sta");
         // window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
 
-        var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1650ani", "klaworldmap.html");
-        window.parent.$(".tablinks[idhash='#" + idc2 + "']").click();
+        //var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1650ani", "klaworldmap.html");
+        //window.parent.$(".tablinks[idhash='#" + idc2 + "']").click();
+        
+        var idc3 = sysbase.tabcreateiframe("Textanalysis", "", "re-klima", "kla1700txt", "klatext.html");
+        window.parent.$(".tablinks[idhash='#" + idc3 + "']").click();
+        
+        
+        
         /* sysbase.initFooter(); */
         // uientry.init();
 

@@ -105,6 +105,12 @@
                             html: "Word-Cloud",
                             click: function (evt) {
                                 evt.preventDefault();
+                                window.parent.sysbase.setCache("wordcloud", actresult);
+                                var idc20 = window.parent.sysbase.tabcreateiframe("WordCloud", "", "re-klima", "kla1710wcl", "klatext.html");
+                                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+
+
+                                /*
                                 var fullname = actfullname;
                                 var target = "#kla1700txt_rightw";
                                 $(target).empty();
@@ -134,8 +140,6 @@
                                 }
                                 WordCloud(document.getElementById('kla1700txtcanvas'), {
                                     list: wordarray,
-                                    /* gridSize: 18, */
-                                    /* weightFactor: 3, */
                                     drawOutOfBound: false,
                                     shrinkToFit: true,
                                     fontFamily: 'Finger Paint, cursive, sans-serif',
@@ -146,6 +150,7 @@
                                     },
                                     backgroundColor: '#001f00'
                                 });
+                                */
                             }
                         }))
 
@@ -176,7 +181,6 @@
             css: {
                 width: "30%",
                 "background-color": "lightsteelblue"
-
             }
         }));
 
@@ -207,10 +211,8 @@
         h -= fh - 3;
         $("#kla1700txt_left").height(h);
         $("#kla1700txt_right").height(h);
-
         var url = $("#kla1700txturl").val();
         var directory = $("#kla1700txtdir").val();
-
         $("#kla1700txt_left")
             .append($("<div/>", {
                     css: {
@@ -345,10 +347,6 @@
                 }))
                 .append($("<br/>"))
 
-
-
-
-
                 .append($("<button/>", {
                     html: "Textanalyse",
                     title: "Bereinigung, Stemming, Auszählung",
@@ -430,7 +428,7 @@
                         */
                         var pos = {
                             left: $("#kla1700txt_rightw").offset().left,
-                            top: screen.height / 2,
+                            top: screen.height / 2 * .4 ,
                             width: $("#kla1700txt_rightw").width() * 0.60,
                         };
                         //Math.ceil($(this).offset().top + $(this).height() + 20)
@@ -444,7 +442,10 @@
                             var target = "#kla1700txt_rightw";
                             $(target).empty();
                             kla1700txt.textanalysis(fullname, target, superParam, function (ret) {
-                                // Ausgabe
+                                // Ausgabe wordcloud
+
+
+
                                 return;
                             });
                         });
@@ -1191,16 +1192,6 @@
                     title: "Anzahl",
                     width: "10%",
                     align: "center"
-                },
-                oper: {
-                    title: "Operation",
-                    width: "10%",
-                    align: "center"
-                },
-                results: {
-                    title: "Ergebnisse",
-                    width: "45%",
-                    align: "left"
                 }
             };
             // for (irec = 0; irec < ret.records.length; irec++) {
@@ -1212,9 +1203,7 @@
                 var starec = {
                     pos: irec,
                     word: record.word,
-                    count: record.count,
-                    oper: "",
-                    results: ""
+                    count: record.count
                 };
                 var line = uihelper.transformJSON2TableTR(starec, irec - 1, staformat, "", "kla1700txttrclick tablesorter-ignoreRow");
                 htmltable += line;

@@ -24,9 +24,6 @@ var StreamZip = require("node-stream-zip");
 
 var csv = require("fast-csv");
 
-//var tm = require("textmining");
-var tm = require('text-miner');
-
 var regression = require("./static/lib/regression.js");
 var uihelper = require("re-frame/uihelper.js");
 
@@ -183,6 +180,7 @@ console.log("*EXIT*");
 var sys0000sys = require("re-frame/sys0000sys.js");
 var kla9020fun = require("re-klima/kla9020fun.js");
 var kla1490srv = require("re-klima/kla1490srv.js");
+var kla1790srv = require("re-klima/kla1790srv.js");
 
 
 var gblInfo = sys0000sys.getInfo();
@@ -598,105 +596,27 @@ app.get('/getfilecontent', function (req, res) {
 });
 
 
-
 /**
- * textanalysis: fullname
- * Analyse und Ergebnis in ret.result als html
- * Blättern kann noch holprig sein
+ * textanalysis - Textanalyse
  */
 app.get('/textanalysis', function (req, res) {
     if (checkSession(req, res)) return;
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
     var rootdir = path.dirname(require.main.filename);
-    var fullname = "";
-    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
-        fullname = req.query.fullname;
-    }
-    var toplimit = 10;
-    if (req.query && typeof req.query.toplimit !== "undefined" && req.query.toplimit.length > 0) {
-        toplimit = parseInt(req.query.toplimit);
-    }
-    var language = "DE";
-    if (req.query && typeof req.query.language !== "undefined" && req.query.language.length > 0) {
-        language = req.query.language;
-    }
-    var aktline = 0;
-    var aktbyte = 0;
-    var newline = 0;
-    var newbyte = 0;
-    var nextchunk = "";
-    var ret = {};
-    ret.error = false;
-    var smsg = "";
-    if (!fs.existsSync(fullname)) {
-        smsg = JSON.stringify({
-            error: true,
-            message: "NOT FOUND:" + fullname,
-            fullname: fullname
-        });
+    kla1790srv.textanalysis(db, async, path, fs, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
         res.writeHead(200, {
             'Content-Type': 'application/text',
             "Access-Control-Allow-Origin": "*"
         });
         res.end(smsg);
         return;
-    }
-    var textcontent = fs.readFileSync(fullname, {
-        encoding: 'utf8'
     });
-
-    // Experiment: jeder Satz sein eigenes Dokument
-    // oder
-
-    // https://www.npmjs.com/package/text-miner
-    // removeInterpunctuation wurde erweitert
-    // var textcontent1 = uihelper.normalizeString (textcontent, false);
-    var textcontent1 = textcontent.replace(/[^a-z0-9äöüß]/gmi, " ").replace(/\s+/g, " ");
-
-    var my_corpus = new tm.Corpus([textcontent1]);
-    var stops = tm.STOPWORDS[language];
-    my_corpus
-        .trim()
-        .toLower()
-        .clean()
-        .removeNewlines()
-        .removeInterpunctuation()
-        .removeDigits()
-        .removeWords(stops)
-        .stem();
-
-    var terms = new tm.TermDocumentMatrix( my_corpus );
-
-    
-
-    var termmat = terms.findFreqTerms(toplimit);
-    var vocstat = tm.weightTfIdf(termmat);
-
-    var vocstats = vocstat.sort(function (a, b) {
-        if (a.count > b.count) return -1;
-        else if (a.count < b.count) return 1;
-        else return 0;
-    });
-
-    // var vocabulary = terms.vocabulary;
-    console.log(vocstats);
-    var result = {
-        vocstats: vocstats
-    };
-    smsg = JSON.stringify({
-        error: false,
-        message: "textanalysis:" + fullname,
-        fullname: fullname,
-        result: result,
-        text: my_corpus.documents[0].text
-    });
-
-    res.writeHead(200, {
-        'Content-Type': 'application/text',
-        "Access-Control-Allow-Origin": "*"
-    });
-    res.end(smsg);
-    return;
-
 });
 
 
