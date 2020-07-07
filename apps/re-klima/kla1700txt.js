@@ -258,8 +258,16 @@
                     },
                     click: function (evt) {
                         evt.preventDefault();
+                        debugger;
                         kla1700txt.showfiles("list", "", "", "", function (ret) {
-                            return;
+                            if (ret.error === true) {
+                                var newdirectory = ["C:", "projekte", "klimadaten", "BOOKS"];
+                                kla1700txt.showfiles("list", "", newdirectory, "", function (ret) {
+                                    return;
+                                });
+                            } else {
+                                return;
+                            }
                         });
                     }
                 }))
@@ -409,7 +417,7 @@
      * directory: Verzeichnis der eigentlichen Daten unter dem klima1001-Verzeichnis
      * ret.files - Array der gefundenen Dateien (Metadaten der Dateien)
      */
-    kla1700txt.showfiles = function (fileopcode, url, predirectory, directory, callback) {
+    kla1700txt.showfiles = function (fileopcode, url, predirectory, directory, callbacksf) {
         if (predirectory.length === 0) {
             predirectory = ["G:", "Projekte", "klimadaten", "BOOKS"];
         }
@@ -523,9 +531,15 @@
 
                 });
             });
+            callbacksf (ret);
+            return;
         }).fail(function (err) {
             document.getElementById("kla1700txt").style.cursor = "default";
             sysbase.putMessage(err, 1);
+            callbacksf ({
+                error: true,
+                message: err
+            });
             return;
         }).always(function () {
             // nope
