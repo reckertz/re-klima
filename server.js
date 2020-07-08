@@ -506,6 +506,13 @@ app.get('/getfilecontent', function (req, res) {
     if (req.query && typeof req.query.checklinelength !== "undefined" && req.query.checklinelength.length > 0) {
         checklinelength = req.query.checklinelength;
     }
+    var getall = false;
+    if (req.query && typeof req.query.getall !== "undefined" && req.query.getall.length > 0) {
+        getall = req.query.getall;
+        if (getall === "true" ||  getall === true) {
+            getall = true;
+        }
+    }
     var aktline = 0;
     var aktbyte = 0;
     var newline = 0;
@@ -548,7 +555,10 @@ app.get('/getfilecontent', function (req, res) {
         } else {
             aktline++;
             aktbyte += line.length;
-            if (aktline > fromline || aktbyte > frombyte) {
+            if (getall === true) {
+                nextchunk += line + "\n";
+                return true;
+            } else if (aktline > fromline || aktbyte > frombyte) {
                 newline++;
                 newbyte += line.length;
                 nextchunk += line + "<br>";
