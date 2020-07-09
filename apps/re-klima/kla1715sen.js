@@ -7,7 +7,7 @@
     var root = typeof self === 'object' && self.self === self && self ||
         typeof global === 'object' && global.global === global && global ||
         this;
-    /** 
+    /**
      * kla1715sen - Sentence-Analysis in raw text
      * Parameter aus getCache mit wordcloud
      */
@@ -209,7 +209,7 @@
      * text2sen - Text in Sentences unterteilen
      */
     kla1715sen.text2sen = function (callbackf) {
-        /** 
+        /**
          * Daten holen
          */
         document.getElementById("kla1715sen").style.cursor = "progress";
@@ -248,7 +248,7 @@
 
 
 
-    /** 
+    /**
      * Ausführen Satzanalyse
     */
 
@@ -276,11 +276,11 @@
         $(target).height($("#kla1715sen_right").height() - 3);
         var target = "#kla1715sen_rightw";
 
-        if (typeof actresult !== "object" || typeof actresult.vocstats !== "object" || actresult.vocstats.length === 0) {
-            sysbase.putMessage("Erst Textanalyse, dann Word-Cloud aufrufen", 3);
+        if (typeof acttext !== "string" || acttext.length === 0) {
+            sysbase.putMessage("Dateiauswahl erst vornehmen, dann Syntaax-Analysis aufrufen", 3);
             return;
         }
-        debugger;
+
         var htmltable = "";
         var staformat = {
             pos: {
@@ -428,7 +428,7 @@
         var fullname = actfullname;
         var target = "#kla1715sen_rightw";
         $(target).empty();
-        /** 
+        /**
          * Daten holen
          */
         actresult = window.parent.sysbase.getCache("wordcloud");

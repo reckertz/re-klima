@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    </meta>
+    <meta name="viewport" content="width=device-width">
+    </meta>
+    <title>Examples Tests</title>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/big.min.js"></script>
+
+    <script type="text/javascript" src="apps/re-frame/uihelper.js"></script>
+
+</head>
+
+<body>
+    <h1>Innere und Äußere Tangente an zwei Kreise: Erde und Sonne</h1>
+    <script>
+        var r, R, a, x, s, t, h, alpha, alphadegrees, betadegrees;
+        try {
+        r = 6371; // Radius Erde km
+        R = 696340; // Radius Sonne km
+        a = 149598000; // Abstand Erde und Sonne
+        x = (r * a) / (R - r); // Berechnung x, Entfernung Erdmittelpunkt zu fiktivem Punkt x
+        s = r * Math.sqrt(a ** 2 - (R - r) ** 2) / (R - r); // Tangentenabschnitt von x bis Erde
+        t = Math.sqrt(a ** 2 - (R - r) ** 2); // länge der Tangente zwischen Erde und Sonne
+
+        alpha = Math.asin(r / x); // Gegenkathete durch Hypothenus
+        alphadegrees = alpha * 180 / Math.PI;
+        betadegrees = 90 - alphadegrees;
+        } catch (err) {
+            console.log (err);
+        }
+        var tanobj = {
+            r: r,
+            R: R,
+            a: a,
+            x: x,
+            s: s,
+            t: t,
+            alpha: alpha,
+            alphadegrees: alphadegrees,
+            betadegrees: betadegrees
+        }
+        var html = uihelper.iterateJSON2pretty (tanobj, "", "");
+        $("body")
+        .append($("<span/>", {
+            html:html
+        }));
+    </script>
+
+</body>
+
+</html>

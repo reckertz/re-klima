@@ -8,15 +8,16 @@
     </meta>
     <title>Examples Tests</title>
     <script src="lib/jquery.min.js"></script>
-
+    <script src="./lib/Astro.js"></script>
+    <script src="./lib/Astro.JulianDay.js"></script>
     <!--
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
-	<script src="./lib/Astro.js"></script>
+
 	<script src="./lib/Astro.Coord.js"></script>
 	<script src="./lib/Astro.DeltaT.js"></script>
 	<script src="./lib/Astro.Globe.js"></script>
 	<script src="./lib/Astro.Interp.js"></script>
-	<script src="./lib/Astro.JulianDay.js"></script>
+
 	<script src="./lib/Astro.Math.js"></script>
 	<script src="./lib/Astro.Moon.js"></script>
 	<script src="./lib/Astro.MoonIllum.js"></script>
@@ -25,7 +26,7 @@
 	<script src="./lib/Astro.Refraction.js"></script>
 	<script src="./lib/Astro.Rise.js"></script>
 	<script src="./lib/Astro.Sidereal.js"></script>
-    <script src="./lib/Astro.Solar.js"></script> 
+    <script src="./lib/Astro.Solar.js"></script>
     -->
     <script src="lib/meuusjs.1.0.3.min.js"></script>
 
@@ -59,20 +60,20 @@
                 /*
 		function update() {
 			var date = new Date(); // now
-			var jdo = new A.JulianDay(date); 
+			var jdo = new A.JulianDay(date);
 			var coord = A.EclCoord.fromWgs84(47.3957, 8.4867, 440);
-		
+
 			var suntp = A.Solar.topocentricPosition(jdo, coord, true);
 			var moontp = A.Moon.topocentricPosition(jdo, coord, true);
-			
+
 			var i = A.MoonIllum.phaseAngleEq2(moontp.eq, suntp.eq);
 			var k = A.MoonIllum.illuminated(i);
-			
+
 			$('#date').text(date.toString() + ", jd:" + jdo.jd);
 			$('#sunpos').text(suntp.hz.toString());
-			$('#moonpos').text(moontp.hz.toString() + ", dist:" + moontp.delta);		
-			
-			$('#moonillum').text("phase:" + i + ", illuminated:" + k);		
+			$('#moonpos').text(moontp.hz.toString() + ", dist:" + moontp.delta);
+
+			$('#moonillum').text("phase:" + i + ", illuminated:" + k);
 		}
         window.setInterval(update, 1000); // refresh every second
         */
@@ -99,7 +100,7 @@
                     ", set:" + A.Coord.secondsToHMSStr(moontimes.set));
 
                 // grosser Test - Loop über alle Breitengrade (Latitude)
-                // A.EclCoord = function (lat, lng, h) 
+                // A.EclCoord = function (lat, lng, h)
                 $("#test")
                     .append($("<table/>")
                         .append($("<thead/>")
