@@ -85,79 +85,6 @@
 
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
-                            html: "Textanalyse",
-                            click: function (evt) {
-                                evt.preventDefault();
-                                var fullname = actfullname;
-                                var target = "#kla1700txt_rightw";
-                                $(target).empty();
-                                var options = {};
-                                kla1700txt.textanalysis(fullname, target, options, function (ret) {
-                                    // Ausgabe
-                                });
-
-                            }
-                        }))
-
-
-                        .append($("<li/>", {
-                            class: "dropdown-menuepoint",
-                            html: "Word-Cloud",
-                            click: function (evt) {
-                                evt.preventDefault();
-                                window.parent.sysbase.setCache("wordcloud", actresult);
-                                var idc20 = window.parent.sysbase.tabcreateiframe("WordCloud", "", "re-klima", "kla1710wcl", "klatext.html");
-                                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-
-
-                                /*
-                                var fullname = actfullname;
-                                var target = "#kla1700txt_rightw";
-                                $(target).empty();
-                                if (typeof actresult !== "object" || Object.keys(actresult).length === 0) {
-                                    sysbase.putMessage("Erst Textanalyse, dann Word-Cloud aufrufen", 3);
-                                    return;
-                                }
-
-                                $(target)
-                                    .append($("<canvas/>", {
-                                        id: "kla1700txtcanvas",
-                                        css: {
-                                            border: "1px solid"
-                                        }
-                                    }));
-                                var canvas = document.getElementById("kla1700txtcanvas");
-                                canvas.width = $("#kla1700txt_rightw").width() * .9;
-                                canvas.height = $("#kla1700txt_rightw").height() * .9;
-
-                                // where list is an array that look like this: [['foo', 12], ['bar', 6]]
-                                var wordarray = [];
-                                for (var iword = 0; iword < actresult.vocstats.length; iword++) {
-                                    wordarray.push([
-                                        actresult.vocstats[iword].word,
-                                        actresult.vocstats[iword].count,
-                                    ])
-                                }
-                                WordCloud(document.getElementById('kla1700txtcanvas'), {
-                                    list: wordarray,
-                                    drawOutOfBound: false,
-                                    shrinkToFit: true,
-                                    fontFamily: 'Finger Paint, cursive, sans-serif',
-                                    color: '#f0f0c0',
-                                    hover: window.drawBox,
-                                    click: function (item) {
-                                        alert(item[0] + ': ' + item[1]);
-                                    },
-                                    backgroundColor: '#001f00'
-                                });
-                                */
-                            }
-                        }))
-
-
-
-                        .append($("<li/>", {
-                            class: "dropdown-menuepoint",
                             html: "zurück",
                             click: function (evt) {
                                 evt.preventDefault();
@@ -223,7 +150,7 @@
                     html: "Text-Tree Save",
                     css: {
                         float: "left",
-                        "margin-left": "10px",
+                        "margin": "10px",
                         "background-color": "navyblue"
                     },
                     click: function (evt) {
@@ -264,11 +191,12 @@
                         }
                     }
                 }))
+
                 .append($("<button/>", {
                     html: "Text-Tree Restore",
                     css: {
                         float: "left",
-                        "margin-left": "10px",
+                        "margin": "10px",
                         "background-color": "navyblue"
                     },
                     click: function (evt) {
@@ -308,11 +236,12 @@
                         });
                     }
                 }))
+                
                 .append($("<button/>", {
                     html: "Text-Tree Refresh",
                     css: {
                         float: "left",
-                        "margin-left": "10px",
+                        "margin": "10px",
                         "background-color": "navyblue"
                     },
                     click: function (evt) {
@@ -335,7 +264,7 @@
                     title: "Dateieinträge ohne physische Datei werden entfernt, History wird geschrieben",
                     css: {
                         float: "left",
-                        "margin-left": "10px",
+                        "margin": "10px",
                         "background-color": "navyblue"
                     },
                     click: function (evt) {
@@ -345,14 +274,13 @@
                         });
                     }
                 }))
-                .append($("<br/>"))
 
                 .append($("<button/>", {
                     html: "Textanalyse",
                     title: "Bereinigung, Stemming, Auszählung",
                     css: {
                         float: "left",
-                        "margin-left": "10px",
+                        "margin": "10px",
                         "background-color": "navyblue"
                     },
                     click: function (evt) {
@@ -428,7 +356,7 @@
                         */
                         var pos = {
                             left: $("#kla1700txt_rightw").offset().left,
-                            top: screen.height / 2 * .4 ,
+                            top: screen.height / 2 * .4,
                             width: $("#kla1700txt_rightw").width() * 0.60,
                         };
                         //Math.ceil($(this).offset().top + $(this).height() + 20)
@@ -442,10 +370,6 @@
                             var target = "#kla1700txt_rightw";
                             $(target).empty();
                             kla1700txt.textanalysis(fullname, target, superParam, function (ret) {
-                                // Ausgabe wordcloud
-
-
-
                                 return;
                             });
                         });
@@ -459,8 +383,27 @@
                         });
                     }
                 }))
-                .append($("<br/>"))
             );
+
+
+        $("#kla1700txt_left div")
+            .append($("<button/>", {
+                html: "Sentence-Analysis",
+                title: "Text in Sentences aufbereiten",
+                css: {
+                    float: "left",
+                    "margin-left": "10px",
+                    "background-color": "navyblue"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    window.parent.sysbase.setCache("wordcloud", actresult);
+                    window.parent.sysbase.setCache("wordtext", acttext);
+                    window.parent.sysbase.setCache("wordfile", actfullname);
+                    var idc20 = window.parent.sysbase.tabcreateiframe("WordCloud", "", "re-klima", "kla1715sen", "klatext.html");
+                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                }
+            }));
 
         var sel = {
             username: uihelper.getUsername(),
@@ -542,6 +485,11 @@
             }
         });
     };
+
+
+
+
+
 
 
     kla1700txt.showclock = function (clockcontainer) {
@@ -1168,7 +1116,7 @@
                         click: function (evt) {
                             evt.preventDefault();
                             //uihelper.downloadHtmlTable ("#kla1700txtwords", "Extrakt", options);
-                            uihelper.downloadHtmlTableSelected ("#kla1700txtwords", "Extract.html");
+                            uihelper.downloadHtmlTableSelected("#kla1700txtwords", "Extract.html");
                         }
                     }))
                 );
@@ -1247,10 +1195,10 @@
         });
     };
 
-    $(document).on("click", ".kla1700txttrclick", function(evt){
+    $(document).on("click", ".kla1700txttrclick", function (evt) {
         alert($(this).find("td[name=word]").text());
     });
-    
+
 
 
 
