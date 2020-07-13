@@ -43,6 +43,31 @@ db.run("PRAGMA optimize", function (err) {
 db.get("PRAGMA page_size", function (err, page) {
     console.log("page_size:" + JSON.stringify(page) + " " + err);
 });
+db.serialize(function () {
+    async.waterfall([
+        function (callbackdb) {
+            var sqlstmt = "CREATE INDEX KLISTATIONS01";
+            sqlstmt += " ON KLISTATIONS(source, stationid)";
+            db.run(sqlstmt, function (err) {
+                console.log("Index KLISTATIONS:" + err);
+                callbackdb(null);
+                return;
+            });
+        },
+        function (callbackdb) {
+            var sqlstmt = "CREATE INDEX KLIDATA01";
+            sqlstmt += " ON KLIDATA(source, stationid, fromyear, anzyears)";
+            db.run(sqlstmt, function (err) {
+                console.log("Index KLIDATA:" + err);
+                callbackdb(null);
+                return;
+            });
+        }
+    ], function (error, result) {
+        console.log("Fertig mit Indexerstellung");
+    }); // async.waterfall
+}); // serialize
+
 db.get("PRAGMA index_list('KLICONFIG')", function (err, indexlist) {
     console.log("index_list KLICONFIG:" + JSON.stringify(indexlist) + " " + err);
     if (typeof indexlist === "object") {
@@ -509,7 +534,7 @@ app.get('/getfilecontent', function (req, res) {
     var getall = false;
     if (req.query && typeof req.query.getall !== "undefined" && req.query.getall.length > 0) {
         getall = req.query.getall;
-        if (getall === "true" ||  getall === true) {
+        if (getall === "true" || getall === true) {
             getall = true;
         }
     }

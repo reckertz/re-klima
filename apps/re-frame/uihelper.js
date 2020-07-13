@@ -1577,7 +1577,8 @@
      *                  format.fields[] für feldspezifische Vorgaben
      *                  wenn format.fields fehlt und somit die alte Formatierung vorliegt, dann
      *                  wird format.fields daraus generiert, die Feldreihenfolge ist dann alphabetisch
-     *          rowid - fakultativ, wird als tr-Attribut ausgegeben
+     *          rowid - fakultativ, wenn string, dann wird das tr-Attribut rowid ausgegeben ODER
+     *                  wenn object, dann werden alle Attribute des Objects als tr-Attribute ausgegeben
      *          rowclass - fakultativ, wird als tr-Class ausgegeben
      *          return ist der html-code zu einer Datenzeile tr oder zur Kopfzeile und der ersten Datenzeile
      *                   die aufrufende Anwendung muss dies aufbereiten
@@ -1763,9 +1764,22 @@
                 res += "<tbody>";
             }
             var rowattr = "";
-            if (typeof rowid !== "undefined" && rowid !== null && rowid.length > 0) {
+
+            if (typeof rowid === "string" && rowid !== null && rowid.length > 0) {
                 rowattr += " rowid='" + rowid + "'";
+            } else if (typeof rowid === "object" && Object.keys(rowid).length > 0) {
+
+                for (var property in rowid) {
+                    if (rowid.hasOwnProperty(property)) {
+                        // do stuff
+                        var value = rowid[property];
+                        rowattr += " " + property + "='" + value + "'";
+                    }
+                }
             }
+
+
+
             if (typeof rowclass !== "undefined" && rowclass.length > 0) {
                 rowattr += " class='" + rowclass + "'";
             }

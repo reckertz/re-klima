@@ -400,8 +400,8 @@
                     source: defaultsource,
                     variablename: defaultvariablename,
                     /* name: "berlin" */
-                    fromyear: "1880",
-                    toyear: "1890"
+                    anzyears: ">=150",
+                    fromyear: ">=1850"
                 };
                 uientry.fromRecord2UI($("#kla1610staform"), starecord, staschema);
                 uientry.init();
@@ -432,33 +432,11 @@
                             click: function (evt) {
                                 evt.preventDefault();
                                 $("#kla1610stabuttons").hide();
-                                kla1610sta.getStations(function (ret) {
+                                kla1610sta.getStations(false, function (ret) {
                                     $("#kla1610stabuttons").show();
                                 });
                             }
                         }))
-
-                        .append($("<button/>", {
-                            css: {
-                                float: "left",
-                                "margin": "10px"
-                            },
-                            html: "Worldmap (Filter)",
-                            click: function (evt) {
-                                evt.preventDefault();
-                                //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                                window.parent.sysbase.setCache("stationrecords", stationrecords);
-                                if (Object.keys(stationrecords).length === 0) {
-                                    sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
-                                    return;
-                                } else {
-                                    window.parent.sysbase.setCache("starecord", starecord);
-                                    var idc20 = window.parent.sysbase.tabcreateiframe("Stations-Map", "", "re-klima", "kla1630map", "klaworldmap.html");
-                                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                                }
-                            }
-                        }))
-
 
                         .append($("<button/>", {
                             css: {
@@ -474,8 +452,8 @@
                                 $("#kla1610sta").find(".col2of2").find("tbody tr:visible").each(function (index, row) {
                                     var stationid = $(row).attr("rowid");
                                     var sitename = $(row).find("td:nth-child(2)").html(); //
-                                    var longitude = $(row).find("td:nth-child(8)").text();
-                                    var latitude = $(row).find("td:nth-child(9)").text();
+                                    var longitude = $(row).attr("longitude");  // .find("td:nth-child(8)").text();
+                                    var latitude = $(row).attr("latitude");  // .find("td:nth-child(9)").text();
                                     stationarray.push({
                                         stationid: stationid,
                                         sitename: sitename,
@@ -922,19 +900,14 @@
                                 }
                             }
                         }))
-
-
-
                     );
             }
         });
 
         $("#kla1610stabuttons").hide();
-        kla1610sta.getStations(function (ret) {
+        kla1610sta.getStations(true, function (ret) {
             $("#kla1610stabuttons").show();
         });
-
-
 
     }; // Ende show
 
@@ -997,7 +970,7 @@
     /**
      * Aufbau Filter und Listenausgaben zunächst einmal
      */
-    kla1610sta.getStations = function (cb16100) {
+    kla1610sta.getStations = function (isfirst, cb16100) {
         $("#kla1610stalist").empty();
         var table = "KLISTATIONS";
         if (origin === "kla1650ani") {
@@ -1046,7 +1019,7 @@
                 sqlStmt += " WHERE " + where;
                 sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
 
-            } else {
+            } else if (selfieldnames.length >= 3) {
                 var selvariablename = starecord.variablename; // wird erst später gebraucht
                 if (typeof starecord.source !== "undefined" && starecord.source.trim().length > 0) {
                     if (where.length > 0) where += " AND ";
@@ -1179,6 +1152,21 @@
                     }
                     sqlStmt += " ORDER BY KLIDATA.source, KLIDATA.stationid";
                 }
+            } else {
+                if (isfirst === false) {
+                    sysbase.putMessage("Bitte Selektionsvorgabe verfeinern", 3);
+                    cb16100({
+                        error: true,
+                        message: "Bitte Selektionsvorgabe verfeinern"
+                    });
+                    return;
+                } else {
+                    cb16100({
+                        error: false,
+                        message: ""
+                    });
+                    return;
+                }
             }
         }
 
@@ -1212,9 +1200,9 @@
                     }
                     */
                     var stationformat = {
-                        source: {
-                            title: "Quelle",
-                            width: "10%",
+                        nr: {
+                            title: "Nr",
+                            width: "8%",
                             align: "center"
                         },
                         station: {
@@ -1232,34 +1220,13 @@
                             width: "8%",
                             align: "center"
                         },
-                        realyears: {
-                            title: "#Daten",
-                            width: "8%",
-                            align: "center"
-                        },
                         fromyear: {
-                            title: "von",
+                            title: "von/bis",
                             width: "8%",
                             align: "center"
                         },
-                        toyear: {
-                            title: "bis",
-                            width: "8%",
-                            align: "center"
-                        },
-
                         longitude: {
-                            title: "lon",
-                            width: "8%",
-                            align: "center"
-                        },
-                        latitude: {
-                            title: "lat",
-                            width: "8%",
-                            align: "center"
-                        },
-                        height: {
-                            title: "height",
+                            title: "lon/lat/h",
                             width: "8%",
                             align: "center"
                         },
@@ -1267,22 +1234,8 @@
                             title: "reg(m)",
                             width: "8%",
                             align: "center"
-                        },
-                        minreg: {
-                            title: "min(t)",
-                            width: "8%",
-                            align: "center"
-                        },
-                        maxreg: {
-                            title: "max(t)",
-                            width: "8%",
-                            align: "center"
-                        },
-                        avgreg: {
-                            title: "avg(t)",
-                            width: "8%",
-                            align: "center"
                         }
+
                     };
                     stationrecords = ret.records;
                     //stationrecords.source = ret.rsource;
@@ -1294,15 +1247,18 @@
                             delete record._id;
                             var rowid = record.stationid; // "key" + irow;
                             var reprecord = {};
-                            reprecord.source = record.source;
+                            // reprecord.source = record.source;
+                            reprecord.nr = irow + 1;
                             reprecord.station = record.stationid;
-                            reprecord.station += " " + record.variable || "" + " ";
-                            reprecord.station += "<br>" + record.stationname;
+                            //reprecord.station += " " + record.variable || "" + " ";
+                            reprecord.station += "<br><b>" + record.stationname + "</b>";
+                            /*
                             if (typeof record.temperature === "undefined" || record.temperature === null) {
                                 reprecord.station += "*unknown";
                             } else {
                                 reprecord.station += " " + record.temperature;
                             }
+                            */
                             reprecord.station += "<br>";
                             reprecord.station += "<img src='/images/icons-png/arrow-u-black.png'";
                             reprecord.station += " title='Upload *.dly'";
@@ -1310,29 +1266,42 @@
                             stationarray[record.stationid] = record.stationname;
                             //delete record.stationid;
                             //delete record.name;
-                            reprecord.region = record.alpha2 + "<br>";
+                            reprecord.region = record.alpha2 + "-";
                             reprecord.region += record.region;
                             reprecord.region += "<br>";
                             reprecord.region += record.countryname;
 
                             reprecord.anzyears = record.anzyears;
-                            reprecord.realyears = record.realyears;
+                            reprecord.anzyears += "<br>";
+                            reprecord.anzyears += record.realyears;
+
                             reprecord.fromyear = record.fromyear;
-                            reprecord.toyear = record.toyear;
+                            reprecord.fromyear += "<br>";
+                            reprecord.fromyear += record.toyear;
+
                             reprecord.longitude = record.longitude;
-                            reprecord.latitude = record.latitude;
-                            reprecord.height = record.height;
+                            reprecord.longitude += "<br>";
+                            reprecord.longitude += record.latitude;
+                            reprecord.longitude += "<br>";
+                            reprecord.longitude += record.height;
                             reprecord.regression = "";
-                            reprecord.regtottmin = "";
-                            reprecord.regtottmax = "";
-                            reprecord.regtottavg = "";
+                            // reprecord.regtottmin = "";
+                            // reprecord.regtottmax = "";
+                            // reprecord.regtottavg = "";
                             try {
                                 reprecord.regression = record.regtotm || "";
-                                reprecord.minreg = record.regtottmin || "";
-                                reprecord.maxreg = record.regtottmax || "";
-                                reprecord.avgreg = record.regtottavg.toFixed(2) || "";
+                                reprecord.regression += "<br>";
+                                reprecord.regression += record.regtottmin || "";
+                                reprecord.regression += " " + record.regtottmax || "";
+                                reprecord.regression += "<br>";
+                                reprecord.regression += record.regtottavg.toFixed(2) || "";
                             } catch (err) {}
-                            var line = uihelper.transformJSON2TableTR(reprecord, irow, stationformat, rowid, "kla1610staid tablesorter-ignoreRow");
+                            var rowprop = {
+                                rowid: rowid,
+                                longitude: record.longitude,
+                                latitude: record.latitude
+                            };
+                            var line = uihelper.transformJSON2TableTR(reprecord, irow, stationformat, rowprop, "kla1610staid tablesorter-ignoreRow");
                             htmltable += line;
                             irow++;
                         }

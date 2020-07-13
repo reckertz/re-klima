@@ -35,6 +35,7 @@
     var worldmap;
 
     kla1630map.show = function (parameters, navigatebucket) {
+
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
 
         }
@@ -500,6 +501,7 @@
                             var selvariablename = starecord.variablename;
                             var source = starecord.source;
                             // alert(msg);
+
                             window.parent.sysbase.setCache("onestation", JSON.stringify({
                                 stationid: stationid,
                                 source: starecord.source,

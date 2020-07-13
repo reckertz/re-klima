@@ -46,6 +46,7 @@
     poprecord.export = false;
 
     kla1620shm.show = function (parameters, navigatebucket) {
+
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
@@ -2709,7 +2710,7 @@
         /**
          * Bereitstellung der Daten
          */
-        debugger;
+
         var matrix = matrix1;
         var years = matrix1.rowheaders;
         var tarray = [];
