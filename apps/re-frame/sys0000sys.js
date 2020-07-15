@@ -2489,7 +2489,8 @@
 
                 if (typeof outdir === "object" && Array.isArray(outdir)) {
                     for (var ifilename = 0; ifilename < outdir.length; ifilename++) {
-                        targetpath = path.join(targetpath, outdir[ifilename]);
+                        var outdir1 = outdir[ifilename].replace(/[><=]/g, "");
+                        targetpath = path.join(targetpath, outdir1);
                         if (!fs.existsSync(targetpath)) {
                             fs.mkdirSync(targetpath);
                         }

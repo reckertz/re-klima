@@ -13,6 +13,7 @@
      * holt die Daten selbst
      */
     var starecord = {};
+    var stationarray = [];
     var pearls = [];
     var cid;
     var cidw;
@@ -152,8 +153,6 @@
                 .append($("<canvas/>", {
                     id: 'rotatingGlobe'
                 }))
-
-
                 .append($("<div/>", {
                         id: 'controls',
                         css: {
@@ -187,6 +186,8 @@
             "max-height": "700px"
         });
         */
+        stationarray = window.parent.sysbase.getCache("stationarray");
+        starecord = window.parent.sysbase.getCache("starecord");
 
         var canvas = document.getElementById("rotatingGlobe");
         canvas.width = $("#kla1640glo .col2of2").width();
@@ -235,124 +236,46 @@
 
     kla1640glo.putglobe = function (callback640) {
         /**
-         * Spezieller Aufbau Filter und Laden in Pufffer
-         * starecord wird beim Aufruf versorgt, ist hier global
+         * stationarray hat die Daten
+         * starecord hat die Selektionsparameter dazu
          */
-        var sel = {};
-        var table = "KLISTATIONS";
-        var sqlStmt = "";
-        var where = "";
-
-        sqlStmt += "SELECT ";
-        sqlStmt += " KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
-        sqlStmt += " KLISTATIONS.climatezone, ";
-        sqlStmt += " KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
-        sqlStmt += " KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
-        sqlStmt += " KLISTATIONS.lats, KLISTATIONS.longitude, KLISTATIONS.latitude, KLISTATIONS.height, ";
-        sqlStmt += " KLIINVENTORY.variable, ";
-        sqlStmt += " KLIINVENTORY.fromyear, KLIINVENTORY.toyear";
-        sqlStmt += " FROM KLISTATIONS";
-        sqlStmt += " LEFT JOIN KLIINVENTORY";
-        sqlStmt += " ON KLISTATIONS.source = KLIINVENTORY.source";
-        sqlStmt += " AND KLISTATIONS.stationid = KLIINVENTORY.stationid";
-        where += " KLISTATIONS.stationid IN (";
-        where += " SELECT stationid FROM KLIINVENTORY";
-        where += " WHERE KLIINVENTORY.source = '" + starecord.source + "'";
-        where += " AND KLIINVENTORY.variable = '" + starecord.variablename + "'";
-        if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
-            var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-            if (fromyear !== null && fromyear.length >= 3) {
-                if (where.length > 0) where += " AND ";
-                where += " KLIINVENTORY.toyear " + ">=" + parseInt(fromyear[2]);
-                starecord.fromyear = fromyear[2];
-            } else {
-                callback640("Error", {
-                    error: true,
-                    message: "Parameterfehler"
-                });
-                return;
-            }
-        }
-        if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
-            var toyear = starecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-            if (toyear !== null && toyear.length >= 3) {
-                if (where.length > 0) where += " AND ";
-                where += " KLIINVENTORY.fromyear " + "<=" + parseInt(toyear[2]);
-                starecord.toyear = toyear[2];
-            } else {
-                callback640("Error", {
-                    error: true,
-                    message: "Parameterfehler"
-                });
-                return;
-            }
-        }
-        where += ")";
-        where += " AND KLISTATIONS.source = '" + starecord.source + "'";
-        where += " AND KLIINVENTORY.variable = '" + starecord.variablename + "'";
-        sqlStmt += " WHERE " + where;
-        sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
         async.waterfall([
             function (callback640a) {
-                var skip = 0;
-                var limit = 0;
-                var api = "getallrecords";
+                var irow = 0;
+                var vonjahr = null;
+                var bisjahr = null;
+                var pearls = [];
+                $("#kla1640glo .col1of2")
+                    .append($("<ul/>", {
+                        id: "kla1640glol1"
+                    }));
 
-                uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
-                    if (ret.error === true) {
-                        // sollte nicht passieren??? oder auch hier anlegen
-                        sysbase.putMessage("Error:" + ret.message, 3);
-                        callback640a("error", {
-                            error: true,
-                            message: ret.message
-                        });
-                        return;
-                    } else {
-                        if (ret.records !== "undefined" && ret.records !== null) {
-                            var irow = 0;
-                            var vonjahr = null;
-                            var bisjahr = null;
-                            var pearls = [];
-                            $("#kla1640glo .col1of2")
-                                .append($("<ul/>", {
-                                    id: "kla1640glol1"
-                                }));
-                            for (var property in ret.records) {
-                                if (ret.records.hasOwnProperty(property)) {
-                                    var record = ret.records[property];
-                                    irow++;
-                                    pearls.push({
-                                        stationid: record.stationid,
-                                        stationname: record.stationname,
-                                        variable: record.variable,
-                                        latitude: record.latitude,
-                                        longitude: record.longitude,
-                                        fromyear: parseInt(record.fromyear) || 0,
-                                        toyear: parseInt(record.toyear) || 0,
-                                        ispainted: false
-                                    });
-                                    $("#kla1640glol1")
-                                        .append($("<li/>", {
-                                            html: JSON.stringify(pearls[pearls.length - 1])
-                                        }));
-                                }
-                            }
-                            callback640a(null, {
-                                error: false,
-                                message: "Daten gefunden:" + irow,
-                                pearls: uihelper.cloneObject(pearls),
-                                starecord: uihelper.cloneObject(starecord),
-                            });
-                            return;
-                        } else {
-                            callback640a("error", {
-                                error: true,
-                                message: "Keine Daten gefunden"
-                            });
-                            return;
-                        }
-                    }
+                for (var ista = 0; ista < stationarray.length; ista++) {
+                    var record = stationarray[ista];
+                    irow++;
+                    pearls.push({
+                        stationid: record.stationid,
+                        stationname: record.stationid,
+                        /* record.stationname, */
+                        variable: starecord.variablename,
+                        latitude: record.latitude,
+                        longitude: record.longitude,
+                        fromyear: record.fromyear || 0,
+                        toyear: record.toyear || 0,
+                        ispainted: false
+                    });
+                    $("#kla1640glol1")
+                        .append($("<li/>", {
+                            html: JSON.stringify(pearls[pearls.length - 1])
+                        }));
+                }
+                callback640a(null, {
+                    error: false,
+                    message: "Daten gefunden:" + irow,
+                    pearls: uihelper.cloneObject(pearls),
+                    starecord: uihelper.cloneObject(starecord),
                 });
+                return;
             },
             function (ret, callback640b) {
                 /**

@@ -62,7 +62,17 @@ db.serialize(function () {
                 callbackdb(null);
                 return;
             });
+        },
+        function (callbackdb) {
+            var sqlstmt = "CREATE INDEX KLIINVENTORY01";
+            sqlstmt += " ON KLIINVENTORY(source, stationid, fromyear, toyear)";
+            db.run(sqlstmt, function (err) {
+                console.log("Index KLIDATA:" + err);
+                callbackdb(null);
+                return;
+            });
         }
+
     ], function (error, result) {
         console.log("Fertig mit Indexerstellung");
     }); // async.waterfall

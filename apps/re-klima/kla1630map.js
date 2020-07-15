@@ -240,6 +240,7 @@
 
         var ret = {};
         starecord = window.parent.sysbase.getCache("starecord");
+        selrecord = starecord;
         if (typeof starecord !== "undefined" && starecord !== null && Object.keys(starecord).length > 0) {
             var wmtit = "Worldmap für Stations";
             wmtit += " " + starecord.source;
@@ -258,9 +259,27 @@
         } else {
             starecord = null; // keine Verzweigung auf einzelne Stations möglich
         }
-        stations = window.parent.sysbase.getCache("stationrecords");
+        stationarray = window.parent.sysbase.getCache("stationarray");
+        if (typeof stationarray !== "undefined" && Array.isArray(stationarray) && stationarray.length > 0) {
+            kla1630map.showMap(stationarray);
+        } else {
+            stationarray = [];
+                kla1630map.prepeditor(function (ret) {
+                    sysbase.putMessage(ret.message);
+                    return;
+                });
+        }
+        /*
+        stationarray.push({
+            stationid: stationid,
+            sitename: sitename,
+            longitude: parseFloat(longitude),
+            latitude: parseFloat(latitude)
+        });
+        */
 
-        if (typeof stations !== "undefined" && stations !== null && Object.keys(stations).length > 0) {
+        /*
+        if (typeof stations !== "undefined" && stations !== null && stations.length > 0) {
             stationarray = [];
             for (var station in stations) {
                 if (stations.hasOwnProperty(station)) {
@@ -281,7 +300,6 @@
                 kla1630map.showMap(stationarray);
             } else {
                 stationarray = [];
-
                     kla1630map.prepeditor(function (ret) {
                         sysbase.putMessage(ret.message);
                         return;
@@ -289,6 +307,7 @@
 
             }
         }
+        */
         window.parent.sysbase.delCache("stationarray");
         window.parent.sysbase.delCache("stationrecords");
     }; // Ende show

@@ -1872,8 +1872,55 @@
      * oder jquery-Object
      * @param {*} filename
      */
-    uihelper.downloadHtmlTable = function (jQhtmltable, filename) {
+    uihelper.downloadHtmlTable = function (jQhtmltable, filename, strip) {
+        var dostrip = strip || false;
+        var newtable;
+        if (dostrip === true) {
+            var trows = 0;
+            newtable = document.createElement("table");
+            var newrow;
+            var newcell;
+            var oldtableid;
+            if (typeof jQhtmltable === "string") {
+                if (!jQhtmltable.startsWith("#")) {
+                    oldtableid = jQhtmltable;
+                } else {
+                    oldtableid = "#" + jQhtmltable;
+                }
+            } else {
+                oldtableid = jQhtmltable;
+            }
+            // Iteration; verfeinern: visible rows und head-Row
+            $(oldtableid).find("tr").each(function (trindex, trelem) {
+                console.log(trindex + ": " + $(this).text());
+                newrow = newtable.appendChild(document.createElement("tr"));
+                $(trelem).find("th").each(function (thindex, thelem) {
+                    var newth = document.createElement("th");
+                    newth.textContent = thelem.textContent;
+                    newrow.appendChild(newth);
+                });
+                $(trelem).find("td").each(function (tdindex, tdelem) {
+                    var newtd = document.createElement("td");
+                    var tdtext = tdelem.textContent;
+                    var tdhtml = tdelem.innerHTML;
+                    tdhtml = tdhtml.replace(/<br>/g,"#br#");
+                    tdhtml = tdhtml.replace(/<\/?[^>]+(>|$)/g, "");
+                    tdhtml = tdhtml.replace(/#br#/g,"<br>");
+                    newtd.innerHTML = tdhtml;
 
+                    newrow.appendChild(newtd);
+                });
+
+
+                /*
+                $(trelem).find("td").each(function (tdindex, tdelem) {
+                    newrow.appendChild(document.createElement("td").setAttribute("text", tdelem.text));
+                });
+                */
+                newtable.appendChild(newrow);
+            });
+
+        }
         var mimeType = "text/html";
         var elHtml = "";
         elHtml += "<html>";
@@ -1882,7 +1929,9 @@
         elHtml += "</head>";
         elHtml += "<body>";
         elHtml += "<table>";
-        if (typeof jQhtmltable === "object" || typeof jQhtmltable === "string" && jQhtmltable.startsWith("#")) {
+        if (dostrip === true) {
+            elHtml += $(newtable).html();
+        } else if (typeof jQhtmltable === "object" || typeof jQhtmltable === "string" && jQhtmltable.startsWith("#")) {
             elHtml += $(jQhtmltable).html();
         } else {
             elHtml += jQhtmltable;
@@ -2748,12 +2797,12 @@
                     position: "absolute",
                     left: "-1000px",
                     top: "-1000px"
-                  }
+                }
             }));
         var copyText = document.getElementById(clipid);
         /* Select the text field */
         copyText.select();
-        copyText.setSelectionRange(0, cliptext.length-1); /*For mobile devices*/
+        copyText.setSelectionRange(0, cliptext.length - 1); /*For mobile devices*/
         /* Copy the text inside the text field */
         document.execCommand("copy");
         /* Alert the copied text */

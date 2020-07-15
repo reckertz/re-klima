@@ -54,12 +54,12 @@
 
         //var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1650ani", "klaworldmap.html");
         //window.parent.$(".tablinks[idhash='#" + idc2 + "']").click();
-        
+
         var idc3 = sysbase.tabcreateiframe("Textanalysis", "", "re-klima", "kla1700txt", "klatext.html");
         window.parent.$(".tablinks[idhash='#" + idc3 + "']").click();
-        
-        
-        
+
+
+
         /* sysbase.initFooter(); */
         // uientry.init();
 
@@ -108,11 +108,22 @@
             },
             */
             {
-                id: "admin0008",
+                id: "admin0005",
                 text: "Stationen",
                 app: "re-klima",
                 module: "kla1610sta"
             },
+
+            //var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1650ani", "klaworldmap.html");
+            //window.parent.$(".tablinks[idhash='#" + idc2 + "']").click();
+            {
+                id: "admin0010",
+                text: "Animation MAP",
+                app: "re-klima",
+                module: "kla1650ani",
+                htmlpage: "klaworldmap.html"
+            },
+
             {
                 id: "admin0010",
                 text: "Rohdaten",

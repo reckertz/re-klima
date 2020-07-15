@@ -298,8 +298,6 @@
                         }
                     })
                     .append($("<ul/>")
-
-
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
                             html: "HTML-Tabelle download",
@@ -439,6 +437,24 @@
                         }))
 
                         .append($("<button/>", {
+                            id: "kla1610stadwn",
+                            css: {
+                                float: "left",
+                                "margin": "10px"
+                            },
+                            html: "HTML-Tabelle download",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt", true);
+                                return;
+                            }
+                        }))
+
+
+
+
+
+                        .append($("<button/>", {
                             css: {
                                 float: "left",
                                 "margin": "10px"
@@ -452,8 +468,8 @@
                                 $("#kla1610sta").find(".col2of2").find("tbody tr:visible").each(function (index, row) {
                                     var stationid = $(row).attr("rowid");
                                     var sitename = $(row).find("td:nth-child(2)").html(); //
-                                    var longitude = $(row).attr("longitude");  // .find("td:nth-child(8)").text();
-                                    var latitude = $(row).attr("latitude");  // .find("td:nth-child(9)").text();
+                                    var longitude = $(row).attr("longitude"); // .find("td:nth-child(8)").text();
+                                    var latitude = $(row).attr("latitude"); // .find("td:nth-child(9)").text();
                                     stationarray.push({
                                         stationid: stationid,
                                         sitename: sitename,
@@ -483,72 +499,37 @@
                             click: function (evt) {
                                 evt.preventDefault();
                                 //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-                                $("#kla1610sta").find(".col2of2").empty();
-                                starecord = {};
-                                uientry.fromUI2Record("#kla1610staform", starecord, staschema);
-                                var sel = {};
-                                var table = "KLISTATIONS";
-                                var sqlStmt = "";
-                                var where = "";
-                                // löschen nicht signifikante Feldnamen
-                                var selfieldnames = Object.keys(starecord);
-                                for (var ifield = 0; ifield < selfieldnames.length; ifield++) {
-                                    var fieldname = selfieldnames[ifield];
-                                    var fieldvalue = starecord[fieldname];
-                                    if (typeof fieldvalue === "undefined" && fieldvalue !== null || typeof fieldvalue === "string" && fieldvalue.trim().length === 0) {
-                                        delete starecord[fieldname];
-                                    }
-                                }
-                                uihelper.markok("#kla1610stasource");
-                                if (typeof starecord.source === "undefined" || starecord.source.length === 0) {
-                                    uihelper.markerror("#kla1610stasource");
+                                var stationarray = [];
+                                var test = $("#kla1610sta").find(".col2of2").find("tbody tr:visible");
+                                $("#kla1610sta").find(".col2of2").find("tbody tr:visible").each(function (index, row) {
+                                    var stationid = $(row).attr("rowid");
+                                    var sitename = $(row).find("td:nth-child(2)").html(); //
+                                    var longitude = $(row).attr("longitude"); // .find("td:nth-child(8)").text();
+                                    var latitude = $(row).attr("latitude"); // .find("td:nth-child(9)").text();
+                                    var fromyear = $(row).attr("fromyear");
+                                    var toyear = $(row).attr("toyear");
+                                    stationarray.push({
+                                        stationid: stationid,
+                                        sitename: sitename,
+                                        longitude: parseFloat(longitude),
+                                        latitude: parseFloat(latitude),
+                                        fromyear: parseInt(fromyear),
+                                        toyear: parseInt(toyear),
+                                    });
+                                });
+                                if (stationarray.length === 0) {
+                                    sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
                                     return;
+                                } else {
+                                    window.parent.sysbase.setCache("stationarray", stationarray);
+                                    window.parent.sysbase.setCache("starecord", starecord);
+                                    var tourl = "klaplanetary.html" + "?" + "source=" + starecord.source;
+                                    tourl += "&variablename=" + starecord.variablename;
+                                    tourl += "&fromyear=" + starecord.fromyear;
+                                    tourl += "&toyear=" + starecord.toyear;
+                                    var idc640 = window.parent.sysbase.tabcreateiframe("Globe", "", "re-klima", "kla1640glo", tourl);
+                                    window.parent.$(".tablinks[idhash='#" + idc640 + "']").click();
                                 }
-                                uihelper.markok("#kla1610stavariablename");
-                                if (typeof starecord.variablename === "undefined" || starecord.variablename.length === 0) {
-                                    uihelper.markerror("#kla1610stavariablename");
-                                    return;
-                                }
-                                uihelper.markok("#kla1610stafromyear");
-                                if (typeof starecord.fromyear === "undefined" || starecord.fromyear.length === 0) {
-                                    uihelper.markerror("#kla1610stafromyear");
-                                    return;
-                                }
-                                uihelper.markok("#kla1610statoyear");
-                                if (typeof starecord.toyear === "undefined" || starecord.toyear.length === 0) {
-                                    uihelper.markerror("#kla1610statoyear");
-                                    return;
-                                }
-                                if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
-                                    var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-                                    if (fromyear !== null && fromyear.length >= 3) {
-                                        if (where.length > 0) where += " AND ";
-                                        where += " KLIINVENTORY.toyear " + ">=" + parseInt(fromyear[2]);
-                                        starecord.fromyear = fromyear[2];
-                                        $("#kla1610stafromyear").val(starecord.fromyear);
-                                    } else {
-                                        uihelper.markerror("#kla1610stafromyear");
-                                        return;
-                                    }
-                                }
-                                if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
-                                    var toyear = starecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-                                    if (toyear !== null && toyear.length >= 3) {
-                                        if (where.length > 0) where += " AND ";
-                                        where += " KLIINVENTORY.fromyear " + "<=" + parseInt(toyear[2]);
-                                        starecord.toyear = toyear[2];
-                                        $("#kla1610stafromyear").val(starecord.toyear);
-                                    } else {
-                                        uihelper.markerror("#kla1610statoyear");
-                                        return;
-                                    }
-                                }
-                                var tourl = "klaplanetary.html" + "?" + "source=" + starecord.source;
-                                tourl += "&variablename=" + starecord.variablename;
-                                tourl += "&fromyear=" + starecord.fromyear;
-                                tourl += "&toyear=" + starecord.toyear;
-                                var idc640 = window.parent.sysbase.tabcreateiframe("Globe", "", "re-klima", "kla1640glo", tourl);
-                                window.parent.$(".tablinks[idhash='#" + idc640 + "']").click();
                             }
                         }))
 
@@ -1299,7 +1280,9 @@
                             var rowprop = {
                                 rowid: rowid,
                                 longitude: record.longitude,
-                                latitude: record.latitude
+                                latitude: record.latitude,
+                                fromyear: record.fromyear,
+                                toyear: record.toyear
                             };
                             var line = uihelper.transformJSON2TableTR(reprecord, irow, stationformat, rowprop, "kla1610staid tablesorter-ignoreRow");
                             htmltable += line;
