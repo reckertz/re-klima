@@ -11,22 +11,22 @@
      * standardisierte Mimik zur Integration mit App, Browser und node.js
      */
 
-     /**
-      * getHeatmap - Heatmap in Container erzeugen
-      * automatische Anpassung an die Spaltenzahl in hmatrix und
-      * Länge gemäß Zeilenzeitl in hmatrix
-      * @param {*} hcontainer - id eines html-Containers (div), der fix definiert ist
-      * @param {*} hmatrix - Daten in der speziellen Matrix-Strukur
-      */
-     var heatmapparms = {};
-     /**
-      * getHeatmap - Heatmap aus Matrix erzeugen und nach Container ausgeben
-      * 1. Prüfen der Daten in Matrix und Default-Setzungen oder Abbruch
-      * 2. Dimensionsparameter auf 400*500-Matrix (maximal)
-      * @param {*} hcontainerid
-      * @param {*} hmatrix
-      * @param {*} callback901
-      */
+    /**
+     * getHeatmap - Heatmap in Container erzeugen
+     * automatische Anpassung an die Spaltenzahl in hmatrix und
+     * Länge gemäß Zeilenzeitl in hmatrix
+     * @param {*} hcontainer - id eines html-Containers (div), der fix definiert ist
+     * @param {*} hmatrix - Daten in der speziellen Matrix-Strukur
+     */
+    var heatmapparms = {};
+    /**
+     * getHeatmap - Heatmap aus Matrix erzeugen und nach Container ausgeben
+     * 1. Prüfen der Daten in Matrix und Default-Setzungen oder Abbruch
+     * 2. Dimensionsparameter auf 400*500-Matrix (maximal)
+     * @param {*} hcontainerid
+     * @param {*} hmatrix
+     * @param {*} callback901
+     */
     kla9020fun.getHeatmap = function (hcontainerid, hmatrix, callback901) {
         if (typeof hmatrix.data === "undefined" || !Array.isArray(hmatrix.data)) {
             callback901({
@@ -54,18 +54,18 @@
         var anzcols = 0;
         var anzrows = 0;
         anzrows = hmatrix.data.length;
-        if (typeof hmatrix.rowheaders === "undefined" ||  hmatrix.rowheaders.length === 0) {
+        if (typeof hmatrix.rowheaders === "undefined" || hmatrix.rowheaders.length === 0) {
             var anz2 = hmatrix.length;
             hmatrix.rowheaders = [];
             for (var irow = 0; irow < anz2; irow++) {
-                hmatrix.rowheaders.push("##" + (irow+1));
+                hmatrix.rowheaders.push("##" + (irow + 1));
             }
         }
-        if (typeof hmatrix.colheaders === "undefined" ||  hmatrix.colheaders.length === 0) {
+        if (typeof hmatrix.colheaders === "undefined" || hmatrix.colheaders.length === 0) {
             var anz1 = hmatrix.data[0].length;
             hmatrix.colheaders = [];
             for (var icol = 0; icol < anz1; icol++) {
-                hmatrix.colheaders.push("#" + (icol+1));
+                hmatrix.colheaders.push("#" + (icol + 1));
             }
         }
         anzcols = hmatrix.colheaders.length;
@@ -138,11 +138,11 @@
             var rowheader = hmatrix.rowheaders[irow];
             // rowindexarray[thisyear] = rowindex;
             for (var icol = 0; icol < hmatrix.data[irow].length; icol++) {
-                var  colindex = icol;
+                var colindex = icol;
                 var temperatur = hmatrix.data[irow][icol];
                 if (temperatur === null) continue;
                 ctx.fillStyle = kla9020fun.getcolorstring(temperatur);
-                var cleft = Math.ceil( colindex * colwidth * wratio);
+                var cleft = Math.ceil(colindex * colwidth * wratio);
                 var ctop = Math.ceil(rowindex * rowheight * hratio);
                 var cwidth = Math.ceil(colwidth * wratio);
                 var cheight = Math.ceil(rowheight * hratio);
@@ -162,34 +162,34 @@
     };
 
     var tempint = [{
-        text: "blue-cyan",
-        vont: -50,
-        bist: -10,
-        voncolor: [0, 0, 1],
-        biscolor: [0, 1, 1]
-    },
-    {
-        text: "cyan-green",
-        vont: -10,
-        bist: 0,
-        voncolor: [0, 1, 1],
-        biscolor: [0, 1, 0]
-    },
-    {
-        text: "green-yellow",
-        vont: 0,
-        bist: 25,
-        voncolor: [0, 1, 0],
-        biscolor: [1, 1, 0]
-    },
-    {
-        text: "yellow-red",
-        vont: 25,
-        bist: 50,
-        voncolor: [1, 1, 0],
-        biscolor: [1, 0, 0]
-    }
-];
+    text: "blue-cyan",
+    vont: -50,
+    bist: -10,
+    voncolor: [0, 0, 1],
+    biscolor: [0, 1, 1]
+},
+{
+    text: "cyan-green",
+    vont: -10,
+    bist: 0,
+    voncolor: [0, 1, 1],
+    biscolor: [0, 1, 0]
+},
+{
+    text: "green-yellow",
+    vont: 0,
+    bist: 25,
+    voncolor: [0, 1, 0],
+    biscolor: [1, 1, 0]
+},
+{
+    text: "yellow-red",
+    vont: 25,
+    bist: 50,
+    voncolor: [1, 1, 0],
+    biscolor: [1, 0, 0]
+}
+    ];
 
 
     /**
@@ -199,7 +199,7 @@
      */
     kla9020fun.getcolorstring = function (temperatur) {
         var tempsave = temperatur;
-        if(isNaN(temperatur)) return "";
+        if (isNaN(temperatur)) return "";
         temperatur = kla9020fun.round(parseFloat(temperatur), 0.5);
         for (var icat = 0; icat < tempint.length; icat++) {
             if (temperatur >= tempint[icat].vont && temperatur < tempint[icat].bist) {
@@ -296,6 +296,140 @@
         var inv = 1.0 / step;
         return Math.round(value * inv) / inv;
     };
+
+
+
+
+    var clamp = (num, min, max) => num < min ? min : num > max ? max : num;
+
+    /** Given a temperature (in Kelvin), estimate an RGB equivalent
+     * @param {number} tmpKelvin - Temperature (in Kelvin) between 1000 and 40000
+     * @returns {{r:number, g:number, b:number}} - RGB channel intensities (0-255)
+     * @description Ported from: http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
+     */
+    exports.getRGBFromTemperature = function (tmpKelvin) {
+        // All calculations require tmpKelvin \ 100, so only do the conversion once
+        tmpKelvin = clamp(tmpKelvin, 1000, 40000) / 100;
+
+        // Note: The R-squared values for each approximation follow each calculation
+        return {
+            r: tmpKelvin <= 66 ? 255 : clamp(329.698727446 * (Math.pow(tmpKelvin - 60, -0.1332047592)), 0, 255), // .988
+
+            g: tmpKelvin <= 66 ?
+                clamp(99.4708025861 * Math.log(tmpKelvin) - 161.1195681661, 0, 255) : // .996
+                clamp(288.1221695283 * (Math.pow(tmpKelvin - 60, -0.0755148492)), 0, 255), // .987
+
+            b: tmpKelvin >= 66 ? 255 : tmpKelvin <= 19 ? 0 : clamp(138.5177312231 * Math.log(tmpKelvin - 10) - 305.0447927307, 0, 255) // .998
+        };
+    };
+
+
+
+
+    /**
+     * getColorPaletteX1 erzeugt Table im Übergabe-Container
+     *   wird genutzt zur Prüfung des ColorGrading
+     * für gif sind nur 256 Farben zulässig,
+     * Schwarz und Weiss sind belegt
+     *   Bereich -50 bis +50
+     *   container muss ein div o.ä. sein
+     */
+    kla9020fun.getColorPaletteX1 = function (container) {
+        if (typeof container === "string" && !container.startsWith("#")) {
+            container = "#" + container;
+        }
+        $(container).empty();
+        var ctx;
+        var c;
+        var cid;
+        var colorcounter = 0;
+
+        for (var icat = 0; icat < tempint.length; icat++) {
+            var subcontainer = container + "d" + icat;
+            $(container)
+                .append($("<div/>", {
+                    id: subcontainer.substr(1),
+                    css: {
+                        clear: "both",
+                        "text-align": "center",
+                        "font-weight": "bold",
+                        "padding-top": "1em"
+                    }
+                }));
+            $(subcontainer)
+                .append($("<span/>", {
+                    html: tempint[icat].text + " " + tempint[icat].vont + "=>" + tempint[icat].bist,
+                    float: "left"
+                }));
+            $(subcontainer).append($("<br/>"));
+            $(subcontainer).append($("<br/>"));
+
+            var idiff = Math.abs(tempint[icat].vont - tempint[icat].bist) + 1;
+            for (var itemp = tempint[icat].vont; itemp < tempint[icat].bist; itemp += 0.5) {
+                /*
+                    voncolor: [0, 0, 1],
+                    biscolor: [0, 1, 1]
+                */
+                var reltemp = itemp - tempint[icat].vont;
+                var colfakt = reltemp / idiff;
+
+                var redcolor = 0;
+                if (tempint[icat].voncolor[0] === tempint[icat].biscolor[0]) {
+                    redcolor = tempint[icat].voncolor[0] * 255;
+                } else if (tempint[icat].voncolor[0] > tempint[icat].biscolor[0]) {
+                    redcolor = (1 - colfakt) * 255;
+                } else {
+                    redcolor = colfakt * 255;
+                }
+                redcolor = (redcolor).toFixed(0);
+
+                var greencolor = 0;
+                if (tempint[icat].voncolor[1] === tempint[icat].biscolor[1]) {
+                    greencolor = tempint[icat].voncolor[1] * 255;
+                } else if (tempint[icat].voncolor[1] > tempint[icat].biscolor[1]) {
+                    greencolor = (1 - colfakt) * 255;
+                } else {
+                    greencolor = colfakt * 255;
+                }
+                greencolor = (greencolor).toFixed(0);
+
+                var bluecolor = 0;
+                if (tempint[icat].voncolor[2] === tempint[icat].biscolor[2]) {
+                    bluecolor = tempint[icat].voncolor[2] * 255;
+                } else if (tempint[icat].voncolor[2] > tempint[icat].biscolor[2]) {
+                    bluecolor = (1 - colfakt) * 255;
+                } else {
+                    bluecolor = colfakt * 255;
+                }
+                bluecolor = (bluecolor).toFixed(0);
+
+                var colorcode = kla9020fun.rgb2hex(redcolor, greencolor, bluecolor);
+                // var color = "rgb(" + (colfakt * 255).toFixed(0) + ", 255, 0)";
+                colorcounter++;
+                $(subcontainer)
+                    .append($("<div/>", {
+                        html: "&nbsp;" + itemp + " " + colorcode + "&nbsp;",
+                        css: {
+                            float: "left",
+                            "background-color": colorcode
+                        }
+                    }));
+
+            }
+        }
+        $(container)
+            .append($("<div/>", {
+                css: {
+                    clear: "both",
+                    "text-align": "center",
+                    "font-weight": "bold",
+                    "padding-top": "1em"
+                },
+                html: "Insgesamt:" + colorcounter
+            }));
+    };
+
+
 
 
     /**

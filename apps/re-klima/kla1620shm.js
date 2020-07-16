@@ -46,7 +46,7 @@
     poprecord.export = false;
 
     kla1620shm.show = function (parameters, navigatebucket) {
-
+        debugger;
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
@@ -57,9 +57,9 @@
             var selparms = window.parent.sysbase.getCache("onestation");
             selparms = JSON.parse(selparms);
             selstationid = selparms.stationid;
-            selsource = selparms.source;
-            selvariablename = selparms.variablename;
             starecord = selparms.starecord;
+            selsource = selparms.starecord.source;
+            selvariablename = selparms.starecord.variablename;
         }
         if (typeof navigatebucket === "object") {
             if (navigatebucket.navigate === "back") {
@@ -645,6 +645,7 @@
             });
         });
         savedwidth = $("#heatmap").width();
+        debugger;
         if (typeof selvariablename !== "undefined" && selvariablename !== null && selvariablename.trim().length > 0) {
             kla1620shm.kliheatmap1(selvariablename, selsource, selstationid, starecord, function (ret) {
 
@@ -1628,7 +1629,8 @@
                 maxyv = maxyv.toFixed(2);
                 if (tcount > 0) avgy = (tsum / tcount).toFixed(2);
                 array1.push({
-                    temp: r2,    /* yIntercept, */
+                    temp: r2,
+                    /* yIntercept, */
                     gradient: gradient,
                     avg: avgy
                 });
@@ -1946,7 +1948,8 @@
                 maxyv = maxyv.toFixed(2);
                 var avg = (tsum / tcount).toFixed(2);
                 array1.push({
-                    temp: r2,  /* yIntercept, */
+                    temp: r2,
+                    /* yIntercept, */
                     gradient: gradient,
                     avg: avg
                 });
@@ -2499,7 +2502,7 @@
                     }))
                     .append($("<td/>", {
                         id: 'var' + pcount,
-                        html: rkat + "<br>" +  rowdata[0].variablename
+                        html: rkat + "<br>" + rowdata[0].variablename
                     }))
                     .append($("<td/>")
                         .append($("<span/>", {
