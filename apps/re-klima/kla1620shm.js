@@ -46,8 +46,8 @@
     poprecord.export = false;
 
     kla1620shm.show = function (parameters, navigatebucket) {
-        debugger;
-        if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
+
+        // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
             selsource = parameters[0].source;
@@ -84,6 +84,7 @@
         $("body").css({
             "background-color": "lightsteelblue"
         });
+
         $(".content").empty();
         $(".headertitle").html("Heatmap für Station:" + selstationid + " Quelle:" + selsource);
         $(".headertitle").attr("title", "kla1620shm");
@@ -132,7 +133,7 @@
                             html: "zurück",
                             click: function (evt) {
                                 evt.preventDefault();
-                                var parameters = {};
+                                parameters = {};
                                 sysbase.navigateBack(parameters, function (ret) {
                                     if (ret.error === true) {
                                         sysbase.putMessage(ret.message, 3);
@@ -192,6 +193,29 @@
                         kla1620shm.paintT(selvariablename, selsource, selstationid, matrix1);
                     }
                 }))
+
+
+                .append($("<button/>", {
+                    html: "Super-Heatmaps",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // stationrecord - heatworld
+                        async.waterfall([
+                            function (cb1620a) {
+                                kla1620shm.kliheatmap1(cid, "TMIN", selsource, selstationid, starecord, function (ret) {
+                                    cb1620a(null);
+                                });
+
+                            }
+                        ]);
+                    }
+                }))
+
+
 
                 .append($("<button/>", {
                     html: "Sparklines-Kelvin",
@@ -298,7 +322,7 @@
                         var title = "Super-Sparklines";
                         var pos = {
                             left: $("#kla1620shmwrapper").offset().left,
-                            top: screen.height * 0.1,
+                            top: window.screen.height * 0.1,
                             width: $("#kla1620shmwrapper").width() * 0.60,
                             height: $("#kla1620shmwrapper").height() * 0.90
                         };
@@ -532,7 +556,7 @@
                                 }));
 
                             $("#kla1620shmcolormap").show();
-                            kla9020fun.getColorPaletteX1("kla1620shmcolormap");
+                            kla9020fun.getColorPaletteX1("kla1620shmcolormap", 7);
                         }
                         return false;
                     }
@@ -645,15 +669,15 @@
             });
         });
         savedwidth = $("#heatmap").width();
-        debugger;
+
         if (typeof selvariablename !== "undefined" && selvariablename !== null && selvariablename.trim().length > 0) {
-            kla1620shm.kliheatmap1(selvariablename, selsource, selstationid, starecord, function (ret) {
+            kla1620shm.kliheatmap2(cid, selvariablename, selsource, selstationid, starecord, function (ret) {
 
             });
         } else {
             sysbase.putMessage("Bitte eine Auswahl TMIN/TMAX treffen, default TMAX genutzt", 3);
             selvariablename = "TMAX";
-            kla1620shm.kliheatmap1(selvariablename, selsource, selstationid, starecord, function (ret) {
+            kla1620shm.kliheatmap1(cid, selvariablename, selsource, selstationid, starecord, function (ret) {
 
             });
         }
@@ -665,12 +689,8 @@
      * kliheatmap1 - Heatmap berechnen, Animation sichern und anzeigen
      * mit "Video-Controls" - aus KLISTATIONS - YEARS
      */
-    kla1620shm.kliheatmap1 = function (selvariablename, selsource, selstationid, starecord, callbackh0) {
-        $("#heatmap").show();
-        $("#heatworld").show();
-
+    kla1620shm.kliheatmap1 = function (cid, selvariablename, selsource, selstationid, starecord, callbackh0) {
         // KLISTATIONS mit <variablename>.years[<year>][12 Werte im Array]
-
         async.waterfall([
                 function (callbackshm1) {
                     var sqlStmt = "";
@@ -825,7 +845,7 @@
                         }
                         // hier ist das Layout nochmal zu kontrollieren
 
-                        var erg = kla9020fun.getHeatmap(cid, matrix1, function (ret) {
+                        var erg = kla9020fun.getHeatmap(cid, matrix1, 7, function (ret) {
                             sysbase.putMessage("Heatmap ausgegeben", 1);
                             callbackshm2(null, {
                                 error: false,
@@ -3006,7 +3026,7 @@
                         var x = ev.x;
                         var y = ev.y;
                         if (x > title.left && x < title.right && y > title.top && y < title.bottom) {
-                            alert('title clicked!')
+                            alert('title clicked!');
                         }
                     }
                 }
@@ -3954,7 +3974,7 @@
      * kliheatmap1 - Heatmap berechnen, Animation sichern und anzeigen
      * mit "Video-Controls" - aus KLISTATIONS - YEARS
      */
-    kla1620shm.kliheatmap1 = function (selvariablename, selsource, selstationid, starecord, callbackh0) {
+    kla1620shm.kliheatmap2 = function (cid, selvariablename, selsource, selstationid, starecord, callbackh0) {
         $("#heatmap").show();
         $("#heatworld").show();
 
@@ -4113,8 +4133,8 @@
                             }
                         }
                         // hier ist das Layout nochmal zu kontrollieren
-
-                        var erg = kla9020fun.getHeatmap(cid, matrix1, function (ret) {
+                        debugger;
+                        var erg = kla9020fun.getHeatmap(cid, matrix1, 7, function (ret) {
                             sysbase.putMessage("Heatmap ausgegeben", 1);
                             callbackshm2(null, {
                                 error: false,

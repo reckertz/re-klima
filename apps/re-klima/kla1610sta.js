@@ -398,8 +398,9 @@
                     source: defaultsource,
                     variablename: defaultvariablename,
                     /* name: "berlin" */
-                    anzyears: ">=150",
-                    fromyear: ">=1850"
+                    /* anzyears: ">=150", */
+                    fromyear: "<=1850",
+                    toyear: ">=1850",
                 };
                 uientry.fromRecord2UI($("#kla1610staform"), starecord, staschema);
                 uientry.init();
@@ -900,14 +901,10 @@
         var idc20 = window.parent.sysbase.tabcreateiframe("Stations", "", "re-klima", "kla1610sta", "kliheatmap.html");
         window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         */
-        var source = $(this).closest("tr").find('td:first-child').text();
-        var str1 = $(this).closest("tr").find(':nth-child(2)').text();
-        var idis1 = str1.indexOf(" ");
-        var variablename = "";
-        if (idis1 > 10) {
-            variablename = str1.substr(idis1 + 1, 4);
-            selvariablename = variablename;
-        }
+
+        var source = starecord.source;   //  $(this).closest("tr").find('td:first-child').text();
+        var variablename = starecord.variablename;
+        selvariablename = variablename;
         console.log("Station:" + stationid + " from:" + source);
         /*
          sysbase.navigateTo("kli1620shm", [{

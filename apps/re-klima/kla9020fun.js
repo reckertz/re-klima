@@ -23,11 +23,46 @@
      * getHeatmap - Heatmap aus Matrix erzeugen und nach Container ausgeben
      * 1. Prüfen der Daten in Matrix und Default-Setzungen oder Abbruch
      * 2. Dimensionsparameter auf 400*500-Matrix (maximal)
-     * @param {*} hcontainerid
+     *
+     * @param {*} hcontainerid - wird flexibel gehandhabt
      * @param {*} hmatrix
+     * @param {*} hmethod
      * @param {*} callback901
+     * @returns
      */
-    kla9020fun.getHeatmap = function (hcontainerid, hmatrix, callback901) {
+    kla9020fun.getHeatmap = function (hcontainerid, hmatrix, hmethod, callback901) {
+        var hcwrapperid = "";
+        var hccanvasid = "";
+        debugger;
+        if (typeof hcontainerid !== "string" || hcontainerid.length === 0) {
+            callback901({
+                error: true,
+                message: "No containerid"
+            });
+            return;
+        }
+        if (hcontainerid.startsWith("#")) {
+            hcontainerid = hcontainerid.substr(1);
+        }
+        var hctagname = document.getElementById(hcontainerid).tagName;
+        if (hctagname === "CANVAS") {
+            // hier ist alles in Ordnung
+            hcwrapperid = document.getElementById(hcontainerid).parentNode.id;
+            hccanvasid = hcontainerid;
+        } else if (hctagname === "DIV") {
+            hcwrapperid = hcontainerid;
+            hccanvasid = "hcan" + Math.floor(Math.random() * 100000) + 1;
+            $("#" + hcwrapperid)
+            .append($("<canvas/>", {
+                id: hccanvasid,
+                css: {
+                    border: "1px solid"
+                }
+            }));
+        }
+
+        $("#" + hcwrapperid).show();
+        $("#" + hccanvasid).show();
         if (typeof hmatrix.data === "undefined" || !Array.isArray(hmatrix.data)) {
             callback901({
                 error: true,
@@ -70,14 +105,14 @@
         }
         anzcols = hmatrix.colheaders.length;
         // Holen der wichtigen Eckparameter
-        var c = document.getElementById(hcontainerid);
-        var canvas = document.getElementById(hcontainerid);
+        var c = document.getElementById(hccanvasid);
+        var canvas = document.getElementById(hccanvasid);
         var ctx = c.getContext("2d");
         /**
          * neue Designüberlegungen Scrollbar wegen hoher Jahreszahl notwendig
          */
         // https://stackoverflow.com/questions/15461811/html-canvas-with-scrollbar
-        $("#" + hcontainerid).parent().css({
+        $("#" + hccanvasid).parent().css({
             "max-width": "500px",
             "max-height": "400px"
         });
@@ -121,7 +156,7 @@
         // evtl. reicht 1? pixel mehr gegen den horizontalen Scrollbar
         var neww = 500 + scw + 15;
 
-        $("#" + hcontainerid).parent().css({
+        $("#" + hccanvasid).parent().css({
             width: "" + neww + "px",
             "max-width": "" + neww + "px",
             "max-height": "500px",
@@ -141,7 +176,7 @@
                 var colindex = icol;
                 var temperatur = hmatrix.data[irow][icol];
                 if (temperatur === null) continue;
-                ctx.fillStyle = kla9020fun.getcolorstring(temperatur);
+                ctx.fillStyle = kla9020fun.getcolorstring(temperatur, hmethod);
                 var cleft = Math.ceil(colindex * colwidth * wratio);
                 var ctop = Math.ceil(rowindex * rowheight * hratio);
                 var cwidth = Math.ceil(colwidth * wratio);
@@ -152,44 +187,97 @@
         }
         heatmapparms.savedwidth = $("#heatmap").width();
         heatmapparms.savedcanvaswidth = $("#heatmap canvas").width();
-
+        $("#" + hcwrapperid).show();
+        $("#" + hccanvasid).show();
         sysbase.putMessage("Heatmap ausgegeben", 1);
         callback901({
             error: false,
-            message: "OK"
+            message: "OK",
+            hccanvasid: hccanvasid
         });
         return;
     };
 
-    var tempint = [{
-    text: "blue-cyan",
-    vont: -50,
-    bist: -10,
-    voncolor: [0, 0, 1],
-    biscolor: [0, 1, 1]
-},
-{
-    text: "cyan-green",
-    vont: -10,
-    bist: 0,
-    voncolor: [0, 1, 1],
-    biscolor: [0, 1, 0]
-},
-{
-    text: "green-yellow",
-    vont: 0,
-    bist: 25,
-    voncolor: [0, 1, 0],
-    biscolor: [1, 1, 0]
-},
-{
-    text: "yellow-red",
-    vont: 25,
-    bist: 50,
-    voncolor: [1, 1, 0],
-    biscolor: [1, 0, 0]
-}
+    var tempint = [];
+    var tempint5 = [{
+            text: "blue-cyan",
+            vont: -50,
+            bist: -20,
+            voncolor: [0, 0, 1],
+            biscolor: [0, 1, 1]
+        },
+        {
+            text: "cyan-green",
+            vont: -20,
+            bist: 0,
+            voncolor: [0, 1, 1],
+            biscolor: [0, 1, 0]
+        },
+        {
+            text: "green-yellow",
+            vont: 0,
+            bist: 25,
+            voncolor: [0, 1, 0],
+            biscolor: [1, 1, 0]
+        },
+        {
+            text: "yellow-red",
+            vont: 25,
+            bist: 50,
+            voncolor: [1, 1, 0],
+            biscolor: [1, 0, 0]
+        }
     ];
+
+
+    var tempint7 = [
+        {
+            text: "black-blue",
+            vont: -50,
+            bist: -20,
+            voncolor: [0, 0, 0],
+            biscolor: [0, 0, 1]
+        },
+        {
+            text: "blue-cyan",
+            vont: -20,
+            bist: 0,
+            voncolor: [0, 0, 1],
+            biscolor: [0, 1, 1]
+        },
+        {
+            text: "cyan-green",
+            vont: 0,
+            bist: 8,
+            voncolor: [0, 1, 1],
+            biscolor: [0, 1, 0]
+        },
+        {
+            text: "green-yellow",
+            vont: 8,
+            bist: 25,
+            voncolor: [0, 1, 0],
+            biscolor: [1, 1, 0]
+        },
+        {
+            text: "yellow-red",
+            vont: 25,
+            bist: 40,
+            voncolor: [1, 1, 0],
+            biscolor: [1, 0, 0]
+        },
+        {
+            text: "red-white",
+            vont: 40,
+            bist: 50,
+            voncolor: [1, 0, 0],
+            biscolor: [1, 1, 1]
+        }
+    ];
+
+
+
+
 
 
     /**
@@ -197,7 +285,16 @@
      * es gibt 100 Ganzzahlwerte, gerundet wird auf 0.5 Grad
      * dann sind es 200 Colorcodes für gif = ok
      */
-    kla9020fun.getcolorstring = function (temperatur) {
+    kla9020fun.getcolorstring = function (temperatur, method) {
+        if (typeof method === "undefined") {
+            method = 5;
+        }
+        method = parseInt(method) || 5;
+        if (method === 5) {
+            tempint = tempint5;
+        } else {
+            tempint = tempint7;
+        }
         var tempsave = temperatur;
         if (isNaN(temperatur)) return "";
         temperatur = kla9020fun.round(parseFloat(temperatur), 0.5);
@@ -307,6 +404,7 @@
      * @returns {{r:number, g:number, b:number}} - RGB channel intensities (0-255)
      * @description Ported from: http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
      */
+    /*
     exports.getRGBFromTemperature = function (tmpKelvin) {
         // All calculations require tmpKelvin \ 100, so only do the conversion once
         tmpKelvin = clamp(tmpKelvin, 1000, 40000) / 100;
@@ -322,6 +420,7 @@
             b: tmpKelvin >= 66 ? 255 : tmpKelvin <= 19 ? 0 : clamp(138.5177312231 * Math.log(tmpKelvin - 10) - 305.0447927307, 0, 255) // .998
         };
     };
+    */
 
 
 
@@ -334,7 +433,16 @@
      *   Bereich -50 bis +50
      *   container muss ein div o.ä. sein
      */
-    kla9020fun.getColorPaletteX1 = function (container) {
+    kla9020fun.getColorPaletteX1 = function (container, method) {
+        if (typeof method === "undefined") {
+            method = 5;
+        }
+        method = parseInt(method) || 5;
+        if (method === 5) {
+            tempint = tempint5;
+        } else {
+            tempint = tempint7;
+        }
         if (typeof container === "string" && !container.startsWith("#")) {
             container = "#" + container;
         }
