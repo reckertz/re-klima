@@ -11,13 +11,83 @@
      * standardisierte Mimik zur Integration mit App, Browser und node.js
      */
 
-    /**
-     * getHeatmap - Heatmap in Container erzeugen
-     * automatische Anpassung an die Spaltenzahl in hmatrix und
-     * Länge gemäß Zeilenzeitl in hmatrix
-     * @param {*} hcontainer - id eines html-Containers (div), der fix definiert ist
-     * @param {*} hmatrix - Daten in der speziellen Matrix-Strukur
-     */
+    var tempopt = {};
+    var temparray = [];
+    var tempint = [];
+    var tempint5 = [{
+            text: "blue-cyan",
+            vont: -50,
+            bist: -20,
+            voncolor: [0, 0, 1],
+            biscolor: [0, 1, 1]
+        },
+        {
+            text: "cyan-green",
+            vont: -20,
+            bist: 0,
+            voncolor: [0, 1, 1],
+            biscolor: [0, 1, 0]
+        },
+        {
+            text: "green-yellow",
+            vont: 0,
+            bist: 25,
+            voncolor: [0, 1, 0],
+            biscolor: [1, 1, 0]
+        },
+        {
+            text: "yellow-red",
+            vont: 25,
+            bist: 50,
+            voncolor: [1, 1, 0],
+            biscolor: [1, 0, 0]
+        }
+    ];
+
+
+    var tempint7 = [{
+            text: "black-blue",
+            vont: -50,
+            bist: -20,
+            voncolor: [0, 0, 0],
+            biscolor: [0, 0, 1]
+        },
+        {
+            text: "blue-cyan",
+            vont: -20,
+            bist: 0,
+            voncolor: [0, 0, 1],
+            biscolor: [0, 1, 1]
+        },
+        {
+            text: "cyan-green",
+            vont: 0,
+            bist: 8,
+            voncolor: [0, 1, 1],
+            biscolor: [0, 1, 0]
+        },
+        {
+            text: "green-yellow",
+            vont: 8,
+            bist: 25,
+            voncolor: [0, 1, 0],
+            biscolor: [1, 1, 0]
+        },
+        {
+            text: "yellow-red",
+            vont: 25,
+            bist: 40,
+            voncolor: [1, 1, 0],
+            biscolor: [1, 0, 0]
+        },
+        {
+            text: "red-white",
+            vont: 40,
+            bist: 50,
+            voncolor: [1, 0, 0],
+            biscolor: [1, 1, 1]
+        }
+    ];
     var heatmapparms = {};
     /**
      * getHeatmap - Heatmap aus Matrix erzeugen und nach Container ausgeben
@@ -26,14 +96,23 @@
      *
      * @param {*} hcontainerid - wird flexibel gehandhabt
      * @param {*} hmatrix
-     * @param {*} hmethod
+     * @param {*} hoptions - Konfigurationsparameter minmax
      * @param {*} callback901
      * @returns
      */
-    kla9020fun.getHeatmap = function (hcontainerid, hmatrix, hmethod, callback901) {
+    kla9020fun.getHeatmap = function (hcontainerid, hmatrix, hoptions, callback901) {
+        tempopt = {};
+        if (typeof hoptions === "number") {
+            var hmethod = hoptions;
+            hoptions = {};
+            hoptions.hmethod = hmethod;
+        } else if (typeof hoptions !== "object") {
+            hoptions = {};
+        }
+        hoptions.hmethod = hoptions.hmethod || 7;
+        hoptions.cbuckets = hoptions.cbuckets || false;
         var hcwrapperid = "";
         var hccanvasid = "";
-        debugger;
         if (typeof hcontainerid !== "string" || hcontainerid.length === 0) {
             callback901({
                 error: true,
@@ -53,12 +132,12 @@
             hcwrapperid = hcontainerid;
             hccanvasid = "hcan" + Math.floor(Math.random() * 100000) + 1;
             $("#" + hcwrapperid)
-            .append($("<canvas/>", {
-                id: hccanvasid,
-                css: {
-                    border: "1px solid"
-                }
-            }));
+                .append($("<canvas/>", {
+                    id: hccanvasid,
+                    css: {
+                        border: "1px solid"
+                    }
+                }));
         }
 
         $("#" + hcwrapperid).show();
@@ -163,7 +242,7 @@
             overflow: "auto"
         });
         /**
-         * jedes Jahr eine Zeile, jede Zeile anzcols Monate
+         * jedes Jahr eine Zeile, jede Zeile anzcols Tage
          * also direkte Steuerung, einfach
          * hier werden die Daten der Matrix bearbeitet , Sortierung liegt bereits vor
          */
@@ -176,7 +255,8 @@
                 var colindex = icol;
                 var temperatur = hmatrix.data[irow][icol];
                 if (temperatur === null) continue;
-                ctx.fillStyle = kla9020fun.getcolorstring(temperatur, hmethod);
+                if (isNaN(temperatur)) continue;
+                ctx.fillStyle = kla9020fun.getcolorstring(temperatur, hoptions);
                 var cleft = Math.ceil(colindex * colwidth * wratio);
                 var ctop = Math.ceil(rowindex * rowheight * hratio);
                 var cwidth = Math.ceil(colwidth * wratio);
@@ -190,90 +270,253 @@
         $("#" + hcwrapperid).show();
         $("#" + hccanvasid).show();
         sysbase.putMessage("Heatmap ausgegeben", 1);
+        /**
+         * Histogramm ausgeben, wenn übergeben
+         */
+        if (hoptions.minmax === true && typeof hoptions.histo === "object" && Object.keys(hoptions.histo).length > 0) {
+            temparray = [];
+            // Ergänzen der Temperaturen ohne count
+            for (var ival = -50; ival <= 50; ival++) {
+                var valstr = "" + ival;
+                if (typeof hoptions.histo[valstr] === "undefined") {
+                    hoptions.histo[valstr] = 0;
+                }
+            }
+            var tempvals = Object.keys(hoptions.histo);
+            var mincount = null;
+            var maxcount = null;
+            for (var i = 0; i < tempvals.length; i++) {
+                var count = hoptions.histo[tempvals[i]];
+                if (mincount === null) {
+                    mincount = count;
+                } else if (count < mincount) {
+                    mincount = count;
+                }
+                if (maxcount === null) {
+                    maxcount = count;
+                } else if (count > maxcount) {
+                    maxcount = count;
+                }
+                temparray.push({
+                    temp: tempvals[i],
+                    count: count
+                });
+            }
+            temparray.sort(function (a, b) {
+                if (parseInt(a.temp) < parseInt(b.temp))
+                    return -1;
+                if (parseInt(a.temp) > parseInt(b.temp))
+                    return 1;
+                return 0;
+            });
+            var sparkpoints = [];
+            for (var i = 0; i < temparray.length; i++) {
+                sparkpoints.push(temparray[i].count);
+            }
+
+            /**
+             * Klimaperioden-Histogramme ausgeben, wenn übergeben
+             * hmoptions.cbucketdata[buckyear] = {
+                    toyear: buck3 + 29,
+                    histo: [],
+                    minval: null,
+                    maxval: null,
+                    valsum: 0,
+                    valcount: 0
+                };
+             */
+            if (hoptions.cbuckets === true && typeof hoptions.cbucketdata === "object" && Object.keys(hoptions.cbucketdata).length > 0) {
+                var tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
+                $("#" + hcwrapperid)
+                    .append($("<table/>", {
+                            id: tableid,
+                            css: {
+                                width: "100%",
+                                float: "left"
+                            }
+                        })
+                        .append($("<thead/>")
+                            .append($("<tr/>")
+                                .append($("<th/>", {
+                                    html: "Periode"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Histogramm"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Min"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Max"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Avg"
+                                }))
+                            )
+                        )
+                        .append($("<tbody/>"))
+                    );
+                /**
+                 * hier wird die Gesamtzeile eingeschoben und ausgegeben
+                 */
+                var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
+                $("#" + tableid + " tbody")
+                    .append($("<tr/>")
+                        .append($("<td/>", {
+                            html: hmatrix.fromyear + "-" + hmatrix.toyear
+                        }))
+                        .append($("<td/>")
+                            .append($("<span/>", {
+                                id: sparkid,
+                                css: {
+                                    width: "100%",
+                                    float: "left"
+                                }
+                            }))
+                        )
+                        .append($("<td/>", {
+                            html: hoptions.minval
+                        }))
+                        .append($("<td/>", {
+                            html: hoptions.maxval
+                        }))
+                        .append($("<td/>", {
+                            html: (hoptions.sumval / hoptions.countval).toFixed(2)
+                        }))
+                    );
+
+
+                $("#" + sparkid).sparkline(sparkpoints, {
+                    type: 'bar',
+                    height: 60,
+                    barColor: "red",
+                    negBarColor: "blue",
+                    barWidth: 3,
+                    barSpacing: 0,
+                    fillColor: false,
+                    defaultPixelsPerValue: 3,
+                    chartRangeMin: mincount,
+                    chartRangeMax: maxcount,
+                    composite: false
+                });
+            }
+
+
+            /**
+             * Loop über die Klimaperioden
+             */
+            var buckyears = Object.keys(hoptions.cbucketdata);
+            for (var ibuck = 0; ibuck < buckyears.length; ibuck++) {
+                temparray = [];
+                var bucket = hoptions.cbucketdata[buckyears[ibuck]];
+                // Ergänzen der Temperaturen ohne count
+                for (var ival = -50; ival <= 50; ival++) {
+                    var valstr = "" + ival;
+                    if (typeof bucket.histo[valstr] === "undefined") {
+                        bucket.histo[valstr] = 0;
+                    }
+                }
+                var tempvals = Object.keys(bucket.histo);
+                var mincount = null;
+                var maxcount = null;
+                for (var i = 0; i < tempvals.length; i++) {
+                    var count = bucket.histo[tempvals[i]];
+                    if (mincount === null) {
+                        mincount = count;
+                    } else if (count < mincount) {
+                        mincount = count;
+                    }
+                    if (maxcount === null) {
+                        maxcount = count;
+                    } else if (count > maxcount) {
+                        maxcount = count;
+                    }
+                    temparray.push({
+                        temp: tempvals[i],
+                        count: count
+                    });
+                }
+                temparray.sort(function (a, b) {
+                    if (parseInt(a.temp) < parseInt(b.temp))
+                        return -1;
+                    if (parseInt(a.temp) > parseInt(b.temp))
+                        return 1;
+                    return 0;
+                });
+                var sparkpoints = [];
+                for (var i = 0; i < temparray.length; i++) {
+                    sparkpoints.push(temparray[i].count);
+                }
+                // Ausgabe
+                var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
+                $("#" + tableid + " tbody")
+                    .append($("<tr/>")
+                        .append($("<td/>", {
+                            html: buckyears[ibuck] + "-" + bucket.toyear
+                        }))
+                        .append($("<td/>")
+                            .append($("<span/>", {
+                                id: sparkid,
+                                css: {
+                                    width: "100%",
+                                    float: "left"
+                                }
+                            }))
+                        )
+                        .append($("<td/>", {
+                            html: bucket.minval
+                        }))
+                        .append($("<td/>", {
+                            html: bucket.maxval
+                        }))
+                        .append($("<td/>", {
+                            html: (bucket.valsum / bucket.valcount).toFixed(2)
+                        }))
+                    );
+
+
+                /*
+                $("#" + sparkid).sparkline(sparkpoints, {
+                    type: 'line',
+                    height: 60,
+                    fillColor: false,
+                    defaultPixelsPerValue: 3,
+                    chartRangeMin: mincount,
+                    chartRangeMax: maxcount,
+                    lineColor: "black",
+                    composite: false
+                });
+                */
+
+                $("#" + sparkid).sparkline(sparkpoints, {
+                    type: 'bar',
+                    height: 60,
+                    barColor: "red",
+                    negBarColor: "blue",
+                    barWidth: 3,
+                    barSpacing: 0,
+                    fillColor: false,
+                    defaultPixelsPerValue: 3,
+                    chartRangeMin: mincount,
+                    chartRangeMax: maxcount,
+                    composite: false
+                });
+            }
+        }
+
+
+
         callback901({
             error: false,
             message: "OK",
-            hccanvasid: hccanvasid
+            hccanvasid: hccanvasid,
+            hoptions: hoptions,
+            temparray: temparray,
+            matrix: hmatrix
         });
         return;
     };
 
-    var tempint = [];
-    var tempint5 = [{
-            text: "blue-cyan",
-            vont: -50,
-            bist: -20,
-            voncolor: [0, 0, 1],
-            biscolor: [0, 1, 1]
-        },
-        {
-            text: "cyan-green",
-            vont: -20,
-            bist: 0,
-            voncolor: [0, 1, 1],
-            biscolor: [0, 1, 0]
-        },
-        {
-            text: "green-yellow",
-            vont: 0,
-            bist: 25,
-            voncolor: [0, 1, 0],
-            biscolor: [1, 1, 0]
-        },
-        {
-            text: "yellow-red",
-            vont: 25,
-            bist: 50,
-            voncolor: [1, 1, 0],
-            biscolor: [1, 0, 0]
-        }
-    ];
-
-
-    var tempint7 = [
-        {
-            text: "black-blue",
-            vont: -50,
-            bist: -20,
-            voncolor: [0, 0, 0],
-            biscolor: [0, 0, 1]
-        },
-        {
-            text: "blue-cyan",
-            vont: -20,
-            bist: 0,
-            voncolor: [0, 0, 1],
-            biscolor: [0, 1, 1]
-        },
-        {
-            text: "cyan-green",
-            vont: 0,
-            bist: 8,
-            voncolor: [0, 1, 1],
-            biscolor: [0, 1, 0]
-        },
-        {
-            text: "green-yellow",
-            vont: 8,
-            bist: 25,
-            voncolor: [0, 1, 0],
-            biscolor: [1, 1, 0]
-        },
-        {
-            text: "yellow-red",
-            vont: 25,
-            bist: 40,
-            voncolor: [1, 1, 0],
-            biscolor: [1, 0, 0]
-        },
-        {
-            text: "red-white",
-            vont: 40,
-            bist: 50,
-            voncolor: [1, 0, 0],
-            biscolor: [1, 1, 1]
-        }
-    ];
 
 
 
@@ -285,32 +528,58 @@
      * es gibt 100 Ganzzahlwerte, gerundet wird auf 0.5 Grad
      * dann sind es 200 Colorcodes für gif = ok
      */
-    kla9020fun.getcolorstring = function (temperatur, method) {
-        if (typeof method === "undefined") {
-            method = 5;
+    kla9020fun.getcolorstring = function (temperatur, coptions) {
+        if (isNaN(temperatur)) {
+            return "";
         }
-        method = parseInt(method) || 5;
-        if (method === 5) {
+        var method;
+        if (typeof coptions === "undefined") {
+            method = 5;
+            coptions = {};
+            coptions.minmax = false;
+        } else {
+            coptions.minmax = coptions.minmax || false;
+        }
+        method = parseInt(method) || 7;
+        if (coptions.minmax === true) {
+            /**
+             * Drama: prüfen, ob die Definition schon da ist, wenn ja, dann verwenden
+             * sonst erst erzeugen und dann verwenden
+             */
+            if (Object.keys(tempopt).length >= 2) {
+                if (tempopt.minval === coptions.minval && tempopt.maxval === coptions.maxval) {
+                    // do nothing, tempint weiter verwenden
+                    var xjkl = 0;
+                } else {
+                    // tempint neu berechnen
+                    kla9020fun.calctempint(coptions);
+                    tempopt.minval = coptions.minval;
+                    tempopt.maxval = coptions.maxval;
+                }
+            } else {
+                // tempint neu berechnen
+                kla9020fun.calctempint(coptions);
+                tempopt.minval = coptions.minval;
+                tempopt.maxval = coptions.maxval;
+            }
+        } else if (method === 5) {
             tempint = tempint5;
         } else {
             tempint = tempint7;
         }
         var tempsave = temperatur;
-        if (isNaN(temperatur)) return "";
         temperatur = kla9020fun.round(parseFloat(temperatur), 0.5);
-        for (var icat = 0; icat < tempint.length; icat++) {
-            if (temperatur >= tempint[icat].vont && temperatur < tempint[icat].bist) {
-                break;
-            }
-        }
-        if (icat >= tempint.length) {
-            if (temperatur < tempint[0].vont) {
-                icat = 0;
-                temperatur = tempint[0].vont;
-            } else {
-                if (temperatur >= tempint[3].bist) {
-                    icat = 3;
-                    temperatur = tempint[3].bistt;
+        var icat;
+        if (temperatur <= tempint[0].vont) {
+            icat = 0;
+            temperatur = tempint[0].vont;
+        } else if (temperatur >= tempint[tempint.length - 1].bist) {
+            icat = tempint.length - 1;
+            temperatur = tempint[icat].bistt;
+        } else {
+            for (icat = 0; icat < tempint.length; icat++) {
+                if (temperatur >= tempint[icat].vont && temperatur <= tempint[icat].bist) {
+                    break;
                 }
             }
         }
@@ -319,6 +588,7 @@
         try {
             idiff = Math.abs(tempint[icat].vont - tempint[icat].bist) + 1;
         } catch (err) {
+            console.log("*******" + icat);
             debugger;
         }
         // itemp ist die Temperatur
@@ -362,6 +632,32 @@
         return colorcode;
     };
 
+    /**
+     *
+     */
+    kla9020fun.calctempint = function (hoptions) {
+        /*
+         var tempint7 = [
+            {
+                text: "black-blue",
+                vont: -50,
+                bist: -20,
+                voncolor: [0, 0, 0],
+                biscolor: [0, 0, 1]
+            },
+        */
+
+        var vont = Math.floor(parseInt(hoptions.minval));
+        var bist = Math.ceil(parseInt(hoptions.maxval));
+        var hinter = Math.ceil(parseInt((bist - vont + 1) / (tempint.length - 1)));
+        tempint = uihelper.cloneObject(tempint7);
+        var aktt = vont;
+        for (var i = 0; i < tempint.length; i++) {
+            tempint[i].vont = aktt;
+            tempint[i].bist = aktt + hinter;
+            aktt += hinter;
+        }
+    };
 
     /**
      * Berechnen Color-String

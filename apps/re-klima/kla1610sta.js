@@ -922,11 +922,14 @@
                 stationid: stationid,
                 source: source,
                 variablename: selvariablename,
-                starecord: starecord
+                starecord: starecord,
+                latitude: $(this).closest("tr").attr("latitude"),
+                longitude: $(this).closest("tr").attr("longitude")
             }));
             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
             var tabname = variablename + " " + stationname;
+            debugger;
             var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1620shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         } else if (source === "ECAD") {

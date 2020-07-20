@@ -2041,7 +2041,7 @@
         var selyears = "";
         var selvars = "";
         var adbc = "AD";
-        var stationids = []; // aufbereitete Form, kommaseparierte Liste
+        var stationids = []; // aufbereitetes Array, aus kommaseparierter Liste
         var lats = false;
         var globals = false; // aus general_files
         var hydetot = {}; // Vorlage für die Ausgabe
@@ -2615,6 +2615,655 @@
             });
         // G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2008AD_pop\rurc_2008AD.asc
     };
+
+
+    /**
+     * stationhyde - HYDE Daten aufbereiten für Stationid nach Klimabuckets ab 1961 in 30-ern
+     * Bezüge
+     * fullname - HYDE-Anker-Verzeichnis für die rekursive Auflösung
+     * Perioden ab 1661 in 30-er Sprüngen, wo Daten vorhanden sind
+     * es wird der letzte Jahreswert in einem Bucket ausgewertet
+     * adbc - AD oder BC, hier immer AD
+     * rootname - Verzeichnis für die Ausgabe von Dateien, default static/temp/hyde/<stationid>.txt
+     * stationids - optional, für liste von stationid's für die station-Auswertung, wenn vorhanden
+     *              dann wird je stationid eine Datei ausgegeben
+     * globals - true, dann statische Daten aus general_files auswerten
+     * sonst werden die total-Auswertung und die Auswertung je Klimazone ausgegeben
+     *
+     * und Ablegen auf dem Server, erst JSON, später mal sehen
+     * Parameter sind url, predirectory, directory, filename
+     * Rückgabe ret.data als Objekt mit Parametern von
+     * Esri ASCII-Raster-Format mit:
+        NCOLS xxx
+        NROWS xxx
+        XLLCORNER xxx
+        YLLCORNER xxx
+        CELLSIZE xxx
+        NODATA_VALUE xxx
+        row 1
+        row 2
+        ...
+        row n
+        sowie Randauszählung der Ländercodes (Spezialfall) und der null-Values (-9999)
+        dann kommt Tabelle der relevanten Punkte, hier: Deutschland im ersten Test
+        var linkname = mydata[i].linkname;
+            var archive = mydata[i].archive;
+            var sitename = mydata[i].sitename;
+            var longitude = Number(mydata[i].longitude);
+            var latitude = Number(mydata[i].latitude);
+    Neue Exports - Dateinamenskonventionen:
+    hydetot.txt - Gesamtsummen pro Jahr <year>
+    hydeC<climatezone>.txt - Gesamtsummen pro Klimazone <climatezone> pro Jahr,
+        dies wird für alle Klimazonen berechnet
+    und nur bei speziellen Aufrufparametern
+    hydeS<stationid>.txt Werte zur Zelle einer Station pro Jahr,
+        dazu Wert je 1 + 8, 1 + 8 + 16 etc. Zellen, also die Stationszelle und Nachbarzellen
+        in wachsendem Umfeld, das wird eine Herausforderung, kann aber gut erledigt werden,
+        wird nur für ausgewählte Stationen berechnet als Umfeldindikatoren.
+        Für das Umfeld einer Station ist das relativ homogen zu sehen, ist erst mal ein pragmatischer Start,
+        der mit den Quadratmetern anfängt.
+    */
+
+   sys0000sys.stationhyde = function (rootname, fs, async, req, reqparm, res, callbackh) {
+    var hydedata = {};
+
+    var files = [];
+    var predirectory = "";
+    var directory = "";
+    var filename = "";
+    var trule = "";
+    var ret = {};
+    ret.data = [];
+    // hierarchie year - lats -
+    var result = {};
+    /**
+     * erst mal den Baum holen
+     */
+    var fullname = "";
+    var outdir = [];
+    var selyears = "";
+    var selvars = "";
+    var adbc = "AD";
+    var stationids = []; // aufbereitetes Array, aus kommaseparierter Liste
+    var lats = false;
+    var globals = false; // aus general_files
+    var hydetot = {}; // Vorlage für die Ausgabe
+    var hydezone = {}; // hyde climatezones Vorlage für die Ausgabe
+    var hydecont = {}; // hyde continents Vorlage für die Ausgabe
+    var hydestation = {}; // wird bei Ausgabe differenziert
+    if (typeof req !== "undefined" && req !== null) {
+        if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+            fullname = req.query.fullname;
+        }
+        if (req.query && typeof req.query.outdir !== "undefined" && req.query.outdir.length > 0) {
+            outdir = req.query.outdir;
+        }
+
+        if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+            selyears = req.query.selyears;
+        }
+        if (req.query && typeof req.query.selvars !== "undefined" && req.query.selvars.length > 0) {
+            selvars = req.query.selvars;
+        }
+        if (req.query && typeof req.query.adbc !== "undefined" && req.query.adbc.length > 0) {
+            adbc = req.query.adbc;
+        }
+        if (req.query && typeof req.query.rootname !== "undefined" && req.query.rootname.length > 0) {
+            rootname = req.query.rootname;
+        }
+        if (req.query && typeof req.query.stationids !== "undefined" && req.query.stationids.length > 0) {
+            stationids = req.query.stationids.split(",");
+        }
+        if (req.query && typeof req.query.lats !== "undefined") {
+            if (typeof req.query.lats === "string" && req.query.lats.length > 0 &&
+                (req.query.lats === "true" || req.query.lats === "-1")) {
+                lats = true;
+            }
+        }
+        if (req.query && typeof req.query.globals !== "undefined") {
+            if (typeof req.query.globals === "string" && req.query.globals.length > 0 &&
+                (req.query.globals === "true" || req.query.globals === "-1")) {
+                globals = true;
+            }
+        }
+    } else if (typeof reqparm !== "undefined" && reqparm !== null) {
+        if (reqparm && typeof reqparm.fullname !== "undefined" && reqparm.fullname.length > 0) {
+            fullname = reqparm.fullname;
+        }
+        if (reqparm && typeof reqparm.outdir !== "undefined" && reqparm.fullname.outdir > 0) {
+            outdir = reqparm.outdir;
+        }
+        if (reqparm && typeof reqparm.selyears !== "undefined" && reqparm.selyears.length > 0) {
+            selyears = reqparm.selyears;
+        }
+        if (reqparm && typeof reqparm.selvars !== "undefined" && reqparm.selvars.length > 0) {
+            selvars = reqparm.selvars;
+        }
+        if (reqparm && typeof reqparm.adbc !== "undefined" && reqparm.adbc.length > 0) {
+            adbc = reqparm.adbc;
+        }
+        if (reqparm && typeof reqparm.rootname !== "undefined" && reqparm.rootname.length > 0) {
+            rootname = reqparm.rootname;
+        }
+        if (reqparm && typeof reqparm.stationids !== "undefined" && reqparm.stationids.length > 0) {
+            stationids = reqparm.stationids.split(",");
+        }
+        if (reqparm.query && typeof reqparm.lats !== "undefined") {
+            if (typeof reqparm.lats === "string" && reqparm.lats.length > 0 &&
+                (reqparm.lats === "true" || reqparm.lats === "-1")) {
+                lats = true;
+            }
+        }
+        if (reqparm.query && typeof reqparm.globals !== "undefined") {
+            if (typeof reqparm.globals === "string" && reqparm.globals.length > 0 &&
+                (reqparm.globals === "true" || reqparm.globals === "-1")) {
+                globals = true;
+            }
+        }
+    }
+    selvars = selvars.replace(/_/g, "");
+    if (fullname.length === 0) {
+        // "G:\\Projekte\klimadaten\"HYDE_lu_pop_proxy"\baseline\asc\2008AD_pop\rurc_2008AD.asc"
+        fullname = path.join("G:", "Projekte");
+        fullname = path.join(fullname, "klimadaten");
+        fullname = path.join(fullname, "HYDE_lu_pop_proxy");
+        if (globals === false) {
+            fullname = path.join(fullname, "baseline");
+            fullname = path.join(fullname, "asc");
+        } else {
+            fullname = path.join(fullname, "general_files");
+        }
+        if (!fs.existsSync(fullname)) {
+            // hier ausweichverzeichnis prüfen
+            callbackh(res, {
+                error: true,
+                message: "keine HYDE-Datenverzeichnis vorgegeben"
+            });
+            return;
+        }
+    } else {
+        if (!fs.existsSync(fullname)) {
+            // hier ausweichverzeichnis prüfen
+            callbackh(res, {
+                error: true,
+                message: "keine HYDE-Datenverzeichnis vorgegeben"
+            });
+            return;
+        }
+    }
+    /**
+     * Bestimmung der Kandidaten-Dateinamen
+     */
+    var firstdir = fullname;
+    var filelist = [];
+    // selyears wird konstruiert für die Station-Klimadaten
+    selyears = "1750,1780,1810,1840,1870,1900,1930,1960,1990,2017";
+    filelist = walkSync(firstdir, filelist, globals, selyears, selvars, adbc);
+    linfilelist.sort(function (a, b) {
+        if (a < b)
+            return -1;
+        if (a > b)
+            return 1;
+        return 0;
+    });
+    console.log("HYDE-Files gefunden:" + linfilelist.length);
+
+    var filecounter = 0;
+    var valcounter = 0;
+    async.eachSeries(linfilelist, function (fullfilename, nextfile) {
+            /**
+             * Iteration über die gefundenen Dateien fullfilename
+             */
+            filecounter++;
+            if (filecounter > 1000000) {
+                var err = new Error('Broke out of async');
+                err.break = true;
+                return nextfile(err);
+            }
+            var ext = path.extname(fullfilename);
+            if (ext !== ".asc") {
+                console.log("Falscher Dateityp, skipped:" + fullfilename);
+                nextfile();
+                return;
+            }
+            console.log(fullfilename + " Started");
+            valcounter = 0;
+            async.waterfall([
+                    function (callbackn) {
+                        // fullfilename zerlegen für Feldname, Jahr
+                        var filename = path.basename(fullfilename);
+                        var fparts = filename.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
+                        var variablename = "";
+                        var year;
+                        if (fparts !== null) {
+                            variablename = fparts[1];
+                            if (typeof hydedata.variables === "undefined") {
+                                hydedata.variables = {};
+                            }
+                            year = fparts[2];
+                            if (year.length > 0) {
+                                year = ("0000" + year).slice(-4);
+                            }
+                            if (typeof hydedata[year] === "undefined") {
+                                hydedata[year] = {};
+                            }
+                        } else {
+                            var idis = filename.indexOf(".");
+                            variablename = filename.substr(0, idis);
+                            if (typeof hydedata.variables === "undefined") {
+                                hydedata.variables = {};
+                            }
+                        }
+                        // variablename erst innerhalb der lats unten
+                        var ret = {
+                            error: false,
+                            message: "start",
+                            fullfilename: fullfilename,
+                            year: year,
+                            variablename: variablename
+                        };
+                        callbackn(null, res, ret);
+                        return;
+                    },
+                    function (res, ret, callbacko) {
+                        // file lesen und Update der Zielstruktur
+                        var year = ret.year;
+                        var variablename = ret.variablename;
+                        var linecount = 0;
+                        var metadata = {};
+                        var metafields = {};
+                        var datamat = []; // zweidimensional erst mal
+                        var hitcells = [];
+                        var rowcount = 0;
+                        var hitcount = 0;
+                        var headfields = [];
+                        var datafields = [];
+                        var datalinecounter = 0;
+                        // ret.filepath = path.join(ret.directory, filename, selyears);
+                        var readInterface = readline.createInterface({
+                            input: fs.createReadStream(ret.fullfilename),
+                            console: false
+                        });
+                        readInterface.on('line', function (line) {
+                            //console.log(line);
+                            if (line.substr(0, 1) === " ") {
+                                line = line.trim();
+                            }
+                            var lline = line.toLocaleLowerCase();
+                            var fld = "";
+                            if (lline.startsWith("ncols")) {
+                                fld = lline.replace("ncols", "");
+                                fld = fld.replace(/ /g, "");
+                                metafields.ncols = parseInt(fld);
+                            } else if (lline.startsWith("nrows")) {
+                                fld = lline.replace("nrows", "");
+                                fld = fld.replace(/ /g, "");
+                                metafields.nrows = parseInt(fld);
+                            } else if (lline.startsWith("xllcorner")) {
+                                fld = lline.replace("xllcorner", "");
+                                fld = fld.replace(/ /g, "");
+                                metafields.xllcorner = parseInt(fld);
+                            } else if (lline.startsWith("yllcorner")) {
+                                fld = lline.replace("yllcorner", "");
+                                fld = fld.replace(/ /g, "");
+                                metafields.yllcorner = parseInt(fld);
+                            } else if (lline.startsWith("cellsize")) {
+                                fld = lline.replace("cellsize", "");
+                                fld = fld.replace(/ /g, "");
+                                metafields.cellsize = Number(fld) || 0;
+                            } else if (lline.startsWith("nodata_value")) {
+                                fld = lline.replace("nodata_value", "");
+                                fld = fld.replace(/ /g, "");
+                                metafields.NODATA_value = fld;
+                            } else {
+                                /**
+                                 * hier kommen die Daten, VIELE DATEN!!!
+                                 */
+                                rowcount++;
+                                // Problem: es gibt Zeilen, die mit Blank beginnen
+                                var rowcells = line.split(" ");
+                                // Sizing-Test, volle Matrix im Speicher
+                                datamat.push(rowcells);
+                                // hydedata[year][variablename]
+                                var y = rowcount;
+                                var latitude = parseFloat(metafields.yllcorner + (metafields.nrows - y) * metafields.cellsize);
+                                /**
+                                 * getlatfieldsp - latitude wird vorgegeben,
+                                 * hier: explizite Dezimalstellen mit . getrennt und -999 für Missing!!!
+                                 * Struktur wird zurückgegeben mit
+                                 * lat - Gerundet auf ganzzahlige latitude
+                                 * latn - Nord/Süd-Wert, mit Präfix für Nord oder Süd, zweistellig
+                                 * lats - Sortierwert von 000 = Nordpol bis 180 = Südpol und lat dahinter
+                                 */
+                                var lat = kla9020fun.getlatfieldsp("" + latitude);
+                                var climatezone = "*";
+                                var climateerg = uihelper.getClimateZone(latitude);
+                                if (climateerg !== false) {
+                                    climatezone = climateerg.value;
+                                } else {
+                                    console.log(latitude);
+                                }
+                                var lastcell = rowcells.length; //
+                                var summe = 0;
+                                var minval = null;
+                                var maxval = null;
+                                var icount = 0;
+                                for (var i = 0; i < lastcell; i++) {
+                                    /**
+                                     * hier die Zellen auf signifikante Werte abprüfen
+                                     */
+                                    var x = i + 1;
+                                    var longitude = parseFloat(metafields.xllcorner + (x * metafields.cellsize));
+                                    var wert = rowcells[i];
+                                    if (!wert.startsWith("-9999")) {
+                                        if (!isNaN(wert) && parseInt(wert) !== 0) {
+                                            icount++;
+                                            valcounter++;
+                                            if (wert.indexOf(".") >= 0) {
+                                                summe += parseFloat(wert) || 0;
+                                            } else {
+                                                summe += parseInt(wert) || 0;
+                                            }
+                                            if (minval === null) {
+                                                minval = wert;
+                                            } else if (wert < minval) {
+                                                minval = wert;
+                                            }
+                                            if (maxval === null) {
+                                                maxval = wert;
+                                            } else if (wert > maxval) {
+                                                maxval = wert;
+                                            }
+                                            /**
+                                             * hier wird es sehr speziell, weil hydecont
+                                             * für die Kontinente aus den Zellen berechnet wird!!!
+                                             * 1. Bestimmung Kontinentalzone
+                                             * 2. Addieren in Kontinentalzone
+                                             */
+                                            var continentobj = uihelper.getContinent(longitude, latitude);
+                                            if (continentobj.error === false) {
+                                                var continent = continentobj.continentcode;
+                                                if (typeof hydecont[continent] === "undefined") {
+                                                    hydecont[continent] = {};
+                                                }
+                                                if (globals === false) {
+                                                    if (typeof hydecont[continent][year] === "undefined") {
+                                                        hydecont[continent][year] = {};
+                                                    }
+                                                    if (typeof hydecont[continent][year][variablename] === "undefined") {
+                                                        hydecont[continent][year][variablename] = {
+                                                            count: 0,
+                                                            summe: 0.0,
+                                                        };
+                                                    }
+                                                    hydecont[continent][year][variablename].count += 1;
+                                                    hydecont[continent][year][variablename].summe += parseFloat(wert);
+                                                } else {
+                                                    if (typeof hydecont[continent][variablename] === "undefined") {
+                                                        hydecont[continent][variablename] = {
+                                                            count: 0,
+                                                            summe: 0.0,
+                                                        };
+                                                    }
+                                                    hydecont[continent][variablename].count += 1;
+                                                    hydecont[continent][variablename].summe += parseFloat(wert);
+                                                }
+                                            }
+                                        } else {
+                                           if (isNaN(wert)) console.log(variablename + " NaN:" + wert);
+                                        }
+                                    }
+                                }
+                                /**
+                                 * Aufbereitung von summe, minval und maxval je row
+                                 * Gesamtsummen je Jahr
+                                 *
+                                 */
+                                // Verdichtung hydetot
+                                if (icount > 0) {
+                                    if (globals === false) {
+                                        if (typeof hydetot[year] === "undefined") {
+                                            hydetot[year] = {};
+                                        }
+                                        if (typeof hydetot[year][variablename] === "undefined") {
+                                            hydetot[year][variablename] = {
+                                                count: 0,
+                                                summe: 0.0,
+                                            };
+                                        }
+                                        hydetot[year][variablename].count += icount;
+                                        hydetot[year][variablename].summe += summe;
+                                    } else {
+                                        if (typeof hydetot[variablename] === "undefined") {
+                                            hydetot[variablename] = {
+                                                count: 0,
+                                                summe: 0.0,
+                                            };
+                                        }
+                                        hydetot[variablename].count += icount;
+                                        hydetot[variablename].summe += summe;
+                                    }
+                                }
+                                // Verdichtung hydezone
+                                if (icount > 0) {
+                                    if (globals === false) {
+                                        if (typeof hydezone[climatezone] === "undefined") {
+                                            hydezone[climatezone] = {};
+                                        }
+                                        if (typeof hydezone[climatezone][year] === "undefined") {
+                                            hydezone[climatezone][year] = {};
+                                        }
+                                        if (typeof hydezone[climatezone][year][variablename] === "undefined") {
+                                            hydezone[climatezone][year][variablename] = {
+                                                count: 0,
+                                                summe: 0.0,
+                                            };
+                                        }
+                                        hydezone[climatezone][year][variablename].count += icount;
+                                        hydezone[climatezone][year][variablename].summe += summe;
+                                    } else {
+                                        if (typeof hydezone[climatezone] === "undefined") {
+                                            hydezone[climatezone] = {};
+                                        }
+                                        if (typeof hydezone[climatezone][variablename] === "undefined") {
+                                            hydezone[climatezone][variablename] = {
+                                                count: 0,
+                                                summe: 0.0,
+                                            };
+                                        }
+                                        hydezone[climatezone][variablename].count += icount;
+                                        hydezone[climatezone][variablename].summe += summe;
+                                    }
+                                }
+                                // alte lats-Aufbereitung, jetzt bedingt; hydedata[year][variablename] = {};
+                                if (icount > 0 && lats === true) {
+                                    if (typeof hydedata[year][lat.lats] === "undefined") {
+                                        hydedata[year][lat.lats] = {};
+                                    }
+                                    if (typeof hydedata[year][lat.lats][variablename] === "undefined") {
+                                        hydedata[year][lat.lats][variablename] = 0;
+                                    }
+                                    hydedata[year][lat.lats][variablename] += summe;
+                                    if (typeof hydedata.variables[variablename] === "undefined") {
+                                        hydedata.variables[variablename] = {
+                                            count: 0,
+                                            min: null,
+                                            max: null
+                                        };
+                                    }
+                                    var vglwert = hydedata[year][lat.lats][variablename];
+                                    hydedata.variables[variablename].count++;
+                                    if (hydedata.variables[variablename].min === null) {
+                                        hydedata.variables[variablename].min = vglwert;
+                                    } else if (vglwert < hydedata.variables[variablename].min) {
+                                        hydedata.variables[variablename].min = vglwert;
+                                    }
+                                    if (hydedata.variables[variablename].max === null) {
+                                        hydedata.variables[variablename].max = vglwert;
+                                    } else if (vglwert > hydedata.variables[variablename].max) {
+                                        hydedata.variables[variablename].max = vglwert;
+                                    }
+                                }
+                            }
+                        });
+                        readInterface.on('close', function () {
+                            // do something on finish here
+                            console.log("Finished:" + valcounter);
+                            callbacko("Finish", res, ret);
+                            return;
+                        });
+                    }
+                ],
+                function (error, ret) {
+                    nextfile();
+                    return;
+                });
+        },
+        function () {
+            /**
+             * Ausgabe Ergebnisdatei(en)
+             * no such file or directory, mkdir 'C:\Projekte\re-klima\apps\re-frame\static\temp'
+             */
+            var fullpath = "";
+            var fpath = "";
+            var targetpath = path.join(rootname, "static");
+            targetpath = path.join(targetpath, "temp");
+            if (!fs.existsSync(targetpath)) {
+                fs.mkdirSync(targetpath);
+            }
+
+            if (typeof outdir === "object" && Array.isArray(outdir)) {
+                for (var ifilename = 0; ifilename < outdir.length; ifilename++) {
+                    var outdir1 = outdir[ifilename].replace(/[><=]/g, "");
+                    targetpath = path.join(targetpath, outdir1);
+                    if (!fs.existsSync(targetpath)) {
+                        fs.mkdirSync(targetpath);
+                    }
+                }
+                fullpath = targetpath;
+                // der echte Dateiname kommt erst später
+            } else {
+                if (typeof outdir === "undefined" || outdir.length === 0) {
+                    outdir = "hyde";
+                }
+                fullpath = path.join(targetpath, outdir);
+            }
+            fpath = fullpath.substr(fullpath.indexOf("static") + 7);
+            //var filnr = Math.floor(Math.random() * (999999999 - 100000000 + 1)) + 100000000;
+            async.waterfall([
+                    function (cb0000Z0) {
+                        var datafilename = "hydelats.txt";
+                        var fulldatafilename = path.join(fullpath, datafilename);
+                        if (lats === true) {
+                            fs.writeFile(fulldatafilename, JSON.stringify(hydedata), {
+                                encoding: 'utf8',
+                                flag: 'w'
+                            }, function (err) {
+                                if (err) {
+                                    console.log(err);
+                                } else {
+                                    console.log(fulldatafilename + " Finished:" + filecounter);
+                                }
+                                cb0000Z0(null, res, {
+                                    error: false,
+                                    message: err || "OK",
+                                    fullpath: fullpath
+                                });
+                                return;
+                            });
+                        } else {
+                            cb0000Z0(null, res, {
+                                error: false,
+                                message: "OK",
+                                fullpath: fullpath
+                            });
+                            return;
+                        }
+                    },
+                    function (res, ret, cb0000Z1) {
+                        /**
+                         * neue Ausgabe hydetot.txt
+                         */
+                        var datafilename = "hydetot.txt";
+                        if (globals === true) datafilename = "hydeglobal.txt";
+                        var fulldatafilename = path.join(ret.fullpath, datafilename);
+                        fs.writeFile(fulldatafilename, JSON.stringify(hydetot), {
+                            encoding: 'utf8',
+                            flag: 'w'
+                        }, function (err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log("Finished-Files processed:" + filecounter);
+                            }
+                            cb0000Z1(null, res, {
+                                error: false,
+                                message: err || "OK",
+                                fullpath: ret.fullpath
+                            });
+                            return;
+                        });
+                    },
+                    function (res, ret, cb0000Z2) {
+                        /**
+                         * neue Ausgabe hydezone.txt
+                         */
+                        var datafilename = "hydezone.txt";
+                        if (globals === true) datafilename = "hydeglobalzone.txt";
+                        var fulldatafilename = path.join(ret.fullpath, datafilename);
+                        fs.writeFile(fulldatafilename, JSON.stringify(hydezone), {
+                            encoding: 'utf8',
+                            flag: 'w'
+                        }, function (err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log("hydezone processed:" + filecounter);
+                            }
+                            cb0000Z2(null, res, {
+                                error: false,
+                                message: err || "OK",
+                                fullpath: ret.fullpath
+                            });
+                            return;
+                        });
+                    },
+                    function (res, ret, cb0000Z3) {
+                        /**
+                         * neue Ausgabe hydezone.txt
+                         */
+                        var datafilename = "hydecont.txt";
+                        if (globals === true) datafilename = "hydeglobalcont.txt";
+                        var fulldatafilename = path.join(ret.fullpath, datafilename);
+                        fs.writeFile(fulldatafilename, JSON.stringify(hydecont), {
+                            encoding: 'utf8',
+                            flag: 'w'
+                        }, function (err) {
+                            if (err) {
+                                console.log(err);
+                            } else {
+                                console.log("hxdecont processed:" + filecounter);
+                            }
+                            cb0000Z3("Finish", res, {
+                                error: false,
+                                message: err || "OK",
+                                fullpath: ret.fullpath
+                            });
+                            return;
+                        });
+                    }
+                ],
+                function (error, res, ret) {
+                    callbackh(res, ret);
+                    return;
+                });
+        });
+    // G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2008AD_pop\rurc_2008AD.asc
+};
+
+
+
+
 
     /**
      * updatecontinent berechnet Kontinentzuordnung neu nach Update inline

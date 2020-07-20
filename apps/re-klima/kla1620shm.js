@@ -25,6 +25,7 @@
     var sgif;
     var aktyear;
     var aktvariablename;
+    var selparms;
     var selstationid = null;
     var selsource = null;
     var selvariablename = null;
@@ -34,6 +35,7 @@
     var stationrecord;
     var yearindexarray = {};
     var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
+    var histo1 = {}; // Histogramm auf Temperatur gerundet Ganzzahl
     var array1 = []; // aktives Array für d3
     var klirecords = [];
 
@@ -54,7 +56,7 @@
             selvariablename = parameters[0].variablename;
             starecord = JSON.parse(parameters[0].starecord);
         } else {
-            var selparms = window.parent.sysbase.getCache("onestation");
+            selparms = window.parent.sysbase.getCache("onestation");
             selparms = JSON.parse(selparms);
             selstationid = selparms.stationid;
             starecord = selparms.starecord;
@@ -197,6 +199,7 @@
 
                 .append($("<button/>", {
                     html: "Super-Heatmaps",
+                    id: "kla1620shmsuper",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -206,15 +209,134 @@
                         // stationrecord - heatworld
                         async.waterfall([
                             function (cb1620a) {
-                                kla1620shm.kliheatmap1(cid, "TMIN", selsource, selstationid, starecord, function (ret) {
+                                // brutal auf die rechte Seite
+                                $("#kla1620shmwrapper").empty();
+                                $("#kla1620shmwrapper").css({
+                                    overflow: "auto"
+                                });
+                                $("#kla1620shmwrapper")
+                                    .append($("<div/>", {
+                                        id: "kla1620shmd1",
+                                        css: {
+                                            width: $("#heatmap").width(),
+                                            height: $("#heatmap").height(),
+                                            float: "left"
+                                        }
+                                    }));
+                                var hmoptions = {
+                                    minmax: false,
+                                    minmaxhistogram: false,
+                                    cbuckets: false,
+                                    hyde: false
+                                };
+                                kla1620shm.kliheatmap2("kla1620shmd1", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
                                     cb1620a(null);
                                 });
-
+                            },
+                            function (cb1620b) {
+                                $("#kla1620shmwrapper")
+                                    .append($("<div/>", {
+                                        id: "kla1620shmd2",
+                                        css: {
+                                            width: $("#heatmap").width(),
+                                            height: $("#heatmap").height(),
+                                            float: "left"
+                                        }
+                                    }));
+                                var hmoptions = {
+                                    minmax: false,
+                                    minmaxhistogram: false,
+                                    cbuckets: false,
+                                    hyde: false
+                                };
+                                kla1620shm.kliheatmap2("kla1620shmd2", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                    cb1620b(null);
+                                });
+                            },
+                            function (cb1620c) {
+                                /**
+                                 * für TMAX min und max bestimmen, Histogramm als Sparkline
+                                 */
+                                $("#kla1620shmwrapper")
+                                    .append($("<div/>", {
+                                        id: "kla1620shmd3",
+                                        css: {
+                                            width: $("#heatmap").width(),
+                                            height: $("#heatmap").height(),
+                                            float: "left"
+                                        }
+                                    }));
+                                var hmoptions = {
+                                    minmax: true,
+                                    minmaxhistogram: true,
+                                    cbuckets: true,
+                                    hyde: true
+                                };
+                                kla1620shm.kliheatmap2("kla1620shmd3", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                    // über ret kommen hier options in ret zurück
+                                    /*
+                                        error: false,
+                                        message: "Heatmap ausgegeben",
+                                        matrix: matrix1,
+                                        options: uihelper.cloneObject(hmoptions),
+                                        hoptions: ret.hoptions,
+                                        histo: hmoptions.histo,
+                                        temparray: ret.temparray,
+                                        matrix: hmatrix
+                                    */
+                                    cb1620c(null);
+                                });
+                            },
+                            function (cb1620d) {
+                                /**
+                                 * für TMIN min und max bestimmen, Histogramm als Sparkline
+                                 */
+                                $("#kla1620shmwrapper")
+                                    .append($("<div/>", {
+                                        id: "kla1620shmd4",
+                                        css: {
+                                            width: $("#heatmap").width(),
+                                            height: $("#heatmap").height(),
+                                            float: "left"
+                                        }
+                                    }));
+                                var hmoptions = {
+                                    minmax: true,
+                                    minmaxhistogram: true,
+                                    cbuckets: true,
+                                    hyde: false
+                                };
+                                kla1620shm.kliheatmap2("kla1620shmd4", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                    cb1620d(null);
+                                });
                             }
+
                         ]);
                     }
                 }))
 
+
+
+                .append($("<button/>", {
+                    html: "Google-Maps",
+                    id: "kla1620shmgoogle",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        //var gurl = "https://www.google.com/maps/dir/";
+                        var gurl = "https://www.google.com/maps/search/?api=1&query=";
+                        debugger;
+                        gurl += selparms.latitude;
+                        gurl += ",";
+                        gurl += selparms.longitude;
+                        var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                        window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
+
+                    }
+                }))
 
 
                 .append($("<button/>", {
@@ -671,13 +793,25 @@
         savedwidth = $("#heatmap").width();
 
         if (typeof selvariablename !== "undefined" && selvariablename !== null && selvariablename.trim().length > 0) {
-            kla1620shm.kliheatmap2(cid, selvariablename, selsource, selstationid, starecord, function (ret) {
+            kla1620shm.kliheatmap2(cid, selvariablename, selsource, selstationid, starecord, {}, function (ret) {
+                $("#kla1620shmwrapper").empty();
+                var h = $("#heatmap").height();
+                var w = $("#kla1620shm.content").width();
+                w -= $("#heatmap").position().left;
+                w -= $("#heatmap").width();
+                w -= 40;
+                $("#kla1620shmwrapper").css({
+                    overflow: "hidden",
+                    height: h,
+                    width: w
+                });
 
+                // kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
             });
         } else {
             sysbase.putMessage("Bitte eine Auswahl TMIN/TMAX treffen, default TMAX genutzt", 3);
             selvariablename = "TMAX";
-            kla1620shm.kliheatmap1(cid, selvariablename, selsource, selstationid, starecord, function (ret) {
+            kla1620shm.kliheatmap2(cid, selvariablename, selsource, selstationid, starecord, {}, function (ret) {
 
             });
         }
@@ -685,201 +819,6 @@
     }; // Ende show
 
 
-    /**
-     * kliheatmap1 - Heatmap berechnen, Animation sichern und anzeigen
-     * mit "Video-Controls" - aus KLISTATIONS - YEARS
-     */
-    kla1620shm.kliheatmap1 = function (cid, selvariablename, selsource, selstationid, starecord, callbackh0) {
-        // KLISTATIONS mit <variablename>.years[<year>][12 Werte im Array]
-        async.waterfall([
-                function (callbackshm1) {
-                    var sqlStmt = "";
-                    var sel = {
-                        source: selsource,
-                        stationid: selstationid
-                    };
-                    var projection = {
-                        source: 1,
-                        stationid: 1,
-                        name: 1,
-                        climatezone: 1,
-                        region: 1,
-                        subregion: 1,
-                        countryname: 1,
-                        lats: 1,
-                        longitude: 1,
-                        latitude: 1,
-                        anzyears: 1,
-                        realyears: 1,
-                        fromyear: 1,
-                        toyear: 1,
-                        height: 1,
-                        "analysis.tavg.regression.total.m": 1,
-                        "analysis.tavg.regression.mtotal": 1,
-                    };
-                    sqlStmt += "SELECT ";
-                    sqlStmt += "KLISTATIONS.source, ";
-                    sqlStmt += "KLISTATIONS.stationid, ";
-                    sqlStmt += "stationname, ";
-                    sqlStmt += "climatezone, ";
-                    sqlStmt += "region, ";
-                    sqlStmt += "subregion, ";
-                    sqlStmt += "countryname, ";
-                    sqlStmt += "lats, ";
-                    sqlStmt += "longitude, ";
-                    sqlStmt += "latitude, ";
-                    sqlStmt += "variable, ";
-                    sqlStmt += "anzyears, ";
-                    sqlStmt += "realyears, ";
-                    sqlStmt += "fromyear, ";
-                    sqlStmt += "toyear, ";
-                    sqlStmt += "height, ";
-                    sqlStmt += "years ";
-                    sqlStmt += "FROM KLISTATIONS ";
-                    sqlStmt += "LEFT JOIN KLIDATA ";
-                    sqlStmt += "ON KLISTATIONS.source = KLIDATA.source ";
-                    sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
-                    sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
-                    sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
-                    sqlStmt += "AND KLIDATA.variable = '" + selvariablename.toUpperCase() + "' ";
-                    sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-                    // "analysis.tavg.regression.total.m": 1,
-                    // "analysis.tavg.regression.mtotal": 1,
-                    var api = "getonerecord";
-                    var table = "KLISTATIONS";
-                    uihelper.getOneRecord(sqlStmt, projection, api, table, function (ret) {
-                        if (ret.error === false && ret.record !== null) {
-                            /*
-                            intern wird getallsqlrecords gerufen und EIN Satz in record zurückgegeben.
-                            */
-                            stationrecord = ret.record;
-                            callbackshm1(null, {
-                                error: false,
-                                message: "Daten gefunden",
-                                record: ret.record
-                            });
-                            return;
-                        } else {
-                            /**
-                             * Abfrage, ob Daten geladen werden sollen
-                             */
-                            var qmsg = "Für Station:" + selstationid + " aus " + selsource;
-                            qmsg += " und " + selvariablename;
-                            qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
-                            var check = window.confirm(qmsg);
-                            if (check === false) {
-                                sysbase.putMessage("Keine Daten zur Station gefunden", 3);
-                                callbackshm1("Error", {
-                                    error: true,
-                                    message: "Keine Daten gefunden",
-                                });
-                                return;
-                            } else {
-                                kla1620shm.loadstationdata(selstationid, selsource, sqlStmt, function (ret, record) {
-                                    sysbase.putMessage("Daten geladen und bereitgestellt", 1);
-                                    console.log("loadstationdata fertig:" + ret.message);
-                                    callbackshm1(null, {
-                                        error: ret.error,
-                                        message: ret.message,
-                                        record: ret.record
-                                    });
-                                    return;
-                                });
-                            }
-                        }
-                    });
-                },
-                function (ret, callbackshm2) {
-                    var colwidth;
-                    var rowheight;
-                    var wratio;
-                    var hratio;
-                    try {
-                        var wmtit = "Selektion für Station:";
-                        wmtit += " " + starecord.source + " ";
-                        // isMember ? '$2.00' : '$10.00'
-                        wmtit += selstationid;
-                        wmtit += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
-                        wmtit += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
-                        wmtit += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
-                        wmtit += (ret.record.anzyears || 0).length > 0 ? " für " + ret.record.anzyears + " Jahre" : "";
-                        wmtit += (ret.record.region || "").length > 0 ? " Region:" + ret.record.region : "";
-                        wmtit += (ret.record.climatezone || "").length > 0 ? " Klimazone:" + ret.record.climatezone : "";
-                        wmtit += (ret.record.height || "").length > 0 ? " Höhe:" + ret.record.height : "";
-                        $(".headertitle").html(wmtit);
-                        var years = JSON.parse(ret.record.years);
-                        var dayyears = JSON.parse(ret.record.years); // ret.record[selvariablename].years;
-
-                        var mtitle = "";
-                        mtitle += (ret.record.variable || "").length > 0 ? " " + ret.record.variable : "";
-                        mtitle += " " + selstationid;
-                        mtitle += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
-                        mtitle += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
-                        mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
-
-                        // Aufruf Heatmap mit Container und Matrix
-                        matrix1 = {
-                            title: mtitle,
-                            colheaders: [],
-                            rowheaders: [],
-                            data: []
-                        };
-                        var irow = 0;
-                        for (var year in years) {
-                            if (years.hasOwnProperty(year)) {
-                                matrix1.rowheaders.push(year);
-                                var rowvalues = years[year];
-                                // zum Test erst mal brutal die ersten 12 Werte
-                                matrix1.data[irow] = [];
-                                for (var icol = 0; icol < 365; icol++) {
-                                    if (rowvalues[icol] === "") {
-                                        matrix1.data[irow][icol] = null;
-                                    } else if (rowvalues[icol] === "-9999" || rowvalues[icol] === "-999.9") {
-                                        matrix1.data[irow][icol] = null;
-                                    } else {
-                                        matrix1.data[irow][icol] = rowvalues[icol];
-                                    }
-                                }
-                                irow++;
-                            }
-                        }
-                        // hier ist das Layout nochmal zu kontrollieren
-
-                        var erg = kla9020fun.getHeatmap(cid, matrix1, 7, function (ret) {
-                            sysbase.putMessage("Heatmap ausgegeben", 1);
-                            callbackshm2(null, {
-                                error: false,
-                                message: "Heatmap ausgegeben",
-                                matrix: matrix1
-                            });
-                            return;
-                        });
-                    } catch (err) {
-                        sysbase.putMessage("Error:" + err, 3);
-                        console.log(err);
-                        console.log(err.stack);
-                        callbackshm2("Error", {
-                            error: true,
-                            message: "Heatmap ausgegeben:" + err
-                        });
-                        return;
-                    }
-                },
-                function (ret, callbackshm2) {
-                    // hier muss die matrix1-Struktur übergeben werden
-                    kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
-                    callbackshm2("Finish", {
-                        error: false,
-                        message: "Heatmap ausgegeben"
-                    });
-                    return;
-                }
-            ],
-            function (error, ret) {
-                callbackh0(ret);
-                return;
-            });
-    };
 
     /**
      * kla1620shm.loadrecs - Bereitstellen klirecords [0] und [1] für TMAX, TMIN
@@ -3969,12 +3908,24 @@
         }
     }; // ende paintSB
 
-
     /**
-     * kliheatmap1 - Heatmap berechnen, Animation sichern und anzeigen
+     * kliheatmap2 - Heatmap berechnen, Animation sichern und anzeigen
      * mit "Video-Controls" - aus KLISTATIONS - YEARS
+     *
+     * @param {*} cid
+     * @param {*} selvariablename
+     * @param {*} selsource
+     * @param {*} selstationid
+     * @param {*} starecord
+     * @param {*} hmoptions
+     *            minmax: true, - Temperaturskala auf echte Min und Max der Werte beziehen, nicht auf die Standardskale
+     *            minmaxhistogram: true - Ausgabe Sparkline über dem Historgramm => histo1
+     *            scale: 7 oder 5 - Anzahl der Grundfarben für die Heatmap
+     *              minval, maxval, sumval, countval werden berechnet und mit übergeben
+     *
+     * @param {*} callbackh0
      */
-    kla1620shm.kliheatmap2 = function (cid, selvariablename, selsource, selstationid, starecord, callbackh0) {
+    kla1620shm.kliheatmap2 = function (cid, selvariablename, selsource, selstationid, starecord, hmoptions, callbackh0) {
         $("#heatmap").show();
         $("#heatworld").show();
 
@@ -4079,6 +4030,22 @@
                     });
                 },
                 function (ret, callbackshm2) {
+                    if (typeof hmoptions === "object" && Object.keys(hmoptions).length >= 1) {
+                        hmoptions.minmax = hmoptions.minmax || false;
+                        hmoptions.scale = 7; // Farb-Buckets
+                        hmoptions.minval = null;
+                        hmoptions.maxval = null;
+                        hmoptions.sumval = 0.0;
+                        hmoptions.countval = 0;
+                    } else {
+                        hmoptions = {};
+                        hmoptions.minmax = false;
+                        hmoptions.scale = 7; // Farb-Buckets
+                        hmoptions.minval = null;
+                        hmoptions.maxval = null;
+                        hmoptions.sumval = 0.0;
+                        hmoptions.countval = 0;
+                    }
                     var colwidth;
                     var rowheight;
                     var wratio;
@@ -4109,37 +4076,117 @@
                         // Aufruf Heatmap mit Container und Matrix
                         matrix1 = {
                             title: mtitle,
+                            fromyear: ret.record.fromyear,
+                            toyear: ret.record.toyear,
                             colheaders: [],
                             rowheaders: [],
                             data: []
                         };
+
                         var irow = 0;
+                        hmoptions.cbucketdata = {}; // year mit: toyear, histo, yearmin, yearmax, yearsum, yearcount
                         for (var year in years) {
                             if (years.hasOwnProperty(year)) {
                                 matrix1.rowheaders.push(year);
                                 var rowvalues = years[year];
-                                // zum Test erst mal brutal die ersten 12 Werte
                                 matrix1.data[irow] = [];
                                 for (var icol = 0; icol < 365; icol++) {
-                                    if (rowvalues[icol] === "") {
+                                    if (typeof rowvalues[icol] === "undefined") {
+                                        debugger;
+                                        matrix1.data[irow][icol] = null;
+                                    } else if (rowvalues[icol] === null || rowvalues[icol] === "" || rowvalues[icol].trim().length === 0) {
                                         matrix1.data[irow][icol] = null;
                                     } else if (rowvalues[icol] === "-9999" || rowvalues[icol] === "-999.9") {
                                         matrix1.data[irow][icol] = null;
                                     } else {
                                         matrix1.data[irow][icol] = rowvalues[icol];
+                                        if (hmoptions.minmax === true) {
+                                            var hmval = parseFloat(rowvalues[icol]);
+                                            if (!isNaN(hmval)) {
+                                                hmoptions.sumval += hmval;
+                                                if (isNaN(hmoptions.sumval)) {
+                                                    console.log("*****" + hmval);
+                                                    debugger;
+                                                }
+                                                hmoptions.countval += 1;
+                                                if (hmoptions.minval === null) {
+                                                    hmoptions.minval = hmval;
+                                                } else if (hmoptions.minval > hmval) {
+                                                    hmoptions.minval = hmval;
+                                                }
+                                                if (hmoptions.maxval === null) {
+                                                    hmoptions.maxval = hmval;
+                                                } else if (hmoptions.maxval < hmval) {
+                                                    hmoptions.maxval = hmval;
+                                                }
+                                                if (hmoptions.minmaxhistogram === true) {
+                                                    var hmvalstr = "" + Math.round(parseFloat(rowvalues[icol]));
+                                                    if (typeof histo1[hmvalstr] === "undefined") {
+                                                        histo1[hmvalstr] = 0;
+                                                    }
+                                                    histo1[hmvalstr] += 1;
+                                                }
+                                                if (hmoptions.cbuckets === true) {
+                                                    //    hmoptions.cbucketdata = {};  // year mit: toyear, histo, minval, maxval, valsum, valcount
+                                                    // berechnen buckyear für das Klimabucket
+                                                    // 1961 bis 1990 als Referenzperiode; 1961 = 30*
+                                                    var buck0 = parseInt(year);
+                                                    var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
+                                                    // oder 1661 als Basisjahr und damit rechnen
+                                                    var buck2 = Math.floor(buck1 / 30);
+                                                    var buck3 = 1661 + (buck2) * 30;
+                                                    var buckyear = "" + buck3;
+                                                    if (typeof hmoptions.cbucketdata[buckyear] === "undefined") {
+                                                        hmoptions.cbucketdata[buckyear] = {
+                                                            toyear: buck3 + 29,
+                                                            histo: [],
+                                                            minval: null,
+                                                            maxval: null,
+                                                            valsum: 0,
+                                                            valcount: 0
+                                                        };
+                                                    }
+                                                    hmoptions.cbucketdata[buckyear].valsum += hmval;
+                                                    hmoptions.cbucketdata[buckyear].valcount += 1;
+                                                    if (hmoptions.cbucketdata[buckyear].minval === null) {
+                                                        hmoptions.cbucketdata[buckyear].minval = hmval;
+                                                    } else if (hmoptions.cbucketdata[buckyear].minval > hmval) {
+                                                        hmoptions.cbucketdata[buckyear].minval = hmval;
+                                                    }
+                                                    if (hmoptions.cbucketdata[buckyear].maxval === null) {
+                                                        hmoptions.cbucketdata[buckyear].maxval = hmval;
+                                                    } else if (hmoptions.cbucketdata[buckyear].maxval < hmval) {
+                                                        hmoptions.cbucketdata[buckyear].maxval = hmval;
+                                                    }
+                                                    if (typeof hmoptions.cbucketdata[buckyear].histo[hmvalstr] === "undefined") {
+                                                        hmoptions.cbucketdata[buckyear].histo[hmvalstr] = 0;
+                                                    }
+                                                    hmoptions.cbucketdata[buckyear].histo[hmvalstr] += 1;
+                                                }
+                                            } else {
+                                                matrix1.data[irow][icol] = null;
+                                                console.log("Keine formal korrekte Temperatur:" + rowvalues[icol]);
+                                                debugger;
+                                            }
+                                        }
                                     }
                                 }
                                 irow++;
                             }
                         }
                         // hier ist das Layout nochmal zu kontrollieren
-                        debugger;
-                        var erg = kla9020fun.getHeatmap(cid, matrix1, 7, function (ret) {
+                        hmoptions.histo = histo1;
+                        var erg = kla9020fun.getHeatmap(cid, matrix1, hmoptions, function (ret) {
                             sysbase.putMessage("Heatmap ausgegeben", 1);
+                            // if (hmoptions.minmax === true) debugger;
                             callbackshm2(null, {
                                 error: false,
                                 message: "Heatmap ausgegeben",
-                                matrix: matrix1
+                                matrix: matrix1,
+                                options: uihelper.cloneObject(hmoptions),
+                                hoptions: ret.hoptions,
+                                histo: hmoptions.histo,
+                                temparray: ret.temparray
                             });
                             return;
                         });
@@ -4156,11 +4203,8 @@
                 },
                 function (ret, callbackshm2) {
                     // hier muss die matrix1-Struktur übergeben werden
-                    kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
-                    callbackshm2("Finish", {
-                        error: false,
-                        message: "Heatmap ausgegeben"
-                    });
+                    // kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
+                    callbackshm2("Finish", ret);
                     return;
                 }
             ],
