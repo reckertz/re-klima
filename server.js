@@ -966,6 +966,83 @@ app.get('/transhyde', function (req, res) {
     });
 });
 
+
+/**
+ * stationhyde - HYDE-Daten in JSON aufbereiten (*.txt-Files)
+ * geplant: KLIHYDE als Tabelle dazu
+ */
+app.get('/stationhyde', function (req, res) {
+    if (checkSession(req, res)) return;
+    var timeout = 100 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootdir = __dirname;
+    var stationid = "";
+    if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
+        stationid = req.query.stationid;
+    }
+    var ret = {};
+    async.waterfall([
+            function (cbsh1) {
+                var reqparm = {
+                    sel: {
+                        source: "HYDE",
+                        stationid: stationid
+                    },
+                    projection: {},
+                    table: "KLIHYDE"
+                };
+                sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                    if (ret1.error === true) {
+                        ret.message = ret1.message;
+                        ret.error = ret1.error;
+                        cbsh1("Error", res, ret);
+                        return;
+                    }
+                    if (ret1.error === false && typeof ret1.record !== "undefined" && ret1.record !== null) {
+                        ret.message = ret1.message;
+                        ret.error = false;
+                        ret.klihyde = ret1.record;
+                        cbsh1("Finish", res, ret);
+                        return;
+                    } else {
+                        ret.message = ret1.message;
+                        ret.error = true;
+                        cbsh1(null , res, ret);
+                        return;
+                    }
+
+                });
+            },
+            function (res, ret, cbsh2) {
+                sys0000sys.stationhyde(db, rootdir, fs, async, req, null, res, function (res, ret) {
+                    // in ret liegen error, message und record
+                    cbsh2("Finish", res, ret);
+                    return;
+                });
+            }
+        ],
+        function (error, res, ret) {
+            var smsg = JSON.stringify(ret);
+            res.writeHead(200, {
+                'Content-Type': 'application/text',
+                "Access-Control-Allow-Origin": "*"
+            });
+            res.end(smsg);
+            return;
+        }
+    );
+
+
+
+
+
+
+});
+
+
 /**
  * updatecontinent - value zu continent in KLISTATIONS neu zuordnen
  */

@@ -39,6 +39,8 @@
     var array1 = []; // aktives Array für d3
     var klirecords = [];
 
+    var klihyde = {};
+
     var poprecord = {}; // Konfigurationsparameter mit Default-Zuweisung
     poprecord.qonly = true;
     poprecord.total = false;
@@ -328,7 +330,7 @@
                         evt.preventDefault();
                         //var gurl = "https://www.google.com/maps/dir/";
                         var gurl = "https://www.google.com/maps/search/?api=1&query=";
-                        debugger;
+
                         gurl += selparms.latitude;
                         gurl += ",";
                         gurl += selparms.longitude;
@@ -4092,7 +4094,6 @@
                                 matrix1.data[irow] = [];
                                 for (var icol = 0; icol < 365; icol++) {
                                     if (typeof rowvalues[icol] === "undefined") {
-                                        debugger;
                                         matrix1.data[irow][icol] = null;
                                     } else if (rowvalues[icol] === null || rowvalues[icol] === "" || rowvalues[icol].trim().length === 0) {
                                         matrix1.data[irow][icol] = null;
@@ -4185,6 +4186,7 @@
                                 matrix: matrix1,
                                 options: uihelper.cloneObject(hmoptions),
                                 hoptions: ret.hoptions,
+                                hcwrapperid: ret.hcwrapperid,
                                 histo: hmoptions.histo,
                                 temparray: ret.temparray
                             });
@@ -4201,10 +4203,67 @@
                         return;
                     }
                 },
-                function (ret, callbackshm2) {
+                function (ret, callbackshm3) {
+                    /**
+                     * HYDE-Daten holen, wenn gefordert
+                     * matrix, options, hoptions, histo, temparray
+                     */
+
+                    $("body").css("cursor", "progress");
+                    $("button").hide();
+                    var jqxhr = $.ajax({
+                        method: "GET",
+                        crossDomain: false,
+                        url: sysbase.getServer("stationhyde"),
+                        data: {
+                            stationid: selstationid,
+                            longitude: stationrecord.longitude,
+                            latitude: stationrecord.latitude,
+                            name: stationrecord.stationname,
+                            globals: false,
+                            selyears: "",
+                            selvars: "popc,rurc,urb,uopp"
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        sysbase.checkSessionLogin(r1);
+                        $("button").show();
+                        $("body").css("cursor", "default");
+                        var ret = JSON.parse(r1);
+                        sysbase.putMessage(ret.message, 1);
+                        if (ret.error === true) {
+                            callbackshm3(null, ret);
+                            return;
+                        } else {
+                            klihyde = ret.klihyde;
+                            debugger;
+                            $("#" + cid)
+                            .append($("<div/>", {
+                                html: "Hier kommt KLIHYDE:" + klihyde.data.length,
+                                css: {
+                                    width: "100%",
+                                    float: "left"
+                                }
+                            }));
+
+
+
+                            callbackshm3(null, ret);
+                            return;
+                        }
+                    }).fail(function (err) {
+                        sysbase.putMessage(err, 1);
+                        $("button").show();
+                        $("body").css("cursor", "default");
+                        callbackshm3(null, ret);
+                        return;
+                    }).always(function () {
+                        // nope
+                    });
+                },
+                function (ret, callbackshm4) {
                     // hier muss die matrix1-Struktur übergeben werden
                     // kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
-                    callbackshm2("Finish", ret);
+                    callbackshm4("Finish", ret);
                     return;
                 }
             ],

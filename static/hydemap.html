@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>klima100 Admin</title>
+    <meta name="description" content="Klima Admin-App" />
+    <meta name="cache-control" content="no-cache, no-store">
+    <meta name="keywords" content="Node.js, JavaScript, AWS EC2, MongoDB, PWA, SPA">
+    <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/klistyles.css" rel="stylesheet">
+
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
+    <script src="lib/raphael.min.js" charset="utf-8"></script>
+    <script src="lib/jquery.mapael.js" charset="utf-8"></script>
+    <script src="maps/germany.js" charset="utf-8"></script>
+    <script src="maps/world.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="apps/re-frame/uihelper.js"></script>
+
+</head>
+
+<body>
+    <!--
+    <div class="container">
+        <div class="mapcontainer">
+            <div class="map">
+                <span id="waiting">Waiting for data</span>
+            </div>
+        </div>
+    </div>
+-->
+    <script>
+        var plots = [];
+        $(document).ready(function () {
+            var tries = 0;
+            var tabtimer = setInterval(function () {
+
+                if (window.localStorage && localStorage.length > 0) {
+                    var mydata = JSON.parse(localStorage.getItem("data"));
+                    if (typeof mydata === "undefined") {
+                        return;
+                    }
+                    console.log("hydemap START");
+                    $("body").empty();
+                    $("body")
+                        .append($("<div/>", {
+                                class: "container"
+                            })
+                            .append($("<div/>", {
+                                    class: "mapcontainer"
+                                })
+                                .append($("<div/>", {
+                                        class: "map"
+                                    })
+                                    .append($("<span/>", {
+                                        id: "waiting"
+                                    }))
+                                )
+                            )
+                        );
+                    /*
+                    $(".container").trigger('update', [{
+                        replaceOptions: true
+                    }]);
+                    */
+                    clearInterval(tabtimer);
+                    plots = [];
+                    for (var i = 0; i < mydata.length; i++) {
+                        var linkname = mydata[i].linkname;
+                        var archive = mydata[i].archive;
+                        var sitename = mydata[i].sitename;
+                        var longitude = Number(mydata[i].longitude);
+                        var latitude = Number(mydata[i].latitude);
+                        var contenthtml = "<span style=\"font-weight:bold;font-size:x-small;\">";
+                        contenthtml += archive;
+                        contenthtml += "</span>";
+                        var texthtml = sitename;
+                        if (mydata[i].checkall === true) {
+                            texthtml = "";
+                        }
+                        plots.push({
+                            type: "square",
+                            size: 1,
+                            latitude: latitude,
+                            longitude: longitude,
+                            attrs: {
+                                fill: "#5ba4ff"
+                                
+                            },
+
+                            tooltip: {
+                                content: contenthtml,
+                                einwohner: 20000
+                            },
+                            text: {
+                                /*
+                                attrs: {
+                                    "font-size": "10px"
+                                },
+                                content: texthtml
+                                */
+                            }
+                        })
+                    }
+                    $(".mapcontainer").mapael({
+                        map: {
+                            // Set the name of the map to display
+                            name: "world",
+                            zoom: {
+                                enabled: true
+                            },
+                            defaultPlot: {
+                                eventHandlers: {
+                                    click: function (e, id, mapElem, textElem, elemOptions) {
+                                        var msg = archive + "\n";
+                                        msg += linkname;
+                                        alert(msg);
+                                    }
+                                }
+                            }
+                        },
+                        plots: plots
+                    });
+                    localStorage.removeItem("data");
+                    tabtimer = setInterval(500);
+                    console.log("hydemap STOP");
+                } else {
+                    // hier geht das Versuchen weiter
+                    tries++;
+                    if (tries > 100) {
+                        clearInterval(tabtimer);
+                        return;
+                    }
+                    $("#waiting").append("," + tries + " " + localStorage.getItem("data"));
+                    console.log("Try:" + tries);
+                }
+            }, 500);
+        });
+    </script>
+</body>
+
+</html>

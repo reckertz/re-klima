@@ -1903,9 +1903,9 @@
                     var newtd = document.createElement("td");
                     var tdtext = tdelem.textContent;
                     var tdhtml = tdelem.innerHTML;
-                    tdhtml = tdhtml.replace(/<br>/g,"#br#");
+                    tdhtml = tdhtml.replace(/<br>/g, "#br#");
                     tdhtml = tdhtml.replace(/<\/?[^>]+(>|$)/g, "");
-                    tdhtml = tdhtml.replace(/#br#/g,"<br>");
+                    tdhtml = tdhtml.replace(/#br#/g, "<br>");
                     newtd.innerHTML = tdhtml;
 
                     newrow.appendChild(newtd);
@@ -2407,6 +2407,41 @@
         */
         return Math.round(d);
     };
+
+    /**
+     * Unterstützung ESRI ASCII Grid Daten
+     * x und y mit Math.floor abrunden nach Berechnung
+     * esrimeta wird initialisiert aus den HYDE-Daten mit
+        ncols 4320
+        nrows 2160
+        xllcorner -180.0
+        yllcorner -90.0
+        cellsize 0.0833333
+        NODATA_value -9999.0
+        aus: C:\Users\profi12\OneDrive\2019\Klima\_Mein Buch\06_22 DEVOP-Funktionen.odt
+    */
+
+    uihelper.x2lon = function (esrimeta, esrix) {
+        var esrilon = esrimeta.xllcorner + (esrix - 1) * esrimeta.cellsize;
+        return esrilon;
+    };
+
+    uihelper.lon2x = function (esrimeta, esrilon) {
+        var esrix = (esrilon - esrimeta.xllcorner) / esrimeta.cellsize + 1;
+        return esrix;
+    };
+
+    uihelper.y2lat = function (esrimeta, esriy) {
+        var esrilat = esrimeta.yllcorner + (esrimeta.nrows - esriy) * esrimeta.cellsize;
+        return esrilat;
+    };
+
+    uihelper.lat2y = function (esrimeta, esrilat) {
+        var esriy = esrimeta.nrows - (esrilat - esrimeta.yllcorner) / esrimeta.cellsize;
+        return esriy;
+    };
+
+
 
 
     /**

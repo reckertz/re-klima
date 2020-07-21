@@ -510,6 +510,7 @@
             error: false,
             message: "OK",
             hccanvasid: hccanvasid,
+            hcwrapperid: hcwrapperid,
             hoptions: hoptions,
             temparray: temparray,
             matrix: hmatrix
