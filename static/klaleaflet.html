@@ -85,6 +85,47 @@
                 });
             }
             $(window).resize();
+
+            var stationid = "";
+            var variablename = "popc_";
+            var latitude = 50.941278;
+            var longitude = 6.958281;
+            var fullname = "";
+            var parmobj = {};
+            debugger;
+            var queryString = window.location.search;
+            console.log(queryString); // ?product=shirt&color=blue&newuser&size=m
+            queryString = queryString.substr(1);
+            var idis = queryString.lastIndexOf("?");
+            if (idis > 0) {
+                queryString = queryString.substr(0, idis);
+            }
+            if (queryString && queryString.length > 0) {
+                var parms = queryString.split("&");
+                parms.forEach(function (item) {
+                    var subparms = item.split("=");
+                    var key = subparms[0];
+                    parmobj[key] = subparms[1];
+                });
+                console.log(parmobj);
+                stationid = parmobj.stationid || "";
+                variablename = parmobj.variablename || "popc_";
+                latitude = parseFloat(parmobj.latitude) || 50.941278;
+                longitude = parseFloat(parmobj.longitude) || 6.958281;
+                var dftfullname = "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy";
+                dftfullname += "\\baseline\\asc\\2017AD_pop";
+                dftfullname += "\\popc_2017AD.asc";
+                fullname = parmobj.fullname || dftfullname;
+            } else {
+                variablename = "popc_";
+                latitude = 50.941278;
+                longitude = 6.958281;
+                var dftfullname = "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy";
+                dftfullname += "\\baseline\\asc\\2017AD_pop";
+                dftfullname += "\\popc_2017AD.asc";
+                fullname = dftfullname;
+            }
+
             var mymap;
             var msg;
             var cells = []; // für die HYDE-Daten
@@ -171,19 +212,20 @@
             // @50.9412818,6.9560927 LatLon Konvention
             $("body").css("cursor", "progress");
             // Kölner Dom
-            var latitude = 50.941278;
-            var longitude = 6.958281;
+            // latitude = 50.941278;
+            // longitude = 6.958281;
 
             // Elbphilharmonie
-            latitude = 53.5582446;
-            longitude = 9.6476395
+            // latitude = 53.5582446;
+            // longitude = 9.6476395
 
             // München Marienplatz
-            latitude = 48.1373932;
-            longitude = 11.5732598;
+            // latitude = 48.1373932;
+            // longitude = 11.5732598;
+
             metafields.latitude = latitude;
             metafields.longitude = longitude;
-            mymap = L.map('mapid').setView([latitude, longitude], 13);
+            mymap = L.map('mapid').setView([latitude, longitude], 11);
             // Default public token
             // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
             L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
@@ -199,6 +241,7 @@
 
 
             // Berechnung der center-Zelle LatLon-Sicht
+            debugger;
             var y = lat2y(metafields, latitude);
             var x = lon2x(metafields, longitude);
 
@@ -232,31 +275,7 @@
             metafields.latSO = latSO;
             metafields.lonSO = lonSO;
 
-
-            // paintcell(mymap, metafields, y, x);
-            /*
-            L.polygon([
-                [metafields.latNW, metafields.lonNW],
-                [metafields.latSO, metafields.lonNW],
-                [metafields.latSO, metafields.lonSO],
-                [metafields.latNW, metafields.lonSO],
-                [metafields.latNW, metafields.lonNW]
-            ]).addTo(mymap).bindPopup("I am a polygon.");
-            */
             paintcell(mymap, metafields, metafields.y, metafields.x);
-
-            /*
-            paintcell(mymap, metafields, metafields.y - 1, metafields.x - 1);
-            paintcell(mymap, metafields, metafields.y, metafields.x - 1);
-            paintcell(mymap, metafields, metafields.y + 1, metafields.x - 1);
-
-            paintcell(mymap, metafields, metafields.y - 1, metafields.x);
-            paintcell(mymap, metafields, metafields.y + 1, metafields.x);
-
-            paintcell(mymap, metafields, metafields.y - 1, metafields.x + 1);
-            paintcell(mymap, metafields, metafields.y, metafields.x + 1);
-            paintcell(mymap, metafields, metafields.y + 1, metafields.x + 1);
-            */
 
             /**
              * Berechnung der Fläche mit turf.js
@@ -278,47 +297,22 @@
             metafields.area = area1;
             metafields.areadim = "m2";
 
-            // Turf expects the data to be standard WGS84 longitude, latitude coordinates
-            /*
-            var toPoint = turf.point([metafields.lonNO, metafields.latSW]);
-            var fromPoint = turf.point([metafields.lonSW, metafields.latSW]);
-            var options = {
-                units: 'kilometers'
-            };
-            metafields.widthBottom = turf.distance(fromPoint, toPoint, options);
-
-            var toPoint = turf.point([metafields.lonNO, metafields.latNO]);
-            var fromPoint = turf.point([metafields.lonSW, metafields.latNO]);
-            var options = {
-                units: 'kilometers'
-            };
-            metafields.widthTop = turf.distance(fromPoint, toPoint, options);
-
-            var fromPoint = turf.point([metafields.lonSW, metafields.latSW]);
-            var toPoint = turf.point([metafields.lonSW, metafields.latNO]);
-            var options = {
-                units: 'kilometers'
-            };
-            metafields.height = turf.distance(fromPoint, toPoint, options);
-            */
             msg = uihelper.iterateJSON2pretty(metafields, "", "");
             $("#prot").html(msg + "<br>" + $("#prot").html());
 
-
             console.log("x=" + x + " y=" + y);
-            /*
-            msg = uihelper.iterateJSON2pretty (metafields, "", "");
-            $("#prot").html(msg + "<br>" + $("#prot").html());
-            */
             async.waterfall([
                     function (callback) {
                         /**
+                         * Holen Hyde-Daten neuer API stationhyde
+                        */
+                       callback (null, ret);
+                       return;
+                    },
+                    function (ret, callback) {
+                        /**
                          * Laden Mapael Daten kontrolliert
                          */
-                        var fullname = "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy";
-                        fullname += "\\baseline\\asc\\2017AD_pop";
-                        fullname += "\\popc_2017AD.asc";
-
                         //fullname = "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy\\general_files\\iso_cr.asc";
                         metafields.fullname = fullname;
                         var jqxhr = $.ajax({
@@ -346,7 +340,6 @@
                     },
                     function (ret, callback) {
                         // hier wird ret.nextchunk abgearbeitet
-
                         var lines = ret.nextchunk.split("<br>");
                         console.log("Lines:" + lines.length);
                         cells = [];
@@ -355,18 +348,14 @@
                         var x = metafields.x;
                         var y = metafields.y;
                         lcontrol.push(["L1", x, y]);
-
                         lcontrol.push(["L2", x - 1, y - 1]);
                         lcontrol.push(["L2", x - 1, y]);
                         lcontrol.push(["L2", x - 1, y + 1]);
-
                         lcontrol.push(["L2", x, y - 1]);
                         lcontrol.push(["L2", x, y + 1]);
-
                         lcontrol.push(["L2", x + 1, y - 1]);
                         lcontrol.push(["L2", x + 1, y]);
                         lcontrol.push(["L2", x + 1, y + 1]);
-
                         // drüber
                         lcontrol.push(["L3", x - 2, y - 2]);
                         lcontrol.push(["L3", x - 1, y - 2]);
@@ -415,7 +404,13 @@
                                         hydeerg[cl] += parseInt(wert) || 0;
                                     }
                                     paintcell(mymap, metafields, cy, cx, parseFloat(wert).toFixed(0));
+                                } else {
+                                    console.log("x-1:" + (cx - 1) + " y:" + cy + " wert:>" + wert + "<");
+                                    paintcell(mymap, metafields, cy, cx, wert);
                                 }
+                            } else {
+                                console.log("x-1:" + (cx - 1) + " y:" + cy + " wert:>" + wert + "<");
+                                paintcell(mymap, metafields, cy, cx, "-");
                             }
                         }
 

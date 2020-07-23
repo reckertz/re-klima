@@ -3015,7 +3015,7 @@
                                             var cl = lcontrol[icontrol][0];
                                             var cx = lcontrol[icontrol][1];
                                             var cy = lcontrol[icontrol][2];
-                                            if (rowcount === cy) {
+                                            if ((rowcount - 1) === cy) {
                                                 //var wert = cells[cy][cx - 1].trim();
                                                 var wert = rowcells[cx - 1].trim();
                                                 if (!wert.startsWith("-9999") && !wert.startsWith(metafields.NODATA_value)) {

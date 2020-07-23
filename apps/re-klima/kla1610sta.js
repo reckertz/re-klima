@@ -896,27 +896,10 @@
     $(document).on("click", ".kla1610staid", function (evt) {
         evt.preventDefault();
         var stationid = $(this).closest("tr").attr("rowid");
-        /*
-        window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
-        var idc20 = window.parent.sysbase.tabcreateiframe("Stations", "", "re-klima", "kla1610sta", "kliheatmap.html");
-        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-        */
-
-        var source = starecord.source;   //  $(this).closest("tr").find('td:first-child').text();
+        var source = starecord.source;
         var variablename = starecord.variablename;
         selvariablename = variablename;
         console.log("Station:" + stationid + " from:" + source);
-        /*
-         sysbase.navigateTo("kli1620shm", [{
-             stationid: stationid,
-             source: source,
-             variablename: selvariablename
-         }], function (ret) {
-             if (ret.error === true) {
-                 alert(ret.message);
-             }
-         });
-         */
         if (source !== "ECAD") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
@@ -929,9 +912,9 @@
             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
             var tabname = variablename + " " + stationname;
-            debugger;
-            var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1620shm", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+
+            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
         } else if (source === "ECAD") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
@@ -1244,6 +1227,12 @@
                             reprecord.station += "<img src='/images/icons-png/arrow-u-black.png'";
                             reprecord.station += " title='Upload *.dly'";
                             reprecord.station += " class='kla1610staupl'>";
+
+                            reprecord.station += " &nbsp;";
+                            reprecord.station += "<img src='/images/icons-png/gear-black.png'";
+                            reprecord.station += " title='Alte Auswertung'";
+                            reprecord.station += " class='kla1610staold'>";
+
                             stationarray[record.stationid] = record.stationname;
                             //delete record.stationid;
                             //delete record.name;
@@ -1324,7 +1313,42 @@
         });
     };
 
-
+    $(document).on("click", ".kla1610staold", function (evt) {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        evt.stopPropagation();
+        var stationid = $(this).closest("tr").attr("rowid");
+        var source = starecord.source;
+        var variablename = starecord.variablename;
+        selvariablename = variablename;
+        console.log("Station:" + stationid + " from:" + source);
+        if (source !== "ECAD") {
+            window.parent.sysbase.setCache("onestation", JSON.stringify({
+                stationid: stationid,
+                source: source,
+                variablename: selvariablename,
+                starecord: starecord,
+                latitude: $(this).closest("tr").attr("latitude"),
+                longitude: $(this).closest("tr").attr("longitude")
+            }));
+            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
+            var stationname = stationarray[stationid];
+            var tabname = variablename + " " + stationname;
+            var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1620shm", tourl);
+            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+        } else if (source === "ECAD") {
+            window.parent.sysbase.setCache("onestation", JSON.stringify({
+                stationid: stationid,
+                source: source,
+                variablename: selvariablename,
+                starecord: starecord
+            }));
+            var tourl = "kliheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
+            var stationname = stationarray[stationid];
+            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima", "kli1640eca", tourl);
+            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+        }
+    });
 
     $(document).on("click", ".kla1610staupl", function (evt) {
         evt.preventDefault();

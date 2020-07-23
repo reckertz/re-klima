@@ -1,938 +1,900 @@
 /*global $,this,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
 (function () {
-    'use strict';
-    var kla1620shm = {};
+        'use strict';
+        var kla1625shm = {};
 
-    var root = typeof self === 'object' && self.self === self && self ||
-        typeof global === 'object' && global.global === global && global ||
-        this;
-    /**
-     * kla1620shm  bekommt über getCache pivotdata oder yearlats(?)
-     * und erzeugt animierte Gifs mit der Option weiterer Zuordnungen
-     * nach latitude und
-     * nach temperatur, grundet auf Ganzzahlen
-     * mit Sekundärdaten aus HYDE
-     */
-    var actprjname;
-    var fullname;
-    var fulldatafilename;
-    var datafilename;
-    var selyears;
-    var yearlats;
-    var tarray = [];
-    var cid;
-    var cidw;
-    var sgif;
-    var aktyear;
-    var aktvariablename;
-    var selparms;
-    var selstationid = null;
-    var selsource = null;
-    var selvariablename = null;
-    var starecord = null; // Selektionsparameter
-    var savedwidth = null;
-    var heatmapparms = {};
-    var stationrecord;
-    var yearindexarray = {};
-    var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
-    var histo1 = {}; // Histogramm auf Temperatur gerundet Ganzzahl
-    var array1 = []; // aktives Array für d3
-    var klirecords = [];
-
-    var klihyde = {};
-
-    var poprecord = {}; // Konfigurationsparameter mit Default-Zuweisung
-    poprecord.qonly = true;
-    poprecord.total = false;
-    poprecord.mixed = true;
-    poprecord.moon = false;
-    poprecord.sunwinter = true;
-    poprecord.export = false;
-
-    kla1620shm.show = function (parameters, navigatebucket) {
-
-        // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
-        if (typeof parameters !== "undefined" && parameters.length > 0) {
-            selstationid = parameters[0].stationid;
-            selsource = parameters[0].source;
-            selvariablename = parameters[0].variablename;
-            starecord = JSON.parse(parameters[0].starecord);
-        } else {
-            selparms = window.parent.sysbase.getCache("onestation");
-            selparms = JSON.parse(selparms);
-            selstationid = selparms.stationid;
-            starecord = selparms.starecord;
-            selsource = selparms.starecord.source;
-            selvariablename = selparms.starecord.variablename;
-        }
-        if (typeof navigatebucket === "object") {
-            if (navigatebucket.navigate === "back") {
-                if (typeof navigatebucket.oldparameters === "object") {
-                    /* hier wird es sehr kontext-/anwendungsspezifisch */
-                    if (navigatebucket.oldparameters.length > 0) {
-                        if (typeof navigatebucket.oldparameters[0].prjname !== "undefined") {
-                            actprjname = navigatebucket.oldparameters[0].prjname;
-                        }
-                    }
-                }
-            }
-        }
-        if (typeof parameters !== "undefined") {
-            if (Array.isArray(parameters) && parameters.length > 0) {
-                actprjname = parameters[0].prjname;
-            }
-        }
-        var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
-        cid = wname + "map";
-        cidw = cid + "w";
-        $("body").css({
-            "background-color": "lightsteelblue"
-        });
-
-        $(".content").empty();
-        $(".headertitle").html("Heatmap für Station:" + selstationid + " Quelle:" + selsource);
-        $(".headertitle").attr("title", "kla1620shm");
-        $(".content").attr("pageid", "kla1620shm");
-        $(".content").attr("id", "kla1620shm");
-        $(".content")
-            .css({
-                overflow: "hidden"
-            });
-        $("#kla1620shm")
-            .append($("<input/>", {
-                type: "hidden",
-                id: "kla1620shm_isdirty",
-                value: "false"
-            }));
-        $(".headerright").remove();
-        $(".header")
-            .append($("<div/>", {
-                class: "headerright",
-                css: {
-                    float: "right"
-                }
-            }));
-        $(".headerright")
-            .prepend($("<button/>", {
-                    title: "Actions",
-                    class: "dropdown-right",
-                    css: {
-                        float: "right",
-                        height: "0.7em",
-                        width: "35px",
-                        "background-color": "navyblue"
-                    }
-                })
-                .append($("<div/>", {
-                        class: "dropdown-content-right",
-                        css: {
-                            margin: 0,
-                            right: 0,
-                            left: "auto"
-                        }
-                    })
-                    .append($("<ul/>")
-                        .append($("<li/>", {
-                            class: "dropdown-menuepoint",
-                            html: "zurück",
-                            click: function (evt) {
-                                evt.preventDefault();
-                                parameters = {};
-                                sysbase.navigateBack(parameters, function (ret) {
-                                    if (ret.error === true) {
-                                        sysbase.putMessage(ret.message, 3);
-                                    }
-                                });
-                                return;
-                            }
-                        }))
-                    )
-                )
-            );
-        sysbase.initFooter();
-        $("#kla1620shm.content")
-            .append($("<div/>", {
-                css: {
-                    width: "100%",
-                    "background-color": "lightsteelblue"
-                }
-            }));
-
-        $("#kla1620shm.content").empty();
-        $("#kla1620shm.content")
-            .append($("<div/>", {
-                    id: "kla1620shmbuttons",
-                    css: {
-                        width: "100%",
-                        float: "left"
-                    }
-                })
-
-                // Auswahl selvariablename
-
-
-
-                .append($("<button/>", {
-                    html: "Sparklines/Periode anzeigen",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.paintS(selvariablename, selsource, selstationid, matrix1);
-                    }
-                }))
-
-                .append($("<button/>", {
-                    html: "Sparklines/Jahr anzeigen",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.paintT(selvariablename, selsource, selstationid, matrix1);
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Super-Heatmaps",
-                    id: "kla1620shmsuper",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        async.waterfall([
-                            function (cb1620a) {
-                                // brutal auf die rechte Seite
-                                $("#kla1620shmwrapper").empty();
-                                $("#kla1620shmwrapper").css({
-                                    overflow: "auto"
-                                });
-                                $("#kla1620shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1620shmd1",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: false,
-                                    minmaxhistogram: false,
-                                    cbuckets: false,
-                                    hyde: false
-                                };
-                                kla1620shm.kliheatmap2("kla1620shmd1", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    cb1620a(null);
-                                });
-                            },
-                            function (cb1620b) {
-                                $("#kla1620shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1620shmd2",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: false,
-                                    minmaxhistogram: false,
-                                    cbuckets: false,
-                                    hyde: false
-                                };
-                                kla1620shm.kliheatmap2("kla1620shmd2", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    cb1620b(null);
-                                });
-                            },
-                            function (cb1620c) {
-                                /**
-                                 * für TMAX min und max bestimmen, Histogramm als Sparkline
-                                 */
-                                $("#kla1620shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1620shmd3",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: true,
-                                    minmaxhistogram: true,
-                                    cbuckets: true,
-                                    hyde: true
-                                };
-                                kla1620shm.kliheatmap2("kla1620shmd3", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    // über ret kommen hier options in ret zurück
-                                    /*
-                                        error: false,
-                                        message: "Heatmap ausgegeben",
-                                        matrix: matrix1,
-                                        options: uihelper.cloneObject(hmoptions),
-                                        hoptions: ret.hoptions,
-                                        histo: hmoptions.histo,
-                                        temparray: ret.temparray,
-                                        matrix: hmatrix
-                                    */
-                                    cb1620c(null);
-                                });
-                            },
-                            function (cb1620d) {
-                                /**
-                                 * für TMIN min und max bestimmen, Histogramm als Sparkline
-                                 */
-                                $("#kla1620shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1620shmd4",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: true,
-                                    minmaxhistogram: true,
-                                    cbuckets: true,
-                                    hyde: false
-                                };
-                                kla1620shm.kliheatmap2("kla1620shmd4", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    cb1620d(null);
-                                });
-                            }
-
-                        ]);
-                    }
-                }))
-
-
-
-                .append($("<button/>", {
-                    html: "Google-Maps",
-                    id: "kla1620shmgoogle",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        //var gurl = "https://www.google.com/maps/dir/";
-                        var gurl = "https://www.google.com/maps/search/?api=1&query=";
-
-                        gurl += selparms.latitude;
-                        gurl += ",";
-                        gurl += selparms.longitude;
-                        var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
-                        window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
-
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Sparklines-Kelvin",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        var matrix2 = uihelper.cloneObject(matrix1);
-                        for (var i1 = 0; i1 < matrix2.data.length; i1++) {
-                            for (var i2 = 0; i2 < matrix2.data[i1].length; i2++) {
-                                var temp1 = matrix2.data[i1][i2];
-                                if (temp1 !== null) {
-                                    var tkelvin = (parseFloat(temp1) + 273).toFixed(1);
-                                    matrix2.data[i1][i2] = tkelvin;
-                                }
-                            }
-                        }
-                        kla1620shm.paintT(selvariablename, selsource, selstationid, matrix2);
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Super-Sparklines",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-
-
-                    click: function (evt) {
-                        evt.preventDefault();
-                        /**
-                         * Popup Prompt zur Bestätigung der kompletten Übernahme
-                         * kla1400rawfullname -  $("#kla1400rawfullname").text();
-                         */
-                        var username = uihelper.getUsername();
-                        var popschema = {
-                            entryschema: {
-                                props: {
-                                    title: "Abrufparameter",
-                                    description: "",
-                                    type: "object", // currency, integer, datum, text, key, object
-                                    class: "uiefieldset",
-                                    properties: {
-                                        qonly: {
-                                            title: "Nur 'gute Daten'",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uiecheckbox",
-                                            /* width: "100px", */
-                                            io: "i"
-                                        },
-                                        mixed: {
-                                            title: "Mixed Sparklines",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uiecheckbox",
-                                            /* width: "100px", */
-                                            io: "i"
-                                        },
-                                        total: {
-                                            title: "ganze Jahre",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uiecheckbox",
-                                            /* width: "100px", */
-                                            io: "i"
-                                        },
-                                        sunwinter: {
-                                            title: "Sommer/Winter",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uiecheckbox",
-                                            default: false,
-                                            /* width: "100px", */
-                                            io: "i"
-                                        },
-                                        export: {
-                                            title: "SQL-Export",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uiecheckbox",
-                                            /* width: "100px", */
-                                            io: "i"
-                                        },
-                                        moon: {
-                                            title: "Mondphasen",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uiecheckbox",
-                                            /* width: "100px", */
-                                            io: "i"
-                                        },
-                                        comment: {
-                                            title: "Kommentar",
-                                            type: "string", // currency, integer, datum, text, key
-                                            class: "uietext",
-                                            default: "",
-                                            io: "i"
-                                        }
-                                    }
-                                }
-                            }
-                        };
-                        var anchorHash = "#kla1620shmwrapper";
-                        var title = "Super-Sparklines";
-                        var pos = {
-                            left: $("#kla1620shmwrapper").offset().left,
-                            top: window.screen.height * 0.1,
-                            width: $("#kla1620shmwrapper").width() * 0.60,
-                            height: $("#kla1620shmwrapper").height() * 0.90
-                        };
-                        //Math.ceil($(this).offset().top + $(this).height() + 20)
-                        $(document).on('popupok', function (evt, extraParam) {
-                            evt.preventDefault();
-                            evt.stopPropagation();
-                            evt.stopImmediatePropagation();
-                            console.log(extraParam);
-                            var superParam = JSON.parse(extraParam).props;
-                            kla1620shm.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
-                                // Daten in klirecords[0] und [1] wenn OK
-                                kla1620shm.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
-                                    return;
-                                });
-                            });
-                        });
-                        uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
-                            if (ret.error === false) {
-                                // outrec.isactive = "false"; // true oder false wenn gelöscht
-                            } else {
-                                sysbase.putMessage("Kein Abruf Super-Sparklines", 1);
-                                return;
-                            }
-                        });
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Sparklines-Download",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
-                        var canliste = $('#kla1620shmt1 tbody tr td span canvas');
-                        $(canliste).each(function (index, element) {
-                            var dataurl = element.toDataURL('image/png');
-                            var par = $(element).parent();
-                            $(par).append($("<img/>", {
-                                src: dataurl
-                            }));
-                            $(element).remove();
-                        });
-                        // Filterzeile clone und löschen
-                        // wenn hasClass u.a. hasFilters
-                        var clonerow;
-                        if ($("#kla1620shmt1").hasClass("hasFilters")) {
-                            clonerow = $("#kla1620shmt1 thead tr").eq(1).clone();
-                            $("#kla1620shmt1 thead tr").eq(1).remove();
-                        }
-                        var elHtml = "";
-                        elHtml += "<html>";
-                        elHtml += "<head>";
-                        elHtml += "<meta charset='UTF-8'>";
-                        elHtml += "<style type='text/css'> @page { size: 29.5cm 21.0cm; margin-left: 1cm; margin-right: 1cm }</style>";
-                        elHtml += "</head>";
-                        elHtml += "<body style='font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px'>";
-                        elHtml += "<h2>" + $("#kla1620shmh2").text() + "</h2>";
-                        elHtml += "<p style='page-break-before: always'>";
-                        var oldwidth = $("#kla1620shmt1").width();
-                        $("#kla1620shmt1").width("100%");
-                        elHtml += $("#kla1620shmt1").parent().html();
-                        elHtml += "</body>";
-                        elHtml += "<html>";
-                        // Filterzeile clone wieder einfügen
-                        if ($("#kla1620shmt1").hasClass("hasFilters")) {
-                            $("#kla1620shmt1 thead").append(clonerow);
-                        }
-                        var filename = "sparklines.html";
-                        if (elHtml.length > 100) {
-                            var jqxhr = $.ajax({
-                                method: "POST",
-                                crossDomain: false,
-                                url: sysbase.getServer("getbackasfile"),
-                                data: {
-                                    timeout: 10 * 60 * 1000,
-                                    largestring: elHtml,
-                                    filename: filename
-                                }
-                            }).done(function (r1, textStatus, jqXHR) {
-                                sysbase.checkSessionLogin(r1);
-                                console.log("getbackasfile:" + filename + "=>" + r1);
-                                var j1 = JSON.parse(r1);
-                                if (j1.error === false) {
-                                    var download_path = j1.path;
-                                    // Could also use the link-click method.
-                                    // window.location = download_path;
-                                    window.open(download_path, '_blank');
-                                    sysbase.putMessage(filename + " download erfolgt", 1);
-                                } else {
-                                    sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
-                                }
-                                return;
-                            }).fail(function (err) {
-                                sysbase.putMessage("download:" + err, 3);
-                                return;
-                            }).always(function () {
-                                // nope
-                            });
-                        }
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Scattergram",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.scatter(selvariablename, selsource, selstationid, matrix1);
-                    }
-                }))
-
-
-
-
-
-
-                .append($("<button/>", {
-                    html: "Regression testen",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.paintU(selvariablename, selsource, selstationid, matrix1);
-                    }
-                }))
-                .append($("<button/>", {
-                    html: "Chart anzeigen",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.paintChart(30, selvariablename, selsource, selstationid);
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Clusteranalyse",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.clusterAnalysis(selvariablename, selsource, selstationid);
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Bucketanalyse (30)",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.bucketAnalysis(30, selvariablename, selsource, selstationid);
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Bucketanalyse (10)",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1620shm.bucketAnalysis(10, selvariablename, selsource, selstationid);
-                    }
-                }))
-
-                .append($("<div/>", {
-                    id: "kla1620shmclock",
-                    float: "left",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    }
-                }))
-                .append($("<button/>", {
-                    html: "Heatmap Colortest",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // evt.stopPropagation();
-                        // evt.stopImmediatePropagation();
-                        if ($("#kliheattable").is(":visible")) {
-                            $("#kliheattable").hide();
-                        } else {
-
-                            $("#kla1620shmwrapper").empty();
-                            var h = $("#heatmap").height();
-                            var w = $("#kla1620shm.content").width();
-                            w -= $("#heatmap").position().left;
-                            w -= $("#heatmap").width();
-                            w -= 40;
-                            $("#kla1620shmwrapper")
-                                .append($("<div/>", {
-                                    id: "kla1620shmcolormap",
-                                    css: {
-                                        "background-color": "yellow",
-                                        height: h,
-                                        width: w,
-                                        overflow: "auto"
-                                    }
-                                }));
-
-                            $("#kla1620shmcolormap").show();
-                            kla9020fun.getColorPaletteX1("kla1620shmcolormap", 7);
-                        }
-                        return false;
-                    }
-                }))
-            );
+        var root = typeof self === 'object' && self.self === self && self ||
+            typeof global === 'object' && global.global === global && global ||
+            this;
         /**
-         * heatmap ist die Konstante in der Darstellung
+         * kla1625shm  bekommt über getCache pivotdata oder yearlats(?)
+         * und erzeugt animierte Gifs mit der Option weiterer Zuordnungen
+         * nach latitude und
+         * nach temperatur, grundet auf Ganzzahlen
+         * mit Sekundärdaten aus HYDE
          */
-        $("#kla1620shm.content")
-            .append($("<div/>", {
-                    id: "heatmap",
-                    height: "600px",
-                    width: "520px",
-                    css: {
-                        "margin": "10px",
-                        float: "left"
-                    }
-                })
-                .append($("<canvas/>", {
-                    id: cid,
-                    css: {
-                        border: "1px solid"
-                    }
-                }))
-            );
-        /**
-         * kla1620shmwrapper ist für die dynamischen Einspielunge zu den Buttons in paintA etc.
-         */
-        $("#kla1620shm.content")
-            .append($("<div/>", {
-                id: "kla1620shmwrapper",
-                class: "kla1620shmwrapper"
-            }));
-        var h = $("#kla1620shm.content").height();
-        var hsum = 0;
-        $("#heatmap").prevAll().each(function (index) {
-            var hs = $(this).height();
-            hsum += hs;
-        });
-        h = h - hsum;
-        $("#kla1620shmwrapper")
-            .css({
-                "margin": "10px",
-                height: h,
-                overflow: "auto",
-                float: "left"
-            });
-        $("#heatmap")
-            .css({
-                "margin": "10px",
-                height: h,
-                overflow: "auto",
-                float: "left"
-            });
-        console.log("kliheatmap Finished");
-        // Dragdrop aktivieren
-        var box = $(".heatvardiv");
-        var mainCanvas = $(".content");
-        box.draggable({
-            containment: mainCanvas,
-            helper: "clone",
-            start: function () {
-                $(this).css({
-                    opacity: 0
-                });
-                $(".box").css("z-index", "0");
-            },
-            stop: function () {
-                $(this).css({
-                    opacity: 1
-                });
-            }
-        });
-        box.droppable({
-            accept: box,
-            drop: function (event, ui) {
-                var draggable = ui.draggable;
-                var droppable = $(this);
-                var dragPos = draggable.position();
-                var dropPos = droppable.position();
-                draggable.css({
-                    left: dropPos.left + "px",
-                    top: dropPos.top + "px",
-                    "z-index": 20
-                });
-                droppable.css("z-index", 10).animate({
-                    left: dragPos.left,
-                    top: dragPos.top
-                });
-            }
-        });
+        var actprjname;
+        var fullname;
+        var fulldatafilename;
+        var datafilename;
+        var selyears;
+        var yearlats;
+        var tarray = [];
+        var cid;
+        var cidw;
+        var sgif;
+        var aktyear;
+        var aktvariablename;
+        var selparms;
+        var selstationid = null;
+        var selsource = null;
+        var selvariablename = null;
+        var starecord = null; // Selektionsparameter
+        var savedwidth = null;
+        var heatmapparms = {};
+        var stationrecord;
+        var yearindexarray = {};
+        var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
+        var histo1 = {}; // Histogramm auf Temperatur gerundet Ganzzahl
+        var array1 = []; // aktives Array für d3
+        var klirecords = [];
 
-        if ($("#" + cid).length === 0) {
-            $("#heatmap")
-                .append($("<canvas/>", {
-                    id: cid,
+        var klihyde = {};
+
+        var hmatrixR;
+        var hmatrixL;
+
+        var hoptionsR;
+        var hoptionsL;
+
+        var poprecord = {}; // Konfigurationsparameter mit Default-Zuweisung
+        poprecord.qonly = true;
+        poprecord.total = false;
+        poprecord.mixed = true;
+        poprecord.moon = false;
+        poprecord.sunwinter = true;
+        poprecord.export = false;
+
+        kla1625shm.show = function (parameters, navigatebucket) {
+
+            // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
+            if (typeof parameters !== "undefined" && parameters.length > 0) {
+                selstationid = parameters[0].stationid;
+                selsource = parameters[0].source;
+                selvariablename = parameters[0].variablename;
+                starecord = JSON.parse(parameters[0].starecord);
+            } else {
+                selparms = window.parent.sysbase.getCache("onestation");
+                selparms = JSON.parse(selparms);
+                selstationid = selparms.stationid;
+                starecord = selparms.starecord;
+                selsource = selparms.starecord.source;
+                selvariablename = selparms.starecord.variablename;
+            }
+            if (typeof navigatebucket === "object") {
+                if (navigatebucket.navigate === "back") {
+                    if (typeof navigatebucket.oldparameters === "object") {
+                        /* hier wird es sehr kontext-/anwendungsspezifisch */
+                        if (navigatebucket.oldparameters.length > 0) {
+                            if (typeof navigatebucket.oldparameters[0].prjname !== "undefined") {
+                                actprjname = navigatebucket.oldparameters[0].prjname;
+                            }
+                        }
+                    }
+                }
+            }
+            if (typeof parameters !== "undefined") {
+                if (Array.isArray(parameters) && parameters.length > 0) {
+                    actprjname = parameters[0].prjname;
+                }
+            }
+            var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+            cid = wname + "map";
+            cidw = cid + "w";
+            $("body").css({
+                "background-color": "lightsteelblue"
+            });
+
+            $(".content").empty();
+            $(".headertitle").html("Heatmap für Station:" + selstationid + " Quelle:" + selsource);
+            $(".headertitle").attr("title", "kla1625shm");
+            $(".content").attr("pageid", "kla1625shm");
+            $(".content").attr("id", "kla1625shm");
+            $(".content")
+                .css({
+                    overflow: "hidden"
+                });
+            $("#kla1625shm")
+                .append($("<input/>", {
+                    type: "hidden",
+                    id: "kla1625shm_isdirty",
+                    value: "false"
+                }));
+            $(".headerright").remove();
+            $(".header")
+                .append($("<div/>", {
+                    class: "headerright",
                     css: {
-                        border: "1px solid"
+                        float: "right"
                     }
                 }));
-        }
+            $(".headerright")
+                .prepend($("<button/>", {
+                        title: "Actions",
+                        class: "dropdown-right",
+                        css: {
+                            float: "right",
+                            height: "0.7em",
+                            width: "35px",
+                            "background-color": "navyblue"
+                        }
+                    })
+                    .append($("<div/>", {
+                            class: "dropdown-content-right",
+                            css: {
+                                margin: 0,
+                                right: 0,
+                                left: "auto"
+                            }
+                        })
+                        .append($("<ul/>")
+                            .append($("<li/>", {
+                                class: "dropdown-menuepoint",
+                                html: "zurück",
+                                click: function (evt) {
+                                    evt.preventDefault();
+                                    parameters = {};
+                                    sysbase.navigateBack(parameters, function (ret) {
+                                        if (ret.error === true) {
+                                            sysbase.putMessage(ret.message, 3);
+                                        }
+                                    });
+                                    return;
+                                }
+                            }))
+                        )
+                    )
+                );
+            sysbase.initFooter();
+            $("#kla1625shm.content").empty();
+            $("#kla1625shm.content")
+                .append($("<div/>", {
+                        id: "kla1625shmbuttons",
+                        css: {
+                            width: "100%",
+                            float: "left"
+                        }
+                    })
 
-        $(window).on('resize', function () {
-            var w = $("#kla1620shm.content").width();
-            w -= $("#heatmap").position().left;
-            w -= $("#heatmap").width();
-            w -= 40;
-            $("#kla1620shmwrapper div:first").css({
-                width: w
-            });
-        });
-        savedwidth = $("#heatmap").width();
 
-        if (typeof selvariablename !== "undefined" && selvariablename !== null && selvariablename.trim().length > 0) {
-            kla1620shm.kliheatmap2(cid, selvariablename, selsource, selstationid, starecord, {}, function (ret) {
-                $("#kla1620shmwrapper").empty();
-                var h = $("#heatmap").height();
-                var w = $("#kla1620shm.content").width();
-                w -= $("#heatmap").position().left;
-                w -= $("#heatmap").width();
-                w -= 40;
-                $("#kla1620shmwrapper").css({
-                    overflow: "hidden",
-                    height: h,
-                    width: w
-                });
+                    .append($("<button/>", {
+                        html: "Google-Maps",
+                        id: "kla1625shmgoogle",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            //var gurl = "https://www.google.com/maps/dir/";
+                            var gurl = "https://www.google.com/maps/search/?api=1&query=";
 
-                // kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
-            });
-        } else {
-            sysbase.putMessage("Bitte eine Auswahl TMIN/TMAX treffen, default TMAX genutzt", 3);
-            selvariablename = "TMAX";
-            kla1620shm.kliheatmap2(cid, selvariablename, selsource, selstationid, starecord, {}, function (ret) {
+                            gurl += selparms.latitude;
+                            gurl += ",";
+                            gurl += selparms.longitude;
+                            var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                            window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
 
-            });
-        }
-
-    }; // Ende show
+                        }
+                    }))
 
 
+                    .append($("<button/>", {
+                        html: "Leaflet-Raster",
+                        id: "kla1625shmleaf",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            var variablename = "popc_";
+                            var latitude = 50.941278;
+                            var longitude = 6.958281;
+                            var dftfullname = "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy";
+                            dftfullname += "\\baseline\\asc\\2017AD_pop";
+                            dftfullname += "\\popc_2017AD.asc";
+                            // var fullname = dftfullname;
 
-    /**
-     * kla1620shm.loadrecs - Bereitstellen klirecords [0] und [1] für TMAX, TMIN
-     * @param {*} selvariablename - hier TMAX,TMIN, wird dann auf SQL aufbereitet
-     * @param {*} selsource
-     * @param {*} selstationid
-     * @param {*} callbackshm77
-     * return in ret: ret.error, ret.message, ret.klirecords
-     * ret.klirecords wird bereitgestellt in klirecords
-     */
-    kla1620shm.loadrecs = function (selvariablename, selsource, selstationid, extraParm, callback77) {
-        klirecords = [];
-        var sqlStmt = "";
-        selvariablename = "TMAX,TMIN";
-        var sel = {
-            source: selsource,
-            stationid: selstationid
-        };
-        var projection = {};
-        sqlStmt += "SELECT ";
-        sqlStmt += "KLISTATIONS.source, ";
-        sqlStmt += "KLISTATIONS.stationid, ";
-        sqlStmt += "stationname, ";
-        sqlStmt += "climatezone, ";
-        sqlStmt += "region, ";
-        sqlStmt += "subregion, ";
-        sqlStmt += "countryname, ";
-        sqlStmt += "continent, ";
-        sqlStmt += "continentname, ";
-        sqlStmt += "lats, ";
-        sqlStmt += "longitude, ";
-        sqlStmt += "latitude, ";
+                            var gurl = "klaleaflet.html";
+                            gurl += "?"
+                            gurl += "latitude=" + encodeURIComponent(selparms.latitude);
+                            gurl += "&"
+                            gurl += "longitude=" + encodeURIComponent(selparms.longitude);
+                            var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                            window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
 
-        sqlStmt += "variable, ";
-        sqlStmt += "anzyears, ";
-        sqlStmt += "realyears, ";
-        sqlStmt += "fromyear, ";
-        sqlStmt += "toyear, ";
-        sqlStmt += "height, ";
-        sqlStmt += "years ";
-        sqlStmt += "FROM KLISTATIONS ";
-        sqlStmt += "LEFT JOIN KLIDATA ";
-        sqlStmt += "ON KLISTATIONS.source = KLIDATA.source ";
-        sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
-        sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
-        sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
-        if (selvariablename.indexOf(",") < 0) {
-            selvariablename = "TMAX,TMIN";
-        }
-        var tliste = selvariablename.split(",");
-        if (tliste.length > 1) {
-            sqlStmt += "AND (";
-            for (var itliste = 0; itliste < tliste.length; itliste++) {
-                if (itliste > 0) sqlStmt += " OR ";
-                sqlStmt += "KLIDATA.variable = '" + tliste[itliste].trim().toUpperCase() + "' ";
-            }
-            sqlStmt += ") ";
-        } else {
-            sqlStmt += "AND KLIDATA.variable = '" + selvariablename.trim().toUpperCase() + "' ";
-        }
-        sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid, KLIDATA.variable";
-        var api = "getallsqlrecords";
-        var table = "KLISTATIONS";
-        async.waterfall([
-                function (callback77a) {
-                    callback77a(null, {
-                        error: false,
-                        message: "Start",
-                        sqlStmt: sqlStmt,
-                        selvariablename: selvariablename,
-                        selsource: selsource,
-                        selstationid: selstationid
-                    });
-                    return;
-                },
-                function (ret, callback77d) {
-                    uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
-                        if (ret1.error === false && ret1.record !== null) {
-                            /*
-                            intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
-                            wenn die Station komplette Temperaturdaten geliefert hat
-                            */
+                        }
+                    }))
 
-                            stationrecord = ret1.record;
-                            klirecords = [];
-                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
-                            if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
-                            callback77d("Finish", {
-                                error: false,
-                                message: "Daten gefunden",
-                                klirecords: ret1.records
+
+
+
+
+
+                    // Auswahl selvariablename
+                    /*
+                    .append($("<button/>", {
+                        html: "Sparklines/Periode anzeigen",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            kla1625shm.paintS(selvariablename, selsource, selstationid, matrix1);
+                        }
+                    }))
+                    */
+                    /*
+                     .append($("<button/>", {
+                         html: "Sparklines/Jahr anzeigen",
+                         css: {
+                             float: "left",
+                             margin: "10px"
+                         },
+                         click: function (evt) {
+                             evt.preventDefault();
+                             // stationrecord - heatworld
+                             kla1625shm.paintT(selvariablename, selsource, selstationid, matrix1);
+                         }
+                     }))
+                     */
+
+                    .append($("<button/>", {
+                        html: "Super-Heatmaps",
+                        id: "kla1625shmsuper",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // stationrecord - heatworld
+                            async.waterfall([
+                                function (cb1625a) {
+                                    // brutal auf die rechte Seite
+                                    $("#kla1625shmwrapper").empty();
+                                    $("#kla1625shmwrapper").css({
+                                        overflow: "auto"
+                                    });
+                                    $("#kla1625shmwrapper")
+                                        .append($("<div/>", {
+                                            id: "kla1625shmd1",
+                                            css: {
+                                                width: $("#heatmap").width(),
+                                                height: $("#heatmap").height(),
+                                                float: "left"
+                                            }
+                                        }));
+                                    var hmoptions = {
+                                        minmax: false,
+                                        minmaxhistogram: false,
+                                        cbuckets: false,
+                                        hyde: false
+                                    };
+                                    kla1625shm.kliheatmap2("kla1625shmd1", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                        cb1625a(null);
+                                    });
+                                },
+                                function (cb1625b) {
+                                    $("#kla1625shmwrapper")
+                                        .append($("<div/>", {
+                                            id: "kla1625shmd2",
+                                            css: {
+                                                width: $("#heatmap").width(),
+                                                height: $("#heatmap").height(),
+                                                float: "left"
+                                            }
+                                        }));
+                                    var hmoptions = {
+                                        minmax: false,
+                                        minmaxhistogram: false,
+                                        cbuckets: false,
+                                        hyde: false
+                                    };
+                                    kla1625shm.kliheatmap2("kla1625shmd2", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                        cb1625b(null);
+                                    });
+                                },
+                                function (cb1625c) {
+                                    /**
+                                     * für TMAX min und max bestimmen, Histogramm als Sparkline
+                                     */
+                                    $("#kla1625shmwrapper")
+                                        .append($("<div/>", {
+                                            id: "kla1625shmd3",
+                                            css: {
+                                                width: $("#heatmap").width(),
+                                                height: $("#heatmap").height(),
+                                                float: "left"
+                                            }
+                                        }));
+                                    var hmoptions = {
+                                        minmax: true,
+                                        minmaxhistogram: true,
+                                        cbuckets: true,
+                                        hyde: true
+                                    };
+                                    kla1625shm.kliheatmap2("kla1625shmd3", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                        // über ret kommen hier options in ret zurück
+                                        /*
+                                            error: false,
+                                            message: "Heatmap ausgegeben",
+                                            matrix: matrix1,
+                                            options: uihelper.cloneObject(hmoptions),
+                                            hoptions: ret.hoptions,
+                                            histo: hmoptions.histo,
+                                            temparray: ret.temparray,
+                                            matrix: hmatrix
+                                        */
+                                        cb1625c(null);
+                                    });
+                                },
+                                function (cb1625d) {
+                                    /**
+                                     * für TMIN min und max bestimmen, Histogramm als Sparkline
+                                     */
+                                    $("#kla1625shmwrapper")
+                                        .append($("<div/>", {
+                                            id: "kla1625shmd4",
+                                            css: {
+                                                width: $("#heatmap").width(),
+                                                height: $("#heatmap").height(),
+                                                float: "left"
+                                            }
+                                        }));
+                                    var hmoptions = {
+                                        minmax: true,
+                                        minmaxhistogram: true,
+                                        cbuckets: true,
+                                        hyde: false
+                                    };
+                                    kla1625shm.kliheatmap2("kla1625shmd4", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                        cb1625d(null);
+                                    });
+                                }
+
+                            ]);
+                        }
+                    }))
+
+
+
+                    .append($("<button/>", {
+                        html: "Bucketanalyse (10)",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // stationrecord - heatworld
+                            kla1625shm.bucketAnalysis(10, selvariablename, selsource, selstationid);
+                        }
+                    }))
+
+
+
+                    /*
+                    .append($("<button/>", {
+                        html: "Sparklines-Kelvin",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            var matrix2 = uihelper.cloneObject(matrix1);
+                            for (var i1 = 0; i1 < matrix2.data.length; i1++) {
+                                for (var i2 = 0; i2 < matrix2.data[i1].length; i2++) {
+                                    var temp1 = matrix2.data[i1][i2];
+                                    if (temp1 !== null) {
+                                        var tkelvin = (parseFloat(temp1) + 273).toFixed(1);
+                                        matrix2.data[i1][i2] = tkelvin;
+                                    }
+                                }
+                            }
+                            kla1625shm.paintT(selvariablename, selsource, selstationid, matrix2);
+                        }
+                    }))
+                    */
+
+                    /*
+                    .append($("<button/>", {
+                        html: "Super-Sparklines",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            var username = uihelper.getUsername();
+                            var popschema = {
+                                entryschema: {
+                                    props: {
+                                        title: "Abrufparameter",
+                                        description: "",
+                                        type: "object", // currency, integer, datum, text, key, object
+                                        class: "uiefieldset",
+                                        properties: {
+                                            qonly: {
+                                                title: "Nur 'gute Daten'",
+                                                type: "string", // currency, integer, datum, text, key
+                                                class: "uiecheckbox",
+                                                io: "i"
+                                            },
+                                            mixed: {
+                                                title: "Mixed Sparklines",
+                                                type: "string", // currency, integer, datum, text, key
+                                                class: "uiecheckbox",
+                                                io: "i"
+                                            },
+                                            total: {
+                                                title: "ganze Jahre",
+                                                type: "string", // currency, integer, datum, text, key
+                                                class: "uiecheckbox",
+                                                io: "i"
+                                            },
+                                            sunwinter: {
+                                                title: "Sommer/Winter",
+                                                type: "string", // currency, integer, datum, text, key
+                                                class: "uiecheckbox",
+                                                default: false,
+                                                io: "i"
+                                            },
+                                            export: {
+                                                title: "SQL-Export",
+                                                type: "string", // currency, integer, datum, text, key
+                                                class: "uiecheckbox",
+                                                io: "i"
+                                            },
+                                            moon: {
+                                                title: "Mondphasen",
+                                                type: "string", // currency, integer, datum, text, key
+                                                class: "uiecheckbox",
+                                                io: "i"
+                                            },
+                                            comment: {
+                                                title: "Kommentar",
+                                                type: "string", // currency, integer, datum, text, key
+                                                class: "uietext",
+                                                default: "",
+                                                io: "i"
+                                            }
+                                        }
+                                    }
+                                }
+                            };
+                            var anchorHash = "#kla1625shmwrapper";
+                            var title = "Super-Sparklines";
+                            var pos = {
+                                left: $("#kla1625shmwrapper").offset().left,
+                                top: window.screen.height * 0.1,
+                                width: $("#kla1625shmwrapper").width() * 0.60,
+                                height: $("#kla1625shmwrapper").height() * 0.90
+                            };
+                            $(document).on('popupok', function (evt, extraParam) {
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                evt.stopImmediatePropagation();
+                                console.log(extraParam);
+                                var superParam = JSON.parse(extraParam).props;
+                                kla1625shm.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
+                                    kla1625shm.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
+                                        return;
+                                    });
+                                });
                             });
-                            return;
-                        } else {
-                            /**
-                             * Abfrage, ob Daten geladen werden sollen
-                             */
-                            var qmsg = "Für Station:" + selstationid + " aus " + selsource;
-                            qmsg += " und " + selvariablename;
-                            qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
-                            var check = window.confirm(qmsg);
-                            if (check === false) {
-                                sysbase.putMessage("Keine Daten zur Station gefunden", 3);
-                                callback77d("Error", {
-                                    error: true,
-                                    message: "Keine Daten gefunden"
+                            uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
+                                if (ret.error === false) {
+                                } else {
+                                    sysbase.putMessage("Kein Abruf Super-Sparklines", 1);
+                                    return;
+                                }
+                            });
+                        }
+                    }))
+                    */
+
+                    /*
+                    .append($("<button/>", {
+                        html: "Sparklines-Download",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
+                            var canliste = $('#kla1625shmt1 tbody tr td span canvas');
+                            $(canliste).each(function (index, element) {
+                                var dataurl = element.toDataURL('image/png');
+                                var par = $(element).parent();
+                                $(par).append($("<img/>", {
+                                    src: dataurl
+                                }));
+                                $(element).remove();
+                            });
+                            // Filterzeile clone und löschen
+                            // wenn hasClass u.a. hasFilters
+                            var clonerow;
+                            if ($("#kla1625shmt1").hasClass("hasFilters")) {
+                                clonerow = $("#kla1625shmt1 thead tr").eq(1).clone();
+                                $("#kla1625shmt1 thead tr").eq(1).remove();
+                            }
+                            var elHtml = "";
+                            elHtml += "<html>";
+                            elHtml += "<head>";
+                            elHtml += "<meta charset='UTF-8'>";
+                            elHtml += "<style type='text/css'> @page { size: 29.5cm 21.0cm; margin-left: 1cm; margin-right: 1cm }</style>";
+                            elHtml += "</head>";
+                            elHtml += "<body style='font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px'>";
+                            elHtml += "<h2>" + $("#kla1625shmh2").text() + "</h2>";
+                            elHtml += "<p style='page-break-before: always'>";
+                            var oldwidth = $("#kla1625shmt1").width();
+                            $("#kla1625shmt1").width("100%");
+                            elHtml += $("#kla1625shmt1").parent().html();
+                            elHtml += "</body>";
+                            elHtml += "<html>";
+                            // Filterzeile clone wieder einfügen
+                            if ($("#kla1625shmt1").hasClass("hasFilters")) {
+                                $("#kla1625shmt1 thead").append(clonerow);
+                            }
+                            var filename = "sparklines.html";
+                            if (elHtml.length > 100) {
+                                var jqxhr = $.ajax({
+                                    method: "POST",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("getbackasfile"),
+                                    data: {
+                                        timeout: 10 * 60 * 1000,
+                                        largestring: elHtml,
+                                        filename: filename
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    sysbase.checkSessionLogin(r1);
+                                    console.log("getbackasfile:" + filename + "=>" + r1);
+                                    var j1 = JSON.parse(r1);
+                                    if (j1.error === false) {
+                                        var download_path = j1.path;
+                                        // Could also use the link-click method.
+                                        // window.location = download_path;
+                                        window.open(download_path, '_blank');
+                                        sysbase.putMessage(filename + " download erfolgt", 1);
+                                    } else {
+                                        sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
+                                    }
+                                    return;
+                                }).fail(function (err) {
+                                    sysbase.putMessage("download:" + err, 3);
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
+                            }
+                        }
+                    }))
+                    */
+                    /*
+                    .append($("<button/>", {
+                        html: "Scattergram",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // stationrecord - heatworld
+                            kla1625shm.scatter(selvariablename, selsource, selstationid, matrix1);
+                        }
+                    }))
+                    */
+
+                    /*
+                    .append($("<button/>", {
+                        html: "Regression testen",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // stationrecord - heatworld
+                            kla1625shm.paintU(selvariablename, selsource, selstationid, matrix1);
+                        }
+                    }))
+                    .append($("<button/>", {
+                        html: "Chart anzeigen",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // stationrecord - heatworld
+                            kla1625shm.paintChart(30, selvariablename, selsource, selstationid);
+                        }
+                    }))
+                    */
+                    /*
+                    .append($("<button/>", {
+                        html: "Clusteranalyse",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // stationrecord - heatworld
+                            kla1625shm.clusterAnalysis(selvariablename, selsource, selstationid);
+                        }
+                    }))
+                    */
+                    /*
+                    .append($("<button/>", {
+                        html: "Bucketanalyse (30)",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // stationrecord - heatworld
+                            kla1625shm.bucketAnalysis(30, selvariablename, selsource, selstationid);
+                        }
+                    }))
+                    */
+
+                    .append($("<div/>", {
+                        id: "kla1625shmclock",
+                        float: "left",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        }
+                    }))
+
+                    .append($("<button/>", {
+                        html: "Heatmap Colortest",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            // evt.stopPropagation();
+                            // evt.stopImmediatePropagation();
+                            if ($("#kliheattable").is(":visible")) {
+                                $("#kliheattable").hide();
+                            } else {
+
+                                $("#kla1625shmwrapper").empty();
+                                var h = $("#heatmap").height();
+                                var w = $("#kla1625shm.content").width();
+                                w -= $("#heatmap").position().left;
+                                w -= $("#heatmap").width();
+                                w -= 40;
+                                $("#kla1625shmwrapper")
+                                    .append($("<div/>", {
+                                        id: "kla1625shmcolormap",
+                                        css: {
+                                            "background-color": "yellow",
+                                            height: h,
+                                            width: w,
+                                            overflow: "auto"
+                                        }
+                                    }));
+
+                                $("#kla1625shmcolormap").show();
+                                kla9020fun.getColorPaletteX1("kla1625shmcolormap", 7);
+                            }
+                            return false;
+                        }
+                    }))
+                );
+            /**
+             * Beginn des initialen Aufbaus kla1625shmwrapper
+             */
+            $("#kla1625shm.content")
+                .append($("<div/>", {
+                        id: "kla1625shmdiv",
+                        class: "kla1625shmdiv"
+                    })
+                    .append($("<div/>", {
+                        id: "kla1625shmwrapper",
+                        class: "kla1625shmwrapper"
+                    }))
+                );
+            var h = $("#kla1625shm").height();
+            h -= $("#kla1625shm.header").height();
+            h -= $("#kla1625shmbuttons").height();
+            h -= $("#kla1625shm.footer").height();
+            $("#kla1625shmdiv")
+                .css({
+                    "margin": "10px",
+                    "background-color": "lime",
+                    height: h,
+                    width: "100%",
+                    overflow: "auto",
+                    float: "left"
+                });
+            console.log("kla1625shmwrapper initialisiert, leer");
+            $(window).on('resize', function () {
+                var h = $("#kla1625shm").height();
+                h -= $("#kla1625shm.header").height();
+                h -= $("#kla1625shmbuttons").height();
+                h -= $("#kla1625shm.footer").height();
+                $("#kla1625shmdiv").css({
+                    height: h
+                });
+            });
+
+            /**
+             * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
+             */
+            kla1625shm.loadalldata(function (ret) {
+                var wmtit = "Auswertung für Station:";
+                // isMember ? '$2.00' : '$10.00'
+                wmtit += selstationid;
+                wmtit += (stationrecord.stationname || "").length > 0 ? " " + stationrecord.stationname : "";
+                wmtit += (stationrecord.fromyear || "").length > 0 ? " von " + stationrecord.fromyear : "";
+                wmtit += (stationrecord.toyear || "").length > 0 ? " bis " + stationrecord.toyear : "";
+                wmtit += (stationrecord.anzyears || 0).length > 0 ? " für " + stationrecord.anzyears + " Jahre" : "";
+                wmtit += (stationrecord.region || "").length > 0 ? " Region:" + stationrecord.region : "";
+                wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
+                wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
+                $(".headertitle").html(wmtit);
+                kla1625shm.showall(ret);
+            });
+
+        }; // Ende show
+
+        /**
+         * alle Daten laden
+         */
+        kla1625shm.loadalldata = function (cb1625g) {
+            async.waterfall([
+                    function (cb1625g1) {
+                        var sqlStmt = "";
+                        selvariablename = "TMAX,TMIN";
+                        var sel = {
+                            source: selsource,
+                            stationid: selstationid
+                        };
+                        var projection = {};
+                        sqlStmt += "SELECT ";
+                        sqlStmt += "KLISTATIONS.source, ";
+                        sqlStmt += "KLISTATIONS.stationid, ";
+                        sqlStmt += "stationname, ";
+                        sqlStmt += "climatezone, ";
+                        sqlStmt += "region, ";
+                        sqlStmt += "subregion, ";
+                        sqlStmt += "countryname, ";
+                        sqlStmt += "continent, ";
+                        sqlStmt += "continentname, ";
+                        sqlStmt += "lats, ";
+                        sqlStmt += "longitude, ";
+                        sqlStmt += "latitude, ";
+                        sqlStmt += "variable, ";
+                        sqlStmt += "anzyears, ";
+                        sqlStmt += "realyears, ";
+                        sqlStmt += "fromyear, ";
+                        sqlStmt += "toyear, ";
+                        sqlStmt += "height, ";
+                        sqlStmt += "years ";
+                        sqlStmt += "FROM KLISTATIONS ";
+                        sqlStmt += "LEFT JOIN KLIDATA ";
+                        sqlStmt += "ON KLISTATIONS.source = KLIDATA.source ";
+                        sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
+                        sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
+                        sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
+                        /* sqlStmt += "AND KLIDATA.variable IN 'TMAX,TMIN' "; */
+                        sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid, KLIDATA.variable";
+                        var api = "getallsqlrecords";
+                        var table = "KLISTATIONS";
+
+                        uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
+                            if (ret1.error === false && ret1.record !== null) {
+                                /*
+                                intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
+                                wenn die Station komplette Temperaturdaten geliefert hat
+                                */
+                                klirecords = [];
+                                // Sortierfolge ist TMAX, TMIN alphabetisch
+                                if (typeof ret1.records[0] !== "undefined") {
+                                    klirecords.push(ret1.records[0]);
+                                    stationrecord = ret1.records[0];
+                                }
+                                if (typeof ret1.records[1] !== "undefined") {
+                                    klirecords.push(ret1.records[1]);
+                                }
+                                cb1625g1(null, {
+                                    error: false,
+                                    message: "Daten gefunden"
                                 });
                                 return;
                             } else {
-                                callback77d(null, {
-                                    error: true,
-                                    message: "Keine Daten gefunden",
+                                /**
+                                 * Abfrage, ob Daten geladen werden sollen
+                                 */
+                                var qmsg = "Für Station:" + selstationid + " aus " + selsource;
+                                qmsg += " und " + selvariablename;
+                                qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                                var check = window.confirm(qmsg);
+                                if (check === false) {
+                                    sysbase.putMessage("Keine Daten zur Station gefunden", 3);
+                                    cb1625g1("Error", {
+                                        error: true,
+                                        message: "Keine Temperatur-Daten gefunden"
+                                    });
+                                    return;
+                                } else {
+                                    cb1625g1(null, {
+                                        error: true,
+                                        operation: "loadghcn",
+                                        message: "Keine Temperatur-Daten gefunden",
+                                        sqlStmt: sqlStmt,
+                                        selvariablename: selvariablename,
+                                        selsource: selsource,
+                                        selstationid: selstationid
+                                    });
+                                    return;
+                                }
+                            }
+                        });
+                    },
+                    function (ret, cb1625g2) {
+                        /**
+                         * Laden der GHCN-Daily-Daten, falls angefordert
+                         * Laden aus den Urdaten (*.dly-Files)
+                         */
+                        if (ret.error === false) {
+                            cb1625g2(null, ret);
+                            return;
+                        }
+                        if (ret.error === true && (typeof ret.operation === "undefined" || typeof ret.operation !== "undefined" && ret.operation !== "loadghcn")) {
+                            cb1625g2(null, ret);
+                            return;
+                        }
+                        var ghcnclock = kla1625shm.showclock("#kla1625shmclock");
+                        var that = this;
+                        $(that).attr("disabled", true);
+                        var jqxhr = $.ajax({
+                            method: "GET",
+                            crossDomain: false,
+                            url: sysbase.getServer("ghcnddata"),
+                            data: {
+                                timeout: 10 * 60 * 1000,
+                                source: selsource,
+                                stationid: selstationid
+                            }
+                        }).done(function (r1, textStatus, jqXHR) {
+                            clearInterval(ghcnclock);
+                            sysbase.checkSessionLogin(r1);
+                            var ret1 = JSON.parse(r1);
+                            sysbase.putMessage(ret1.message, 1);
+                            if (ret1.error === true) {
+                                cb1625g2("Error", {
+                                    error: ret1.error,
+                                    message: ret1.message
+                                });
+                                return;
+                            } else {
+                                cb1625g2(null, {
+                                    error: ret1.error,
+                                    operation: "repeat",
+                                    message: ret1.message,
                                     sqlStmt: ret.sqlStmt,
                                     selvariablename: ret.selvariablename,
                                     selsource: ret.selsource,
@@ -940,194 +902,1009 @@
                                 });
                                 return;
                             }
+                        }).fail(function (err) {
+                            clearInterval(ghcnclock);
+                            //$("#kli1400raw_rightwdata").empty();
+                            //document.getElementById("kli1400raw").style.cursor = "default";
+                            sysbase.putMessage("ghcnddata:" + err, 3);
+                            cb1625g2("Error", {
+                                error: true,
+                                message: err.message || err
+                            });
+                            return;
+                        }).always(function () {
+                            // nope
+                            $(that).attr("disabled", false);
+                        });
+                    },
+                    function (ret, cb1625g3) {
+                        /**
+                         * nochmaliges Lesen, falls erforderlich
+                         */
+                        if (typeof ret.operation === "undefined" || ret.operation !== "repeat") {
+                            cb1625g3(null, ret);
+                            return;
                         }
+                        uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, ret.api, ret.table, function (ret1) {
+                            if (ret1.error === false && ret1.record !== null) {
+                                stationrecord = ret1.record;
+                                klirecords = [];
+                                // Sortierfolge ist TMAX, TMIN alphabetisch
+                                if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
+                                if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
+                                cb1625g3(null, {
+                                    error: false,
+                                    message: "Daten gefunden"
+                                });
+                                return;
+                            } else {
+                                cb1625g3(null, {
+                                    error: true,
+                                    message: "Endgültig keine Temperatur-Daten gefunden"
+                                });
+                                return;
+                            }
+                        });
+                    },
+                    function (ret, cb1625g4) {
+                        /**
+                         * Holen der HYDE-Daten
+                         */
+                        var jqxhr = $.ajax({
+                            method: "GET",
+                            crossDomain: false,
+                            url: sysbase.getServer("stationhyde"),
+                            data: {
+                                stationid: selstationid,
+                                longitude: stationrecord.longitude,
+                                latitude: stationrecord.latitude,
+                                name: stationrecord.stationname,
+                                globals: false,
+                                selyears: "",
+                                selvars: "popc,rurc,urb,uopp"
+                            }
+                        }).done(function (r1, textStatus, jqXHR) {
+                            sysbase.checkSessionLogin(r1);
+                            $("button").show();
+                            $("body").css("cursor", "default");
+                            var ret = JSON.parse(r1);
+                            sysbase.putMessage(ret.message, 1);
+                            if (ret.error === true) {
+                                cb1625g4(null, ret);
+                                return;
+                            } else {
+                                klihyde = ret.klihyde;
+                                // klihyde.data muss mit JSON.parse noch entpackt werden
+                                cb1625g4(null, ret);
+                                return;
+                            }
+                        }).fail(function (err) {
+                            sysbase.putMessage(err, 1);
+                            $("button").show();
+                            $("body").css("cursor", "default");
+                            cb1625g4(null, ret);
+                            return;
+                        }).always(function () {
+                            // nope
+                        });
+                    }
+                ],
+                function (error, result) {
+                    $("button").show();
+                    $("body").css("cursor", "default");
+                    cb1625g(result);
+                    return;
+                });
+        };
+
+        /**
+         * kla1625shm.showall - Aufruf aller Funktionen für die Standardauswertung
+         * @param {*} ret
+         */
+        kla1625shm.showall = function (ret) {
+            /**
+             * zweibahnige Ausgabe nach kla1625shmwrapper
+             */
+            hmatrixR = {};
+            hmatrixL = {};
+
+            hoptionsR = {};
+            hoptionsL = {};
+
+            async.waterfall([
+                    function (cb1625g1) {
+                        var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                        $("#kla1625shmwrapper")
+                            .append($("<div/>", {
+                                    css: {
+                                        width: "100%",
+                                        float: "left",
+                                        overflow: "hidden"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "L",
+                                    css: {
+                                        "text-align": "left",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                }))
+                                .append($("<div/>", {
+                                    id: divid + "R",
+                                    css: {
+                                        "text-align": "left",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                }))
+                            );
+                        // Linke heatmap
+                        var hmoptions = {
+                            minmax: false,
+                            minmaxhistogram: false,
+                            cbuckets: false,
+                            hyde: true
+                        };
+                        kla1625shm.kliheatmap2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            ret.divid = divid;
+                            var nkorr = $("#" + divid + "L").find("canvas").height();
+                            $("#" + divid + "L").css({
+                                "max-height": nkorr + 10,
+                                height: nkorr + 10,
+                                overflow: "hidden"
+                            });
+                            cb1625g1(null, ret);
+                            return;
+                        });
+                    },
+                    function (ret, cb1625g2) {
+                        // Rechte heatmap
+                        var hmoptions = {
+                            minmax: false,
+                            minmaxhistogram: false,
+                            cbuckets: false,
+                            hyde: true
+                        };
+                        var divid = ret.divid;
+                        kla1625shm.kliheatmap2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            var nkorr = $("#" + divid + "R").find("canvas").height();
+                            $("#" + divid + "R").css({
+                                "max-height": nkorr + 10,
+                                height: nkorr + 10,
+                                overflow: "hidden"
+                            });
+                            cb1625g2(null, ret);
+                            return;
+                        });
+                    },
+
+                    function (ret, cb1625g3) {
+                        var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                        $("#kla1625shmwrapper")
+                            .append($("<div/>", {
+                                    css: {
+                                        width: "100%",
+                                        float: "left",
+                                        overflow: "hidden"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "L",
+                                    css: {
+                                        "text-align": "left",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                }))
+                                .append($("<div/>", {
+                                    id: divid + "R",
+                                    css: {
+                                        "text-align": "left",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                }))
+                            );
+                        // Linke heatmap
+                        var hmoptions = {
+                            minmax: true,
+                            minmaxhistogram: true,
+                            cbuckets: true,
+                            hyde: true
+                        };
+                        kla1625shm.kliheatmap2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            ret.divid = divid;
+                            var nkorr = $("#" + divid + "L").find("canvas").height();
+                            $("#" + divid + "L").css({
+                                "max-height": nkorr + 10,
+                                height: nkorr + 10,
+                                overflow: "hidden"
+                            });
+                            hmatrixL = ret.matrix;
+                            hoptionsL = ret.options;
+                            cb1625g3(null, ret);
+                            return;
+                        });
+                    },
+                    function (ret, cb1625g4) {
+                        // Rechte heatmap
+                        var hmoptions = {
+                            minmax: true,
+                            minmaxhistogram: true,
+                            cbuckets: true,
+                            hyde: true
+                        };
+                        var divid = ret.divid;
+                        kla1625shm.kliheatmap2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            var nkorr = $("#" + divid + "R").find("canvas").height();
+                            $("#" + divid + "R").css({
+                                "max-height": nkorr + 10,
+                                height: nkorr + 10,
+                                overflow: "hidden"
+                            });
+                            hmatrixR = ret.matrix;
+                            hoptionsR = ret.options;
+                            cb1625g4(null, ret);
+                            return;
+                        });
+                    },
+
+                    function (ret, cb1625g5) {
+                        var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                        $("#kla1625shmwrapper")
+                            .append($("<div/>", {
+                                    css: {
+                                        width: "100%",
+                                        float: "left",
+                                        overflow: "hidden"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "L",
+                                    css: {
+                                        "text-align": "left",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                }))
+                                .append($("<div/>", {
+                                    id: divid + "R",
+                                    css: {
+                                        "text-align": "left",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                }))
+                            );
+                        // Linke heatmap
+                        var hmoptions = {
+                            minmax: true,
+                            minmaxhistogram: true,
+                            cbuckets: true,
+                            hyde: true
+                        };
+                        hoptionsL.minmaxhistogram = true;
+                        kla1625shm.klihisto2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                            ret.divid = divid;
+                            $('.mouseoverdemo').bind('sparklineRegionChange', function (ev) {
+                                var sparkline = ev.sparklines[0];
+                                var region = sparkline.getCurrentRegionFields();
+                                var value = region.y;
+                                sysbase.putMessage("x=" + region.x + " y=" + region.y, 0);
+                            });
+                            cb1625g5(null, ret);
+                            return;
+                        });
+                    },
+
+                    function (ret, cb1625g6) {
+                        // Rechte heatmap
+                        var hmoptions = {
+                            minmax: true,
+                            minmaxhistogram: true,
+                            cbuckets: true,
+                            hyde: true,
+                            divid: ret.divid
+                        };
+                        hoptionsR.minmaxhistogram = true;
+                        kla1625shm.klihisto2("#" + ret.divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
+                            cb1625g6(null, ret);
+                            return;
+                        });
+                    },
+
+                    function (ret, cb1625g7) {
+                        var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                        $("#kla1625shmwrapper")
+                            .append($("<div/>", {
+                                    css: {
+                                        width: "100%",
+                                        float: "left",
+                                        overflow: "hidden"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid,
+                                    css: {
+                                        "text-align": "left",
+                                        float: "left",
+                                        width: "99%"
+                                    }
+                                }))
+                            );
+                        var hmoptions = {};
+                        kla1625shm.klihyde2("#" + divid, selstationid, starecord, function (ret) {
+                            cb1625g7(null, ret);
+                            return;
+                        });
+                    }
+
+                ],
+                function (error, result) {
+
+                });
+        };
+
+
+
+
+
+        /**
+         * kliheatmap2 - Heatmap berechnen, Animation sichern und anzeigen
+         * mit "Video-Controls" - aus KLISTATIONS - YEARS
+         *
+         * @param {*} cid
+         * @param {*} selvariablename
+         * @param {*} selsource
+         * @param {*} selstationid
+         * @param {*} starecord
+         * @param {*} hmoptions
+         *            minmax: true, - Temperaturskala auf echte Min und Max der Werte beziehen, nicht auf die Standardskale
+         *            minmaxhistogram: true - Ausgabe Sparkline über dem Historgramm => histo1
+         *            scale: 7 oder 5 - Anzahl der Grundfarben für die Heatmap
+         *              minval, maxval, sumval, countval werden berechnet und mit übergeben
+         * @param {*} callbackh0
+         */
+        kla1625shm.kliheatmap2 = function (cid, selvariablename, selsource, selstationid, starecord, hmoptions, callbackh0) {
+
+            async.waterfall([
+                    function (callbackshm2) {
+                        var ret = {};
+                        if (typeof hmoptions === "object" && Object.keys(hmoptions).length >= 1) {
+                            hmoptions.minmax = hmoptions.minmax || false;
+                            hmoptions.scale = 7; // Farb-Buckets
+                            hmoptions.minval = null;
+                            hmoptions.maxval = null;
+                            hmoptions.sumval = 0.0;
+                            hmoptions.countval = 0;
+                        } else {
+                            hmoptions = {};
+                            hmoptions.minmax = false;
+                            hmoptions.scale = 7; // Farb-Buckets
+                            hmoptions.minval = null;
+                            hmoptions.maxval = null;
+                            hmoptions.sumval = 0.0;
+                            hmoptions.countval = 0;
+                        }
+                        var colwidth;
+                        var rowheight;
+                        var wratio;
+                        var hratio;
+                        try {
+
+                            if (selvariablename === "TMAX" && klirecords.length > 0) {
+                                ret.record = klirecords[0];
+                            } else if (selvariablename === "TMIN" && klirecords.length > 1) {
+                                ret.record = klirecords[1];
+                            }
+
+                            var years = JSON.parse(ret.record.years);
+                            var dayyears = JSON.parse(ret.record.years); // ret.record[selvariablename].years;
+
+                            var mtitle = "";
+                            mtitle += (ret.record.variable || "").length > 0 ? " " + ret.record.variable : "";
+                            mtitle += " " + selstationid;
+                            mtitle += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
+                            mtitle += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
+                            mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
+
+                            // Aufruf Heatmap mit Container und Matrix
+                            matrix1 = {
+                                title: mtitle,
+                                fromyear: ret.record.fromyear,
+                                toyear: ret.record.toyear,
+                                colheaders: [],
+                                rowheaders: [],
+                                data: []
+                            };
+
+                            var irow = 0;
+                            hmoptions.cbucketdata = {}; // year mit: toyear, histo, yearmin, yearmax, yearsum, yearcount
+                            for (var year in years) {
+                                if (years.hasOwnProperty(year)) {
+                                    matrix1.rowheaders.push(year);
+                                    var rowvalues = years[year];
+                                    matrix1.data[irow] = [];
+                                    for (var icol = 0; icol < 365; icol++) {
+                                        if (typeof rowvalues[icol] === "undefined") {
+                                            matrix1.data[irow][icol] = null;
+                                        } else if (rowvalues[icol] === null || rowvalues[icol] === "" || rowvalues[icol].trim().length === 0) {
+                                            matrix1.data[irow][icol] = null;
+                                        } else if (rowvalues[icol] === "-9999" || rowvalues[icol] === "-999.9") {
+                                            matrix1.data[irow][icol] = null;
+                                        } else {
+                                            matrix1.data[irow][icol] = rowvalues[icol];
+                                            if (hmoptions.minmax === true) {
+                                                var hmval = parseFloat(rowvalues[icol]);
+                                                if (!isNaN(hmval)) {
+                                                    hmoptions.sumval += hmval;
+                                                    if (isNaN(hmoptions.sumval)) {
+                                                        console.log("*****" + hmval);
+                                                        debugger;
+                                                    }
+                                                    hmoptions.countval += 1;
+                                                    if (hmoptions.minval === null) {
+                                                        hmoptions.minval = hmval;
+                                                    } else if (hmoptions.minval > hmval) {
+                                                        hmoptions.minval = hmval;
+                                                    }
+                                                    if (hmoptions.maxval === null) {
+                                                        hmoptions.maxval = hmval;
+                                                    } else if (hmoptions.maxval < hmval) {
+                                                        hmoptions.maxval = hmval;
+                                                    }
+                                                    if (hmoptions.minmaxhistogram === true) {
+                                                        var hmvalstr = "" + Math.round(parseFloat(rowvalues[icol]));
+                                                        if (typeof histo1[hmvalstr] === "undefined") {
+                                                            histo1[hmvalstr] = 0;
+                                                        }
+                                                        histo1[hmvalstr] += 1;
+                                                    }
+                                                    if (hmoptions.cbuckets === true) {
+                                                        //    hmoptions.cbucketdata = {};  // year mit: toyear, histo, minval, maxval, valsum, valcount
+                                                        // berechnen buckyear für das Klimabucket
+                                                        // 1961 bis 1990 als Referenzperiode; 1961 = 30*
+                                                        var buck0 = parseInt(year);
+                                                        var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
+                                                        // oder 1661 als Basisjahr und damit rechnen
+                                                        var buck2 = Math.floor(buck1 / 30);
+                                                        var buck3 = 1661 + (buck2) * 30;
+                                                        var buckyear = "" + buck3;
+                                                        if (typeof hmoptions.cbucketdata[buckyear] === "undefined") {
+                                                            hmoptions.cbucketdata[buckyear] = {
+                                                                toyear: buck3 + 29,
+                                                                histo: [],
+                                                                minval: null,
+                                                                maxval: null,
+                                                                valsum: 0,
+                                                                valcount: 0
+                                                            };
+                                                        }
+                                                        hmoptions.cbucketdata[buckyear].valsum += hmval;
+                                                        hmoptions.cbucketdata[buckyear].valcount += 1;
+                                                        if (hmoptions.cbucketdata[buckyear].minval === null) {
+                                                            hmoptions.cbucketdata[buckyear].minval = hmval;
+                                                        } else if (hmoptions.cbucketdata[buckyear].minval > hmval) {
+                                                            hmoptions.cbucketdata[buckyear].minval = hmval;
+                                                        }
+                                                        if (hmoptions.cbucketdata[buckyear].maxval === null) {
+                                                            hmoptions.cbucketdata[buckyear].maxval = hmval;
+                                                        } else if (hmoptions.cbucketdata[buckyear].maxval < hmval) {
+                                                            hmoptions.cbucketdata[buckyear].maxval = hmval;
+                                                        }
+                                                        if (typeof hmoptions.cbucketdata[buckyear].histo[hmvalstr] === "undefined") {
+                                                            hmoptions.cbucketdata[buckyear].histo[hmvalstr] = 0;
+                                                        }
+                                                        hmoptions.cbucketdata[buckyear].histo[hmvalstr] += 1;
+                                                    }
+                                                } else {
+                                                    matrix1.data[irow][icol] = null;
+                                                    console.log("Keine formal korrekte Temperatur:" + rowvalues[icol]);
+                                                    debugger;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    irow++;
+                                }
+                            }
+                            // hier ist das Layout nochmal zu kontrollieren
+                            hmoptions.histo = histo1;
+                            var erg = kla9020fun.getHeatmap(cid, matrix1, hmoptions, function (ret) {
+                                sysbase.putMessage("Heatmap ausgegeben", 1);
+                                // if (hmoptions.minmax === true) debugger;
+                                callbackshm2(null, {
+                                    error: false,
+                                    message: "Heatmap ausgegeben",
+                                    matrix: matrix1,
+                                    options: uihelper.cloneObject(hmoptions),
+                                    hoptions: ret.hoptions,
+                                    hcwrapperid: ret.hcwrapperid,
+                                    histo: hmoptions.histo,
+                                    temparray: ret.temparray
+                                });
+                                return;
+                            });
+                        } catch (err) {
+                            sysbase.putMessage("Error:" + err, 3);
+                            console.log(err);
+                            console.log(err.stack);
+                            callbackshm2("Error", {
+                                error: true,
+                                message: "Heatmap ausgegeben:" + err
+                            });
+                            return;
+                        }
+                    },
+                    function (ret, callbackshm4) {
+                        // hier muss die matrix1-Struktur übergeben werden
+                        // kla1625shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
+                        callbackshm4("Finish", ret);
+                        return;
+                    }
+                ],
+                function (error, ret) {
+                    callbackh0(ret);
+                    return;
+                });
+        };
+
+
+        kla1625shm.klihisto2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb1625h) {
+            var ret = {
+                error: false,
+                message: ""
+            };
+
+            /**
+             * Histogramm ausgeben, wenn übergeben
+             */
+
+            var temparray = [];
+            if (hoptions.minmax === true && typeof hoptions.histo === "object" && Object.keys(hoptions.histo).length > 0) {
+                temparray = [];
+                // Ergänzen der Temperaturen ohne count
+                for (var ival = -50; ival <= 50; ival++) {
+                    var valstr = "" + ival;
+                    if (typeof hoptions.histo[valstr] === "undefined") {
+                        hoptions.histo[valstr] = 0;
+                    }
+                }
+                var tempvals = Object.keys(hoptions.histo);
+                var mincount = null;
+                var maxcount = null;
+                for (var i = 0; i < tempvals.length; i++) {
+                    var count = hoptions.histo[tempvals[i]];
+                    if (mincount === null) {
+                        mincount = count;
+                    } else if (count < mincount) {
+                        mincount = count;
+                    }
+                    if (maxcount === null) {
+                        maxcount = count;
+                    } else if (count > maxcount) {
+                        maxcount = count;
+                    }
+                    temparray.push({
+                        temp: tempvals[i],
+                        count: count
                     });
-                },
-                function (ret, callback77g) {
+                }
+                temparray.sort(function (a, b) {
+                    if (parseInt(a.temp) < parseInt(b.temp))
+                        return -1;
+                    if (parseInt(a.temp) > parseInt(b.temp))
+                        return 1;
+                    return 0;
+                });
+                var sparkpoints = [];
+                var xvalues = [];
+                for (var i = 0; i < temparray.length; i++) {
+                    //sparkpoints.push(temparray[i].count);
+                    //xvalues.push(temparray[i].temp);
+                    sparkpoints.push([temparray[i].temp, temparray[i].count]);
+
+                }
+                var tableid;
+                if (hoptions.cbuckets === true && typeof hoptions.cbucketdata === "object" && Object.keys(hoptions.cbucketdata).length > 0) {
+                    tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
+                    $(cid)
+                        .append($("<table/>", {
+                                id: tableid,
+                                css: {
+                                    float: "left"
+                                }
+                            })
+                            .append($("<thead/>")
+                                .append($("<tr/>")
+                                    .append($("<th/>", {
+                                        html: "Periode"
+                                    }))
+                                    .append($("<th/>", {
+                                        html: "Histogramm"
+                                    }))
+                                    .append($("<th/>", {
+                                        html: "Min"
+                                    }))
+                                    .append($("<th/>", {
+                                        html: "Max"
+                                    }))
+                                    .append($("<th/>", {
+                                        html: "Avg"
+                                    }))
+                                )
+                            )
+                            .append($("<tbody/>"))
+                        );
                     /**
-                     * Laden aus den Urdaten (*.dly-Files)
+                     * hier wird die Gesamtzeile eingeschoben und ausgegeben
                      */
-                    var ghcnclock = kla1620shm.showclock("#kla1620shmclock");
-                    var that = this;
-                    $(that).attr("disabled", true);
-                    var jqxhr = $.ajax({
-                        method: "GET",
-                        crossDomain: false,
-                        url: sysbase.getServer("ghcnddata"),
-                        data: {
-                            timeout: 10 * 60 * 1000,
-                            source: selsource,
-                            stationid: selstationid
-                        }
-                    }).done(function (r1, textStatus, jqXHR) {
-                        clearInterval(ghcnclock);
-                        sysbase.checkSessionLogin(r1);
-                        var ret1 = JSON.parse(r1);
-                        sysbase.putMessage(ret1.message, 1);
-                        if (ret1.error === true) {
-                            callback77g("Error", {
-                                error: ret1.error,
-                                message: ret1.message
-                            });
-                            return;
-                        } else {
-                            callback77g(null, {
-                                error: ret1.error,
-                                message: ret1.message,
-                                sqlStmt: ret.sqlStmt,
-                                selvariablename: ret.selvariablename,
-                                selsource: ret.selsource,
-                                selstationid: ret.selstationid
-                            });
-                            return;
-                        }
-                    }).fail(function (err) {
-                        clearInterval(ghcnclock);
-                        //$("#kli1400raw_rightwdata").empty();
-                        //document.getElementById("kli1400raw").style.cursor = "default";
-                        sysbase.putMessage("ghcnddata:" + err, 3);
-                        callback77g("Error", {
-                            error: true,
-                            message: err.message || err
-                        });
-                        return;
-                    }).always(function () {
-                        // nope
-                        $(that).attr("disabled", false);
-                    });
-                },
-                function (ret, callback77j) {
-                    uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
-                        if (ret1.error === false && ret1.record !== null) {
-                            /*
-                            intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
-                            wenn die Station komplette Temperaturdaten geliefert hat
-                            */
-                            klirecords = [];
-                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
-                            if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
-                            callback77j("Finish", {
-                                error: false,
-                                message: "Daten gefunden",
-                                klirecords: ret1.records
-                            });
-                            return;
-                        } else {
-                            sysbase.putMessage("Keine Daten zur Station gefunden", 3);
-                            callback77j("Error", {
-                                error: true,
-                                message: "Keine Daten gefunden"
-                            });
-                            return;
-                        }
+                    var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
+                    $("#" + tableid + " tbody")
+                        .append($("<tr/>")
+                            .append($("<td/>", {
+                                html: hmatrix.fromyear + "-" + hmatrix.toyear
+                            }))
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: sparkid,
+                                    class: "mouseoverdemo",
+                                    css: {
+                                        width: "100%",
+                                        float: "left"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>", {
+                                html: hoptions.minval
+                            }))
+                            .append($("<td/>", {
+                                html: hoptions.maxval
+                            }))
+                            .append($("<td/>", {
+                                html: (hoptions.sumval / hoptions.countval).toFixed(2)
+                            }))
+                        );
+                    $("#" + sparkid).sparkline(sparkpoints, {
+                        type: 'line',
+                        height: 60,
+                        fillColor: "red",
+                        defaultPixelsPerValue: 3,
+                        chartRangeMin: mincount,
+                        chartRangeMax: maxcount,
+                        lineColor: "red",
+                        composite: false
                     });
                 }
-            ],
-            function (error, ret) {
-                callback77(ret);
-                return;
-            });
-    };
 
-
-
-
-
-
-
-    /**
-     * loadstationdata - Laden der Rohdaten nach SQLite und Bereitstellen Datensatz
-     * @param {*} stationid  - identifiziert die Staion
-     * @param {*} source - Datenquelle zur Selektion
-     * @param {*} sqlStmt  - SQL-SELECT, um den geforderten Satz zu holen, wiederholt den Zugriff
-     * vor dem Laden der Daten
-     * returns callbackshm8 mit ret, record, wenn Record gefunden wurde nach dem Aufruf Laden
-     */
-    kla1620shm.loadstationdata = function (stationid, source, sqlStmt, callbackshm8) {
-
-        async.waterfall([
-                function (callbackshm8a) {
-                    var ghcnclock = kla1620shm.showclock("#kla1620shmclock");
-                    var that = this;
-                    $(that).attr("disabled", true);
-                    var jqxhr = $.ajax({
-                        method: "GET",
-                        crossDomain: false,
-                        url: sysbase.getServer("ghcnddata"),
-                        data: {
-                            timeout: 10 * 60 * 1000,
-                            source: source,
-                            stationid: stationid
+                /**
+                 * Loop über die Klimaperioden
+                 */
+                var buckyears = Object.keys(hoptions.cbucketdata);
+                for (var ibuck = 0; ibuck < buckyears.length; ibuck++) {
+                    temparray = [];
+                    var bucket = hoptions.cbucketdata[buckyears[ibuck]];
+                    // Ergänzen der Temperaturen ohne count
+                    for (var ival = -50; ival <= 50; ival++) {
+                        var valstr = "" + ival;
+                        if (typeof bucket.histo[valstr] === "undefined") {
+                            bucket.histo[valstr] = 0;
                         }
-                    }).done(function (r1, textStatus, jqXHR) {
-                        clearInterval(ghcnclock);
-                        sysbase.checkSessionLogin(r1);
-                        var ret1 = JSON.parse(r1);
-                        sysbase.putMessage(ret1.message, 1);
-                        if (ret1.error === true) {
-                            callbackshm8a("Error", {
-                                error: ret1.error,
-                                message: ret1.message
-                            });
-                            return;
-                        } else {
-                            callbackshm8a(null, {
-                                error: ret1.error,
-                                message: ret1.message
-                            });
-                            return;
+                    }
+                    var tempvals = Object.keys(bucket.histo);
+                    var mincount = null;
+                    var maxcount = null;
+                    for (var i = 0; i < tempvals.length; i++) {
+                        var count = bucket.histo[tempvals[i]];
+                        if (mincount === null) {
+                            mincount = count;
+                        } else if (count < mincount) {
+                            mincount = count;
                         }
-                    }).fail(function (err) {
-                        clearInterval(ghcnclock);
-                        //$("#kli1400raw_rightwdata").empty();
-                        //document.getElementById("kli1400raw").style.cursor = "default";
-                        sysbase.putMessage("ghcnddata:" + err, 3);
-                        callbackshm8a("Error", {
-                            error: true,
-                            message: err
+                        if (maxcount === null) {
+                            maxcount = count;
+                        } else if (count > maxcount) {
+                            maxcount = count;
+                        }
+                        temparray.push({
+                            temp: tempvals[i],
+                            count: count
                         });
-                        return;
-                    }).always(function () {
-                        // nope
-                        $(that).attr("disabled", false);
+                    }
+                    temparray.sort(function (a, b) {
+                        if (parseInt(a.temp) < parseInt(b.temp))
+                            return -1;
+                        if (parseInt(a.temp) > parseInt(b.temp))
+                            return 1;
+                        return 0;
                     });
-                },
-                function (ret, callbackshm8b) {
-                    uihelper.getOneRecord(sqlStmt, "", "getonerecord", "KLIDATA", function (ret) {
-                        if (ret.error === false && ret.record !== null) {
-                            /*
-                            intern wird getallsqlrecords gerufen und EIN Satz in record zurückgegeben.
-                            */
-                            stationrecord = ret.record;
-                            callbackshm8b("Finish", {
-                                error: false,
-                                message: "Daten gefunden",
-                                record: ret.record
-                            });
-                            return;
-                        } else {
-                            callbackshm8b("Error", {
-                                error: true,
-                                message: ret.message
-                            });
-                            return;
-                        }
+                    var sparkpoints = [];
+                    for (var i = 0; i < temparray.length; i++) {
+                        sparkpoints.push(temparray[i].count);
+                    }
+                    // Ausgabe
+                    var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
+                    $("#" + tableid + " tbody")
+                        .append($("<tr/>")
+                            .append($("<td/>", {
+                                html: buckyears[ibuck] + "-" + bucket.toyear
+                            }))
+                            .append($("<td/>")
+                                .append($("<span/>", {
+                                    id: sparkid,
+                                    class: "mouseoverdemo",
+                                    css: {
+                                        width: "100%",
+                                        float: "left"
+                                    }
+                                }))
+                            )
+                            .append($("<td/>", {
+                                html: bucket.minval
+                            }))
+                            .append($("<td/>", {
+                                html: bucket.maxval
+                            }))
+                            .append($("<td/>", {
+                                html: (bucket.valsum / bucket.valcount).toFixed(2)
+                            }))
+                        );
+                    $("#" + sparkid).sparkline(sparkpoints, {
+                        type: 'bar',
+                        height: 60,
+                        barColor: "red",
+                        negBarColor: "blue",
+                        barWidth: 3,
+                        barSpacing: 0,
+                        fillColor: false,
+                        defaultPixelsPerValue: 3,
+                        chartRangeMin: mincount,
+                        chartRangeMax: maxcount,
+                        composite: false
                     });
                 }
-            ],
-            function (error, result) {
-                callbackshm8(result);
+                cb1625h(ret);
                 return;
-            });
-    };
+            } else {
+                cb1625h(ret);
+                return;
+            }
+        };
 
+        /**
+         * kla1625shm.klihyde2 - Ausgabe der HYDE-Daten
+         * Tabelle mit Spalten und Unterteilungen nach Variablen
+         * Prüfen: Line-Chart je Variablen, 3 Linien L1, L2, L3 - in %-Egalisierung auf jeweiliges Maximum
+         * oder height entsprechend erweitern
+         * {"1750": {
+            "L1":{"popc_":175.11806088,"rurc_":0,"uopp_":0},
+            "L2":{"popc_":1281.765752112,"rurc_":246.622361287,"uopp_":0},
+            "L3":{"popc_":1275.5785712538,"rurc_":611.3757526348,"uopp_":0}
+           },
+         * @param {*} cid - Container-ID, wird vorgegeben, mit #
+         * @param {*} selstationid - wird ausgewertet, Daten stehen in klihyde
+         * @param {*} starecord - wird ausgewertet für Geo-Koordinaten
+         * @param {*} cb1625j - Callback
+         */
+        kla1625shm.klihyde2 = function (cid, selstationid, starecord, cb1625j) {
+            // Transformation der Daten nach Variable, year, L1, L2, L3 in Struktur
+            // Dasmit Tabelle mit Charts
+            var hyderep = {}; // variable - year - level
+            if (typeof klihyde.data === "string" && klihyde.data.length > 0) {
+                klihyde.data = JSON.parse(klihyde.data);
+            }
+            for (var year in klihyde.data) {
+                if (klihyde.data.hasOwnProperty(year)) {
+                    var yeardata = klihyde.data[year];
+                    for (var level in yeardata) {
+                        if (yeardata.hasOwnProperty(level)) {
+                            var leveldata = yeardata[level];
+                            for (var variablename in leveldata) {
+                                if (leveldata.hasOwnProperty(variablename)) {
+                                    var wert = leveldata[variablename];
+                                    // hier ist die finale Werteebene
+                                    if (typeof hyderep[variablename] === "undefined") {
+                                        hyderep[variablename] = {};
+                                    }
+                                    if (typeof hyderep[variablename][year] === "undefined") {
+                                        hyderep[variablename][year] = {};
+                                    }
+                                    if (typeof hyderep[variablename][year][level] === "undefined") {
+                                        hyderep[variablename][year][level] = 0;
+                                    }
+                                    hyderep[variablename][year][level] += wert;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            for (var variablename in hyderep) {
+                if (hyderep.hasOwnProperty(variablename)) {
+                    var ciddiv = cid + variablename;
+                    var tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
+                    $(cid)
+                        .append($("<div/>", {
+                                id: ciddiv.substr(1),
+                                css: {
+                                    width: "100%",
+                                    float: "left",
+                                    overflow: "hidden"
+                                }
+                            })
+                            .append($("<h2/>", {
+                                html: variablename
+                            }))
+                            .append($("<table/>", {
+                                    id: tableid,
+                                    css: {
+                                        float: "left"
+                                    }
+                                })
+                                .append($("<thead/>")
+                                    .append($("<tr/>")
+                                        .append($("<th/>", {
+                                            html: "Variable"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "Jahr"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "L1"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "L2"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "L3"
+                                        }))
+                                    )
+                                )
+                                .append($("<tbody/>"))
+                            )
+                        );
+                    // Loop über die Jahre
+                    // hyderep[variablename][year][level] += wert;
+                    for (var year in hyderep[variablename]) {
+                        if (hyderep[variablename].hasOwnProperty(year)) {
+                            var yeardata = hyderep[variablename][year];
+                            $("#" + tableid)
+                                .find("tbody")
+                                .append($("<tr/>")
+                                    .append($("<td/>", {
+                                        html: variablename
+                                    }))
+                                    .append($("<td/>", {
+                                        html: year
+                                    }))
+                                    .append($("<td/>", {
+                                        html: yeardata.L1.toFixed(0)
+                                    }))
+                                    .append($("<td/>", {
+                                        html: (yeardata.L1 + yeardata.L2).toFixed(0)
+                                    }))
+                                    .append($("<td/>", {
+                                        html: (yeardata.L1 + yeardata.L2 + yeardata.L3).toFixed(0)
+                                    }))
+                                )
+                        }
+                    }
+                    $(ciddiv)
+                        .append($("<br/>", {
+                            css: {
+                                float: "left"
+                            }
+                        }));
+                    /**
+                     * Hier Chart-Ausgabe - mit chartJS wird eine Gesamtgraphik ausgegeben
+                     */
+                    // hmatrixL, hoptionsL,
+                    // hmatrixR, hoptionsR,
+
+
+
+                    //kla1625shm.paintChart = function (bucketlength, selvariablename, selsource, selstationid) {
+                    /*
+                    var matrix = matrix1;
+                    var years = matrix1.rowheaders;
+                    var tarray = [];
+                    for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
+                        tarray.push({
+                            year: matrix1.rowheaders[iyear],
+                            days: matrix.data[iyear]
+                        });
+                    }
+                    tarray.sort(function (a, b) {
+                        if (a.year < b.year)
+                            return -1;
+                        if (a.year > b.year)
+                            return 1;
+                        return 0;
+                    });
+                    var anzyears = tarray.length;
+
+                    $("#kla1625shmwrapper").empty();
+                    var h = $("#heatmap").height();
+                    var w = $("#kla1625shm.content").width();
+                    w -= $("#heatmap").position().left;
+                    w -= $("#heatmap").width();
+                    w -= 40;
+                    $("#kla1625shmwrapper")
+                        .append($("<div/>", {
+                                css: {
+                                    height: h,
+                                    width: w,
+                                    "background-color": "white"
+                                }
+                            })
+                            .append($("<canvas/>", {
+                                id: "myChart",
+                                css: {
+                                    height: h,
+                                    width: w
+                                }
+                            }))
+                        );
+                    var datasets = [];
+                    var labels = [];
+                    var lab;
+                    for (var iday = 0; iday < 365; iday++) {
+                        var rowvalues = [];
+                        for (var iarray = 0; iarray < tarray.length; iarray++) {
+                            if (iday === 0) {
+                                lab = "";
+                                if (iarray % bucketlength === 0 || iarray === 0) {
+                                    lab = tarray[iarray].year;
+                                }
+                                labels.push(lab);
+                            }
+                            rowvalues.push(parseFloat(tarray[iarray].days[iday]));
+                        }
+                        datasets.push({
+                            label: "D" + ("000" + (iday + 1)).slice(-3),
+                            backgroundColor: '#00FFFF',
+                            borderColor: '#00FFFF',
+                            borderWidth: 1,
+                            pointRadius: 1,
+                            data: rowvalues,
+                            fill: false,
+                        });
+                    }
+                    var ctx = document.getElementById('myChart').getContext('2d');
+                    Chart.defaults.global.plugins.colorschemes.override = true;
+                    Chart.defaults.global.legend.display = true;
+                    // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+                    var config = {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: datasets
+                        },
+                        options: {
+                            plugins: {
+                                colorschemes: {
+                                    scheme: 'tableau.HueCircle19'
+                                }
+                            }
+                        }
+                    };
+                    window.chart1 = new Chart(ctx, config);
+                    */
+            }
+        }
+
+
+    };
 
 
     /**
      * paintS - Sparklines für Monate Gesamt = alle Jahre
      * - Randauszählung der Zuordnungen zu Grad Celsius je Jahr
      */
-    kla1620shm.paintS = function (selvariablename, selsource, selstationid, matrix) {
+    kla1625shm.paintS = function (selvariablename, selsource, selstationid, matrix) {
         /**
          * Aufbau des Rahmens für die Einzelgraphiken
          */
@@ -1151,19 +1928,19 @@
         });
         var anzyears = tarray.length;
 
-        $("#kla1620shmwrapper").empty();
+        $("#kla1625shmwrapper").empty();
         var h = $("#heatmap").height();
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
-        $("#kla1620shmwrapper").css({
+        $("#kla1625shmwrapper").css({
             overflow: "hidden",
             height: h,
             width: w
         });
 
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         height: h,
@@ -1173,7 +1950,7 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
-                        id: "kla1620shmt1",
+                        id: "kla1625shmt1",
                         css: {
                             "max-width": w + "px"
                         }
@@ -1287,7 +2064,7 @@
                 rowtit = 'D' + ("000" + (ivalue + 1)).slice(-3);
             }
 
-            $("#kla1620shmt1")
+            $("#kla1625shmt1")
                 .append($("<tr/>")
                     .append($("<td/>", {
                         html: rowtit
@@ -1444,7 +2221,7 @@
      * - Randauszählung der Zuordnungen zu Grad Celsius je Jahr
      * - Regressionsanalyse je Zeile
      */
-    kla1620shm.paintT = function (selvariablename, selsource, selstationid, matrix) {
+    kla1625shm.paintT = function (selvariablename, selsource, selstationid, matrix) {
         /**
          * Aufbau des Rahmens für die Einzelgraphiken
          * tarray[i] mit year und values[]
@@ -1470,19 +2247,19 @@
         });
         var anzyears = tarray.length;
 
-        $("#kla1620shmwrapper").empty();
+        $("#kla1625shmwrapper").empty();
         var h = $("#heatmap").height();
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
-        $("#kla1620shmwrapper").css({
+        $("#kla1625shmwrapper").css({
             overflow: "hidden",
             height: h,
             width: w
         });
 
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         height: h,
@@ -1492,7 +2269,7 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
-                        id: "kla1620shmt1",
+                        id: "kla1625shmt1",
                         css: {
                             "max-width": w + "px"
                         }
@@ -1600,7 +2377,7 @@
             // rowtit noch verfeinern für spezielle Termine, wie Tag/Nachtgleiche etc.
             var rowtit = tarray[iarray].year;
 
-            $("#kla1620shmt1")
+            $("#kla1625shmt1")
                 .append($("<tr/>")
                     .append($("<td/>", {
                         html: rowtit
@@ -1757,7 +2534,7 @@
      * paintU - Testen der Regression
      * - Regressionsanalyse je Zeile - concatenierte Werte 1 - Jahre
      */
-    kla1620shm.paintU = function (selvariablename, selsource, selstationid, matrix) {
+    kla1625shm.paintU = function (selvariablename, selsource, selstationid, matrix) {
         /**
          * Aufbau des Rahmens für die Einzelgraphiken
          * tarray[i] mit year und values[]
@@ -1783,19 +2560,19 @@
         });
         var anzyears = tarray.length;
 
-        $("#kla1620shmwrapper").empty();
+        $("#kla1625shmwrapper").empty();
         var h = $("#heatmap").height();
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
-        $("#kla1620shmwrapper").css({
+        $("#kla1625shmwrapper").css({
             overflow: "hidden",
             height: h,
             width: w
         });
 
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         height: h,
@@ -1805,7 +2582,7 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
-                        id: "kla1620shmt1",
+                        id: "kla1625shmt1",
                         css: {
                             "max-width": w + "px"
                         }
@@ -1922,7 +2699,8 @@
             // rowtit noch verfeinern für spezielle Termine, wie Tag/Nachtgleiche etc.
             var rowtit = tarray[iarray].year;
 
-            $("#kla1620shmt1")
+            $("#kla1625shmt1")
+                .find("tbody")
                 .append($("<tr/>")
                     .append($("<td/>", {
                         html: rowtit
@@ -2024,8 +2802,7 @@
      * mit Super-Sparkline auf Basis klirecords
      * superParam.sunwinter - das ist schon ein Brocken
      */
-    var outrecords = [];
-    kla1620shm.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
+    var outrecords = []; kla1625shm.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
         try {
             outrecords = [];
             if (typeof klirecords === "undefined" || klirecords.length < 1) {
@@ -2033,20 +2810,20 @@
                 return;
             }
             /**
-             * Container kla1620shmwrapper aufbereiten
+             * Container kla1625shmwrapper aufbereiten
              * in diesen Container gehen sukzessive die Auswertungen
              */
-            $("#kla1620shmwrapper").empty();
+            $("#kla1625shmwrapper").empty();
             var h = screen.height;
             h -= $(".header").height();
-            h -= $("#kla1620shmbuttons").height();
+            h -= $("#kla1625shmbuttons").height();
             h -= $(".footer").height();
 
-            var w = $("#kla1620shm.content").width();
+            var w = $("#kla1625shm.content").width();
             w -= $("#heatmap").position().left;
             w -= $("#heatmap").width();
             w -= 40;
-            $("#kla1620shmwrapper").css({
+            $("#kla1625shmwrapper").css({
                 overflow: "auto",
                 height: h,
                 width: w
@@ -2055,7 +2832,7 @@
             /**
              * Abschnitt Stammdaten zur Station
              */
-            $("#kla1620shmwrapper")
+            $("#kla1625shmwrapper")
                 .append($("<div/>", {
                         css: {
                             width: "100%",
@@ -2063,7 +2840,7 @@
                         }
                     })
                     .append($("<h2/>", {
-                        id: "kla1620shmh2",
+                        id: "kla1625shmh2",
                         text: stationdata.stationid + " " + stationdata.stationname
                     }))
                 );
@@ -2072,7 +2849,7 @@
              * Abschnitt sparklines
              * Header zu sparkline-Tabelle
              * */
-            $("#kla1620shmwrapper")
+            $("#kla1625shmwrapper")
                 .append($("<div/>", {
                         css: {
                             width: "100%",
@@ -2081,7 +2858,7 @@
                     })
                     .append($("<table/>", {
                             class: "tablesorter",
-                            id: "kla1620shmt1",
+                            id: "kla1625shmt1",
                             css: {
                                 "max-width": w + "px"
                             }
@@ -2225,7 +3002,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1620shm.paintXtr("#kla1620shmt1", "tot", iyear, pcount, rowdata, superParam);
+                    kla1625shm.paintXtr("#kla1625shmt1", "tot", iyear, pcount, rowdata, superParam);
                 }
 
 
@@ -2272,7 +3049,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1620shm.paintXtr("#kla1620shmt1", "som", iyear, pcount, rowdata, superParam);
+                    kla1625shm.paintXtr("#kla1625shmt1", "som", iyear, pcount, rowdata, superParam);
 
 
                     /**
@@ -2315,7 +3092,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1620shm.paintXtr("#kla1620shmt1", "win", iyear, pcount, rowdata, superParam);
+                    kla1625shm.paintXtr("#kla1625shmt1", "win", iyear, pcount, rowdata, superParam);
                 }
             }
             /**
@@ -2387,13 +3164,13 @@
     }; // ende paintX
 
     /**
-     * kla1620shm.paintXtr - Ausgabe der Zeilen zu rowdata[0] und rowdata[1]
+     * kla1625shm.paintXtr - Ausgabe der Zeilen zu rowdata[0] und rowdata[1]
      * max drei Zeilen für total, summer-up, winter-dwn
      * @param {*} trcontainer
      * @param {*} rowdata
      * @param {*} superParam
      */
-    kla1620shm.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
+    kla1625shm.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
         /**
          * Vorlauf: regressionsrechnung
          */
@@ -2456,7 +3233,7 @@
             /**
              * neue eine Variable = eine einfache Zeile
              */
-            $("#kla1620shmt1")
+            $("#kla1625shmt1")
                 .append($("<tr/>")
                     .append($("<td/>", {
                         html: rowtit
@@ -2670,7 +3447,7 @@
      * paintChart - mit chartJS wird eine Gesamtgraphik ausgegeben
      * mit Skalierung etc.
      */
-    kla1620shm.paintChart = function (bucketlength, selvariablename, selsource, selstationid) {
+    kla1625shm.paintChart = function (bucketlength, selvariablename, selsource, selstationid) {
         /**
          * Bereitstellung der Daten
          */
@@ -2693,13 +3470,13 @@
         });
         var anzyears = tarray.length;
 
-        $("#kla1620shmwrapper").empty();
+        $("#kla1625shmwrapper").empty();
         var h = $("#heatmap").height();
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         height: h,
@@ -2764,7 +3541,7 @@
     /**
      * Clusteranalyse mit https://www.npmjs.com/package/tayden-clusterfck
      */
-    kla1620shm.clusterAnalysis = function (selvariablename, selsource, selstationid) {
+    kla1625shm.clusterAnalysis = function (selvariablename, selsource, selstationid) {
         /**
          * Bereitstellung der Daten
          */
@@ -2844,7 +3621,7 @@
         /**
          * Vorbereitung Ausgabebereich
          */
-        $("#kla1620shmwrapper").empty();
+        $("#kla1625shmwrapper").empty();
         var h = $("#heatmap").height();
         var whm = $("#heatmap").width();
         /*
@@ -2856,18 +3633,18 @@
         }
         */
 
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
 
-        $("#kla1620shmwrapper").css({
+        $("#kla1625shmwrapper").css({
             height: h,
             width: w,
             overflow: "auto"
         });
 
-        var scw = uihelper.getScrollbarWidth($("#kla1620shmwrapper")[0].parentElement);
+        var scw = uihelper.getScrollbarWidth($("#kla1625shmwrapper")[0].parentElement);
         /**
          * Loop zur Ausgabe der Charts zu den Clustern
          */
@@ -2916,7 +3693,7 @@
                     fill: false,
                 });
             }
-            $("#kla1620shmwrapper")
+            $("#kla1625shmwrapper")
                 .append($("<div/>", {
                         css: {
                             height: h - scw,
@@ -3057,7 +3834,7 @@
             metaarray.push(Number(yearsounds[iy][1]));
         }
 
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         height: h - scw,
@@ -3139,7 +3916,7 @@
             metaarray1.push(clusteravgs[metaarray[imeta]].newval);
         }
 
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<br/>"))
             .append($("<span/>", {
                 id: "metasound",
@@ -3177,7 +3954,7 @@
         });
 
 
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<br/>"))
             .append($("<span/>", {
                 id: "metasound1",
@@ -3228,7 +4005,7 @@
     /**
      * bucketAnalysis - 30 Jahre zusammengefasst = Klimaperioden-Monatsaufbereitung
      */
-    kla1620shm.bucketAnalysis = function (bucketlength, selvariablename, selsource, selstationid) {
+    kla1625shm.bucketAnalysis = function (bucketlength, selvariablename, selsource, selstationid) {
         /**
          * Bereitstellung der Daten
          */
@@ -3266,14 +4043,14 @@
         /**
          * Vorbereitung Ausgabebereich
          */
-        var scw = uihelper.getScrollbarWidth($("#kla1620shmwrapper")[0].parentElement);
-        $("#kla1620shmwrapper").empty();
+        var scw = uihelper.getScrollbarWidth($("#kla1625shmwrapper")[0].parentElement);
+        $("#kla1625shmwrapper").empty();
         var h = $("#heatmap").height();
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         height: h - scw,
@@ -3293,17 +4070,17 @@
         /**
          * Rahmen für die Sparklines mit Regressionsgerade zu den Buckets
          */
-        var scw = uihelper.getScrollbarWidth($("#kla1620shmwrapper")[0].parentElement);
+        var scw = uihelper.getScrollbarWidth($("#kla1625shmwrapper")[0].parentElement);
         var h = $("#heatmap").height();
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
 
         /**
-         * Tabelle 1 "kla1620shmt3" - Monatsspalten pivotiert
+         * Tabelle 1 "kla1625shmt3" - Monatsspalten pivotiert
          */
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         width: w - scw,
@@ -3315,7 +4092,7 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
-                        id: "kla1620shmt3",
+                        id: "kla1625shmt3",
                         css: {
                             "max-width": (w - scw - 10) + "px",
                             "margin-top": "10px"
@@ -3370,11 +4147,11 @@
                     .append($("<tbody/>"))
                 )
             );
-        $("#kla1620shmt3").hide();
+        $("#kla1625shmt3").hide();
         /**
-         * Tabelle 2 "kla1620shmt2"
+         * Tabelle 2 "kla1625shmt2"
          */
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         width: w - scw,
@@ -3386,7 +4163,7 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
-                        id: "kla1620shmt2",
+                        id: "kla1625shmt2",
                         css: {
                             "max-width": (w - scw - 10) + "px",
                             "margin-top": "10px"
@@ -3446,7 +4223,7 @@
             var rowvalues = [];
             var monsum = new Array(12).fill(0);
             var moncount = new Array(12).fill(0);
-            kla1620shm.paintSB(bucketlength, selvariablename, selsource, selstationid, firstyear, lastyear, "kla1620shmt2", "kla1620shmt3");
+            kla1625shm.paintSB(bucketlength, selvariablename, selsource, selstationid, firstyear, lastyear, "kla1625shmt2", "kla1625shmt3");
             for (var iyear = firstyear; iyear <= lastyear; iyear++) {
                 rowvalues = tarray[iyear].months;
                 for (var imon = 0; imon < 12; imon++) {
@@ -3488,7 +4265,7 @@
             }
         }); // so funktioniert es
 
-        $("#kla1620shmt3").show();
+        $("#kla1625shmt3").show();
 
         var ctx = document.getElementById('myChartBucket').getContext('2d');
         Chart.defaults.global.plugins.colorschemes.override = true;
@@ -3523,7 +4300,7 @@
          * Soundification for buckets https://ttsuchiya.github.io/dtm/doc/
          */
         /*
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                     css: {
                         "max-width": (w - scw - 10) + "px",
@@ -3632,7 +4409,7 @@
      * paintSB - Sparklines für Monate eines Buckets
      * - von Jahr, bis Jahr für ein Bucket
      */
-    kla1620shm.paintSB = function (bucketlength, selvariablename, selsource, selstationid, von, bis, tableid, tableid2) {
+    kla1625shm.paintSB = function (bucketlength, selvariablename, selsource, selstationid, von, bis, tableid, tableid2) {
         /**
          * Aufbau des Rahmens für die Einzelgraphiken
          * table wird vorausgesetzt, es kommen nur die rows in die Table
@@ -3910,369 +4687,7 @@
         }
     }; // ende paintSB
 
-    /**
-     * kliheatmap2 - Heatmap berechnen, Animation sichern und anzeigen
-     * mit "Video-Controls" - aus KLISTATIONS - YEARS
-     *
-     * @param {*} cid
-     * @param {*} selvariablename
-     * @param {*} selsource
-     * @param {*} selstationid
-     * @param {*} starecord
-     * @param {*} hmoptions
-     *            minmax: true, - Temperaturskala auf echte Min und Max der Werte beziehen, nicht auf die Standardskale
-     *            minmaxhistogram: true - Ausgabe Sparkline über dem Historgramm => histo1
-     *            scale: 7 oder 5 - Anzahl der Grundfarben für die Heatmap
-     *              minval, maxval, sumval, countval werden berechnet und mit übergeben
-     *
-     * @param {*} callbackh0
-     */
-    kla1620shm.kliheatmap2 = function (cid, selvariablename, selsource, selstationid, starecord, hmoptions, callbackh0) {
-        $("#heatmap").show();
-        $("#heatworld").show();
 
-        // KLISTATIONS mit <variablename>.years[<year>][12 Werte im Array]
-
-        async.waterfall([
-                function (callbackshm1) {
-                    var sqlStmt = "";
-                    var sel = {
-                        source: selsource,
-                        stationid: selstationid
-                    };
-                    var projection = {
-                        source: 1,
-                        stationid: 1,
-                        name: 1,
-                        climatezone: 1,
-                        region: 1,
-                        subregion: 1,
-                        countryname: 1,
-                        lats: 1,
-                        longitude: 1,
-                        latitude: 1,
-                        anzyears: 1,
-                        realyears: 1,
-                        fromyear: 1,
-                        toyear: 1,
-                        height: 1,
-                        "analysis.tavg.regression.total.m": 1,
-                        "analysis.tavg.regression.mtotal": 1,
-                    };
-                    sqlStmt += "SELECT ";
-                    sqlStmt += "KLISTATIONS.source, ";
-                    sqlStmt += "KLISTATIONS.stationid, ";
-                    sqlStmt += "stationname, ";
-                    sqlStmt += "climatezone, ";
-                    sqlStmt += "region, ";
-                    sqlStmt += "subregion, ";
-                    sqlStmt += "countryname, ";
-                    sqlStmt += "lats, ";
-                    sqlStmt += "longitude, ";
-                    sqlStmt += "latitude, ";
-                    sqlStmt += "variable, ";
-                    sqlStmt += "anzyears, ";
-                    sqlStmt += "realyears, ";
-                    sqlStmt += "fromyear, ";
-                    sqlStmt += "toyear, ";
-                    sqlStmt += "height, ";
-                    sqlStmt += "years ";
-                    sqlStmt += "FROM KLISTATIONS ";
-                    sqlStmt += "LEFT JOIN KLIDATA ";
-                    sqlStmt += "ON KLISTATIONS.source = KLIDATA.source ";
-                    sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
-                    sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
-                    sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
-                    sqlStmt += "AND KLIDATA.variable = '" + selvariablename.toUpperCase() + "' ";
-                    sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-                    // "analysis.tavg.regression.total.m": 1,
-                    // "analysis.tavg.regression.mtotal": 1,
-                    var api = "getonerecord";
-                    var table = "KLISTATIONS";
-                    uihelper.getOneRecord(sqlStmt, projection, api, table, function (ret) {
-                        if (ret.error === false && ret.record !== null) {
-                            /*
-                            intern wird getallsqlrecords gerufen und EIN Satz in record zurückgegeben.
-                            */
-                            stationrecord = ret.record;
-                            callbackshm1(null, {
-                                error: false,
-                                message: "Daten gefunden",
-                                record: ret.record
-                            });
-                            return;
-                        } else {
-                            /**
-                             * Abfrage, ob Daten geladen werden sollen
-                             */
-                            var qmsg = "Für Station:" + selstationid + " aus " + selsource;
-                            qmsg += " und " + selvariablename;
-                            qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
-                            var check = window.confirm(qmsg);
-                            if (check === false) {
-                                sysbase.putMessage("Keine Daten zur Station gefunden", 3);
-                                callbackshm1("Error", {
-                                    error: true,
-                                    message: "Keine Daten gefunden",
-                                });
-                                return;
-                            } else {
-                                kla1620shm.loadstationdata(selstationid, selsource, sqlStmt, function (ret, record) {
-                                    sysbase.putMessage("Daten geladen und bereitgestellt", 1);
-                                    console.log("loadstationdata fertig:" + ret.message);
-                                    callbackshm1(null, {
-                                        error: ret.error,
-                                        message: ret.message,
-                                        record: ret.record
-                                    });
-                                    return;
-                                });
-                            }
-                        }
-                    });
-                },
-                function (ret, callbackshm2) {
-                    if (typeof hmoptions === "object" && Object.keys(hmoptions).length >= 1) {
-                        hmoptions.minmax = hmoptions.minmax || false;
-                        hmoptions.scale = 7; // Farb-Buckets
-                        hmoptions.minval = null;
-                        hmoptions.maxval = null;
-                        hmoptions.sumval = 0.0;
-                        hmoptions.countval = 0;
-                    } else {
-                        hmoptions = {};
-                        hmoptions.minmax = false;
-                        hmoptions.scale = 7; // Farb-Buckets
-                        hmoptions.minval = null;
-                        hmoptions.maxval = null;
-                        hmoptions.sumval = 0.0;
-                        hmoptions.countval = 0;
-                    }
-                    var colwidth;
-                    var rowheight;
-                    var wratio;
-                    var hratio;
-                    try {
-                        var wmtit = "Selektion für Station:";
-                        wmtit += " " + ret.record.source + " ";
-                        // isMember ? '$2.00' : '$10.00'
-                        wmtit += selstationid;
-                        wmtit += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
-                        wmtit += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
-                        wmtit += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
-                        wmtit += (ret.record.anzyears || 0).length > 0 ? " für " + ret.record.anzyears + " Jahre" : "";
-                        wmtit += (ret.record.region || "").length > 0 ? " Region:" + ret.record.region : "";
-                        wmtit += (ret.record.climatezone || "").length > 0 ? " Klimazone:" + ret.record.climatezone : "";
-                        wmtit += (ret.record.height || "").length > 0 ? " Höhe:" + ret.record.height : "";
-                        $(".headertitle").html(wmtit);
-                        var years = JSON.parse(ret.record.years);
-                        var dayyears = JSON.parse(ret.record.years); // ret.record[selvariablename].years;
-
-                        var mtitle = "";
-                        mtitle += (ret.record.variable || "").length > 0 ? " " + ret.record.variable : "";
-                        mtitle += " " + selstationid;
-                        mtitle += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
-                        mtitle += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
-                        mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
-
-                        // Aufruf Heatmap mit Container und Matrix
-                        matrix1 = {
-                            title: mtitle,
-                            fromyear: ret.record.fromyear,
-                            toyear: ret.record.toyear,
-                            colheaders: [],
-                            rowheaders: [],
-                            data: []
-                        };
-
-                        var irow = 0;
-                        hmoptions.cbucketdata = {}; // year mit: toyear, histo, yearmin, yearmax, yearsum, yearcount
-                        for (var year in years) {
-                            if (years.hasOwnProperty(year)) {
-                                matrix1.rowheaders.push(year);
-                                var rowvalues = years[year];
-                                matrix1.data[irow] = [];
-                                for (var icol = 0; icol < 365; icol++) {
-                                    if (typeof rowvalues[icol] === "undefined") {
-                                        matrix1.data[irow][icol] = null;
-                                    } else if (rowvalues[icol] === null || rowvalues[icol] === "" || rowvalues[icol].trim().length === 0) {
-                                        matrix1.data[irow][icol] = null;
-                                    } else if (rowvalues[icol] === "-9999" || rowvalues[icol] === "-999.9") {
-                                        matrix1.data[irow][icol] = null;
-                                    } else {
-                                        matrix1.data[irow][icol] = rowvalues[icol];
-                                        if (hmoptions.minmax === true) {
-                                            var hmval = parseFloat(rowvalues[icol]);
-                                            if (!isNaN(hmval)) {
-                                                hmoptions.sumval += hmval;
-                                                if (isNaN(hmoptions.sumval)) {
-                                                    console.log("*****" + hmval);
-                                                    debugger;
-                                                }
-                                                hmoptions.countval += 1;
-                                                if (hmoptions.minval === null) {
-                                                    hmoptions.minval = hmval;
-                                                } else if (hmoptions.minval > hmval) {
-                                                    hmoptions.minval = hmval;
-                                                }
-                                                if (hmoptions.maxval === null) {
-                                                    hmoptions.maxval = hmval;
-                                                } else if (hmoptions.maxval < hmval) {
-                                                    hmoptions.maxval = hmval;
-                                                }
-                                                if (hmoptions.minmaxhistogram === true) {
-                                                    var hmvalstr = "" + Math.round(parseFloat(rowvalues[icol]));
-                                                    if (typeof histo1[hmvalstr] === "undefined") {
-                                                        histo1[hmvalstr] = 0;
-                                                    }
-                                                    histo1[hmvalstr] += 1;
-                                                }
-                                                if (hmoptions.cbuckets === true) {
-                                                    //    hmoptions.cbucketdata = {};  // year mit: toyear, histo, minval, maxval, valsum, valcount
-                                                    // berechnen buckyear für das Klimabucket
-                                                    // 1961 bis 1990 als Referenzperiode; 1961 = 30*
-                                                    var buck0 = parseInt(year);
-                                                    var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
-                                                    // oder 1661 als Basisjahr und damit rechnen
-                                                    var buck2 = Math.floor(buck1 / 30);
-                                                    var buck3 = 1661 + (buck2) * 30;
-                                                    var buckyear = "" + buck3;
-                                                    if (typeof hmoptions.cbucketdata[buckyear] === "undefined") {
-                                                        hmoptions.cbucketdata[buckyear] = {
-                                                            toyear: buck3 + 29,
-                                                            histo: [],
-                                                            minval: null,
-                                                            maxval: null,
-                                                            valsum: 0,
-                                                            valcount: 0
-                                                        };
-                                                    }
-                                                    hmoptions.cbucketdata[buckyear].valsum += hmval;
-                                                    hmoptions.cbucketdata[buckyear].valcount += 1;
-                                                    if (hmoptions.cbucketdata[buckyear].minval === null) {
-                                                        hmoptions.cbucketdata[buckyear].minval = hmval;
-                                                    } else if (hmoptions.cbucketdata[buckyear].minval > hmval) {
-                                                        hmoptions.cbucketdata[buckyear].minval = hmval;
-                                                    }
-                                                    if (hmoptions.cbucketdata[buckyear].maxval === null) {
-                                                        hmoptions.cbucketdata[buckyear].maxval = hmval;
-                                                    } else if (hmoptions.cbucketdata[buckyear].maxval < hmval) {
-                                                        hmoptions.cbucketdata[buckyear].maxval = hmval;
-                                                    }
-                                                    if (typeof hmoptions.cbucketdata[buckyear].histo[hmvalstr] === "undefined") {
-                                                        hmoptions.cbucketdata[buckyear].histo[hmvalstr] = 0;
-                                                    }
-                                                    hmoptions.cbucketdata[buckyear].histo[hmvalstr] += 1;
-                                                }
-                                            } else {
-                                                matrix1.data[irow][icol] = null;
-                                                console.log("Keine formal korrekte Temperatur:" + rowvalues[icol]);
-                                                debugger;
-                                            }
-                                        }
-                                    }
-                                }
-                                irow++;
-                            }
-                        }
-                        // hier ist das Layout nochmal zu kontrollieren
-                        hmoptions.histo = histo1;
-                        var erg = kla9020fun.getHeatmap(cid, matrix1, hmoptions, function (ret) {
-                            sysbase.putMessage("Heatmap ausgegeben", 1);
-                            // if (hmoptions.minmax === true) debugger;
-                            callbackshm2(null, {
-                                error: false,
-                                message: "Heatmap ausgegeben",
-                                matrix: matrix1,
-                                options: uihelper.cloneObject(hmoptions),
-                                hoptions: ret.hoptions,
-                                hcwrapperid: ret.hcwrapperid,
-                                histo: hmoptions.histo,
-                                temparray: ret.temparray
-                            });
-                            return;
-                        });
-                    } catch (err) {
-                        sysbase.putMessage("Error:" + err, 3);
-                        console.log(err);
-                        console.log(err.stack);
-                        callbackshm2("Error", {
-                            error: true,
-                            message: "Heatmap ausgegeben:" + err
-                        });
-                        return;
-                    }
-                },
-                function (ret, callbackshm3) {
-                    /**
-                     * HYDE-Daten holen, wenn gefordert
-                     * matrix, options, hoptions, histo, temparray
-                     */
-
-                    $("body").css("cursor", "progress");
-                    $("button").hide();
-                    var jqxhr = $.ajax({
-                        method: "GET",
-                        crossDomain: false,
-                        url: sysbase.getServer("stationhyde"),
-                        data: {
-                            stationid: selstationid,
-                            longitude: stationrecord.longitude,
-                            latitude: stationrecord.latitude,
-                            name: stationrecord.stationname,
-                            globals: false,
-                            selyears: "",
-                            selvars: "popc,rurc,urb,uopp"
-                        }
-                    }).done(function (r1, textStatus, jqXHR) {
-                        sysbase.checkSessionLogin(r1);
-                        $("button").show();
-                        $("body").css("cursor", "default");
-                        var ret = JSON.parse(r1);
-                        sysbase.putMessage(ret.message, 1);
-                        if (ret.error === true) {
-                            callbackshm3(null, ret);
-                            return;
-                        } else {
-                            klihyde = ret.klihyde;
-                            // klihyde.data muss mit JSON.parse noch entpackt werden
-                            debugger;
-                            $("#" + cid)
-                            .append($("<div/>", {
-                                html: "Hier kommt KLIHYDE:" + klihyde.data.length,
-                                css: {
-                                    width: "100%",
-                                    float: "left"
-                                }
-                            }));
-
-
-
-                            callbackshm3(null, ret);
-                            return;
-                        }
-                    }).fail(function (err) {
-                        sysbase.putMessage(err, 1);
-                        $("button").show();
-                        $("body").css("cursor", "default");
-                        callbackshm3(null, ret);
-                        return;
-                    }).always(function () {
-                        // nope
-                    });
-                },
-                function (ret, callbackshm4) {
-                    // hier muss die matrix1-Struktur übergeben werden
-                    // kla1620shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
-                    callbackshm4("Finish", ret);
-                    return;
-                }
-            ],
-            function (error, ret) {
-                callbackh0(ret);
-                return;
-            });
-    };
 
 
 
@@ -4283,21 +4698,21 @@
      * das ist zu verallgemeinern mit x und y als Übergaben und
      * Konfiguration bzw. Beschriftung, die dem Anwender die Bedeutung erklärt
      */
-    kla1620shm.scatter = function () {
+    kla1625shm.scatter = function () {
 
-        $("#kla1620shmwrapper").empty();
+        $("#kla1625shmwrapper").empty();
         var h = $("#heatmap").height();
-        var w = $("#kla1620shm.content").width();
+        var w = $("#kla1625shm.content").width();
         w -= $("#heatmap").position().left;
         w -= $("#heatmap").width();
         w -= 40;
-        $("#kla1620shmwrapper").css({
+        $("#kla1625shmwrapper").css({
             overflow: "hidden",
             height: h,
             width: w
         });
 
-        $("#kla1620shmwrapper")
+        $("#kla1625shmwrapper")
             .append($("<div/>", {
                 id: "my_dataviz",
                 css: {
@@ -4424,10 +4839,10 @@
 
 
 
-    kla1620shm.activateDragDrop = function () {
+    kla1625shm.activateDragDrop = function () {
         // Dragdrop aktivieren, umstellen auf offset
         var box = $(".heatvardiv");
-        var mainCanvas = $(".kla1620shmwrapper");
+        var mainCanvas = $(".kla1625shmwrapper");
         box.draggable({
             containment: mainCanvas,
             helper: "clone",
@@ -4460,7 +4875,7 @@
     /**
      * Einblendung Stopuhr wärend langer AJAX-Aufrufe
      */
-    kla1620shm.showclock = function (clockcontainer) {
+    kla1625shm.showclock = function (clockcontainer) {
         // Update the count down every 1 second
         if (typeof clockcontainer === "string") {
             if (!clockcontainer.startsWith("#")) clockcontainer = "#" + clockcontainer;
@@ -4502,14 +4917,14 @@
      */
     if (typeof module === 'object' && module.exports) {
         // Node.js
-        module.exports = kla1620shm;
+        module.exports = kla1625shm;
     } else if (typeof define === 'function' && define.amd) {
         // AMD / RequireJS
         define([], function () {
-            return kla1620shm;
+            return kla1625shm;
         });
     } else {
         // included directly via <script> tag
-        root.kla1620shm = kla1620shm;
+        root.kla1625shm = kla1625shm;
     }
 }());
