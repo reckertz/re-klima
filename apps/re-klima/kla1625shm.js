@@ -1214,6 +1214,8 @@
                     });
                 },
 
+
+
                 function (ret, cb1625g7) {
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     $("#kla1625shmwrapper")
@@ -1225,21 +1227,73 @@
                                 }
                             })
                             .append($("<div/>", {
-                                id: divid,
+                                id: divid + "L",
                                 css: {
                                     "text-align": "left",
                                     float: "left",
-                                    width: "99%"
+                                    width: "49%"
+                                }
+                            }))
+                            .append($("<div/>", {
+                                id: divid + "R",
+                                css: {
+                                    "text-align": "left",
+                                    float: "left",
+                                    width: "49%"
                                 }
                             }))
                         );
-                    var hmoptions = {};
-                    kla1625shm.klihyde2("#" + divid, selstationid, starecord, function (ret) {
+                    // Linke heatmap
+                    var hmoptions = {
+                        minmax: true,
+                        minmaxhistogram: true,
+                        cbuckets: true,
+                        hyde: true
+                    };
+                    hoptionsL.minmaxhistogram = true;
+                    kla1625shm.klitemp2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                        ret.divid = divid;
                         cb1625g7(null, ret);
                         return;
                     });
-                }
+                },
 
+                function (ret, cb1625g8) {
+                    // Rechte heatmap
+                    var hmoptions = {
+                        minmax: true,
+                        minmaxhistogram: true,
+                        cbuckets: true,
+                        hyde: true,
+                        divid: ret.divid
+                    };
+                    hoptionsR.minmaxhistogram = true;
+                    var divid = ret.divid;
+                    kla1625shm.klitemp2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
+                        cb1625g8(null, ret);
+                        return;
+                    });
+                },
+
+
+
+                function (ret, cb1625g9) {
+                    var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                    $("#kla1625shmwrapper")
+                        .append($("<div/>", {
+                            id: divid,
+                            css: {
+                                width: "100%",
+                                float: "left",
+                                overflow: "hidden"
+                            }
+                        }));
+                    var hmoptions = {};
+                    kla1625shm.klihyde2("#" + divid, selstationid, starecord, function (ret) {
+                        cb1625g9(null, ret);
+                        return;
+                    });
+                }
             ],
             function (error, result) {
 
@@ -1673,6 +1727,225 @@
     };
 
     /**
+     * kla1625shm.klitemp2 Temperatur-Sparkline über Klima-Buckets
+     * @param {*} cid
+     * @param {*} selvariable
+     * @param {*} selsource
+     * @param {*} selstationid
+     * @param {*} starecord
+     * @param {*} hmatrix
+     * @param {*} hoptions
+     * @param {*} cb1625k
+     */
+    kla1625shm.klitemp2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb1625k) {
+        var ret = {};
+        var ciddiv = cid.substr(1) + "div";
+        var tableid = cid.substr(1) + "tbl";
+        $(cid)
+            .append($("<div/>", {
+                    id: ciddiv,
+                    css: {
+                        width: "49%",
+                        float: "left",
+                        overflow: "hidden"
+                    }
+                })
+                .append($("<table/>", {
+                        id: tableid,
+                        css: {
+                            width: "50%",
+                            float: "left"
+                        }
+                    })
+                    .append($("<thead/>")
+                        .append($("<tr/>")
+                            .append($("<th/>", {
+                                html: "Jahr"
+                            }))
+                            .append($("<th/>", {
+                                html: "min"
+                            }))
+                            .append($("<th/>", {
+                                html: "avg"
+                            }))
+                            .append($("<th/>", {
+                                html: "max"
+                            }))
+                        )
+                    )
+                    .append($("<tbody/>"))
+                )
+            );
+        // Loop über die Jahre
+        // hoptions.cbucketdata[year]
+
+        var miny = null;
+        var maxy = null;
+        var minvals = [];
+        var avgvals = [];
+        var maxvals = [];
+        for (var year in hoptions.cbucketdata) {
+            if (hoptions.cbucketdata.hasOwnProperty(year)) {
+                var yeardata = hoptions.cbucketdata[year];
+                yeardata.avgval = yeardata.valsum / yeardata.valcount;
+                $("#" + tableid)
+                    .find("tbody")
+                    .append($("<tr/>")
+                        .append($("<td/>", {
+                            html: year
+                        }))
+                        .append($("<td/>", {
+                            html: yeardata.minval.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: yeardata.avgval.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: yeardata.maxval.toFixed(1)
+                        }))
+                    );
+                minvals.push(yeardata.minval.toFixed(1));
+                avgvals.push(yeardata.avgval.toFixed(1));
+                maxvals.push(yeardata.maxval.toFixed(1));
+                if (miny === null) {
+                    miny = yeardata.minval;
+                } else if (miny < yeardata.minval) {
+                    miny = yeardata.minval
+                }
+                if (maxy === null) {
+                    maxy = yeardata.maxval;
+                } else if (maxy < yeardata.maxval) {
+                    maxy = yeardata.maxval;
+                }
+            }
+        }
+        // erst mal Sparkline, geht schneller
+        /*
+        var sparkid = "spark" + ciddiv.substr(1) + "1";
+        $(cid)
+            .append($("<div/>", {
+                    id: ciddiv + "R",
+                    css: {
+                        width: "49%",
+                        float: "right",
+                        overflow: "hidden"
+                    }
+                })
+                .append($("<span/>", {
+                    id: sparkid,
+                    css: {
+                        margin: "5px",
+                        float: "left"
+                    }
+                }))
+            );
+
+        $("#" + sparkid).sparkline(minvals, {
+            type: 'line',
+            height: 60,
+            fillColor: false,
+            defaultPixelsPerValue: 20,
+            chartRangeMin: miny,
+            chartRangeMax: maxy,
+            lineColor: "blue",
+            composite: false
+        });
+
+        $("#" + sparkid).sparkline(avgvals, {
+            type: 'line',
+            height: 60,
+            fillColor: false,
+            defaultPixelsPerValue: 20,
+            chartRangeMin: miny,
+            chartRangeMax: maxy,
+            lineColor: "blue",
+            composite: true
+        });
+
+        $("#" + sparkid).sparkline(maxvals, {
+            type: 'line',
+            height: 60,
+            fillColor: false,
+            defaultPixelsPerValue: 20,
+            chartRangeMin: miny,
+            chartRangeMax: maxy,
+            lineColor: "blue",
+            composite: true
+        });
+        */
+        var chartid = ciddiv + "chart";
+        $(cid)
+            .append($("<div/>", {
+                    id: ciddiv + "R1",
+                    css: {
+                        width: "49%",
+                        float: "right",
+                        overflow: "hidden",
+                        "background-color": "white"
+                    }
+                })
+                .append($("<canvas/>", {
+                    id: chartid,
+
+                }))
+            );
+
+        var ctx = document.getElementById(chartid).getContext('2d');
+        //Chart.defaults.global.plugins.colorschemes.override = true;
+        //Chart.defaults.global.legend.display = true;
+        // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+
+        var config = {
+            type: 'line',
+            data: {
+                labels: Object.keys(hoptions.cbucketdata),
+                datasets: [{
+                        label: "min",
+                        data: minvals,
+                        backgroundColor: "blue",
+					    borderColor: "blue",
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: "avg",
+                        data: avgvals,
+                        backgroundColor: "black", /* window.chartColors.black,*/
+					    borderColor: "black",  /* window.chartColors.black, */
+                        fill: false,
+                        borderWidth: 2
+                    },
+                    {
+                        label: "max",
+                        data: maxvals,
+                        backgroundColor: "red",
+					    borderColor: "red",
+                        fill: false,
+                        borderWidth: 2
+                    }
+                ],
+                backgroundColor: "yellow"
+            },
+            options: {
+                plugins: {
+                    colorschemes: {
+                        scheme: 'tableau.HueCircle19'
+                    }
+                }
+            }
+        };
+        window.chart1 = new Chart(ctx, config);
+
+
+
+
+        cb1625k(ret);
+        return;
+    };
+
+
+
+    /**
      * kla1625shm.klihyde2 - Ausgabe der HYDE-Daten
      * Tabelle mit Spalten und Unterteilungen nach Variablen
      * Prüfen: Line-Chart je Variablen, 3 Linien L1, L2, L3 - in %-Egalisierung auf jeweiliges Maximum
@@ -1728,20 +2001,21 @@
                 var tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
                 var gravec = []; // Vektor für Sparekline-Graphik
                 $(cid)
+                    .append($("<h2/>", {
+                        html: variablename
+                    }))
                     .append($("<div/>", {
                             id: ciddiv.substr(1),
                             css: {
-                                width: "100%",
+                                width: "49%",
                                 float: "left",
                                 overflow: "hidden"
                             }
                         })
-                        .append($("<h2/>", {
-                            html: variablename
-                        }))
                         .append($("<table/>", {
                                 id: tableid,
                                 css: {
+                                    width: "50%",
                                     float: "left"
                                 }
                             })
@@ -1807,33 +2081,35 @@
                         L3vals.push((yeardata.L1 + yeardata.L2 + yeardata.L3).toFixed(0));
                         if (miny === null) {
                             miny = yeardata.L1;
-                        } else if (miny < yeardata.L1)  {
+                        } else if (miny < yeardata.L1) {
                             miny = yeardata.L1
                         }
                         if (maxy === null) {
                             maxy = yeardata.L1 + yeardata.L2 + yeardata.L3;
-                        } else if (maxy < yeardata.L1 + yeardata.L2 + yeardata.L3)  {
+                        } else if (maxy < yeardata.L1 + yeardata.L2 + yeardata.L3) {
                             maxy = yeardata.L1 + yeardata.L2 + yeardata.L3;
                         }
                     }
                 }
-                $(ciddiv)
-                    .append($("<br/>", {
-                        css: {
-                            float: "left"
-                        }
-                    }));
                 // erst mal Sparkline, geht schneller
                 var sparkid = "spark" + ciddiv.substr(1) + "1";
-
+                // $(cid)
                 $(ciddiv)
-                .append($("<span/>", {
-                    id: sparkid,
-                    css: {
-                        margin: "5px",
-                        float: "right"
-                    }
-                }));
+                    .append($("<div/>", {
+                            css: {
+                                width: "49%",
+                                align: "right",
+                                overflow: "auto"
+                            }
+                        })
+                        .append($("<span/>", {
+                            id: sparkid,
+                            css: {
+                                margin: "5px",
+                                float: "left"
+                            }
+                        }))
+                    );
 
                 $("#" + sparkid).sparkline(L1vals, {
                     type: 'line',
@@ -1867,6 +2143,7 @@
                     lineColor: "blue",
                     composite: true
                 });
+
 
                 /**
                  * Hier Chart-Ausgabe - mit chartJS wird eine Gesamtgraphik ausgegeben
