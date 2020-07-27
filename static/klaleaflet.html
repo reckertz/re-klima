@@ -92,7 +92,6 @@
             var longitude = 6.958281;
             var fullname = "";
             var parmobj = {};
-            debugger;
             var queryString = window.location.search;
             console.log(queryString); // ?product=shirt&color=blue&newuser&size=m
             queryString = queryString.substr(1);
@@ -241,7 +240,6 @@
 
 
             // Berechnung der center-Zelle LatLon-Sicht
-            debugger;
             var y = lat2y(metafields, latitude);
             var x = lon2x(metafields, longitude);
 
@@ -306,6 +304,7 @@
                         /**
                          * Holen Hyde-Daten neuer API stationhyde
                         */
+                       var ret = {};
                        callback (null, ret);
                        return;
                     },

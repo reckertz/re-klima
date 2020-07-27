@@ -2713,18 +2713,6 @@
         return color;
     };
 
-        // color list from https://stackoverflow.com/q/1573053/731179  with added gray/gray
-
-        window.chartColors = {
-            red: 'rgb(255, 99, 132)',
-            orange: 'rgb(255, 159, 64)',
-            yellow: 'rgb(255, 205, 86)',
-            green: 'rgb(75, 192, 192)',
-            blue: 'rgb(54, 162, 235)',
-            purple: 'rgb(153, 102, 255)',
-            grey: 'rgb(201, 203, 207)'
-        };
-
 
     /**
      * deep copy für Objekte, Arrays etc.
@@ -2875,6 +2863,42 @@
         return width;
     };
 
+    /**
+     * getSqlCompareString -
+     * @param {*} sqlcompname - Name der Variablen in SQL
+     * @param {*} sqlcompinput - Eingabe des Bedieners mit Compare-Operator und Wert, auch von-bis
+     * @param {*} wherestring - string, der mit " AND " ergänzt wird, wenn er nicht leer ist
+     * Beispielaufruf:  where = uihelper.getSqlCompareString ("KLIDATA.anzyears", starecord.anzyears, where);
+     */
+    uihelper.getSqlCompareString = function (sqlcompname, sqlcompinput, wherestring) {
+        var compstring = "";
+        if (typeof sqlcompinput !== "undefined" && sqlcompinput.trim().length > 0) {
+            if (sqlcompinput.indexOf("-") > 0) {
+                var sqlcompparts = sqlcompinput.split("-");
+                if (sqlcompparts.length === 2) {
+                    compstring = sqlcompname + " >= " + sqlcompparts[0];
+                    compstring += " AND ";
+                    compstring += sqlcompname + " <= " + sqlcompparts[1];
+                } else {
+                    return "";
+                }
+            } else {
+                var anzparts = sqlcompinput.match(/(<=|>=|<|>|=)(\d*)/);
+                if (anzparts !== null && anzparts.length > 2) {
+                    compstring += sqlcompname + " " + anzparts[1] + " " + parseInt(anzparts[2]);
+                } else {
+                    compstring += sqlcompname + " >= " + sqlcompinput;
+                }
+            }
+        } else {
+            return "";
+        }
+        if (compstring.length > 0 && (wherestring || "").length > 0) {
+            return wherestring + " AND " + compstring;
+        } else {
+            return compstring;
+        }
+    };
 
 
     /**

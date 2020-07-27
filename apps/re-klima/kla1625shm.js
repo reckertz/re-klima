@@ -1819,60 +1819,7 @@
                 }
             }
         }
-        // erst mal Sparkline, geht schneller
-        /*
-        var sparkid = "spark" + ciddiv.substr(1) + "1";
-        $(cid)
-            .append($("<div/>", {
-                    id: ciddiv + "R",
-                    css: {
-                        width: "49%",
-                        float: "right",
-                        overflow: "hidden"
-                    }
-                })
-                .append($("<span/>", {
-                    id: sparkid,
-                    css: {
-                        margin: "5px",
-                        float: "left"
-                    }
-                }))
-            );
 
-        $("#" + sparkid).sparkline(minvals, {
-            type: 'line',
-            height: 60,
-            fillColor: false,
-            defaultPixelsPerValue: 20,
-            chartRangeMin: miny,
-            chartRangeMax: maxy,
-            lineColor: "blue",
-            composite: false
-        });
-
-        $("#" + sparkid).sparkline(avgvals, {
-            type: 'line',
-            height: 60,
-            fillColor: false,
-            defaultPixelsPerValue: 20,
-            chartRangeMin: miny,
-            chartRangeMax: maxy,
-            lineColor: "blue",
-            composite: true
-        });
-
-        $("#" + sparkid).sparkline(maxvals, {
-            type: 'line',
-            height: 60,
-            fillColor: false,
-            defaultPixelsPerValue: 20,
-            chartRangeMin: miny,
-            chartRangeMax: maxy,
-            lineColor: "blue",
-            composite: true
-        });
-        */
         var chartid = ciddiv + "chart";
         $(cid)
             .append($("<div/>", {

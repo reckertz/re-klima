@@ -303,7 +303,7 @@
                             html: "HTML-Tabelle download",
                             click: function (evt) {
                                 evt.preventDefault();
-                                uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt");
+                                uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt", true);
                                 return;
                             }
                         }))
@@ -963,6 +963,7 @@
                 sqlStmt += " KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
                 sqlStmt += " KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
                 sqlStmt += " KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
+                sqlStmt += " KLISTATIONS.continentname,";
                 sqlStmt += " KLISTATIONS.temperature,";
                 sqlStmt += " KLISTATIONS.lats, KLISTATIONS.longitude, KLISTATIONS.latitude, KLISTATIONS.height, ";
                 sqlStmt += " KLIDATA.variable, ";
@@ -1015,9 +1016,12 @@
                         where += " lower(KLISTATIONS.region) LIKE '%" + starecord.region.toLowerCase() + "%'";
                         where += " OR lower(KLISTATIONS.subregion) LIKE '%" + starecord.region.toLowerCase() + "%'";
                         where += " OR lower(KLISTATIONS.countryname) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                        where += " OR lower(KLISTATIONS.continentname) LIKE '%" + starecord.region.toLowerCase() + "%'";
                         where += ")";
                     }
                 }
+
+                /*
                 if (typeof starecord.anzyears !== "undefined" && starecord.anzyears.trim().length > 0) {
                     if (where.length > 0) where += " AND ";
                     var anzparts = starecord.anzyears.match(/(<=|>=|<|>|=)(\d*)/);
@@ -1027,6 +1031,11 @@
                         where += " KLIDATA.anzyears >= " + starecord.anzyears.trim();
                     }
                 }
+                */
+                // geht nur für numerische Vorgaben
+                where = uihelper.getSqlCompareString ("KLIDATA.anzyears", starecord.anzyears, where);
+                debugger;
+
                 if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
                     if (where.length > 0) where += " AND ";
                     var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)(\d*)/);
@@ -1084,6 +1093,7 @@
                 sqlStmt += "KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
                 sqlStmt += "KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
                 sqlStmt += "KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
+                sqlStmt += " KLISTATIONS.continentname,";
                 sqlStmt += " KLISTATIONS.temperature,";
                 sqlStmt += "KLISTATIONS.lats, KLISTATIONS.longitude, KLISTATIONS.latitude, KLISTATIONS.height, ";
                 sqlStmt += "KLIDATA.variable, ";
@@ -1240,6 +1250,10 @@
                             reprecord.region += record.region;
                             reprecord.region += "<br>";
                             reprecord.region += record.countryname;
+                            var continentname = record.continentname;
+                            if (reprecord.region.indexOf(continentname) < 0) {
+                                reprecord.region += " " + continentname;
+                            }
 
                             reprecord.anzyears = record.anzyears;
                             reprecord.anzyears += "<br>";

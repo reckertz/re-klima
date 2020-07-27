@@ -2770,10 +2770,6 @@
         }
         selvars = selvars.replace(/_/g, "");
 
-
-
-
-
         if (fullname.length === 0) {
             // "G:\\Projekte\klimadaten\"HYDE_lu_pop_proxy"\baseline\asc\2008AD_pop\rurc_2008AD.asc"
             fullname = path.join("G:", "Projekte");
