@@ -1745,7 +1745,7 @@
             .append($("<div/>", {
                     id: ciddiv,
                     css: {
-                        width: "49%",
+                        width: "40%",
                         float: "left",
                         overflow: "hidden"
                     }
@@ -1753,8 +1753,9 @@
                 .append($("<table/>", {
                         id: tableid,
                         css: {
-                            width: "50%",
-                            float: "left"
+                            width: "100%",
+                            float: "left",
+                            margin: "15px"
                         }
                     })
                     .append($("<thead/>")
@@ -1825,7 +1826,7 @@
             .append($("<div/>", {
                     id: ciddiv + "R1",
                     css: {
-                        width: "49%",
+                        width: "55%",
                         float: "right",
                         overflow: "hidden",
                         "background-color": "white"
@@ -1833,7 +1834,9 @@
                 })
                 .append($("<canvas/>", {
                     id: chartid,
-
+                    css: {
+                        "text-align": "center"
+                    }
                 }))
             );
 
@@ -1850,15 +1853,17 @@
                         label: "min",
                         data: minvals,
                         backgroundColor: "blue",
-					    borderColor: "blue",
+                        borderColor: "blue",
                         fill: false,
                         borderWidth: 2
                     },
                     {
                         label: "avg",
                         data: avgvals,
-                        backgroundColor: "black", /* window.chartColors.black,*/
-					    borderColor: "black",  /* window.chartColors.black, */
+                        backgroundColor: "black",
+                        /* window.chartColors.black,*/
+                        borderColor: "black",
+                        /* window.chartColors.black, */
                         fill: false,
                         borderWidth: 2
                     },
@@ -1866,7 +1871,7 @@
                         label: "max",
                         data: maxvals,
                         backgroundColor: "red",
-					    borderColor: "red",
+                        borderColor: "red",
                         fill: false,
                         borderWidth: 2
                     }
@@ -1882,10 +1887,6 @@
             }
         };
         window.chart1 = new Chart(ctx, config);
-
-
-
-
         cb1625k(ret);
         return;
     };
@@ -1941,51 +1942,67 @@
             }
         }
 
-
+        var hcount = 0;
         for (var variablename in hyderep) {
             if (hyderep.hasOwnProperty(variablename)) {
+                hcount++;
                 var ciddiv = cid + variablename;
                 var tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
-                var gravec = []; // Vektor für Sparekline-Graphik
+                var gravec = []; // Vektor für Sparkline-Graphik
+                var floatdirection = "right";
+                if (hcount % 2 === 1) {
+                    floatdirection = "left";
+                }
                 $(cid)
-                    .append($("<h2/>", {
-                        html: variablename
-                    }))
                     .append($("<div/>", {
-                            id: ciddiv.substr(1),
                             css: {
                                 width: "49%",
-                                float: "left",
+                                float: floatdirection,
                                 overflow: "hidden"
                             }
                         })
-                        .append($("<table/>", {
-                                id: tableid,
+                        .append($("<h2/>", {
+                            html: variablename + " " + cfeCodes.getTitleKey ("hydevariable", variablename),
+                            css: {
+                                width: "100%"
+                            }
+                        }))
+                        .append($("<div/>", {
+                                id: ciddiv.substr(1),
                                 css: {
-                                    width: "50%",
-                                    float: "left"
+                                    width: "40%",
+                                    float: "left",
+                                    overflow: "hidden"
                                 }
                             })
-                            .append($("<thead/>")
-                                .append($("<tr/>")
-                                    .append($("<th/>", {
-                                        html: "Variable"
-                                    }))
-                                    .append($("<th/>", {
-                                        html: "Jahr"
-                                    }))
-                                    .append($("<th/>", {
-                                        html: "L1"
-                                    }))
-                                    .append($("<th/>", {
-                                        html: "L2"
-                                    }))
-                                    .append($("<th/>", {
-                                        html: "L3"
-                                    }))
+                            .append($("<table/>", {
+                                    id: tableid,
+                                    css: {
+                                        width: "100%",
+                                        float: "left"
+                                    }
+                                })
+                                .append($("<thead/>")
+                                    .append($("<tr/>")
+                                        .append($("<th/>", {
+                                            html: "Variable"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "Jahr"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "L1"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "L2"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "L3"
+                                        }))
+                                    )
                                 )
+                                .append($("<tbody/>"))
                             )
-                            .append($("<tbody/>"))
                         )
                     );
                 // Loop über die Jahre
@@ -2038,144 +2055,69 @@
                         }
                     }
                 }
-                // erst mal Sparkline, geht schneller
-                var sparkid = "spark" + ciddiv.substr(1) + "1";
+                var chartid = ciddiv + "chart";
                 // $(cid)
                 $(ciddiv)
+                    .parent()
                     .append($("<div/>", {
                             css: {
                                 width: "49%",
                                 align: "right",
-                                overflow: "auto"
-                            }
-                        })
-                        .append($("<span/>", {
-                            id: sparkid,
-                            css: {
-                                margin: "5px",
-                                float: "left"
-                            }
-                        }))
-                    );
-
-                $("#" + sparkid).sparkline(L1vals, {
-                    type: 'line',
-                    height: 60,
-                    fillColor: false,
-                    defaultPixelsPerValue: 20,
-                    chartRangeMin: miny,
-                    chartRangeMax: maxy,
-                    lineColor: "blue",
-                    composite: false
-                });
-
-                $("#" + sparkid).sparkline(L2vals, {
-                    type: 'line',
-                    height: 60,
-                    fillColor: false,
-                    defaultPixelsPerValue: 20,
-                    chartRangeMin: miny,
-                    chartRangeMax: maxy,
-                    lineColor: "blue",
-                    composite: true
-                });
-
-                $("#" + sparkid).sparkline(L3vals, {
-                    type: 'line',
-                    height: 60,
-                    fillColor: false,
-                    defaultPixelsPerValue: 20,
-                    chartRangeMin: miny,
-                    chartRangeMax: maxy,
-                    lineColor: "blue",
-                    composite: true
-                });
-
-
-                /**
-                 * Hier Chart-Ausgabe - mit chartJS wird eine Gesamtgraphik ausgegeben
-                 */
-                // hmatrixL, hoptionsL,
-                // hmatrixR, hoptionsR,
-
-
-
-                //kla1625shm.paintChart = function (bucketlength, selvariablename, selsource, selstationid) {
-                /*
-                var matrix = matrix1;
-                var years = matrix1.rowheaders;
-                var tarray = [];
-                for (var iyear = 0; iyear < matrix1.rowheaders.length; iyear++) {
-                    tarray.push({
-                        year: matrix1.rowheaders[iyear],
-                        days: matrix.data[iyear]
-                    });
-                }
-                tarray.sort(function (a, b) {
-                    if (a.year < b.year)
-                        return -1;
-                    if (a.year > b.year)
-                        return 1;
-                    return 0;
-                });
-                var anzyears = tarray.length;
-
-                $("#kla1625shmwrapper").empty();
-                var h = $("#heatmap").height();
-                var w = $("#kla1625shm.content").width();
-                w -= $("#heatmap").position().left;
-                w -= $("#heatmap").width();
-                w -= 40;
-                $("#kla1625shmwrapper")
-                    .append($("<div/>", {
-                            css: {
-                                height: h,
-                                width: w,
+                                overflow: "auto",
                                 "background-color": "white"
                             }
                         })
+                        // hier Canvas für Chartjs
                         .append($("<canvas/>", {
-                            id: "myChart",
+                            id: chartid,
                             css: {
-                                height: h,
-                                width: w
+                                "text-align": "center"
                             }
                         }))
                     );
-                var datasets = [];
-                var labels = [];
-                var lab;
-                for (var iday = 0; iday < 365; iday++) {
-                    var rowvalues = [];
-                    for (var iarray = 0; iarray < tarray.length; iarray++) {
-                        if (iday === 0) {
-                            lab = "";
-                            if (iarray % bucketlength === 0 || iarray === 0) {
-                                lab = tarray[iarray].year;
-                            }
-                            labels.push(lab);
-                        }
-                        rowvalues.push(parseFloat(tarray[iarray].days[iday]));
-                    }
-                    datasets.push({
-                        label: "D" + ("000" + (iday + 1)).slice(-3),
-                        backgroundColor: '#00FFFF',
-                        borderColor: '#00FFFF',
-                        borderWidth: 1,
-                        pointRadius: 1,
-                        data: rowvalues,
-                        fill: false,
-                    });
-                }
-                var ctx = document.getElementById('myChart').getContext('2d');
-                Chart.defaults.global.plugins.colorschemes.override = true;
-                Chart.defaults.global.legend.display = true;
+
+                var ctx = document.getElementById(chartid).getContext('2d');
+                //Chart.defaults.global.plugins.colorschemes.override = true;
+                //Chart.defaults.global.legend.display = true;
                 // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
                 var config = {
                     type: 'line',
                     data: {
-                        labels: labels,
-                        datasets: datasets
+                        labels: gravec.map(function (a) {
+                            return a.year;
+                        }),
+                        datasets: [{
+                                label: "L1",
+                                data: gravec.map(function (a) {
+                                    return a.L1;
+                                }),
+                                backgroundColor: "blue",
+                                borderColor: "blue",
+                                fill: false,
+                                borderWidth: 2
+                            },
+                            {
+                                label: "L2",
+                                data: gravec.map(function (a) {
+                                    return a.L2;
+                                }),
+                                backgroundColor: "black",
+                                borderColor: "black",
+                                fill: false,
+                                borderWidth: 2
+                            },
+                            {
+                                label: "L3",
+                                data: gravec.map(function (a) {
+                                    return a.L3;
+                                }),
+                                backgroundColor: "red",
+                                borderColor: "red",
+                                fill: false,
+                                borderWidth: 2
+                            }
+                        ],
+                        backgroundColor: "yellow"
                     },
                     options: {
                         plugins: {
@@ -2186,7 +2128,12 @@
                     }
                 };
                 window.chart1 = new Chart(ctx, config);
-                */
+                /**
+                 * Hier Chart-Ausgabe - mit chartJS wird eine Gesamtgraphik ausgegeben
+                 */
+                // hmatrixL, hoptionsL,
+                // hmatrixR, hoptionsR,
+
             }
         }
 

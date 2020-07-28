@@ -912,7 +912,6 @@
             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
             var tabname = variablename + " " + stationname;
-
             var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
         } else if (source === "ECAD") {
