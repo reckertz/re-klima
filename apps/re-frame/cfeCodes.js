@@ -3,7 +3,7 @@
 /*global $:false, intel:false, cordova:false, device:false */
 /*global IDBKeyRange,IDBCursor,pdfMake,tageliste,uihelper,ecsystem,console,devide,window,module,define,root,global,self */
 /*global async,CKEDITOR,uisystem, */
-
+"use strict";
 (function () {
     var cfeCodes = {};
 
@@ -39,9 +39,15 @@
             popc_: "population count per cell",
             popd_: "population density per km2 in cell",
             rurc_: "rural population count per cell",
-            urb_: "urban population count per cell",
-            uopp_: "total built-up area in km2 per cell"
+            urbc_: "urban population count per cell",
+            uopp_: "total built-up area in km2 per cell",
 
+            cropland: "total cropland area, km2 per cell (Ackerland)",
+            grazing: "total land grazing, km2 per cell (Weideland)",
+            pasture: "total pasture, km2 per cell, aridity >.5 (Trockenzonen)",
+            rangeland: "total rangeland, km2 per cell, aridity < .5 (Naturweide)",
+            conv_rangeland: "total converted rangeland, km2 per cell (ehem. Wald)",
+            tot_irri: "total irrigated area, km2 per cell (Bewässertes Land)"
         },
     };
 
@@ -95,49 +101,6 @@
         } else {
             return null;
         }
-    };
-
-    /**
-     * getSalesTaxRate
-     * @param {*} leistungsdatum (ISO-Datum ohne Trennzeichen)
-     * @param {*} articlecode
-     * @param {*} transactioncode - S wie Service und V wie Verkauf
-     * return Steuersatz (Mehrwertsteuersatz)
-     */
-    cfeCodes.getSalesTaxRate = function (leistungsdatum, vktyp, vktrans) {
-        if (salestaxarray.length === 0) {
-            // Aufbau salestaxarray aus salestaxstrings - reverse order!!!!
-            for (istr = 0; istr < salestaxstrings.length; istr++) {
-                //from;vktyp;vktrans;mwstproz
-                var sts = salestaxstrings[istr].split(";");
-                if (sts.length === 4) {
-                    salestaxarray.unshift({
-                        from: sts[0],
-                        vktaxcode: sts[1],
-                        vktrans: sts[2],
-                        mwstproz: sts[3]
-                    });
-                }
-            }
-        }
-        /*
-        var salestaxrate = [{
-            from: 20000101,
-            Voll: 19.0,
-            Reduziert: 7.0,
-            Keine: 0
-        */
-        if (leistungsdatum.indexOf("-") > 0) {
-            leistungsdatum = leistungsdatum.replace(/-/g, "");
-        }
-        for (itr = 0; itr < salestaxarray.length; itr++) {
-            if (leistungsdatum >= salestaxarray[itr].from) {
-                if (vktyp === salestaxarray[itr].vktaxcode && vktrans === salestaxarray[itr].vktrans) {
-                    return salestaxarray[itr].mwstproz;
-                }
-            }
-        }
-        return null;
     };
 
     /**

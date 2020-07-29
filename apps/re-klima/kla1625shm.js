@@ -1463,6 +1463,7 @@
                                 irow++;
                             }
                         }
+                        
                         // hier ist das Layout nochmal zu kontrollieren
                         hmoptions.histo = histo1;
                         var erg = kla9020fun.getHeatmap(cid, matrix1, hmoptions, function (ret) {

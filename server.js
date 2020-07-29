@@ -24,6 +24,8 @@ var StreamZip = require("node-stream-zip");
 
 var csv = require("fast-csv");
 
+var csvformat = require('@fast-csv/format');
+
 var regression = require("./static/lib/regression.js");
 var uihelper = require("re-frame/uihelper.js");
 
@@ -1010,7 +1012,7 @@ app.get('/stationhyde', function (req, res) {
                     } else {
                         ret.message = ret1.message;
                         ret.error = true;
-                        cbsh1(null , res, ret);
+                        cbsh1(null, res, ret);
                         return;
                     }
 
@@ -1619,26 +1621,18 @@ app.post('/sql2csv', function (req, res) {
     reqparm.sel = sqlstmt;
     reqparm.limit = limit || 1000;
     reqparm.offset = 0;
-    sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret1) {
-        // getbackasfile
-        var fpath = "/temp/" + filename;
-        var fullpath = __dirname + "/static" + fpath;
-        var ws = fs.createWriteStream(fullpath);
-        for (var irec = 0; irec < ret1.records.length; irec++) {
-            csv.
-            write([
-                    ret1.records[irec]
-                ], {
-                    headers: true
-                })
-                .pipe(ws);
-        }
-        // res.download(fullpath, filename);
+
+    var fpath = "/temp/" + filename;
+    var fullpath = __dirname + "/static" + fpath;
+    var ws = fs.createWriteStream(fullpath);
+
+    var csvStream = csvformat.format({ headers: true });
+    /*
+    csvStream.pipe(ws).on('end', function() {
         var ret = {
             error: false,
             message: "Datei zwischengespeichert",
             path: fpath,
-
         };
         var smsg1 = JSON.stringify(ret);
         res.writeHead(200, {
@@ -1646,6 +1640,42 @@ app.post('/sql2csv', function (req, res) {
         });
         res.end(smsg1);
         return;
+    });
+    */
+    sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret1) {
+        // getbackasfile
+        csvStream.pipe(ws);
+        for (var irec = 0; irec < ret1.records.length; irec++) {
+            /*
+            var vals = gravec.map(function (a) {
+                return a.year;
+            }),
+            */
+            var csvrecord = ret1.records[irec];
+            csvStream.write(csvrecord);
+
+            /*
+            csv.
+            write([csvrecord], {
+                    headers: false
+                })
+                .pipe(ws);
+            */
+
+        }
+        csvStream.end();
+        var ret = {
+            error: false,
+            message: "Datei zwischengespeichert",
+            path: fpath,
+        };
+        var smsg1 = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text'
+        });
+        res.end(smsg1);
+        return;
+        // res.download(fullpath, filename);
 
     });
 
