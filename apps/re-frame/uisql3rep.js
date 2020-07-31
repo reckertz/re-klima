@@ -318,6 +318,101 @@
                         }));
 
 
+                    $("#uisql3repbutts")
+                        .append($("<button/>", {
+                            html: "Doppel-Elimination",
+                            css: {
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                /**
+                                 * Prüfung des SQL-Statements
+                                 */
+                                var sqlstmt = "";
+                                sqlstmt = $("#uisql3repselstmt").val();
+
+                                if (sqlstmt.indexOf("COUNT(") < 0) {
+                                    sysbase.putMessage("COUNT fehlt", 3);
+                                    return;
+                                }
+                                if (sqlstmt.indexOf("as anzahl") < 0) {
+                                    sysbase.putMessage("as anzahl fehlt", 3);
+                                    return;
+                                }
+                                if (sqlstmt.indexOf("GROUP BY") < 0) {
+                                    sysbase.putMessage("GROUP BY fehlt", 3);
+                                    return;
+                                }
+                                if (sqlstmt.indexOf("HAVING") < 0) {
+                                    sysbase.putMessage("HAVING fehlt", 3);
+                                    return;
+                                }
+                                if (sqlstmt.indexOf("ORDER BY") < 0) {
+                                    sysbase.putMessage("ORDER BY fehlt", 3);
+                                    return;
+                                }
+                                // Tabellenname extrahieren
+
+
+
+                                var regex = /from\s+(\w+)/i;
+                                var matches = sqlstmt.match(regex);
+                                var qmsg = "";
+                                debugger;
+                                if (null != matches && matches.length >= 2) {
+                                    qmsg = "Soll für Tabelle:" + matches[1] + " die Elimination doppelter Sätze durchgeführt werden?";
+                                } else {
+                                    sysbase.putMessage("Tabelle nicht erkennbar nach FROM", 3);
+                                    return;
+                                }
+
+                                var check = window.confirm(qmsg);
+                                if (check !== true) {
+                                    sysbase.putMessage("Abgebrochen", 3);
+                                    return;
+                                }
+                                uisql3rep.parms.tablename = "KLISQL";
+                                uisql3rep.parms.sel = sqlstmt;
+                                uisql3rep.parms.skip = 0;
+                                uisql3rep.parms.limit = 1000;
+                                var filename = "sql.csv";
+                                var jqxhr = $.ajax({
+                                    method: "POST",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("sql2eliminate"),
+                                    data: {
+                                        sqlstmt: sqlstmt,
+                                        limit: 1000,
+                                        filename: filename
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    sysbase.checkSessionLogin(r1);
+                                    var j1 = JSON.parse(r1);
+                                    if (j1.error === false) {
+                                        var download_path = j1.path;
+                                        // Could also use the link-click method.
+                                        // window.location = download_path;
+                                        debugger;
+                                        window.open(download_path, '_blank');
+                                        sysbase.putMessage(filename + " download erfolgt", 1);
+                                    } else {
+                                        sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
+                                    }
+                                    return;
+
+
+                                }).fail(function (err) {
+                                    sysbase.putMessage("getAllTables AJAX ERROR:" + err.message);
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
+
+                            }
+                        }));
+
+
 
                     $("#uisql3repbuttu")
                         .append($("<button/>", {
