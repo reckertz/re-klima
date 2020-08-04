@@ -90,7 +90,7 @@
      * @param {*} res - response zum Server, wird übernommen, um die Antwort im callback zurückgeben zu können
      * @param {*} callback - callback funktion
      */
-    sys0000sys.getallsqlrecords = function (db, async, req, reqparm, res, callback) {
+    sys0000sys.getallsqlrecords = function (db, async, req, reqparm, res, callbackgsr) {
         /**
          * Prüfen, welche Parameter vorliegen, dann zugreifen
          * username und firma sind auch verfügbar
@@ -209,7 +209,7 @@
                     // Dickes Problem!!!
                     ret.error = true;
                     ret.message = "WHERE zu komplex:" + JSON.stringify(sel);
-                    callback(res, ret);
+                    callbackgsr(res, ret);
                     return;
                 }
             }
@@ -277,14 +277,13 @@
                 ret.message = "getallsqlrecords-1:" + "Keine Datenbank übergeben";
                 ret.record = null;
                 ret.records = null;
-                callback(res, ret);
+                callbackgsr(res, ret);
                 return;
             }
             /**
              * Aufbau des Response-Array
              */
             var record = {};
-            console.log("***SKIP***" + skip + " " + typeof skip);
             var sqlStmt = sel;
             var rows;
             db.serialize(function () {
@@ -294,20 +293,20 @@
                         ret.error = true;
                         ret.message = "getallsqlrecords-2:" + err;
                         console.log(ret.message);
-                        callback(res, ret);
+                        callbackgsr(res, ret);
                         return;
                     } else if (rows.length === 0) {
                         ret.error = false;
                         ret.message = "getallsqlrecords-2:Keine Sätze zu " + sqlStmt;
                         console.log(ret.message);
-                        callback(res, ret);
+                        callbackgsr(res, ret);
                         return;
                     } else {
                         ret.error = false;
                         ret.message = "getallsqlrecords-5:" + " gefunden:" + rows.length;
                         ret.records = rows;
                         console.log(ret.message);
-                        callback(res, ret);
+                        callbackgsr(res, ret);
                         return;
                     }
                 });
@@ -317,7 +316,7 @@
             ret.message = "getallsqlrecords-6:" + err.message;
             ret.records = null;
             console.log("getallsqlrecords-7:" + ret.message);
-            callback(res, ret);
+            callbackgsr(res, ret);
             return;
         }
     };
@@ -3232,6 +3231,252 @@
                     return;
                 });
         });
+    };
+
+
+
+    /**
+     * sql2eliminate - Doppelte Sätze beseitigen
+     * der unique index wird später aufgebaut
+     */
+    var icount = 0;
+    var gblcount = 0;
+    sys0000sys.sql2eliminate = function (gblInfo, sqlite3, db, async, uihelper, req, res, cbeli000) {
+        var db2 = new sqlite3.Database(db.filename);
+        var sqlstmt = "";
+        if (req.body && typeof req.body.sqlstmt !== "undefined" && req.body.sqlstmt.length > 0) {
+            sqlstmt = req.body.sqlstmt;
+        }
+        var regex = /from\s+(\w+)/i;
+        var matches = sqlstmt.match(regex);
+        var qmsg = "";
+        var tablename = "";
+        if (null !== matches && matches.length >= 2) {
+            tablename = matches[1];
+        } else {
+            // Fehlerfall und raus
+        }
+        var limit = 100;
+        if (req.body && typeof req.body.limit !== "undefined" && req.body.limit.length > 0) {
+            limit = req.body.limit;
+            if (parseInt(limit) === 0) {
+                limit = 100;
+            }
+        }
+        var skip = 0;
+        if (req.body && typeof req.body.skip !== "undefined" && req.body.skip.length > 0) {
+            skip = req.body.skip;
+        }
+        var filename = "sql.csv";
+        if (req.body && typeof req.body.filename !== "undefined" && req.body.filename.length > 0) {
+            filename = req.body.filename;
+        }
+
+
+        var fpath = "/temp/" + filename;
+        var fullpath = __dirname + "/static" + fpath;
+
+        var itotal = 0;
+
+
+        var iread = 0;
+        var ccount = 0;
+        try {
+            /**
+             * chunk lesen, skip icontrol, limit 100
+             * wenn rows.length < 100, dann gibt es ein Dateiende
+             */
+            var cskip = 0; // da die Sätze verschwinden immer wieder vorne anfangen!!!
+            var climit = 1;
+            db.serialize(function () {
+                async.waterfall([
+                        function (cbeli100) {
+                            /**
+                             * Einen Gruppensatz lesen als Template
+                             */
+                            db.run("BEGIN TRANSACTION;");
+                            var sqlstmt1 = sqlstmt.replace(/[\r\n\t]/g, " ");
+                            if (sqlstmt1.toUpperCase().indexOf("ORDER BY") > 0) {
+                                // sel += " LIMIT " + limit;
+                                //sel += "," + skip;
+                                sqlstmt1 += " LIMIT " + cskip;
+                                sqlstmt1 += "," + climit;
+                            }
+                            gblcount += climit;
+                            db.all(sqlstmt1, function (err, rows) {
+                                var ret = {};
+                                if (err) {
+                                    ret.error = true;
+                                    ret.message = "getallsqlrecords-2:" + err;
+                                    cbeli100("Error", res, ret);
+                                    return;
+                                } else if (rows.length === 0) {
+                                    ret.error = true;
+                                    ret.message = "getallsqlrecords-3: Keine Daten";
+                                    cbeli100("Error", res, ret);
+                                    return;
+                                } else {
+                                    ret.error = false;
+                                    ret.message = "getallsqlrecords-2:" + " Chunk gefunden:" + rows.length;
+                                    ret.records = rows;
+                                    ret.tablename = tablename;
+                                    cbeli100(null, res, ret);
+                                    return;
+                                }
+                            });
+                        },
+                        function (res, ret, cbeli101) {
+                            /**
+                             * Sätze einzeln lesen, klassische Gruppenwechsel
+                             */
+                            var where = "";
+                            var orderby = "";
+                            var selfields = {};
+                            var reqparm = {};
+                            var sel = "SELECT ROWID as rid, * FROM " + ret.tablename;
+                            var elimrecord = ret.records[0];
+                            var vglfields = [];
+                            for (var feld in elimrecord) {
+                                if (elimrecord.hasOwnProperty(feld)) {
+                                    if (feld === "anzahl") {
+                                        continue;
+                                    }
+                                    if (feld === "rid") {
+                                        continue;
+                                    }
+                                    vglfields.push(feld);
+                                    if (where.length > 0) {
+                                        where += " AND ";
+                                    }
+                                    where += " " + feld;
+                                    where += " = ";
+                                    var wert = elimrecord[feld];
+                                    if (typeof wert === "string") {
+                                        where += "'" + wert + "'";
+                                    } else {
+                                        where += wert;
+                                    }
+                                    selfields[feld] = wert;
+                                    if (orderby.length > 0) {
+                                        orderby += ", ";
+                                    }
+                                    orderby += feld;
+                                }
+                            }
+                            // sel += " WHERE " + where;
+
+                            var limit = 100;
+                            var offset = 0;
+                            var actcount = 0;
+                            var grucount = 0;
+                            var idel = 0;
+                            var newvgls = {};
+                            var oldvgls = {};
+                            var oldkeys = "";
+                            var newkeys = "";
+                            var gruwe = false;
+                            // Database#each(sql, [param, ...], [callback], [completecallback])
+                            // completecallback liefert error und #rows
+                            // "There is currently no way to abort execution." USC00327655
+
+                            sel += " ORDER BY " + orderby;
+                            console.log(JSON.stringify(vglfields));
+                            console.log(sel);
+                            db2.each(sel, function (err, elirow) {
+                                    var eliret = {};
+                                    if (err) {
+                                        eliret.error = true;
+                                        eliret.message = "getallsqlrecords-2:" + err;
+                                        console.log(eliret.message);
+                                        cbeli101("Error", res, eliret);
+                                        return;
+                                    } else if (elirow.length === 0) {
+                                        eliret.error = true;
+                                        eliret.message = "getallsqlrecords-3: Keine Daten";
+                                        console.log(eliret.message);
+                                        cbeli101("Error", res, eliret);
+                                        return;
+                                    } else {
+                                        /**
+                                         * Gruppenwechsel und Löschen
+                                         */
+                                        actcount++;
+                                        for (var ifeld = 0; ifeld < vglfields.length; ifeld++) {
+                                            newvgls[vglfields[ifeld]] = elirow[vglfields[ifeld]];
+                                        }
+                                        newkeys = JSON.stringify(newvgls);
+                                        if (actcount === 1) {
+                                            oldkeys = newkeys;
+                                            console.log(elirow);
+                                        } else if (oldkeys !== newkeys) {
+                                            grucount = 1;
+                                            oldkeys = newkeys;
+                                        } else {
+                                            grucount++;
+                                            console.log(actcount + " " + grucount + " " + elirow.rid);
+                                            if (grucount > 1) {
+                                                where = "";
+                                                for (var ivgl = 0; ivgl < vglfields.length; ivgl++) {
+                                                    var feld = vglfields[ivgl];
+                                                    if (where.length > 0) {
+                                                        where += " AND ";
+                                                    }
+                                                    where += " " + feld;
+                                                    where += " = ";
+                                                    var wert = elirow[feld];
+                                                    if (typeof wert === "string") {
+                                                        where += "'" + wert + "'";
+                                                    } else {
+                                                        where += wert;
+                                                    }
+                                                }
+                                                var delsql = "DELETE FROM " + tablename;
+                                                delsql += " WHERE ROWID = " + elirow.rid;
+                                                idel++;
+                                                if (idel < 100 || idel % 1000 === 0) {
+                                                    console.log("delete:" + delsql);
+                                                }
+                                                db.run(delsql, function (err) {
+                                                    // eigentlich nix
+                                                    if (idel < 100 || idel % 1000 === 0) {
+                                                        console.log("delete:" + delsql);
+                                                    }
+                                                    return;
+                                                });
+                                            }
+                                        }
+                                    }
+                                },
+                                function (error, rowcount) {
+                                    /**
+                                     * Abschluss, Tabellenende/Query-Ende
+                                     */
+                                    cbeli101("Finish", res, {
+                                        error: false,
+                                        message: "rowcount:" + rowcount + " " + error
+                                    });
+                                    return;
+                                });
+                        }
+                    ],
+                    function (error, res, ret) {
+                        var ret = {
+                            error: false,
+                            message: "ENDE"
+                        };
+                        cbeli000(res, ret);
+                        return;
+                    });
+            });
+
+        } catch (err) {
+            var ret = {
+                error: true,
+                message: err
+            };
+            cbeli000(res, ret);
+            return;
+        }
     };
 
 

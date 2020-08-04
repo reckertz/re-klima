@@ -30,21 +30,41 @@ var regression = require("./static/lib/regression.js");
 var uihelper = require("re-frame/uihelper.js");
 
 // DB expressions
-var sqlite3 = require('sqlite3').verbose();
-// var db = new sqlite3.Database('klidata.db3');
-var db = new sqlite3.cached.Database('klidata.db3'); // Optimierungsversuch
+var sqlite3 = require('sqlite3');
+var db = new sqlite3.Database('klidata.db3');
+//var db = new sqlite3.cached.Database('klidata.db3'); // Optimierungsversuch
 db.run("PRAGMA synchronous = OFF", function (err) {
     console.log("synchronous = OFF:" + err);
 });
-db.run("PRAGMA journal_mode = MEMORY", function (err) {
-    console.log("journal_mode = MEMORY:" + err);
+
+db.run("PRAGMA journal_mode = TRUNCATE", function (err) {
+    console.log("journal_mode = TRUNCATE:" + err);
 });
+// PRAGMA temp_store = 0 | DEFAULT | 1 | FILE | 2 | MEMORY;
+db.run("PRAGMA temp_store = 2", function (err) {
+    console.log("temp_store = 2:" + err);
+});
+
+
+/*
 db.run("PRAGMA optimize", function (err) {
     console.log("optimize:" + err);
 });
+*/
 db.get("PRAGMA page_size", function (err, page) {
     console.log("page_size:" + JSON.stringify(page) + " " + err);
 });
+
+db.on('trace', function (sql) {
+    console.log(sql);
+});
+/*
+db.on('profile', function (sql, ms) {
+    if (ms > 0) console.log(ms);
+});
+*/
+
+
 db.serialize(function () {
     async.waterfall([
         function (callbackdb) {
@@ -194,6 +214,22 @@ db.serialize(function () {
 */
 
 
+process.on('uncaughtException', function (err) {
+    console.log("###uncaughtException", err);
+});
+
+process.on('unhandledRejection', function (err) {
+    console.log("###unhandledRejection", err);
+});
+
+process.on('rejectionHandled', function (promise) {
+    console.log("###rejectionHandled");
+    // unhandledRejections.delete(promise);
+});
+
+process.on('exit', function (code) {
+    console.log("###exit", code);
+});
 
 
 // bereitstellen countries.json und continents.json
@@ -1682,148 +1718,189 @@ app.post('/sql2csv', function (req, res) {
     });
 
 });
-
-
-
 /**
  * sql2eliminate - Doppelte Sätze beseitigen
  * der unique index wird später aufgebaut
  */
+var icount = 0;
+var gblcount = 0;
 app.post('/sql2eliminate', function (req, res) {
     if (checkSession(req, res)) return;
-
+    icount = 0;
     var timeout = 10 * 60 * 1000; // hier: gesetzter Default, kann sehr lange dauern, je nach Filtert
     //req.body.filename;
     if (req.body && typeof req.body.timeout !== "undefined" && req.body.timeout.length > 0) {
         timeout = req.body.timeout;
         req.setTimeout(parseInt(timeout));
     }
-    var sqlstmt = "";
-    if (req.body && typeof req.body.sqlstmt !== "undefined" && req.body.sqlstmt.length > 0) {
-        sqlstmt = req.body.sqlstmt;
-    }
-
-    var regex = /from\s+(\w+)/i;
-    var matches = sqlstmt.match(regex);
-    var qmsg = "";
-    var tablename = "";
-    if (null !== matches && matches.length >= 2) {
-        tablename = matches[1];
-    } else {
-        // Fehlerfall und raus
-    }
-    var limit = 1000;
-    if (req.body && typeof req.body.limit !== "undefined" && req.body.limit.length > 0) {
-        limit = req.body.limit;
-    }
-    var filename = "sql.csv";
-    if (req.body && typeof req.body.filename !== "undefined" && req.body.filename.length > 0) {
-        filename = req.body.filename;
-    }
-
-    var reqparm = {};
-    reqparm.sel = sqlstmt;
-    reqparm.limit = 0;
-    reqparm.offset = 0;
-
-    var fpath = "/temp/" + filename;
-    var fullpath = __dirname + "/static" + fpath;
-    var ws = fs.createWriteStream(fullpath);
-
-    var csvStream = csvformat.format({
-        headers: true
+    var rootname = __dirname;
+    sys0000sys.sql2eliminate(gblInfo, sqlite3, db, async, uihelper, req, res, function (res, ret) {
+        // in ret liegen error und message
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
     });
+});
 
-    sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret1) {
-        if (ret1.error === true || ret1.records === null || ret1.records.length === 0) {
+
+/**
+ * sql2eliminatechunk
+ * @param {*} elimtable - Tablename
+ * @param {*} elimrecords - Sätze des Chunks
+ * @param {*} callbackeli10 - returns res, ret
+ */
+function sql2eliminatechunk(elimtable, elimrecords, callbackeli10) {
+    /**
+     * Loop über die Gruppen des Chunk
+     */
+    var rounds = 1; // Math.floor(elirecords.length / 100) + 1;
+    var icount = 0;
+    async.eachSeries(elimrecords, function (elirecord, nextrecord) {
+            icount++;
+            if (icount % 10 === 0) console.log(icount);
+            sql2eliminateone(icount, elimtable, elirecord, function (ret) {
+                console.log("nextrecord nach:" + icount);
+                setImmediate(function () {
+                    nextrecord();
+                    return;
+                });
+
+            });
+        },
+        function (error) {
+            console.log("fertig");
             var ret = {
                 error: false,
-                message: "Kein Download"
+                message: "Fertig"
             };
-            var smsg1 = JSON.stringify(ret);
-            res.writeHead(200, {
-                'Content-Type': 'application/text'
-            });
-            res.end(smsg1);
+            callbackeli10(ret);
             return;
-        }
-        // hier sind die Keys der doppelten Sätze bekannt
-        async.eachSeries(ret1.records, function (record, nextrecord) {
-                async.waterfall([
-                        function (cbeli1) {
-                            /**
-                             * SELECT Sätze der Gruppe
-                             */
-                            var where = "";
-                            var orderby = "";
-                            var selfields = {};
-                            var reqparm = {};
-                            reqparm.sel = "SELECT * FROM " + tablename;
-                            for (var feld in record) {
-                                if (record.hasOwnProperty(feld)) {
-                                    if (feld === "anzahl") {
-                                        continue;
-                                    }
-                                    if (where.length > 0) {
-                                        where += " AND ";
-                                    }
-                                    where += " " + feld;
-                                    where += " = ";
-                                    var wert = record[feld];
-                                    if (typeof wert === "string") {
-                                        where += "'" + wert + "'";
-                                    } else {
-                                        where += wert;
-                                    }
-                                    selfields[feld] = wert;
-                                    if (orderby.length > 0) {
-                                        orderby += ", ";
-                                    }
-                                    orderby += feld;
-                                }
-                            }
+        });
+} // Ende Loop über die Gruppen
 
-                            reqparm.sel += " WHERE " + where;
-                            reqparm.sel += " ORDER BY " + orderby;
-                            reqparm.limit = 1;
-                            reqparm.offset = 0;
-                            debugger;
-                            sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret2) {
-                                // jetzt mit dem EINEN Satz den setonerecord vorbereiten durchführen
-                                if (ret2.error === true) {
-                                    cbeli1("Error", res, ret2);
-                                    return;
-                                } else {
-                                    cbeli1(null, res, {
-                                        error: false,
-                                        message: "Sätze vorhanden",
-                                        duprecords: ret2.records,
-                                        tablename: tablename,
-                                        where: where,
-                                        selfields: selfields,
-                                        orderby: orderby
-                                    });
-                                }
-                            });
-                        },
+
+
+
+/**
+ * sql2eliminateone
+ * @param {*} elimtable - Tablename
+ * @param {*} elimrecord - Satz mit den Keys aus group by
+ * @param {*} callbackeli0 - returns res, ret
+ */
+function sql2eliminateone(elimcount, elimtable, elimrecord, callbackeli0) {
+    var ret = {
+        error: false,
+        message: "dummy"
+    };
+    db.serialize(function () {
+        async.waterfall([
+                function (cbeli1) {
+                    var where = "";
+                    var orderby = "";
+                    var selfields = {};
+                    var reqparm = {};
+                    reqparm.sel = "SELECT * FROM " + elimtable;
+                    for (var feld in elimrecord) {
+                        if (elimrecord.hasOwnProperty(feld)) {
+                            if (feld === "anzahl") {
+                                continue;
+                            }
+                            if (where.length > 0) {
+                                where += " AND ";
+                            }
+                            where += " " + feld;
+                            where += " = ";
+                            var wert = elimrecord[feld];
+                            if (typeof wert === "string") {
+                                where += "'" + wert + "'";
+                            } else {
+                                where += wert;
+                            }
+                            selfields[feld] = wert;
+                            if (orderby.length > 0) {
+                                orderby += ", ";
+                            }
+                            orderby += feld;
+                        }
+                    }
+
+                    reqparm.sel += " WHERE " + where;
+                    reqparm.sel += " ORDER BY " + orderby;
+                    reqparm.limit = 100;
+                    reqparm.offset = 0;
+                    var actcount = 0;
+                    db.run("BEGIN TRANSACTION;");
+                    db.all(reqparm.sel, function (err, elirows) {
+                        db.run("COMMIT TRANSACTION;");
+                        var ret = {};
+                        if (err) {
+                            ret.error = true;
+                            ret.message = "getallsqlrecords-2:" + err + " " + reqparm.sel;
+                            console.log(ret.message);
+                            cbeli1("Error", ret);
+                            return;
+                        } else if (elirows.length === 0) {
+                            ret.error = false;
+                            ret.message = "getallsqlrecords-2:Keine Sätze zu " + reqparm.sel;
+                            console.log(ret.message);
+                            cbeli1("Error", ret);
+                            return;
+                        } else {
+                            ret.error = false;
+                            ret.message = "getallsqlrecords-5:" + " gefunden:" + elirows.length + " " + (gblcount + elimcount);
+                            ret.records = elirows;
+                            console.log(ret.message);
+                            cbeli1("Test", ret);
+                            return;
+                        }
+                    });
+                }
+            ],
+            function (error, ret) {
+                console.log("Callback:" + error);
+                setImmediate(function () {
+                    callbackeli0(ret);
+                    return;
+                });
+            });
+    });
+}
+
+
+/*
+        async.eachSeries(ret1.records, function (record, nextrecord) {
+
                         function (res, ret, cbeli2) {
-                            /**
-                             * DELETE aller Sätze der Gruppe
-                             */
-                            var delStmt = "DELETE FROM " + ret.tablename;
-                            delStmt += " WHERE " + ret.where;
-                            db.run(delStmt, function (err) {
-                                console.log("sql2eliminate: deleted:" + this.changes);
-                                ret.deleted = this.changes;
+                            if (1 === 1) {
                                 cbeli2(null, res, ret);
                                 return;
+                            }
+
+                            var delStmt = "DELETE FROM " + ret.tablename;
+                            delStmt += " WHERE " + ret.where;
+                            db.serialize(function () {
+                                db.run(delStmt, function (err) {
+                                    if (err) {
+                                        console.log("***Error:" + err);
+                                    }
+                                    console.log("sql2eliminate: deleted:" + this.changes);
+                                    ret.deleted = this.changes;
+
+                                });
                             });
+                            cbeli2(null, res, ret);
+                            return;
                         },
-                        function (ret, cbeli3) {
-                            /**
-                             * INSERT erster der Gruppe mit setonerecord!!!
-                             * und "finish" der Gruppe
-                             */
+                        function (res, ret, cbeli3) {
+                            if (1 === 1) {
+                                cbeli3(null, res, ret);
+                                return;
+                            }
+
                             var reqparm = {};
                             var insrecord = uihelper.cloneObject(ret.duprecords[0]);
                             var reqparm = {};
@@ -1833,34 +1910,33 @@ app.post('/sql2eliminate', function (req, res) {
                             reqparm.updfields = {};
                             reqparm.updfields["$setOnInsert"] = {};
                             reqparm.updfields["$setOnInsert"] = ret.selfields;
-
-                            /**
-                             * TODO: mehrere Key-Felder eliminieren!!! und dann weiter
-                            */
-                            delete record[primarykey];
-
-                            reqparm.updfields["$set"] = record;
-                            reqparm.table = targettable;
-                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret) {
-                                //console.log("setonerecord-returned:" + JSON.stringify(ret));
+                            reqparm.updfields["$set"] = insrecord;
+                            for (var feld in ret.selfields) {
+                                if (ret.selfields.hasOwnProperty(feld)) {
+                                    delete reqparm.updfields["$set"][feld];
+                                }
+                            }
+                            reqparm.table = ret.tablename;
+                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret4) {
+                                if (ret4.error === true) {
+                                    console.log("***Error:" + ret4.message);
+                                } else {
+                                    console.log("***Inserted:" + 1);
+                                }
                                 ret.inserted = 1;
-                                ebeli3 (null, res, ret);
+                                cbeli3(null, res, ret);
+                                return;
                             });
-
-
-
-
                         },
-                        function (ret, cbeli4) {
-                            /**
-                             * csv-Protokoll der eliminierten Sätze,
-                             * leichte Feldkürzungen
-                             */
+                        function (res, ret, cbeli4) {
+                            cbeli4("finish", res, ret);
+                            return;
                         }
                     ],
                     function (error, result) {
-                        // nextrecord();
+                        nextrecord();
                     });
+
             },
             function (err) {
                 csvStream.end();
@@ -1876,27 +1952,10 @@ app.post('/sql2eliminate', function (req, res) {
                 res.end(smsg1);
                 return;
             });
-
-
-        // getbackasfile
-        csvStream.pipe(ws);
-        for (var irec = 0; irec < ret1.records.length; irec++) {
-            /*
-            var vals = gravec.map(function (a) {
-                return a.year;
-            }),
-            */
-            var csvrecord = ret1.records[irec];
-            csvStream.write(csvrecord);
-
-
-
-        }
-        // res.download(fullpath, filename);
-
     });
+    */
 
-});
+
 
 
 

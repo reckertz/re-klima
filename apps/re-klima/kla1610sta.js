@@ -970,7 +970,7 @@
                 sqlStmt += " KLIDATA.regtotm,KLIDATA.regtottmin, KLIDATA.regtottmax, KLIDATA.regtottavg";
                 sqlStmt += " FROM KLISTATIONS";
 
-                sqlStmt += " LEFT JOIN KLIDATA";
+                sqlStmt += " INNER JOIN KLIDATA";
                 sqlStmt += " ON KLISTATIONS.source = KLIDATA.source";
                 sqlStmt += " AND KLISTATIONS.stationid = KLIDATA.stationid";
                 where += " KLISTATIONS.stationid IN (";
@@ -982,7 +982,6 @@
 
                 sqlStmt += " WHERE " + where;
                 sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-
             } else if (selfieldnames.length >= 3) {
                 var selvariablename = starecord.variablename; // wird erst später gebraucht
                 if (typeof starecord.source !== "undefined" && starecord.source.trim().length > 0) {
@@ -1033,7 +1032,7 @@
                 */
                 // geht nur für numerische Vorgaben
                 where = uihelper.getSqlCompareString ("KLIDATA.anzyears", starecord.anzyears, where);
-                debugger;
+
 
                 if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
                     if (where.length > 0) where += " AND ";
@@ -1107,7 +1106,7 @@
                 checkwhere = checkwhere.replace(/KLISTATIONS.source/g, " ");
                 if (checkwhere.indexOf("KLISTATIONS") >= 0) {
                     sqlStmt += " FROM KLISTATIONS";
-                    sqlStmt += " LEFT JOIN KLIDATA";
+                    sqlStmt += " INNER JOIN KLIDATA";
                     sqlStmt += " ON KLIDATA.source = KLISTATIONS.source";
                     sqlStmt += " AND KLIDATA.stationid = KLISTATIONS.stationid";
                     if (where.length > 0) {
@@ -1117,7 +1116,7 @@
                 } else {
                     where = where.replace(/KLISTATIONS.source/g, "KLIDATA.source");
                     sqlStmt += " FROM KLIDATA";
-                    sqlStmt += " LEFT JOIN KLISTATIONS";
+                    sqlStmt += " INNER JOIN KLISTATIONS";
                     sqlStmt += " ON KLIDATA.source = KLISTATIONS.source";
                     sqlStmt += " AND KLIDATA.stationid = KLISTATIONS.stationid";
                     if (where.length > 0) {

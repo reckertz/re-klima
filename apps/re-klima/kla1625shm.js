@@ -799,7 +799,7 @@
                     sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
                     sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
                     sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
-                    /* sqlStmt += "AND KLIDATA.variable IN 'TMAX,TMIN' "; */
+                    sqlStmt += "AND (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
                     sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid, KLIDATA.variable";
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
@@ -1463,7 +1463,7 @@
                                 irow++;
                             }
                         }
-                        
+
                         // hier ist das Layout nochmal zu kontrollieren
                         hmoptions.histo = histo1;
                         var erg = kla9020fun.getHeatmap(cid, matrix1, hmoptions, function (ret) {
@@ -1567,6 +1567,8 @@
                 $(cid)
                     .append($("<table/>", {
                             id: tableid,
+                            border: "2",
+                            rules: "all",
                             css: {
                                 float: "left"
                             }
@@ -1587,6 +1589,12 @@
                                 }))
                                 .append($("<th/>", {
                                     html: "Avg"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Kurtosis"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Skewness"
                                 }))
                             )
                         )
@@ -1620,6 +1628,12 @@
                         .append($("<td/>", {
                             html: (hoptions.sumval / hoptions.countval).toFixed(2)
                         }))
+                        .append($("<td/>", {
+                            html: "&nbsp;"
+                        }))
+                        .append($("<td/>", {
+                            html: "&nbsp;"
+                        }))
                     );
                 $("#" + sparkid).sparkline(sparkpoints, {
                     type: 'line',
@@ -1636,6 +1650,7 @@
             /**
              * Loop über die Klimaperioden
              */
+            debugger;
             var buckyears = Object.keys(hoptions.cbucketdata);
             for (var ibuck = 0; ibuck < buckyears.length; ibuck++) {
                 temparray = [];
@@ -1678,6 +1693,10 @@
                 for (var i = 0; i < temparray.length; i++) {
                     sparkpoints.push(temparray[i].count);
                 }
+                // Kennziffern
+                debugger;
+                var kur = ss.sampleKurtosis(sparkpoints);
+                var skew = ss.sampleSkewness(sparkpoints);
                 // Ausgabe
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
                 $("#" + tableid + " tbody")
@@ -1704,6 +1723,12 @@
                         .append($("<td/>", {
                             html: (bucket.valsum / bucket.valcount).toFixed(2)
                         }))
+                        .append($("<td/>", {
+                            html: kur.toFixed(2)
+                        }))
+                        .append($("<td/>", {
+                            html: skew.toFixed(2)
+                        }))
                     );
                 $("#" + sparkid).sparkline(sparkpoints, {
                     type: 'bar',
@@ -1718,6 +1743,7 @@
                     chartRangeMax: maxcount,
                     composite: false
                 });
+
             }
             cb1625h(ret);
             return;
@@ -1888,6 +1914,7 @@
             }
         };
         window.chart1 = new Chart(ctx, config);
+
         cb1625k(ret);
         return;
     };

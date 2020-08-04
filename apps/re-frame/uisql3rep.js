@@ -383,8 +383,9 @@
                                     url: sysbase.getServer("sql2eliminate"),
                                     data: {
                                         sqlstmt: sqlstmt,
-                                        limit: 1000,
-                                        filename: filename
+                                        limit: 0,
+                                        filename: filename,
+                                        timeout: 60 * 60 * 1000
                                     }
                                 }).done(function (r1, textStatus, jqXHR) {
                                     sysbase.checkSessionLogin(r1);
