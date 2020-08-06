@@ -729,6 +729,14 @@
                 overflow: "auto",
                 float: "left"
             });
+        $("#kla1625shmwrapper")
+            .css({
+                "background-color": "lime",
+                height: h,
+                width: "100%",
+                overflow: "auto",
+                float: "left"
+            });
         console.log("kla1625shmwrapper initialisiert, leer");
         $(window).on('resize', function () {
             var h = $("#kla1625shm").height();
@@ -961,7 +969,7 @@
                             name: stationrecord.stationname,
                             globals: false,
                             selyears: "",
-                            selvars: "popc,rurc,urb,uopp"
+                            selvars: "popc,rurc,urbc,uopp,cropland,tot_irri"
                         }
                     }).done(function (r1, textStatus, jqXHR) {
                         sysbase.checkSessionLogin(r1);
@@ -1022,22 +1030,30 @@
                                     overflow: "hidden"
                                 }
                             })
+
                             .append($("<div/>", {
-                                id: divid + "L",
-                                css: {
-                                    "text-align": "left",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
+                                    css: {
+                                        "text-align": "center",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "L",
+                                }))
+                            )
+
                             .append($("<div/>", {
-                                id: divid + "R",
-                                css: {
-                                    "text-align": "left",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
+                                    css: {
+                                        "text-align": "center",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "R",
+                                }))
+                            )
                         );
                     // Linke heatmap
                     var hmoptions = {
@@ -1089,23 +1105,30 @@
                                     overflow: "hidden"
                                 }
                             })
+
                             .append($("<div/>", {
-                                id: divid + "L",
-                                css: {
-                                    "text-align": "left",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
+                                    css: {
+                                        "text-align": "center",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "L",
+                                }))
+                            )
+
                             .append($("<div/>", {
-                                id: divid + "R",
-                                css: {
-                                    "text-align": "left",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
-                        );
+                                    css: {
+                                        "text-align": "center",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "R",
+                                }))
+                            ));
                     // Linke heatmap
                     var hmoptions = {
                         minmax: true,
@@ -1160,22 +1183,35 @@
                                     overflow: "hidden"
                                 }
                             })
+
+
                             .append($("<div/>", {
-                                id: divid + "L",
-                                css: {
-                                    "text-align": "left",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
+                                    css: {
+                                        "text-align": "center",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "L",
+                                }))
+                            )
+
+
                             .append($("<div/>", {
-                                id: divid + "R",
-                                css: {
-                                    "text-align": "left",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
+                                    css: {
+                                        "text-align": "center",
+                                        float: "left",
+                                        width: "49%"
+                                    }
+                                })
+                                .append($("<div/>", {
+                                    id: divid + "R",
+                                }))
+                            )
+
+
+
                         );
                     // Linke heatmap
                     var hmoptions = {
@@ -1229,7 +1265,7 @@
                             .append($("<div/>", {
                                 id: divid + "L",
                                 css: {
-                                    "text-align": "left",
+                                    "text-align": "center",
                                     float: "left",
                                     width: "49%"
                                 }
@@ -1237,7 +1273,7 @@
                             .append($("<div/>", {
                                 id: divid + "R",
                                 css: {
-                                    "text-align": "left",
+                                    "text-align": "center",
                                     float: "left",
                                     width: "49%"
                                 }
@@ -1301,13 +1337,8 @@
     };
 
 
-
-
-
     /**
-     * kliheatmap2 - Heatmap berechnen, Animation sichern und anzeigen
-     * mit "Video-Controls" - aus KLISTATIONS - YEARS
-     *
+     * kliheatmap2 - Heatmap berechnen und anzeigen
      * @param {*} cid
      * @param {*} selvariablename
      * @param {*} selsource
@@ -1375,6 +1406,7 @@
 
                         var irow = 0;
                         hmoptions.cbucketdata = {}; // year mit: toyear, histo, yearmin, yearmax, yearsum, yearcount
+                        var numberhisto = new Array(10).fill(0);
                         for (var year in years) {
                             if (years.hasOwnProperty(year)) {
                                 matrix1.rowheaders.push(year);
@@ -1432,9 +1464,18 @@
                                                             minval: null,
                                                             maxval: null,
                                                             valsum: 0,
-                                                            valcount: 0
+                                                            valcount: 0,
+                                                            numberhisto: []
                                                         };
+                                                        hmoptions.cbucketdata[buckyear].numberhisto = new Array(10).fill(0);
                                                     }
+                                                    var wert = rowvalues[icol];
+                                                    var inum = 0;
+                                                    var numt = wert.split(".");
+                                                    if (numt.length = 2) {
+                                                        inum = parseInt(numt[1].substr(0, 1));
+                                                    }
+                                                    hmoptions.cbucketdata[buckyear].numberhisto[inum] += 1;
                                                     hmoptions.cbucketdata[buckyear].valsum += hmval;
                                                     hmoptions.cbucketdata[buckyear].valcount += 1;
                                                     if (hmoptions.cbucketdata[buckyear].minval === null) {
@@ -1515,7 +1556,6 @@
         /**
          * Histogramm ausgeben, wenn übergeben
          */
-
         var temparray = [];
         if (hoptions.minmax === true && typeof hoptions.histo === "object" && Object.keys(hoptions.histo).length > 0) {
             temparray = [];
@@ -1570,31 +1610,40 @@
                             border: "2",
                             rules: "all",
                             css: {
-                                float: "left"
+                                float: "left",
+                                margin: "10px",
+                                layout: "fixed"
                             }
                         })
                         .append($("<thead/>")
                             .append($("<tr/>")
                                 .append($("<th/>", {
+                                    width: "10%",
                                     html: "Periode"
                                 }))
                                 .append($("<th/>", {
+                                    width: "40%",
                                     html: "Histogramm"
                                 }))
                                 .append($("<th/>", {
+                                    width: "10%",
                                     html: "Min"
                                 }))
                                 .append($("<th/>", {
+                                    width: "10%",
                                     html: "Max"
                                 }))
                                 .append($("<th/>", {
+                                    width: "10%",
                                     html: "Avg"
                                 }))
                                 .append($("<th/>", {
-                                    html: "Kurtosis"
+                                    width: "10%",
+                                    html: "Kurtosis<br>Skewness"
                                 }))
                                 .append($("<th/>", {
-                                    html: "Skewness"
+                                    width: "10%",
+                                    html: "Shapiro Wilk W/P"
                                 }))
                             )
                         )
@@ -1620,18 +1669,23 @@
                             }))
                         )
                         .append($("<td/>", {
+                            align: "center",
                             html: hoptions.minval
                         }))
                         .append($("<td/>", {
+                            align: "center",
                             html: hoptions.maxval
                         }))
                         .append($("<td/>", {
+                            align: "center",
                             html: (hoptions.sumval / hoptions.countval).toFixed(2)
                         }))
                         .append($("<td/>", {
+                            align: "center",
                             html: "&nbsp;"
                         }))
                         .append($("<td/>", {
+                            align: "center",
                             html: "&nbsp;"
                         }))
                     );
@@ -1650,9 +1704,10 @@
             /**
              * Loop über die Klimaperioden
              */
-            debugger;
+            var bucknumberprot = "";
             var buckyears = Object.keys(hoptions.cbucketdata);
             for (var ibuck = 0; ibuck < buckyears.length; ibuck++) {
+                bucknumberprot += " " + JSON.stringify(hoptions.cbucketdata[buckyears[ibuck]].numberhisto);
                 temparray = [];
                 var bucket = hoptions.cbucketdata[buckyears[ibuck]];
                 // Ergänzen der Temperaturen ohne count
@@ -1694,7 +1749,6 @@
                     sparkpoints.push(temparray[i].count);
                 }
                 // Kennziffern
-                debugger;
                 var kur = ss.sampleKurtosis(sparkpoints);
                 var skew = ss.sampleSkewness(sparkpoints);
                 // Ausgabe
@@ -1715,19 +1769,24 @@
                             }))
                         )
                         .append($("<td/>", {
+                            align: "center",
                             html: bucket.minval
                         }))
                         .append($("<td/>", {
+                            align: "center",
                             html: bucket.maxval
                         }))
                         .append($("<td/>", {
+                            align: "center",
                             html: (bucket.valsum / bucket.valcount).toFixed(2)
                         }))
                         .append($("<td/>", {
-                            html: kur.toFixed(2)
+                            align: "center",
+                            html: kur.toFixed(2) + "<br>" + skew.toFixed(2)
                         }))
                         .append($("<td/>", {
-                            html: skew.toFixed(2)
+                            align: "center",
+                            html: "&nbsp;"
                         }))
                     );
                 $("#" + sparkid).sparkline(sparkpoints, {
@@ -1745,6 +1804,73 @@
                 });
 
             }
+            $("#" + tableid).parent().append($("<span/>", {
+                html: bucknumberprot
+            }));
+
+
+
+
+            var divid = "div" + Math.floor(Math.random() * 100000) + 1;
+            var chartid = divid + "c";
+            $("#" + tableid)
+                .parent()
+                .append($("<div/>", {
+                        id: divid,
+                        css: {
+                            float: "left",
+                            overflow: "hidden",
+                            "background-color": "white"
+                        }
+                    })
+                    .append($("<canvas/>", {
+                        id: chartid,
+                        css: {
+                            "text-align": "center"
+                        }
+                    }))
+                );
+
+            var ctx = document.getElementById(chartid).getContext('2d');
+            //Chart.defaults.global.plugins.colorschemes.override = true;
+            //Chart.defaults.global.legend.display = true;
+            // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+
+            var config = {
+                type: 'line',
+                data: {
+                    labels: ["0","1","2","3","4", "5", "6", "7", "8","9"],
+                    datasets: [],
+                    backgroundColor: "yellow"
+                },
+                options: {
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.HueCircle19'
+                        }
+                    }
+                }
+            };
+            for (var ibuck = 0; ibuck < buckyears.length; ibuck++) {
+                bucknumberprot += " " + JSON.stringify(hoptions.cbucketdata[buckyears[ibuck]].numberhisto);
+                config.data.datasets.push({
+                    label: buckyears[ibuck],
+                    data: hoptions.cbucketdata[buckyears[ibuck]].numberhisto,
+                    backgroundColor: "red",
+                    borderColor: "red",
+                    fill: false,
+                    borderWidth: 2
+                });
+            }
+
+            window.chart1 = new Chart(ctx, config);
+
+
+
+
+
+
+
             cb1625h(ret);
             return;
         } else {
@@ -1990,7 +2116,7 @@
                             }
                         })
                         .append($("<h2/>", {
-                            html: variablename + " " + cfeCodes.getTitleKey ("hydevariable", variablename),
+                            html: variablename + " " + cfeCodes.getTitleKey("hydevariable", variablename),
                             css: {
                                 width: "100%"
                             }
