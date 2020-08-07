@@ -779,6 +779,9 @@
         async.waterfall([
                 function (cb1625g1) {
                     kla1625shmclock = kla1625shm.showclock("#kla1625shmclock");
+                    //$("button").hide();
+                    $(':button').prop('disabled', true); // Disable all the buttons
+                    $("body").css("cursor", "progress");
                     var sqlStmt = "";
                     selvariablename = "TMAX,TMIN";
                     var sel = {
@@ -892,7 +895,6 @@
                             stationid: selstationid
                         }
                     }).done(function (r1, textStatus, jqXHR) {
-                        clearInterval(ghcnclock);
                         sysbase.checkSessionLogin(r1);
                         var ret1 = JSON.parse(r1);
                         sysbase.putMessage(ret1.message, 1);
@@ -915,7 +917,6 @@
                             return;
                         }
                     }).fail(function (err) {
-                        clearInterval(ghcnclock);
                         //$("#kli1400raw_rightwdata").empty();
                         //document.getElementById("kli1400raw").style.cursor = "default";
                         sysbase.putMessage("ghcnddata:" + err, 3);
@@ -977,8 +978,6 @@
                         }
                     }).done(function (r1, textStatus, jqXHR) {
                         sysbase.checkSessionLogin(r1);
-                        $("button").show();
-                        $("body").css("cursor", "default");
                         var ret = JSON.parse(r1);
                         sysbase.putMessage(ret.message, 1);
                         if (ret.error === true) {
@@ -992,8 +991,6 @@
                         }
                     }).fail(function (err) {
                         sysbase.putMessage(err, 1);
-                        $("button").show();
-                        $("body").css("cursor", "default");
                         cb1625g4(null, ret);
                         return;
                     }).always(function () {
@@ -1003,7 +1000,9 @@
             ],
             function (error, result) {
                 clearInterval(kla1625shmclock);
-                $("button").show();
+                $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
+                //$("button").show();
+                $(':button').prop('disabled', false); // Enable all the buttons
                 $("body").css("cursor", "default");
                 cb1625g(result);
                 return;
@@ -1035,6 +1034,16 @@
                                     overflow: "hidden"
                                 }
                             })
+                            .append($("<div/>", {
+                                    css: {
+                                        width: "100%",
+                                        "text-align": "center"
+                                    }
+                                })
+                                .append($("<h2>", {
+                                    text: "Heatmaps"
+                                }))
+                            )
 
                             .append($("<div/>", {
                                     css: {
@@ -5298,7 +5307,6 @@
         if (typeof clockcontainer === "string") {
             if (!clockcontainer.startsWith("#")) clockcontainer = "#" + clockcontainer;
         }
-
         if ($('#kliclock', clockcontainer).length === 0) {
             $(clockcontainer)
                 .append($("<span/>", {
@@ -5325,7 +5333,7 @@
             distance = Math.floor(distance - minutes * 1000 * 60);
             var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             // Display the result in the element with id="demo"
-            $("#kliclock").text(hours + "h " + minutes + "m " + seconds + "s ");
+            $("#kliclock").text(hours + "h " + minutes + "m " + seconds + "s " + " . . . loading");
         }, 1000);
         return xclock;
     };
