@@ -40,6 +40,7 @@
     var klirecords = [];
 
     var klihyde = {};
+    var kla1625shmclock;
 
     var hmatrixR;
     var hmatrixL;
@@ -656,15 +657,6 @@
                 }))
                 */
 
-                .append($("<div/>", {
-                    id: "kla1625shmclock",
-                    float: "left",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    }
-                }))
-
                 .append($("<button/>", {
                     html: "Heatmap Colortest",
                     css: {
@@ -702,6 +694,18 @@
                         return false;
                     }
                 }))
+
+
+                .append($("<div/>", {
+                    id: "kla1625shmclock",
+                    float: "left",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    }
+                }))
+
+
             );
         /**
          * Beginn des initialen Aufbaus kla1625shmwrapper
@@ -774,6 +778,7 @@
     kla1625shm.loadalldata = function (cb1625g) {
         async.waterfall([
                 function (cb1625g1) {
+                    kla1625shmclock = kla1625shm.showclock("#kla1625shmclock");
                     var sqlStmt = "";
                     selvariablename = "TMAX,TMIN";
                     var sel = {
@@ -875,8 +880,7 @@
                         cb1625g2(null, ret);
                         return;
                     }
-                    var ghcnclock = kla1625shm.showclock("#kla1625shmclock");
-                    var that = this;
+
                     $(that).attr("disabled", true);
                     var jqxhr = $.ajax({
                         method: "GET",
@@ -998,6 +1002,7 @@
                 }
             ],
             function (error, result) {
+                clearInterval(kla1625shmclock);
                 $("button").show();
                 $("body").css("cursor", "default");
                 cb1625g(result);
@@ -1605,6 +1610,9 @@
             if (hoptions.cbuckets === true && typeof hoptions.cbucketdata === "object" && Object.keys(hoptions.cbucketdata).length > 0) {
                 tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
                 $(cid)
+                    .append($("<h3/>", {
+                        text: "Histogramm Temperaturverteilung"
+                    }))
                     .append($("<table/>", {
                             id: tableid,
                             border: "2",
@@ -1751,6 +1759,7 @@
                 // Kennziffern
                 var kur = ss.sampleKurtosis(sparkpoints);
                 var skew = ss.sampleSkewness(sparkpoints);
+                var calc1 = kur.toFixed(2) + "<br>" + skew.toFixed(2) + "<br>" + (kur - skew ** 2).toFixed(2);
                 // Ausgabe
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
                 $("#" + tableid + " tbody")
@@ -1782,7 +1791,7 @@
                         }))
                         .append($("<td/>", {
                             align: "center",
-                            html: kur.toFixed(2) + "<br>" + skew.toFixed(2)
+                            html: calc1
                         }))
                         .append($("<td/>", {
                             align: "center",
@@ -1804,12 +1813,12 @@
                 });
 
             }
+
+            /*
             $("#" + tableid).parent().append($("<span/>", {
                 html: bucknumberprot
             }));
-
-
-
+            */
 
             var divid = "div" + Math.floor(Math.random() * 100000) + 1;
             var chartid = divid + "c";
@@ -1820,9 +1829,14 @@
                         css: {
                             float: "left",
                             overflow: "hidden",
-                            "background-color": "white"
+                            "background-color": "white",
+                            margin: "10px",
+                            width: "90%"
                         }
                     })
+                    .append($("<h3/>", {
+                        text: "Histogramm 1. Dezimalstelle"
+                    }))
                     .append($("<canvas/>", {
                         id: chartid,
                         css: {
@@ -1839,14 +1853,14 @@
             var config = {
                 type: 'line',
                 data: {
-                    labels: ["0","1","2","3","4", "5", "6", "7", "8","9"],
+                    labels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
                     datasets: [],
                     backgroundColor: "yellow"
                 },
                 options: {
                     plugins: {
                         colorschemes: {
-                            scheme: 'tableau.HueCircle19'
+                            scheme: 'brewer.Paired12'
                         }
                     }
                 }
@@ -1856,20 +1870,14 @@
                 config.data.datasets.push({
                     label: buckyears[ibuck],
                     data: hoptions.cbucketdata[buckyears[ibuck]].numberhisto,
-                    backgroundColor: "red",
-                    borderColor: "red",
+                    /* backgroundColor: "red", */
+                    /* borderColor: "red", */
                     fill: false,
                     borderWidth: 2
                 });
             }
 
             window.chart1 = new Chart(ctx, config);
-
-
-
-
-
-
 
             cb1625h(ret);
             return;
@@ -1895,6 +1903,9 @@
         var ciddiv = cid.substr(1) + "div";
         var tableid = cid.substr(1) + "tbl";
         $(cid)
+            .append($("<h3/>", {
+                text: "Temperaturverlauf"
+            }))
             .append($("<div/>", {
                     id: ciddiv,
                     css: {
@@ -2097,6 +2108,17 @@
         }
 
         var hcount = 0;
+        $(cid)
+            .append($("<div/>", {
+                    css: {
+                        width: "100%",
+                        "text-align": "center"
+                    }
+                })
+                .append($("<h2>", {
+                    text: "Auswertung HYDE-Daten"
+                }))
+            );
         for (var variablename in hyderep) {
             if (hyderep.hasOwnProperty(variablename)) {
                 hcount++;
@@ -5282,7 +5304,7 @@
                 .append($("<span/>", {
                     id: "kliclock",
                     class: "kliclock",
-                    html: "Stoppuhr",
+                    html: "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;",
                     css: {
                         "font-size": "2em",
                         "font-weight": "bold"
