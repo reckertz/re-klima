@@ -657,6 +657,48 @@
                 }))
                 */
 
+
+
+               .append($("<button/>", {
+                html: "Drucken",
+                css: {
+                    "text-align": "center",
+                    float: "left",
+                    margin: "10px"
+
+                },
+                click: function (evt) {
+                    // sysbase.printDivAll($("#kla1625shmwrapper").html());
+                    evt.preventDefault();
+                    // https://github.com/jasonday/printThis
+                    $('#kla1625shmwrapper').printThis({
+                        canvas:true
+                    });
+
+                }
+            }))
+
+                .append($("<button/>", {
+                    html: "Download HTML",
+                    css: {
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // evt.stopPropagation();
+                        // evt.stopImmediatePropagation();
+                        var a = document.body.appendChild(
+                            document.createElement("a")
+                        );
+                        a.download = "export.html";
+                        a.href = "data:text/html," + document.getElementById("kla1625shmwrapper").innerHTML;
+                        //a.innerHTML = "[Export content]";
+                        a.click();
+                    }
+                }))
+
+
                 .append($("<button/>", {
                     html: "Heatmap Colortest",
                     css: {
@@ -1022,6 +1064,14 @@
 
         hoptionsR = {};
         hoptionsL = {};
+
+        /*
+        var w = new Vector([0.2, 0.2, 0.2, 0.2, 0.2, 0.4, 0.3, 0.2, 0.2, 0.1, 0.2, 0.2, 0.1, 0.1, 0.2, 0.4, 0.4, 0.3, 0.3, 0.3, 0.2, 0.4, 0.2, 0.5, 0.2, 0.2, 0.4, 0.2, 0.2, 0.2, 0.2, 0.4, 0.1, 0.2, 0.2, 0.2, 0.2, 0.1, 0.2, 0.2, 0.3, 0.3, 0.2, 0.6, 0.4, 0.3, 0.2, 0.2, 0.2, 0.2, 1.4, 1.5, 1.5, 1.3, 1.5, 1.3, 1.6, 1.0, 1.3, 1.4, 1.0, 1.5, 1.0, 1.4, 1.3, 1.4, 1.5, 1.0, 1.5, 1.1, 1.8, 1.3, 1.5, 1.2, 1.3, 1.4, 1.4, 1.7, 1.5, 1.0, 1.1, 1.0, 1.2, 1.6, 1.5, 1.6, 1.5, 1.3, 1.3, 1.3, 1.2, 1.4, 1.2, 1.0, 1.3, 1.2, 1.3, 1.3, 1.1, 1.3, 2.5, 1.9, 2.1, 1.8, 2.2, 2.1, 1.7, 1.8, 1.8, 2.5, 2.0, 1.9, 2.1, 2.0, 2.4, 2.3, 1.8, 2.2, 2.3, 1.5, 2.3, 2.0, 2.0, 1.8, 2.1, 1.8, 1.8, 1.8, 2.1, 1.6, 1.9, 2.0, 2.2, 1.5, 1.4, 2.3, 2.4, 1.8, 1.8, 2.1, 2.4, 2.3, 1.9, 2.3, 2.5, 2.3, 1.9, 2.0, 2.3, 1.8]);
+        var l = new Vector([1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.5, 1.4, 1.5, 1.5, 1.6, 1.4, 1.1, 1.2, 1.5, 1.3, 1.4, 1.7, 1.5, 1.7, 1.5, 1.0, 1.7, 1.9, 1.6, 1.6, 1.5, 1.4, 1.6, 1.6, 1.5, 1.5, 1.4, 1.5, 1.2, 1.3, 1.4, 1.3, 1.5, 1.3, 1.3, 1.3, 1.6, 1.9, 1.4, 1.6, 1.4, 1.5, 1.4, 4.7, 4.5, 4.9, 4.0, 4.6, 4.5, 4.7, 3.3, 4.6, 3.9, 3.5, 4.2, 4.0, 4.7, 3.6, 4.4, 4.5, 4.1, 4.5, 3.9, 4.8, 4.0, 4.9, 4.7, 4.3, 4.4, 4.8, 5.0, 4.5, 3.5, 3.8, 3.7, 3.9, 5.1, 4.5, 4.5, 4.7, 4.4, 4.1, 4.0, 4.4, 4.6, 4.0, 3.3, 4.2, 4.2, 4.2, 4.3, 3.0, 4.1, 6.0, 5.1, 5.9, 5.6, 5.8, 6.6, 4.5, 6.3, 5.8, 6.1, 5.1, 5.3, 5.5, 5.0, 5.1, 5.3, 5.5, 6.7, 6.9, 5.0, 5.7, 4.9, 6.7, 4.9, 5.7, 6.0, 4.8, 4.9, 5.6, 5.8, 6.1, 6.4, 5.6, 5.1, 5.6, 6.1, 5.6, 5.5, 4.8, 5.4, 5.6, 5.1, 5.1, 5.9, 5.7, 5.2, 5.0, 5.2, 5.4, 5.1]);
+        var lm = new Regression.linear(l, w);
+        console.log(JSON.stringify(lm, null, 4));
+        debugger;
+        */
 
         async.waterfall([
                 function (cb1625g1) {
@@ -1769,6 +1819,13 @@
                 var kur = ss.sampleKurtosis(sparkpoints);
                 var skew = ss.sampleSkewness(sparkpoints);
                 var calc1 = kur.toFixed(2) + "<br>" + skew.toFixed(2) + "<br>" + (kur - skew ** 2).toFixed(2);
+
+                var w = new Vector(sparkpoints);
+                var wperg = new Normality.shapiroWilk(w);
+                var calc2 = "W: " + wperg.w.toFixed(4) + "<br>P: " + wperg.p.toFixed(4);
+                //var lm = new Regression.linear(l, w);
+
+
                 // Ausgabe
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
                 $("#" + tableid + " tbody")
@@ -1804,7 +1861,7 @@
                         }))
                         .append($("<td/>", {
                             align: "center",
-                            html: "&nbsp;"
+                            html: calc2
                         }))
                     );
                 $("#" + sparkid).sparkline(sparkpoints, {

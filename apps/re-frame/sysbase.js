@@ -270,6 +270,12 @@
 
     };
 
+    /**
+     * Bereitstellen des Inhalts einer div zum Drucken (PDF, Printer)
+     * Eingabefelder werden in Ausgabefelder umgewandelt
+     * keine Canvas
+     * @param {*} data
+     */
     sysbase.printDiv = function (data) {
         var mywindow = window.open();
         var is_chrome = Boolean(mywindow.chrome);
@@ -310,6 +316,85 @@
 
         return true;
     };
+
+
+
+
+    /**
+     * printDivAll - Bereitstellen des Inhalts einer div zum Drucken (PDF, Printer)
+     * Eingabefelder werden in Ausgabefelder umgewandelt
+     * Canvas werden umgewandelt zum Druck (siehe kla1650ani), dort
+     * mit /getbackasfile Umsetzung svg-Tag in Bilddatei
+     *  var svghtml = (new XMLSerializer()).serializeToString(document.querySelector('svg'));
+     *  var url = "data:image/svg+xml," + encodeURIComponent(svghtml);
+     * das ist hier erst mal nicht erforderlich, daher Umsetzung canvas in string
+     * mit var dataURL = canvas.toDataURL(); => "data:image/png;base64,iVBORw0KGgoAA...
+     * oder var mediumQuality = canvas.toDataURL("image/jpeg", 0.5);   // 1.0 High, 0.1 Low
+     *  var img = new Image;
+     *  img.src = "data:image/png;base64,..."; // Assume valid data
+     * https://stackoverflow.com/questions/11112321/how-to-save-canvas-as-png-image
+     * dort Konzentration auf Bild => File, aber gut
+     * @param {*} data
+     */
+    sysbase.printDivAll = function (data) {
+        var mywindow = window.open();
+        var is_chrome = Boolean(mywindow.chrome);
+        mywindow.document.write(data);
+        // jetzt die Felder ändern in Ausgaben
+        $(mywindow.document).find('.noprint').each(function () {
+            $(this).empty();
+        });
+        $(mywindow.document).find('input').each(function () {
+            $(this).replaceWith("<span>&nbsp;" + this.value + "</span>");
+        });
+
+        $(mywindow.document).find('textarea').each(function () {
+            $(this).replaceWith("<span>&nbsp;" + this.value + "</span>");
+        });
+
+        $(mywindow.document).find('button').each(function () {
+            $(this).replaceWith("<span>" + "&nbsp;" + "</span>");
+        });
+
+        $(mywindow.document).find('a').each(function () {
+            $(this).replaceWith("<span>&nbsp;" + this.text + "</span>");
+        });
+
+        $(mywindow.document).find('canvas').each(function () {
+            //var mediumQuality = this.toDataURL("image/jpeg", 0.5);
+            var mediumQuality = this.toDataURL();
+            console.log("id:" + $(this).attr("id"));
+            console.log("dataUrl:" + mediumQuality.substr(0, 100));
+            $(this).replaceWith("<img src='" + mediumQuality + "' alt='from canvas' />");
+        });
+
+        if (is_chrome) {
+            setTimeout(function () { // wait until all resources loaded
+
+                var newwindow = window.open();
+                var ihtml = mywindow.document.body.innerHTML;
+                $(newwindow.document.body).append(ihtml);
+
+                mywindow.document.close(); // necessary for IE >= 10
+                mywindow.focus(); // necessary for IE >= 10
+                mywindow.print(); // change window to winPrint
+                //mywindow.close(); // change window to winPrint
+            }, 500);
+        } else {
+
+            var newwindow = window.open();
+            var ihtml = mywindow.document.body.innerHTML;
+            $(newwindow.document.body).append(ihtml);
+
+            mywindow.document.close(); // necessary for IE >= 10
+            mywindow.focus(); // necessary for IE >= 10
+            mywindow.print();
+            //mywindow.close();
+        }
+
+        return true;
+    };
+
 
     var lastmessage = "*";
     sysbase.putMessage = function (message, severity, dopush) {
