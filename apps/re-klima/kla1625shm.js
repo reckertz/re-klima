@@ -671,8 +671,19 @@
                     // sysbase.printDivAll($("#kla1625shmwrapper").html());
                     evt.preventDefault();
                     // https://github.com/jasonday/printThis
-                    $('#kla1625shmwrapper').printThis({
-                        canvas:true
+                    $('.doprintthis').printThis({
+                        canvas:true,
+                        afterPrint: function() {
+                            //var lsid = $("iframe").find("[name=printIframe]").attr("id");
+                            var lsid = $('iframe[name="printIframe"]').attr('id');
+                            debugger;
+                            var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+
+                            uihelper.downloadfile ("station.html", largestring, function(ret) {
+                                console.log("Downloaded");
+                            });
+
+                        }
                     });
 
                 }
@@ -1616,7 +1627,7 @@
             error: false,
             message: ""
         };
-
+        $(cid).addClass("doprintthis");
         /**
          * Histogramm ausgeben, wenn übergeben
          */
@@ -1970,10 +1981,12 @@
         var tableid = cid.substr(1) + "tbl";
         $(cid)
             .append($("<h3/>", {
-                text: "Temperaturverlauf"
+                text: "Temperaturverlauf",
+                class: "doprintthis",
             }))
             .append($("<div/>", {
                     id: ciddiv,
+                    class: "doprintthis",
                     css: {
                         width: "40%",
                         float: "left",
@@ -2055,6 +2068,7 @@
         $(cid)
             .append($("<div/>", {
                     id: ciddiv + "R1",
+                    class: "doprintthis",
                     css: {
                         width: "55%",
                         float: "right",
@@ -2182,7 +2196,9 @@
                     }
                 })
                 .append($("<h2>", {
-                    text: "Auswertung HYDE-Daten"
+                    text: "Auswertung HYDE-Daten",
+                    class: "doprintthis"
+
                 }))
             );
         for (var variablename in hyderep) {
@@ -2205,6 +2221,7 @@
                         })
                         .append($("<h2/>", {
                             html: variablename + " " + cfeCodes.getTitleKey("hydevariable", variablename),
+                            class: "doprintthis",
                             css: {
                                 width: "100%"
                             }
@@ -2219,6 +2236,7 @@
                             })
                             .append($("<table/>", {
                                     id: tableid,
+                                    class: "doprintthis",
                                     css: {
                                         width: "100%",
                                         float: "left"
@@ -2302,6 +2320,7 @@
                 $(ciddiv)
                     .parent()
                     .append($("<div/>", {
+                        class: "doprintthis",
                             css: {
                                 width: "49%",
                                 align: "right",

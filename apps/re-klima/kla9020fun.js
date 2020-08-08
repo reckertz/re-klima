@@ -140,6 +140,7 @@
                 }));
         }
 
+        $("#" + hcwrapperid).addClass("doprintthis");
         $("#" + hcwrapperid).show();
         $("#" + hccanvasid).show();
         if (typeof hmatrix.data === "undefined" || !Array.isArray(hmatrix.data)) {
