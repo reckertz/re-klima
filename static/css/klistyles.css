@@ -30,7 +30,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #77b2f511,
-    /* color: #21376c; */
+        /* color: #21376c; */
 }
 
 body {
@@ -89,7 +89,7 @@ h1 {
 }
 
 .col2of2 {
-   /* text-align: left; */
+    /* text-align: left; */
     float: right;
     width: 49%;
 }
@@ -249,7 +249,7 @@ span {}
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
     padding: 0px;
-    text-align:left;
+    text-align: left;
     float: left;
 }
 
@@ -362,12 +362,12 @@ body:not(:-moz-handler-blocked) .ui-field-contain {
 
 
 .uieform input[type=button] {
-    float:none;
+    float: none;
 }
 
 
 .uieform button {
-    float:none;
+    float: none;
 }
 
 .uieform th {
@@ -631,3 +631,14 @@ iframe {
 .draggable {
     background-color: mistyrose;
 }
+/*
+.doprintthis table {
+    border-collapse: collapse  !important;
+}
+
+.doprintthis table,
+th,
+td {
+    border: 1px solid black  !important;
+}
+*/

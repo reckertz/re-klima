@@ -659,35 +659,59 @@
 
 
 
-               .append($("<button/>", {
-                html: "Drucken",
-                css: {
-                    "text-align": "center",
-                    float: "left",
-                    margin: "10px"
+                .append($("<button/>", {
+                    html: "Drucken",
+                    css: {
+                        "text-align": "center",
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        // sysbase.printDivAll($("#kla1625shmwrapper").html());
+                        // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
+                        $('canvas').each(function (e) {
+                            var image = new Image();
+                            var that = this;
+                            image.src = this.toDataURL("image/png");
+                            var w = $(this).width();
+                            var h = $(this).height();
+                            $(image).width (w);
+                            $(image).height(h);
+                            var parspan = $(this).parent();
+                            if ($(parspan).prop("tagName") === "SPAN") {
+                                $(parspan).css({
+                                    width: w + "px",
+                                    height: h + "px"
+                                });
+                            }
+                            $(this).replaceWith(image);
+                        });
+                        evt.preventDefault();
+                        // https://github.com/jasonday/printThis
+                        $('.doprintthis').printThis({
+                            canvas: true,
+                            afterPrint: function () {
+                                //var lsid = $("iframe").find("[name=printIframe]").attr("id");
+                                var lsid = $('iframe[name="printIframe"]').attr('id');
 
-                },
-                click: function (evt) {
-                    // sysbase.printDivAll($("#kla1625shmwrapper").html());
-                    evt.preventDefault();
-                    // https://github.com/jasonday/printThis
-                    $('.doprintthis').printThis({
-                        canvas:true,
-                        afterPrint: function() {
-                            //var lsid = $("iframe").find("[name=printIframe]").attr("id");
-                            var lsid = $('iframe[name="printIframe"]').attr('id');
-                            debugger;
-                            var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+                                var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+                                uihelper.downloadfile("station.html", largestring, function (ret) {
+                                    console.log("Downloaded");
+                                });
+                                /*
+                                var canvas = document.getElementById("mycanvas");
+                                var imgString = canvas.toDataURL("image/png");
+                                var image1 = new Image();
+                                image1.src = imgString;
 
-                            uihelper.downloadfile ("station.html", largestring, function(ret) {
-                                console.log("Downloaded");
-                            });
+                                var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
+                                window.location.href = image;
+                                */
+                            }
+                        });
 
-                        }
-                    });
-
-                }
-            }))
+                    }
+                }))
 
                 .append($("<button/>", {
                     html: "Download HTML",
@@ -723,7 +747,6 @@
                         if ($("#kliheattable").is(":visible")) {
                             $("#kliheattable").hide();
                         } else {
-
                             $("#kla1625shmwrapper").empty();
                             var h = $("#heatmap").height();
                             var w = $("#kla1625shm.content").width();
@@ -740,14 +763,12 @@
                                         overflow: "auto"
                                     }
                                 }));
-
                             $("#kla1625shmcolormap").show();
                             kla9020fun.getColorPaletteX1("kla1625shmcolormap", 7);
                         }
                         return false;
                     }
                 }))
-
 
                 .append($("<div/>", {
                     id: "kla1625shmclock",
@@ -757,7 +778,6 @@
                         margin: "10px"
                     }
                 }))
-
 
             );
         /**
@@ -1741,7 +1761,7 @@
                                 id: sparkid,
                                 class: "mouseoverdemo",
                                 css: {
-                                    width: "100%",
+                                    /* width: "100%", */
                                     float: "left"
                                 }
                             }))
@@ -1986,7 +2006,6 @@
             }))
             .append($("<div/>", {
                     id: ciddiv,
-                    class: "doprintthis",
                     css: {
                         width: "40%",
                         float: "left",
@@ -1995,6 +2014,9 @@
                 })
                 .append($("<table/>", {
                         id: tableid,
+                        class: "doprintthis",
+                        border: "2",
+                        rules: "all",
                         css: {
                             width: "100%",
                             float: "left",
@@ -2237,8 +2259,10 @@
                             .append($("<table/>", {
                                     id: tableid,
                                     class: "doprintthis",
+                                    border: "2",
+                                    rules: "all",
                                     css: {
-                                        width: "100%",
+                                        width: "49%",
                                         float: "left"
                                     }
                                 })
@@ -2320,7 +2344,7 @@
                 $(ciddiv)
                     .parent()
                     .append($("<div/>", {
-                        class: "doprintthis",
+                            class: "doprintthis",
                             css: {
                                 width: "49%",
                                 align: "right",
@@ -2452,6 +2476,8 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
+                        border: "2",
+                        rules: "all",
                         id: "kla1625shmt1",
                         css: {
                             "max-width": w + "px"
@@ -2771,6 +2797,8 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
+                        border: "2",
+                        rules: "all",
                         id: "kla1625shmt1",
                         css: {
                             "max-width": w + "px"
@@ -3084,6 +3112,8 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
+                        border: "2",
+                        rules: "all",
                         id: "kla1625shmt1",
                         css: {
                             "max-width": w + "px"
@@ -3361,6 +3391,8 @@
                     })
                     .append($("<table/>", {
                             class: "tablesorter",
+                            border: "2",
+                            rules: "all",
                             id: "kla1625shmt1",
                             css: {
                                 "max-width": w + "px"
@@ -4595,6 +4627,8 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
+                        border: "2",
+                        rules: "all",
                         id: "kla1625shmt3",
                         css: {
                             "max-width": (w - scw - 10) + "px",
@@ -4666,6 +4700,8 @@
                 })
                 .append($("<table/>", {
                         class: "tablesorter",
+                        border: "2",
+                        rules: "all",
                         id: "kla1625shmt2",
                         css: {
                             "max-width": (w - scw - 10) + "px",
