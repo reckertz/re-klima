@@ -396,6 +396,12 @@
     };
 
 
+    /**
+     * putMessage
+     * @param {*} message
+     * @param {*} severity
+     * @param {*} dopush
+     */
     var lastmessage = "*";
     sysbase.putMessage = function (message, severity, dopush) {
         if (typeof severity === undefined) {

@@ -1893,7 +1893,9 @@
                             var schema = JSON.parse(bschema);
                             var record = {};
                             var result = uientry.fromUI2Record(popupHash, record, schema);
+
                             $(document).trigger('popupok', [JSON.stringify(result)]);
+
                             $(popupHash).remove();
                             return;
                         }

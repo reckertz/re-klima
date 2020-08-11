@@ -55,8 +55,8 @@
         //var idc2 = sysbase.tabcreateiframe("Animation", "", "re-klima", "kla1650ani", "klaworldmap.html");
         //window.parent.$(".tablinks[idhash='#" + idc2 + "']").click();
 
-        var idc3 = sysbase.tabcreateiframe("Textanalysis", "", "re-klima", "kla1700txt", "klatext.html");
-        window.parent.$(".tablinks[idhash='#" + idc3 + "']").click();
+        //var idc3 = sysbase.tabcreateiframe("Textanalysis", "", "re-klima", "kla1700txt", "klatext.html");
+        //window.parent.$(".tablinks[idhash='#" + idc3 + "']").click();
 
 
 

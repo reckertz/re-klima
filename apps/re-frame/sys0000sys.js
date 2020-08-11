@@ -259,13 +259,15 @@
             }
             sel = selstring; // et voila der Zauber
         }
-        if (limit > 0) {
-            //  + " LIMIT 10 OFFSET 0";
-            if (sel.toUpperCase().indexOf("ORDER BY") > 0) {
-                // sel += " LIMIT " + limit;
-                //sel += "," + skip;
-                sel += " LIMIT " + skip;
-                sel += "," + limit;
+        if (sel.indexOf("LIMIT ") > 0) {} else {
+            if (limit > 0) {
+                //  + " LIMIT 10 OFFSET 0";
+                if (sel.toUpperCase().indexOf("ORDER BY") > 0) {
+                    // sel += " LIMIT " + limit;
+                    //sel += "," + skip;
+                    sel += " LIMIT " + skip;
+                    sel += "," + limit;
+                }
             }
         }
         var ret = {};

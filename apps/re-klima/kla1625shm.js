@@ -208,9 +208,9 @@
                         // var fullname = dftfullname;
 
                         var gurl = "klaleaflet.html";
-                        gurl += "?"
+                        gurl += "?";
                         gurl += "latitude=" + encodeURIComponent(selparms.latitude);
-                        gurl += "&"
+                        gurl += "&";
                         gurl += "longitude=" + encodeURIComponent(selparms.longitude);
                         var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
                         window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
@@ -371,7 +371,7 @@
                 }))
 
 
-
+                /*
                 .append($("<button/>", {
                     html: "Bucketanalyse (10)",
                     css: {
@@ -384,6 +384,7 @@
                         kla1625shm.bucketAnalysis(10, selvariablename, selsource, selstationid);
                     }
                 }))
+                */
 
 
 
@@ -411,7 +412,7 @@
                 }))
                 */
 
-                /*
+
                 .append($("<button/>", {
                     html: "Super-Sparklines",
                     css: {
@@ -491,22 +492,21 @@
                             evt.stopImmediatePropagation();
                             console.log(extraParam);
                             var superParam = JSON.parse(extraParam).props;
-                            kla1625shm.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
-                                kla1625shm.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
-                                    return;
-                                });
+                            //kla1625shm.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
+                            kla1625shm.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
+                                return;
                             });
+                            //});
                         });
                         uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
-                            if (ret.error === false) {
-                            } else {
+                            if (ret.error === false) {} else {
                                 sysbase.putMessage("Kein Abruf Super-Sparklines", 1);
                                 return;
                             }
                         });
                     }
                 }))
-                */
+
 
                 /*
                 .append($("<button/>", {
@@ -675,8 +675,13 @@
                             image.src = this.toDataURL("image/png");
                             var w = $(this).width();
                             var h = $(this).height();
-                            $(image).width (w);
+                            $(image).width(w);
                             $(image).height(h);
+                            // doprintthis, wenn die Klasse schon da war
+                            if ($(this).hasClass("doprintthis")) {
+                                $(image).addClass("doprintthis");
+                            }
+
                             var parspan = $(this).parent();
                             if ($(parspan).prop("tagName") === "SPAN") {
                                 $(parspan).css({
@@ -714,7 +719,7 @@
                 }))
 
                 .append($("<button/>", {
-                    html: "Download HTML",
+                    html: "Aufbereiten HTML",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -723,6 +728,143 @@
                         evt.preventDefault();
                         // evt.stopPropagation();
                         // evt.stopImmediatePropagation();
+                        // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
+                        /**
+                         * Konvertieren svg zu image
+                         * http://bl.ocks.org/biovisualize/8187844
+                         */
+                        var tourl = "klaheatmap.html" + "?" + "stationid=" + selstationid + "&source=" + selsource + "&variablename=" + selvariablename;
+                        var idc21 = window.parent.sysbase.tabcreateiframe(selstationid, "", "re-klima", "kla1990htm", tourl);
+                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click(); // das legt erst den iFrame an
+                        setTimeout(function () {
+
+                            var actdiv = window.parent.$("#" + idc21);
+                            var actiFrame = $(actdiv).find("iframe").get(0);
+
+                            var actiFrameBody = $(actiFrame).contents();
+                            /**
+                             * Loop über alle doprintthis-Elemente
+                             */
+                            var aktwrapper = $(actiFrameBody).find(".kla1990htmwrapper");
+                            $('.doprintthis').each(function (index, printelement) {
+                                $(aktwrapper)
+                                    .append($(printelement));
+                                $(aktwrapper)
+                                    .append($("<div/>", {
+                                        html: "&nbsp;",
+                                        css: {
+                                            clear: "both"
+                                        }
+                                    }));
+
+                            });
+
+                            /**
+                             * Konvertieren canvas zu image
+                             */
+                            $(actiFrameBody).find('canvas').each(function (index, printcanvas) {
+                                var image = new Image();
+                                image.src = printcanvas.toDataURL("image/png");
+                                var w = $(printcanvas).width();
+                                var h = $(printcanvas).height();
+                                $(image).width(w);
+                                $(image).height(h);
+                                // doprintthis, wenn die Klasse schon da war
+                                if ($(printcanvas).hasClass("doprintthis")) {
+                                    $(image).addClass("doprintthis");
+                                }
+                                var parspan = $(printcanvas).parent();
+                                if ($(parspan).prop("tagName") === "SPAN") {
+                                    $(parspan).css({
+                                        width: w + "px",
+                                        height: h + "px"
+                                    });
+                                }
+                                $(printcanvas).replaceWith(image);
+                            });
+
+
+
+
+
+                        }, 2000);
+                        if (1 === 1) return;
+
+
+
+                        $(actiFrame).find('svg').each(function (index, svgelement) {
+                            var svgString = new XMLSerializer().serializeToString(svgelement);
+                            //var canvas = document.getElementById("canvas");
+                            var canvas = document.createElement("canvas");
+                            var ctx = canvas.getContext("2d");
+                            var DOMURL = self.URL || self.webkitURL || self;
+                            var svg = new Blob([svgString], {
+                                type: "image/svg+xml;charset=utf-8"
+                            });
+                            var url = DOMURL.createObjectURL(svg);
+                            var image = new Image();
+                            image.src = url;
+                            var w = $(svgelement).width();
+                            var h = $(svgelement).height();
+                            $(image).width(w);
+                            $(image).height(h);
+                            // doprintthis, wenn die Klasse schon da war
+                            if ($(svgelement).hasClass("doprintthis")) {
+                                $(svgelement).addClass("doprintthis");
+                            }
+                            var parspan = $(svgelement).parent();
+                            if ($(parspan).prop("tagName") === "SPAN") {
+                                $(parspan).css({
+                                    width: w + "px",
+                                    height: h + "px"
+                                });
+                            }
+                            $(svgelement).replaceWith(image);
+                            /*
+                            var img = new Image();
+                            img.onload = function () {
+                                ctx.drawImage(img, 0, 0);
+                                var png = canvas.toDataURL("image/png");
+                                document.querySelector('#png-container').innerHTML = '<img src="' + png + '"/>';
+                                DOMURL.revokeObjectURL(png);
+                            };
+                            img.src = url;
+                            */
+                        });
+                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                        /*
+                        var largestring = $("#kla1625shmwrapper").html();
+                        uihelper.downloadfile("station.html", largestring, function (ret) {
+                            console.log("Downloaded");
+                        });
+                        */
+                        // https://github.com/jasonday/printThis
+                        /*
+                        $('.doprintthis').printThis({
+                            canvas: true,
+                            afterPrint: function () {
+                                //var lsid = $("iframe").find("[name=printIframe]").attr("id");
+                                var lsid = $('iframe[name="printIframe"]').attr('id');
+                                var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+                                uihelper.downloadfile("station.html", largestring, function (ret) {
+                                    console.log("Downloaded");
+                                });
+                                var canvas = document.getElementById("mycanvas");
+                                var imgString = canvas.toDataURL("image/png");
+                                var image1 = new Image();
+                                image1.src = imgString;
+
+                                var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
+                                window.location.href = image;
+
+                            }
+                        });
+                        */
+
+
+
+
+                        /*
                         var a = document.body.appendChild(
                             document.createElement("a")
                         );
@@ -730,6 +872,7 @@
                         a.href = "data:text/html," + document.getElementById("kla1625shmwrapper").innerHTML;
                         //a.innerHTML = "[Export content]";
                         a.click();
+                        */
                     }
                 }))
 
@@ -750,9 +893,9 @@
                             $("#kla1625shmwrapper").empty();
                             var h = $("#heatmap").height();
                             var w = $("#kla1625shm.content").width();
-                            w -= $("#heatmap").position().left;
-                            w -= $("#heatmap").width();
-                            w -= 40;
+                            w -= 0; // $("#heatmap").position().left;
+                            w -= 0; // $("#heatmap").width();
+                            w -= 0; // 40;
                             $("#kla1625shmwrapper")
                                 .append($("<div/>", {
                                     id: "kla1625shmcolormap",
@@ -1105,7 +1248,66 @@
         */
 
         async.waterfall([
-                function (cb1625g1) {
+                function (cb1625g0) {
+                    var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                    $("#kla1625shmwrapper")
+                        .append($("<div/>", {
+                            id: divid,
+                            css: {
+                                width: "100%",
+                                float: "left",
+                                overflow: "hidden"
+                            }
+                        }));
+                    /**
+                     * Prüfung der Datenqualität je Jahr in klirecords.years
+                     */
+
+                     for (var irec = 0; irec < klirecords.length; irec++) {
+                        var klirecord = klirecords[irec];
+                        var years = JSON.parse(klirecord.years)
+                        var rawyears = Object.keys(years);
+                        var yearcontrol = [];
+                        var firstyear = null;
+                        var lastyear = null;
+                        for (var iyear = 0; iyear < rawyears.length; iyear++) {
+                            yearcontrol.push(parseInt(rawyears[iyear]));
+                        }
+                        yearcontrol.sort(function (a, b) {
+                            if (a < b)
+                                return -1;
+                            if (a > b)
+                                return 1;
+                            return 0;
+                        });
+                        debugger;
+                        var imissing = 0;
+                        var ibad = 0;
+                        var badyears = [];
+                        var missingyears = [];
+                        for (var iyear = 1; iyear < yearcontrol.length; iyear++) {
+                            var ydiff = yearcontrol[iyear] + yearcontrol[iyear-1];
+                            if (ydiff !== 1) {
+                                for (var imiss = yearcontrol[iyear-1] + 1; imiss < yearcontrol[iyear] - 1; imiss++) {
+                                    missingyears.push(imiss);
+                                }
+                            }
+                        }
+                        for (var iyear = 1; iyear < yearcontrol.length; iyear++) {
+                            var ayear = "" + yearcontrol[iyear];
+                            var testyear = years[ayear];
+                            if (uihelper.isqualityyear(testyear) === false) {
+                                badyears.push(ayear);
+                            }
+                        }
+                        console.log("Missing:" + JSON.stringify(missingyears));
+                        console.log("Bad:" + JSON.stringify(badyears));
+                    }
+
+                    cb1625g0(null, ret);
+                    return;
+                },
+                function (ret27, cb1625g1) {
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     $("#kla1625shmwrapper")
                         .append($("<div/>", {
@@ -1471,6 +1673,7 @@
                     var rowheight;
                     var wratio;
                     var hratio;
+                    var hmvalstr;
                     try {
 
                         if (selvariablename === "TMAX" && klirecords.length > 0) {
@@ -1536,7 +1739,7 @@
                                                     hmoptions.maxval = hmval;
                                                 }
                                                 if (hmoptions.minmaxhistogram === true) {
-                                                    var hmvalstr = "" + Math.round(parseFloat(rowvalues[icol]));
+                                                    hmvalstr = "" + Math.round(parseFloat(rowvalues[icol]));
                                                     if (typeof histo1[hmvalstr] === "undefined") {
                                                         histo1[hmvalstr] = 0;
                                                     }
@@ -1647,7 +1850,8 @@
             error: false,
             message: ""
         };
-        $(cid).addClass("doprintthis");
+
+        //$(cid).addClass("doprintthis");
         /**
          * Histogramm ausgeben, wenn übergeben
          */
@@ -1701,12 +1905,14 @@
                 tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
                 $(cid)
                     .append($("<h3/>", {
-                        text: "Histogramm Temperaturverteilung"
+                        text: "Histogramm Temperaturverteilung",
+                        class: "doprintthis"
                     }))
                     .append($("<table/>", {
                             id: tableid,
                             border: "2",
                             rules: "all",
+                            class: "doprintthis",
                             css: {
                                 float: "left",
                                 margin: "10px",
@@ -1932,10 +2138,12 @@
                         }
                     })
                     .append($("<h3/>", {
-                        text: "Histogramm 1. Dezimalstelle"
+                        text: "Histogramm 1. Dezimalstelle",
+                        class: "doprintthis"
                     }))
                     .append($("<canvas/>", {
                         id: chartid,
+                        class: "doprintthis",
                         css: {
                             "text-align": "center"
                         }
@@ -1959,7 +2167,8 @@
                         colorschemes: {
                             scheme: 'brewer.Paired12'
                         }
-                    }
+                    },
+                    animation: true
                 }
             };
             for (var ibuck = 0; ibuck < buckyears.length; ibuck++) {
@@ -1973,7 +2182,6 @@
                     borderWidth: 2
                 });
             }
-
             window.chart1 = new Chart(ctx, config);
 
             cb1625h(ret);
@@ -2005,10 +2213,20 @@
                 class: "doprintthis",
             }))
             .append($("<div/>", {
-                    id: ciddiv,
+                id: ciddiv + "L1",
+                css: {
+                    width: "55%",
+                    margin: "10px",
+                    float: "left",
+                    "background-color": "white",
+                    overflow: "hidden"
+                }
+            }))
+            .append($("<div/>", {
+                    id: ciddiv + "R1",
                     css: {
                         width: "40%",
-                        float: "left",
+                        float: "right",
                         overflow: "hidden"
                     }
                 })
@@ -2018,9 +2236,9 @@
                         border: "2",
                         rules: "all",
                         css: {
-                            width: "100%",
+                            width: "95%",
                             float: "left",
-                            margin: "15px"
+                            margin: "10px"
                         }
                     })
                     .append($("<thead/>")
@@ -2076,7 +2294,7 @@
                 if (miny === null) {
                     miny = yeardata.minval;
                 } else if (miny < yeardata.minval) {
-                    miny = yeardata.minval
+                    miny = yeardata.minval;
                 }
                 if (maxy === null) {
                     maxy = yeardata.maxval;
@@ -2086,25 +2304,16 @@
             }
         }
 
+
         var chartid = ciddiv + "chart";
-        $(cid)
-            .append($("<div/>", {
-                    id: ciddiv + "R1",
-                    class: "doprintthis",
-                    css: {
-                        width: "55%",
-                        float: "right",
-                        overflow: "hidden",
-                        "background-color": "white"
-                    }
-                })
-                .append($("<canvas/>", {
-                    id: chartid,
-                    css: {
-                        "text-align": "center"
-                    }
-                }))
-            );
+        $("#" + ciddiv + "L1")
+            .append($("<canvas/>", {
+                id: chartid,
+                class: "doprintthis",
+                css: {
+                    "text-align": "center"
+                }
+            }));
 
         var ctx = document.getElementById(chartid).getContext('2d');
         //Chart.defaults.global.plugins.colorschemes.override = true;
@@ -2344,7 +2553,6 @@
                 $(ciddiv)
                     .parent()
                     .append($("<div/>", {
-                            class: "doprintthis",
                             css: {
                                 width: "49%",
                                 align: "right",
@@ -2355,6 +2563,7 @@
                         // hier Canvas für Chartjs
                         .append($("<canvas/>", {
                             id: chartid,
+                            class: "doprintthis",
                             css: {
                                 "text-align": "center"
                             }
@@ -3353,9 +3562,9 @@
             h -= $(".footer").height();
 
             var w = $("#kla1625shm.content").width();
-            w -= $("#heatmap").position().left;
-            w -= $("#heatmap").width();
-            w -= 40;
+            w -= 0; // $("#heatmap").position().left;
+            w -= 0; // $("#heatmap").width();
+            w -= 0; // 40;
             $("#kla1625shmwrapper").css({
                 overflow: "auto",
                 height: h,
@@ -5279,7 +5488,7 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform",
-                "translate(" + margin.left + "," + margin.top + ")")
+                "translate(" + margin.left + "," + margin.top + ")");
 
         var minx = null;
         var maxx = null;
@@ -5360,7 +5569,7 @@
         svg.selectAll("circle")
             .transition()
             .delay(function (d, i) {
-                return (i * 3)
+                return (i * 3);
             })
             .duration(2000)
             .attr("cx", function (d) {
