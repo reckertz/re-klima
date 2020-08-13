@@ -2348,3 +2348,656 @@
     };
 
 
+
+
+
+    /**
+     * paintX - gemischte Auswertung TMAX, TMIN und "all years"
+     * mit Super-Sparkline auf Basis klirecords
+     * superParam.sunwinter - das ist schon ein Brocken
+     */
+    var outrecords = [];
+    kla1625shm.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
+        try {
+            outrecords = [];
+            if (typeof klirecords === "undefined" || klirecords.length < 1) {
+                sysbase.putMessage("Keine Daten vorhanden", 3);
+                return;
+            }
+            /**
+             * Container kla1625shmwrapper aufbereiten
+             * in diesen Container gehen sukzessive die Auswertungen
+             */
+            $("#kla1625shmwrapper").empty();
+            var h = screen.height;
+            h -= $(".header").height();
+            h -= $("#kla1625shmbuttons").height();
+            h -= $(".footer").height();
+
+            var w = $("#kla1625shm.content").width();
+            w -= 0; // $("#heatmap").position().left;
+            w -= 0; // $("#heatmap").width();
+            w -= 0; // 40;
+            $("#kla1625shmwrapper").css({
+                overflow: "auto",
+                height: h,
+                width: w
+            });
+            var stationdata = klirecords[0];
+            /**
+             * Abschnitt Stammdaten zur Station
+             */
+            $("#kla1625shmwrapper")
+                .append($("<div/>", {
+                        css: {
+                            width: "100%",
+                            overflow: "hidden"
+                        }
+                    })
+                    .append($("<h2/>", {
+                        id: "kla1625shmh2",
+                        text: stationdata.stationid + " " + stationdata.stationname
+                    }))
+                );
+
+            /**
+             * Abschnitt sparklines
+             * Header zu sparkline-Tabelle
+             * */
+            $("#kla1625shmwrapper")
+                .append($("<div/>", {
+                        css: {
+                            width: "100%",
+                            overflow: "hidden"
+                        }
+                    })
+                    .append($("<table/>", {
+                            class: "tablesorter",
+                            border: "2",
+                            rules: "all",
+                            id: "kla1625shmt1",
+                            css: {
+                                "max-width": w + "px"
+                            }
+                        })
+                        .append($("<thead/>")
+                            .append($("<tr/>")
+                                .append($("<th/>", {
+                                    html: "Jahr"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Kat"
+                                }))
+                                .append($("<th/>", {
+                                    html: "Sparkline mit Regressionsgerade y = m*x + c"
+                                }))
+                                .append($("<th/>", {
+                                    html: "m"
+                                }))
+                                .append($("<th/>", {
+                                    html: "c"
+                                })).append($("<th/>", {
+                                    html: "r2"
+                                }))
+                                .append($("<th/>", {
+                                    html: "min"
+                                }))
+                                .append($("<th/>", {
+                                    html: "max"
+                                }))
+                                .append($("<th/>", {
+                                    html: "avg"
+                                }))
+                            )
+                        )
+                        .append($("<tbody/>"))
+                    )
+                );
+
+            /**
+             * jedes Jahr mit allen Tagen für eine Sparkline
+             */
+            var varyears = [];
+            var fromyear = null;
+            var toyear = null;
+            varyears.push({
+                variablename: klirecords[0].variable,
+                years: JSON.parse(klirecords[0].years)
+            });
+            fromyear = parseInt(klirecords[0].fromyear);
+            toyear = parseInt(klirecords[0].toyear);
+            if (klirecords.length > 1) {
+                varyears.push({
+                    variablename: klirecords[1].variable,
+                    years: JSON.parse(klirecords[1].years)
+                });
+                var fromyear1 = parseInt(klirecords[1].fromyear);
+                var toyear1 = parseInt(klirecords[1].toyear);
+                if (fromyear1 < fromyear) fromyear = fromyear1;
+                if (toyear1 > toyear) toyear = toyear1;
+            }
+            /**
+             * Vorlauf: Loop über alle möglichen Jahre
+             * totmin und totmax bestimmen die Dimensionierung der Sparklines!!!
+             * evtl. runden auf .5/.0
+             */
+            var totmin = null;
+            var totmax = null;
+            var xcount = 0;
+            for (var iyear = fromyear; iyear <= toyear; iyear++) {
+                for (var ivar = 0; ivar < varyears.length; ivar++) {
+                    xcount++;
+                    if (typeof varyears[ivar].years === "undefined" ||
+                        typeof varyears[ivar].years[iyear] === "undefined") {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert");
+                        continue;
+                    }
+                    if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
+                        console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
+                        continue;
+                    }
+                    for (var iday = 0; iday < varyears[ivar].years[iyear].length; iday++) {
+                        var temp = varyears[ivar].years[iyear][iday];
+                        if (temp !== null && temp.length > 0) {
+                            if (totmin === null) {
+                                totmin = temp;
+                            } else if (totmin > parseFloat(temp)) {
+                                totmin = parseFloat(temp);
+                            }
+                            if (totmax === null) {
+                                totmax = temp;
+                            } else if (totmax < parseFloat(temp)) {
+                                totmax = parseFloat(temp);
+                            }
+                        }
+                    }
+                }
+            }
+            superParam.totmin = totmin;
+            superParam.totmax = totmax;
+            /**
+             * Basis-Loop über die Jahr und die Variablen
+             */
+            var pcount = 0; // für die sparklines
+            var rowdata = [];
+            for (var iyear = fromyear; iyear <= toyear; iyear++) {
+                if (superParam.total === true) {
+                    rowdata = []; // bekommt rowrecord[0] und [1]
+                    pcount++;
+                    for (var ivar = 0; ivar < varyears.length; ivar++) {
+                        // Jahr ohne Daten
+                        if (typeof varyears[ivar].years === "undefined" ||
+                            typeof varyears[ivar].years[iyear] === "undefined") {
+                            console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert");
+                            continue;
+                        }
+                        if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
+                            console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
+                            continue;
+                        }
+                        /**
+                         * reine Vorbereitung und Initialisierung rowrecord für rowdata
+                         * noch keine Algorithmen
+                         */
+                        var rowrecord = {};
+                        rowrecord.source = selsource;
+                        rowrecord.stationid = selstationid;
+                        rowrecord.variablename = varyears[ivar].variablename;
+                        rowrecord.year = iyear.toFixed(0);
+                        rowrecord.tarray = [];
+                        rowrecord.pearls = [];
+                        for (var iday = 0; iday < varyears[ivar].years[iyear].length; iday++) {
+                            var temp = varyears[ivar].years[iyear][iday];
+                            if (temp === null || temp.length === 0) {
+                                rowrecord.tarray[iday] = [iday, null]; // x, y
+                                rowrecord.pearls.push(null);
+                            } else {
+                                var tempf = parseFloat(temp)
+                                rowrecord.tarray[iday] = [iday, tempf];
+                                rowrecord.pearls.push(temp);
+                            }
+                        }
+                        rowdata.push(rowrecord);
+                    }
+                    kla1625shm.paintXtr("#kla1625shmt1", "tot", iyear, pcount, rowdata, superParam);
+                }
+
+
+                if (superParam.sunwinter === true) {
+                    // Sommer- und Winterrechnung - halbes Jahr
+                    rowdata = []; // bekommt rowrecord[0] und [1]
+                    pcount++;
+                    var middleindex;
+                    for (var ivar = 0; ivar < varyears.length; ivar++) {
+                        /**
+                         * Sommer
+                         */
+                        if (typeof varyears[ivar].years === "undefined" ||
+                            typeof varyears[ivar].years[iyear] === "undefined") {
+                            console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert");
+                            continue;
+                        }
+                        if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
+                            console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
+                            continue;
+                        }
+                        var rowrecord = {};
+                        rowrecord.source = selsource;
+                        rowrecord.stationid = selstationid;
+                        rowrecord.variablename = varyears[ivar].variablename;
+                        rowrecord.year = iyear.toFixed(0);
+                        rowrecord.tarray = [];
+                        rowrecord.pearls = [];
+                        if (uihelper.isleapyear(iyear)) {
+                            middleindex = 366 / 2;
+                        } else {
+                            middleindex = Math.floor(365 / 2);
+                        }
+                        for (var iday = 0; iday < middleindex; iday++) {
+                            var temp = varyears[ivar].years[iyear][iday];
+                            if (temp === null || temp.length === 0) {
+                                rowrecord.tarray[iday] = [iday, null]; // x, y
+                                rowrecord.pearls.push(null);
+                            } else {
+                                var tempf = parseFloat(temp);
+                                rowrecord.tarray[iday] = [iday, tempf];
+                                rowrecord.pearls.push(temp);
+                            }
+                        }
+                        rowdata.push(rowrecord);
+                    }
+                    kla1625shm.paintXtr("#kla1625shmt1", "som", iyear, pcount, rowdata, superParam);
+
+
+                    /**
+                     * Winter
+                     */
+                    rowdata = []; // bekommt rowrecord[0] und [1]
+                    pcount++;
+                    for (var ivar = 0; ivar < varyears.length; ivar++) {
+                        /**
+                         * Sommer
+                         */
+                        if (typeof varyears[ivar].years === "undefined" ||
+                            typeof varyears[ivar].years[iyear] === "undefined") {
+                            console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert");
+                            continue;
+                        }
+                        if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
+                            console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
+                            continue;
+                        }
+                        rowrecord = {};
+                        rowrecord.source = selsource;
+                        rowrecord.stationid = selstationid;
+                        rowrecord.variablename = varyears[ivar].variablename;
+                        rowrecord.year = iyear.toFixed(0);
+                        rowrecord.tarray = [];
+                        rowrecord.pearls = [];
+                        var firstindex = varyears[ivar].years[iyear].length - middleindex;
+                        var lastindex = varyears[ivar].years[iyear].length;
+                        for (var iday = firstindex - 1; iday < lastindex; iday++) {
+                            var temp = varyears[ivar].years[iyear][iday];
+                            if (temp === null || temp.length === 0) {
+                                rowrecord.tarray.push([iday, null]); // x, y
+                                rowrecord.pearls.push(null);
+                            } else {
+                                var tempf = parseFloat(temp);
+                                rowrecord.tarray.push([iday, tempf]);
+                                rowrecord.pearls.push(temp);
+                            }
+                        }
+                        rowdata.push(rowrecord);
+                    }
+                    kla1625shm.paintXtr("#kla1625shmt1", "win", iyear, pcount, rowdata, superParam);
+                }
+            }
+            /**
+             * Nachlauf für die gesamte Tabelle
+             */
+            $(".tablesorter").tablesorter({
+                theme: "blue",
+                widgets: ['filter'],
+                widthFixed: false,
+                widgetOptions: {
+                    filter_hideFilters: false,
+                    filter_ignoreCase: true
+                }
+            }); // so funktioniert es
+        } catch (err) {
+            console.log(err);
+            console.log(err.stack);
+        }
+
+        if (superParam.export === true) {
+            //for (var irow = 0; irow < rowdata.length; irow++) {
+            //    var outrecord = rowdata[irow];
+            async.eachSeries(outrecords, function (outrecord, nextoutrecord) {
+                delete outrecord.tarray;
+                delete outrecord.points;
+                outrecord.pearls = outrecord.pearls.join(",");
+                var selfields = {
+                    source: outrecord.source,
+                    stationid: outrecord.stationid,
+                    year: outrecord.year,
+                    rkat: outrecord.rkat,
+                    variable: outrecord.variablename
+                };
+                var updfields = {};
+                updfields["$setOnInsert"] = {
+                    source: outrecord.source,
+                    stationid: outrecord.stationid,
+                    year: outrecord.year,
+                    rkat: outrecord.rkat,
+                    variable: outrecord.variablename
+                };
+                delete outrecord.source;
+                delete outrecord.stationid;
+                delete outrecord.year;
+                delete outrecord.rkat;
+                delete outrecord.variablename;
+                updfields["$set"] = outrecord;
+                uihelper.setOneRecord(selfields, updfields, "setonerecord", "KLISTA1", function (ret) {
+                    nextoutrecord();
+                    return;
+                });
+            }, function (err) {
+                sysbase.putMessage("Daten geschrieben");
+                callbackshm9({
+                    error: false,
+                    message: "Daten gechrieben"
+                });
+                return;
+            });
+        } else {
+            callbackshm9({
+                error: false,
+                message: "keine Daten gechrieben"
+            });
+            return;
+        }
+
+
+    }; // ende paintX
+
+    /**
+     * kla1625shm.paintXtr - Ausgabe der Zeilen zu rowdata[0] und rowdata[1]
+     * max drei Zeilen für total, summer-up, winter-dwn
+     * @param {*} trcontainer
+     * @param {*} rowdata
+     * @param {*} superParam
+     */
+    kla1625shm.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
+        /**
+         * Vorlauf: regressionsrechnung
+         */
+        var totmin = superParam.totmin;
+        var totmax = superParam.totmax;
+        for (var irow = 0; irow < rowdata.length; irow++) {
+            var rowrecord = rowdata[irow];
+            rowrecord.year = iyear;
+            rowrecord.rkat = rkat;
+            var cleanarray0 = rowrecord.pearls.map(function (pearl) {
+                if (pearl === null) {
+                    return null;
+                } else {
+                    return parseFloat(pearl);
+                }
+            });
+            var cleanarray = cleanarray0.filter(function (cval) {
+                if (cval !== null) cval = parseFloat(cval);
+                return cval !== null;
+            });
+            rowrecord.tmin = cleanarray.reduce(function (min, p) {
+                return p < min ? p : min;
+            }).toFixed(1);
+            rowrecord.tmax = cleanarray.reduce(function (max, p) {
+                return p > max ? p : max;
+            }).toFixed(1);
+            rowrecord.tcount = cleanarray.length;
+            rowrecord.tsum = cleanarray.reduce(function (total, num) {
+                return total + num;
+            });
+            rowrecord.tavg = (rowrecord.tsum / rowrecord.tcount).toFixed(2);
+            rowrecord.tsum = rowrecord.tsum.toFixed(1);
+            var result = regression.linear(rowrecord.tarray, {
+                order: 2,
+                precision: 3,
+            });
+            var gradient = result.equation[0];
+            var yIntercept = result.equation[1];
+            var r2 = result.r2;
+            rowrecord.gradient = (gradient).toFixed(3);
+            rowrecord.yIntercept = yIntercept.toFixed(1);
+            rowrecord.r2 = (r2).toFixed(3);
+            rowrecord.points = result.points;
+            array1.push({
+                temp: r2,
+                gradient: gradient
+            });
+            if (superParam.export === true) {
+                for (var irowdata = 0; irowdata < rowdata.length; irowdata++) {
+                    outrecords.push(rowrecord);
+                }
+            }
+        }
+        /**
+         * Bearbeitung: Ausgabe in Tabellenzeile
+         */
+        // hier wird eine Tabellenzeile für TMIN und TMAX ausgegeben
+        var rowtit = iyear.toFixed(0);
+        if (rowdata.length > 0) {
+            /**
+             * neue eine Variable = eine einfache Zeile
+             */
+            $("#kla1625shmt1")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: rowtit
+                    }))
+                    .append($("<td/>", {
+                        id: 'var' + pcount,
+                        html: rkat + "<br>" + rowdata[0].variablename
+                    }))
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'spark' + pcount,
+                            css: {
+                                margin: "5px",
+                                float: "left",
+                                "background-color": "yellow"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'grad' + pcount,
+                            html: rowdata[0].gradient,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'inter' + pcount,
+                            html: rowdata[0].yIntercept,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'r2' + pcount,
+                            html: rowdata[0].r2,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'min' + pcount,
+                            html: rowdata[0].tmin,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'max' + pcount,
+                            html: rowdata[0].tmax,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                    .append($("<td/>")
+                        .append($("<span/>", {
+                            id: 'avg' + pcount,
+                            html: rowdata[0].tavg,
+                            css: {
+                                margin: "5px",
+                                float: "right"
+                            }
+                        }))
+                    )
+                );
+
+
+            var defaultpixel = 3;
+            if (rowdata[0].pearls.length > 350) defaultpixel = 2;
+            var sparkid = "#spark" + pcount;
+            $(sparkid).sparkline(rowdata[0].pearls, {
+                type: 'line',
+                height: 60,
+                fillColor: false,
+                defaultPixelsPerValue: defaultpixel,
+                chartRangeMin: totmin,
+                chartRangeMax: totmax,
+                lineColor: "red"
+                /* composite: true */
+            });
+
+            if (typeof rowdata[0].points !== "undefined") {
+                var sparkpoints = [];
+                for (var i = 0; i < rowdata[0].points.length; i++) {
+                    sparkpoints.push(rowdata[0].points[i][1]);
+                }
+                $(sparkid).sparkline(sparkpoints, {
+                    type: 'line',
+                    height: 60,
+                    fillColor: false,
+                    defaultPixelsPerValue: defaultpixel,
+                    chartRangeMin: totmin,
+                    chartRangeMax: totmax,
+                    lineColor: "black",
+                    composite: true
+                });
+            }
+        }
+        if (rowdata.length >= 2) {
+            /**
+             * Doppelzeile, wird spannend - anfügen an bestehende span-Bereiche
+             * mit id aus spark, grad, inter, r2, min, max, avg und pcount als Suffix
+             */
+            try {
+                var html = "";
+
+                html = $("#var" + pcount).html();
+                html += "<br>" + rowdata[1].variablename;
+                $("#var" + pcount).html(html);
+
+                html = $("#grad" + pcount).html();
+                html += "<br>" + rowdata[1].gradient;
+                $("#grad" + pcount).html(html);
+
+                html = $("#inter" + pcount).html();
+                html += "<br>" + rowdata[1].yIntercept;
+                $("#inter" + pcount).html(html);
+
+                html = $("#r2" + pcount).html();
+                html += "<br>" + rowdata[1].r2;
+                $("#r2" + pcount).html(html);
+
+                html = $("#min" + pcount).html();
+                html += "<br>" + rowdata[1].tmin;
+                $("#min" + pcount).html(html);
+
+                html = $("#max" + pcount).html();
+                html += "<br>" + rowdata[1].tmax;
+                $("#max" + pcount).html(html);
+
+                html = $("#avg" + pcount).html();
+                html += "<br>" + rowdata[1].tavg;
+                $("#avg" + pcount).html(html);
+
+                var defaultpixel = 3;
+                if (rowdata[0].pearls.length > 350) defaultpixel = 2;
+                var sparkid = "#spark" + pcount;
+                $(sparkid).sparkline(rowdata[1].pearls, {
+                    type: 'line',
+                    height: 60,
+                    fillColor: false,
+                    defaultPixelsPerValue: defaultpixel,
+                    chartRangeMin: totmin,
+                    chartRangeMax: totmax,
+                    lineColor: "blue",
+                    composite: true
+                });
+            } catch (err) {
+
+            }
+        }
+        /**
+         * Vollmond als Bar-Chart zu iyear und pcount mit uihelper.moonphase
+         * returns phase, name
+         * 0 = Neumond => -8 in der Graphik
+         * 4 = Vollmond => +8
+         */
+        if (superParam.moon === true) {
+            var moonpearls = [];
+            var anztage = 365;
+            if (uihelper.isleapyear(iyear)) {
+                anztage = 366;
+            }
+            for (var iday = 0; iday < anztage; iday++) {
+                var mday = uihelper.fromTTT2MMTT(iyear, iday);
+                var moon = uihelper.moonphase(iyear, mday.month, mday.day);
+                if (moon.phase === 0) {
+                    moonpearls.push("-8");
+                } else if (moon.phase === 4) {
+                    moonpearls.push("8");
+                    // if (iyear === 1968) console.log("1968:" + iday + "=>" + mday.day + "." + mday.month + "=>" + moon.phase);
+                } else {
+                    moonpearls.push(null);
+                }
+            }
+            var defaultpixel = 3;
+            if (anztage > 350) defaultpixel = 2;
+            var sparkid = "#spark" + pcount;
+            $(sparkid).sparkline(moonpearls, {
+                type: 'bar',
+                height: 60,
+                barColor: "red",
+                negBarColor: "blue",
+                barWidth: defaultpixel,
+                barSpacing: 0,
+                fillColor: false,
+                defaultPixelsPerValue: defaultpixel,
+                chartRangeMin: totmin,
+                chartRangeMax: totmax,
+                composite: true
+            });
+        }
+    }; // paintXtr
+
+
+

@@ -294,7 +294,6 @@
         } else {
             return "";
         }
-
     };
 
     uihelper.getWeekDayLongtext = function (dayofweek) {
@@ -306,7 +305,6 @@
         } else {
             return "";
         }
-
     };
 
     /**
@@ -2498,6 +2496,13 @@
      *    day - one-based
      */
     uihelper.fromTTT2MMTT = function (tyear, tint) {
+        if (tint < 31) {
+            // zuordnen 1. Monat explizit
+            return {
+                month:  1,
+                day: tint + 1
+            }
+        }
         var uihelpermd = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         if (uihelper.isleapyear(tyear)) {
             uihelpermd[1] = 29;
