@@ -37,7 +37,7 @@
     var sqlStmt = "";
     var origin = "";
     var poprecord = {};
-
+    var confrecord = {};
     var staschema = {
         entryschema: {
             source: {
@@ -1373,16 +1373,19 @@
         evt.stopImmediatePropagation();
         evt.stopPropagation();
         var stationid = $(this).closest("tr").attr("rowid");
+        var longitude = $(this).closest("tr").attr("longitude");
+        var latitude = $(this).closest("tr").attr("latitude");
+
         var source = starecord.source;
         var variablename = starecord.variablename;
         selvariablename = variablename;
         console.log("Station:" + stationid + " from:" + source);
 
         var username = uihelper.getUsername();
-        var popschema = {
+        var confschema = {
             entryschema: {
                 props: {
-                    title: "Abrufparameter",
+                    title: "Abrufparameter " + stationid,
                     description: "",
                     type: "object", // currency, integer, datum, text, key, object
                     class: "uiefieldset",
@@ -1391,14 +1394,12 @@
                             title: "Stammdaten",
                             type: "string", // currency, integer, datum, text, key
                             class: "uiecheckbox",
-                            default: true,
                             io: "i"
                         },
                         qonly: {
-                            title: "Nur 'gute Daten'",
+                            title: "gute Daten",
                             type: "string", // currency, integer, datum, text, key
                             class: "uiecheckbox",
-                            default: true,
                             io: "i"
                         },
                         heatmaps: {
@@ -1452,7 +1453,7 @@
             }
         };
         var anchorHash = "#kla1610sta .col2of2";
-        var title = "Super-Sparklines";
+        var title = "GHCN-D Analyse-Konfiguration";
         var pos = {
             left: $(anchorHash).offset().left,
             top: window.screen.height * 0.1,
@@ -1464,15 +1465,16 @@
             evt.stopPropagation();
             evt.stopImmediatePropagation();
             console.log(extraParam);
-            var superParam = JSON.parse(extraParam).props;
+            confrecord = JSON.parse(extraParam).props;
+
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
-                source: source,
+                source: starecord.source,
                 variablename: selvariablename,
                 starecord: starecord,
                 latitude: $(this).closest("tr").attr("latitude"),
                 longitude: $(this).closest("tr").attr("longitude"),
-                config: superParam
+                config: confrecord
             }));
             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
@@ -1480,9 +1482,9 @@
             var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         });
-        if (Object.keys(poprecord).length === 0) {
+        if (Object.keys(confrecord).length === 0) {
             // Default-Setzungen
-            poprecord = {
+            confrecord = {
                 comment: "",
                 decimals: true,
                 heatmaps: true,
@@ -1494,25 +1496,14 @@
                 temptable: true
             };
         }
-        uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
+        uientry.inputDialogX(anchorHash, pos, title, confschema, confrecord, function (ret) {
             if (ret.error === false) {} else {
                 sysbase.putMessage("Kein Abruf Super-Sparklines", 1);
                 return;
             }
         });
 
-
-
-
-
-
-
-
-
-
-
         /*
-
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
                 source: source,

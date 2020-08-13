@@ -18,7 +18,6 @@
         return sysbaseconfig;
     };
 
-
     var appCache = {};
     sysbase.setCache = function (name, data) {
         if (typeof appCache[name] === "undefined") {

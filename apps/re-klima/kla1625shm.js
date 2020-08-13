@@ -1203,6 +1203,10 @@
                     /**
                      * Holen der HYDE-Daten
                      */
+                    if (kla1652shmconfig.hyde === false) {
+                        cb1625g4(null, ret);
+                        return;
+                    }
                     var jqxhr = $.ajax({
                         method: "GET",
                         crossDomain: false,
@@ -1296,23 +1300,23 @@
                         }));
                     var master = {};
                     master.stationid = klirecords[0].stationid;
-                    master.source =  klirecords[0].source,
-                    master.stationname  = klirecords[0].stationname;
-                    master.climatezone  = klirecords[0].climatezone;
+                    master.source = klirecords[0].source,
+                        master.stationname = klirecords[0].stationname;
+                    master.climatezone = klirecords[0].climatezone;
                     master.region = klirecords[0].region;
                     master.subregion = klirecords[0].subregion;
                     master.countryname = klirecords[0].countryname;
-                    master.continent  = klirecords[0].continent;
+                    master.continent = klirecords[0].continent;
                     master.continentname = klirecords[0].continentname;
                     master.lats = klirecords[0].lats;
                     master.longitude = klirecords[0].longitude;
                     master.latitude = klirecords[0].latitude;
                     master.height = klirecords[0].height;
-                    var html = uihelper.iterateJSON2HTML (master,"", "");
+                    var html = uihelper.iterateJSON2HTML(master, "", "");
                     $("#" + divid)
-                    .append($("<div/>", {
-                        html: html
-                    }));
+                        .append($("<div/>", {
+                            html: html
+                        }));
                     cb1625g0a(null, ret);
                     return;
                 },
@@ -1657,9 +1661,13 @@
                 },
                 function (ret, cb1625g7) {
                     /**
-                     * Tabelle
+                     * Temperaturverlauf Graphik und Tabelle
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                    if (kla1652shmconfig.tempchart === false) {
+                        cb1625g7(null, ret);
+                        return;
+                    }
                     $("#kla1625shmwrapper")
                         .append($("<div/>", {
                                 css: {
@@ -1685,7 +1693,7 @@
                                 }
                             }))
                         );
-                    // Linke heatmap
+                    // Linker Temperaturverlauf
                     var hmoptions = {
                         minmax: true,
                         minmaxhistogram: true,
@@ -1701,7 +1709,11 @@
                 },
 
                 function (ret, cb1625g8) {
-                    // Rechte heatmap
+                    // Rechter Temperaturverlauf
+                    if (kla1652shmconfig.tempchart === false) {
+                        cb1625g8(null, ret);
+                        return;
+                    }
                     var hmoptions = {
                         minmax: true,
                         minmaxhistogram: true,
@@ -1720,6 +1732,10 @@
 
 
                 function (ret, cb1625g9) {
+                    if (kla1652shmconfig.hyde === false) {
+                        cb1625g9(null, ret);
+                        return;
+                    }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     $("#kla1625shmwrapper")
                         .append($("<div/>", {
@@ -1879,7 +1895,7 @@
                                                     var wert = rowvalues[icol];
                                                     var inum = 0;
                                                     var numt = wert.split(".");
-                                                    if (numt.length = 2) {
+                                                    if (numt.length === 2) {
                                                         inum = parseInt(numt[1].substr(0, 1));
                                                     }
                                                     hmoptions.cbucketdata[buckyear].numberhisto[inum] += 1;
@@ -2030,7 +2046,7 @@
                 if (kla1652shmconfig.temptable === true) {
                     $(cid)
                         .append($("<h3/>", {
-                            text: "Histogramm Temperaturverteilung",
+                            text: "Histogramm Temperaturverteilung " + selvariable,
                             class: "doprintthis"
                         }))
                         .append($("<table/>", {
@@ -2081,6 +2097,10 @@
                 }
                 /**
                  * hier wird die Gesamtzeile eingeschoben und ausgegeben
+                 * für split stehen bereit selvariable, selsource, selstationid, starecord,
+                 * klirecords.push(ret1.records[0]);
+                 * stationrecord = ret1.records[0];
+                 * sowie hmatrix.fromyear + "-" + hmatrix.toyear
                  */
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
                 if (kla1652shmconfig.temptable === true) {
@@ -2195,7 +2215,14 @@
 
                 if (kla1652shmconfig.temptable === true) {
                     $("#" + tableid + " tbody")
-                        .append($("<tr/>")
+                        .append($("<tr/>", {
+                                class: "kla1625shmsplit",
+                                fromyear: buckyears[ibuck],
+                                toyear: bucket.toyear,
+                                selvariable: selvariable,
+                                selsource: selsource,
+                                selstationid: selstationid
+                            })
                             .append($("<td/>", {
                                 html: buckyears[ibuck] + "-" + bucket.toyear
                             }))
@@ -2270,7 +2297,7 @@
                             }
                         })
                         .append($("<h3/>", {
-                            text: "Histogramm 1. Dezimalstelle",
+                            text: "Histogramm 1. Dezimalstelle " + selvariable,
                             class: "doprintthis"
                         }))
                         .append($("<canvas/>", {
@@ -2302,11 +2329,10 @@
                         }
                     }
                 };
-
                 for (var ibuck = 0; ibuck < buckyears.length; ibuck++) {
                     bucknumberprot += " " + JSON.stringify(hoptions.cbucketdata[buckyears[ibuck]].numberhisto);
                     config.data.datasets.push({
-                        label: buckyears[ibuck],
+                        label: buckyears[ibuck] + "-" + hoptions.cbucketdata[buckyears[ibuck]].toyear,
                         data: hoptions.cbucketdata[buckyears[ibuck]].numberhisto,
                         /* backgroundColor: "red", */
                         /* borderColor: "red", */
@@ -2323,6 +2349,253 @@
             return;
         }
     };
+
+
+    /**
+     * kla1625shmsplit - Splitten Sommer/Winter Histogramm
+     * in neue Zeilen der Zieltabelle
+     * starecord hat source, stationid
+     * klirecords[0] oder [1] mit variable
+     */
+    $(document).on("click", ".kla1625shmsplit", function (evt) {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        evt.stopPropagation();
+        debugger;
+        var splstationid = $(this).closest("tr").attr("selstationid");
+        var splsource = $(this).closest("tr").attr("selsource");
+        var splvariable = $(this).closest("tr").attr("selvariable");
+        var splfromyear = $(this).closest("tr").attr("fromyear");
+        var spltoyear = $(this).closest("tr").attr("toyear");
+        // from - to Logik mit den years
+        //var years = JSON.parse(ret.record.years);
+        var splrecord = klirecords[0];
+        if (splrecord.variable !== splvariable) {
+            splrecord = klirecords[1];
+        }
+        var sun = {
+            numberhisto: [],
+            valsum: 0,
+            valcount: 0,
+            minval: null,
+            maxval: null,
+            maxcount: 0
+        }
+        var win = {
+            numberhisto: [],
+            valsum: 0,
+            valcount: 0,
+            minval: null,
+            maxval: null,
+            maxcount: 0
+        }
+        var years = JSON.parse(splrecord.years);
+        /*
+        for (var year in years) {
+            if (years.hasOwnProperty(year)) {
+            }
+        }
+        */
+        var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        sun.temphisto = new Array(101).fill(0);
+        win.temphisto = new Array(101).fill(0);
+        for (var iyear = parseInt(splfromyear); iyear <= parseInt(spltoyear); iyear++) {
+            if (typeof years[iyear] !== "undefined") {
+                if (uihelper.isleapyear(iyear)) {
+                    mdtable[1] = 29;
+                } else {
+                    mdtable[1] = 28;
+                }
+                var splfromday = 0;
+                var spltoday = mdtable[0] + mdtable[1] + mdtable[2] + mdtable[3] + mdtable[4] + mdtable[5];
+                var yearvals = years["" + iyear];
+                // Summer-Loop, 1. Halbjahr
+                for (var iday = splfromday; iday < spltoday; iday++) {
+                    var dval1 = yearvals[iday];
+                    if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
+                        var dval = parseFloat(dval1);
+                        var inum = 0;
+                        var numt = dval1.split(".");
+                        if (numt.length === 2) {
+                            inum = parseInt(numt[1].substr(0, 1));
+                        }
+                        sun.valsum += dval;
+                        sun.valcount += 1;
+                        if (sun.minval === null) {
+                            sun.minval = dval;
+                        } else if (dval < sun.minval) {
+                            sun.minval = dval;
+                        }
+                        if (sun.maxval === null) {
+                            sun.maxval = dval;
+                        } else if (dval > sun.maxval) {
+                            sun.maxval = dval;
+                        }
+                        //numberhisto: [],
+                        var itemp = Math.round(dval);
+                        itemp += 50;
+                        if (itemp >= 0 && itemp <= 100) {
+                            sun.temphisto[itemp] += 1;
+                        } else if (itemp < 0) {
+                            sun.temphisto[0] += 1;
+                        } else {
+                            sun.temphisto[100] += 1;
+                        }
+                        //hmoptions.cbucketdata[buckyear].numberhisto[inum] += 1;
+                    }
+                }
+                // Winter-Loop, 2. Halbjahr
+                splfromday = spltoday;
+                spltoday = yearvals.length;
+                for (var iday = splfromday; iday < spltoday; iday++) {
+                    var dval1 = yearvals[iday];
+                    if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
+                        var dval = parseFloat(dval1);
+                        var inum = 0;
+                        var numt = dval1.split(".");
+                        if (numt.length === 2) {
+                            inum = parseInt(numt[1].substr(0, 1));
+                        }
+                        win.valsum += dval;
+                        win.valcount += 1;
+                        if (win.minval === null) {
+                            win.minval = dval;
+                        } else if (dval < win.minval) {
+                            win.minval = dval;
+                        }
+                        if (win.maxval === null) {
+                            win.maxval = dval;
+                        } else if (dval > win.maxval) {
+                            win.maxval = dval;
+                        }
+                        //numberhisto: [],
+                        var itemp = Math.round(dval);
+                        itemp += 50;
+                        if (itemp >= 0 && itemp <= 100) {
+                            win.temphisto[itemp] += 1;
+                        } else if (itemp < 0) {
+                            win.temphisto[0] += 1;
+                        } else {
+                            win.temphisto[100] += 1;
+                        }
+                        //hmoptions.cbucketdata[buckyear].numberhisto[inum] += 1;
+                    }
+                }
+            }
+        }
+        // Ausgabe der Zeile mit den Sommerwerten
+        var baserow = $(this).closest("tr");
+        var sparkid = "S" + Math.floor(Math.random() * 100000) + 1;
+        $(baserow)
+            .after($("<tr/>", {
+                id: sparkid + "r"
+                })
+                .append($("<td/>", {
+                    html: splfromyear + "-" + spltoyear + " 01-06"
+                }))
+                .append($("<td/>")
+                    .append($("<span/>", {
+                        id: sparkid,
+                        class: "mouseoverdemo",
+                        css: {
+                            width: "100%",
+                            float: "left"
+                        }
+                    }))
+                )
+                .append($("<td/>", {
+                    align: "center",
+                    html: sun.minval
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: sun.maxval
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: (sun.valsum / sun.valcount).toFixed(2)
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: "calc1"
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: "calc2"
+                }))
+            );
+        $("#" + sparkid).sparkline(sun.temphisto, {
+            type: 'bar',
+            height: 60,
+            barColor: "red",
+            negBarColor: "blue",
+            barWidth: 3,
+            barSpacing: 0,
+            fillColor: false,
+            defaultPixelsPerValue: 3,
+            chartRangeMin: 0,
+            chartRangeMax: Math.max(sun.temphisto),
+            composite: false
+        });
+
+        var sparkid1 = "S" + Math.floor(Math.random() * 100000) + 1;
+        $("#" + sparkid + "r")
+            .after($("<tr/>", {
+                })
+                .append($("<td/>", {
+                    html: splfromyear + "-" + spltoyear + " 07-12"
+                }))
+                .append($("<td/>")
+                    .append($("<span/>", {
+                        id: sparkid1,
+                        class: "mouseoverdemo",
+                        css: {
+                            width: "100%",
+                            float: "left"
+                        }
+                    }))
+                )
+                .append($("<td/>", {
+                    align: "center",
+                    html: win.minval
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: win.maxval
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: (win.valsum / win.valcount).toFixed(2)
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: "calc1"
+                }))
+                .append($("<td/>", {
+                    align: "center",
+                    html: "calc2"
+                }))
+            );
+        $("#" + sparkid1).sparkline(win.temphisto, {
+            type: 'bar',
+            height: 60,
+            barColor: "red",
+            negBarColor: "blue",
+            barWidth: 3,
+            barSpacing: 0,
+            fillColor: false,
+            defaultPixelsPerValue: 3,
+            chartRangeMin: 0,
+            chartRangeMax: Math.max(win.temphisto),
+            composite: false
+        });
+
+
+
+
+    });
+
+
 
     /**
      * kla1625shm.klitemp2 Temperatur-Sparkline über Klima-Buckets
@@ -2341,7 +2614,7 @@
         var tableid = cid.substr(1) + "tbl";
         $(cid)
             .append($("<h3/>", {
-                text: "Temperaturverlauf",
+                text: "Temperaturverlauf " + selvariable,
                 class: "doprintthis",
             }))
             .append($("<div/>", {
@@ -2403,12 +2676,13 @@
         for (var year in hoptions.cbucketdata) {
             if (hoptions.cbucketdata.hasOwnProperty(year)) {
                 var yeardata = hoptions.cbucketdata[year];
+                var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
                 yeardata.avgval = yeardata.valsum / yeardata.valcount;
                 $("#" + tableid)
                     .find("tbody")
                     .append($("<tr/>")
                         .append($("<td/>", {
-                            html: year
+                            html: yearlabel
                         }))
                         .append($("<td/>", {
                             html: yeardata.minval.toFixed(1)
@@ -2567,6 +2841,7 @@
             if (hyderep.hasOwnProperty(variablename)) {
                 hcount++;
                 var ciddiv = cid + variablename;
+                var chartdiv = ciddiv + "c";
                 var tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
                 var gravec = []; // Vektor für Sparkline-Graphik
                 var floatdirection = "right";
@@ -2589,10 +2864,18 @@
                             }
                         }))
                         .append($("<div/>", {
+                            id: chartdiv.substr(1),
+                            css: {
+                                width: "50%",
+                                float: "left",
+                                overflow: "hidden"
+                            }
+                        }))
+                        .append($("<div/>", {
                                 id: ciddiv.substr(1),
                                 css: {
                                     width: "40%",
-                                    float: "left",
+                                    float: "right",
                                     overflow: "hidden"
                                 }
                             })
@@ -2681,6 +2964,7 @@
                 }
                 var chartid = ciddiv + "chart";
                 // $(cid)
+                /*
                 $(ciddiv)
                     .parent()
                     .append($("<div/>", {
@@ -2691,15 +2975,17 @@
                                 "background-color": "white"
                             }
                         })
-                        // hier Canvas für Chartjs
-                        .append($("<canvas/>", {
-                            id: chartid,
-                            class: "doprintthis",
-                            css: {
-                                "text-align": "center"
-                            }
-                        }))
-                    );
+                        */
+                // hier Canvas für Chartjs
+                $(chartdiv)
+                    .append($("<canvas/>", {
+                        id: chartid,
+                        class: "doprintthis",
+                        css: {
+                            "text-align": "center"
+                        }
+                    }));
+                //);
 
                 var ctx = document.getElementById(chartid).getContext('2d');
                 //Chart.defaults.global.plugins.colorschemes.override = true;
