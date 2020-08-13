@@ -1367,7 +1367,9 @@
     });
 
 
-
+    /**
+     * kla1610staconf - Konfigurierte Analyse
+    */
     $(document).on("click", ".kla1610staconf", function (evt) {
         evt.preventDefault();
         evt.stopImmediatePropagation();
@@ -1390,6 +1392,24 @@
                     type: "object", // currency, integer, datum, text, key, object
                     class: "uiefieldset",
                     properties: {
+                        stationid: {
+                            title: "Stations-ID",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            io: "h"
+                        },
+                        source: {
+                            title: "Source",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            io: "h"
+                        },
+                        variable: {
+                            title: "Variable",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            io: "h"
+                        },
                         master: {
                             title: "Stammdaten",
                             type: "string", // currency, integer, datum, text, key
@@ -1468,17 +1488,17 @@
             confrecord = JSON.parse(extraParam).props;
 
             window.parent.sysbase.setCache("onestation", JSON.stringify({
-                stationid: stationid,
-                source: starecord.source,
-                variablename: selvariablename,
+                stationid: confrecord.stationid,
+                source: confrecord.source,
+                variablename: confrecord.variable,
                 starecord: starecord,
                 latitude: $(this).closest("tr").attr("latitude"),
                 longitude: $(this).closest("tr").attr("longitude"),
                 config: confrecord
             }));
-            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
-            var stationname = stationarray[stationid];
-            var tabname = variablename + " " + stationname;
+            var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+            var stationname = stationarray[confrecord.stationid];
+            var tabname = confrecord.stationid + " " + stationname;
             var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
         });
@@ -1496,6 +1516,10 @@
                 temptable: true
             };
         }
+        // Hidden der aktuellen variablen Daten
+        confrecord.stationid = stationid;
+        confrecord.source = source;
+        confrecord.variable = variablename;
         uientry.inputDialogX(anchorHash, pos, title, confschema, confrecord, function (ret) {
             if (ret.error === false) {} else {
                 sysbase.putMessage("Kein Abruf Super-Sparklines", 1);

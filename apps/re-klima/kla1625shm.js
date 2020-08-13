@@ -2268,7 +2268,6 @@
                         },
                         mytype: selvariable,
                         onClick: function (mouseEvent, chart) {
-                            debugger;
                             var mytype = this.options.mytype;
                             var myChart = myCharts[mytype];
                             var firstPoint = myChart.getElementAtEvent(mouseEvent)[0];
@@ -2278,14 +2277,16 @@
                                 var xlabel = myChart.data.labels[firstPoint._index];
                                 var ylabel = myChart.data.datasets[firstPoint._datasetIndex].label;
                                 var value = myChart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
+
+                                var syears = ylabel.split("-");
                                 /**
                                  * echte Werte später
                                 */
                                 window.parent.sysbase.setCache("regstation", JSON.stringify({
                                     starecord: starecord,
                                     klirecords: klirecords,
-                                    fromyear: klirecords[0].fromyear,
-                                    toyear: "" + (parseInt(klirecords[0].fromyear) + 29)
+                                    fromyear: syears[0],
+                                    toyear: syears[1]
                                 }));
                                 var tourl = "klaheatmap.html" + "?" + "stationid=" + klirecords[0].stationid + "&source=" + klirecords[0].source + "&variablename=" + klirecords[0].variable;
                                 var tabname = klirecords[0].stationname;
@@ -2344,7 +2345,6 @@
         evt.preventDefault();
         evt.stopImmediatePropagation();
         evt.stopPropagation();
-        debugger;
         var splstationid = $(this).closest("tr").attr("selstationid");
         var splsource = $(this).closest("tr").attr("selsource");
         var splvariable = $(this).closest("tr").attr("selvariable");

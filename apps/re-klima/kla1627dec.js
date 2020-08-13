@@ -55,7 +55,6 @@
     poprecord.export = false;
 
     kla1627dec.show = function (parameters, navigatebucket) {
-        debugger;
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
@@ -433,8 +432,8 @@
         // isMember ? '$2.00' : '$10.00'
         wmtit += selstationid;
         wmtit += (stationrecord.stationname || "").length > 0 ? " " + stationrecord.stationname : "";
-        wmtit += (stationrecord.fromyear || "").length > 0 ? " von " + stationrecord.fromyear : "";
-        wmtit += (stationrecord.toyear || "").length > 0 ? " bis " + stationrecord.toyear : "";
+        wmtit +=  " von " + selfromyear;
+        wmtit +=  " bis " + seltoyear;
         wmtit += (stationrecord.anzyears || 0).length > 0 ? " für " + stationrecord.anzyears + " Jahre" : "";
         wmtit += (stationrecord.region || "").length > 0 ? " Region:" + stationrecord.region : "";
         wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
@@ -453,8 +452,6 @@
         return;
     };
 
-
-
     /**
      * paintX - gemischte Auswertung TMAX, TMIN und "all years"
      * mit Super-Sparkline auf Basis klirecords
@@ -464,7 +461,6 @@
     kla1627dec.paintX = function (selvariablename, selsource, selstationid, callbackshm9) {
         try {
             outrecords = [];
-            debugger;
             if (typeof klirecords === "undefined" || klirecords.length < 1) {
                 sysbase.putMessage("Keine Daten vorhanden", 3);
                 return;
@@ -685,7 +681,7 @@
                             float: "left",
                             overflow: "hidden",
                             "background-color": "white",
-                            margin: "10px",
+                            margin: "20px",
                             width: "90%"
                         }
                     })
