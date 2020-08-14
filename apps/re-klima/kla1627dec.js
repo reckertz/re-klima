@@ -1,4 +1,4 @@
-/*global $,this,screen,document,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
+/*global $,this,screen,Image,Chart,document,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
 (function () {
     'use strict';
     var kla1627dec = {};
@@ -47,12 +47,6 @@
     var hoptionsL;
 
     var poprecord = {}; // Konfigurationsparameter mit Default-Zuweisung
-    poprecord.qonly = true;
-    poprecord.total = false;
-    poprecord.mixed = true;
-    poprecord.moon = false;
-    poprecord.sunwinter = true;
-    poprecord.export = false;
 
     kla1627dec.show = function (parameters, navigatebucket) {
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
@@ -198,8 +192,61 @@
                     click: function (evt) {
                         evt.preventDefault();
                         var username = uihelper.getUsername();
-                        kla1627dec.paintX(selvariablename, selsource, selstationid, function (ret) {
-                            return;
+
+
+                        var popschema = {
+                            entryschema: {
+                                props: {
+                                    title: "Abrufparameter",
+                                    description: "",
+                                    type: "object", // currency, integer, datum, text, key, object
+                                    class: "uiefieldset",
+                                    properties: {
+                                        fromyear: {
+                                            title: "Von Jahr",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uietext",
+                                            io: "i"
+                                        },
+                                        toyear: {
+                                            title: "Bis Jahr",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uietext",
+                                            io: "i"
+                                        }
+                                    }
+                                }
+                            }
+                        };
+                        var anchorHash = "#kla1627decwrapper";
+                        var title = "Super-Sparklines";
+                        var pos = {
+                            left: $("#kla1627decwrapper").offset().left,
+                            top: window.screen.height * 0.1,
+                            width: $("#kla1627decwrapper").width() * 0.60,
+                            height: $("#kla1627decwrapper").height() * 0.90
+                        };
+                        $(document).on('popupok', function (evt, extraParam) {
+                            evt.preventDefault();
+                            evt.stopPropagation();
+                            evt.stopImmediatePropagation();
+                            console.log(extraParam);
+                            poprecord = JSON.parse(extraParam).props;
+                            selfromyear = poprecord.fromyear;
+                            seltoyear = poprecord.toyear;
+                            kla1627dec.paintDec(selvariablename, selsource, selstationid, function (ret) {
+                                return;
+                            });
+                        });
+                        if (Object.keys(poprecord).length === 0) {
+                            poprecord.fromyear = selfromyear;
+                            poprecord.toyear = seltoyear;
+                        }
+                        uientry.inputDialogX(anchorHash, pos, title, popschema, poprecord, function (ret) {
+                            if (ret.error === false) {} else {
+                                sysbase.putMessage("Kein Abruf Super-Sparklines", 1);
+                                return;
+                            }
                         });
                     }
                 }))
@@ -324,48 +371,6 @@
                                 $(printcanvas).replaceWith(image);
                             });
                         }, 2000);
-                        if (1 === 1) return;
-
-                        $(actiFrame).find('svg').each(function (index, svgelement) {
-                            var svgString = new XMLSerializer().serializeToString(svgelement);
-                            //var canvas = document.getElementById("canvas");
-                            var canvas = document.createElement("canvas");
-                            var ctx = canvas.getContext("2d");
-                            var DOMURL = self.URL || self.webkitURL || self;
-                            var svg = new Blob([svgString], {
-                                type: "image/svg+xml;charset=utf-8"
-                            });
-                            var url = DOMURL.createObjectURL(svg);
-                            var image = new Image();
-                            image.src = url;
-                            var w = $(svgelement).width();
-                            var h = $(svgelement).height();
-                            $(image).width(w);
-                            $(image).height(h);
-                            // doprintthis, wenn die Klasse schon da war
-                            if ($(svgelement).hasClass("doprintthis")) {
-                                $(svgelement).addClass("doprintthis");
-                            }
-                            var parspan = $(svgelement).parent();
-                            if ($(parspan).prop("tagName") === "SPAN") {
-                                $(parspan).css({
-                                    width: w + "px",
-                                    height: h + "px"
-                                });
-                            }
-                            $(svgelement).replaceWith(image);
-                            /*
-                            var img = new Image();
-                            img.onload = function () {
-                                ctx.drawImage(img, 0, 0);
-                                var png = canvas.toDataURL("image/png");
-                                document.querySelector('#png-container').innerHTML = '<img src="' + png + '"/>';
-                                DOMURL.revokeObjectURL(png);
-                            };
-                            img.src = url;
-                            */
-                        });
-                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
                     }
                 }))
 
@@ -432,33 +437,27 @@
         // isMember ? '$2.00' : '$10.00'
         wmtit += selstationid;
         wmtit += (stationrecord.stationname || "").length > 0 ? " " + stationrecord.stationname : "";
-        wmtit +=  " von " + selfromyear;
-        wmtit +=  " bis " + seltoyear;
+        wmtit += " von " + selfromyear;
+        wmtit += " bis " + seltoyear;
         wmtit += (stationrecord.anzyears || 0).length > 0 ? " für " + stationrecord.anzyears + " Jahre" : "";
         wmtit += (stationrecord.region || "").length > 0 ? " Region:" + stationrecord.region : "";
         wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
         wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
         $(".headertitle").html(wmtit);
 
-        $("#kla1627decsup").click();
-
+        // $("#kla1627decsup").click();
+        kla1627dec.paintDec(selvariablename, selsource, selstationid, function (ret) {
+            return;
+        });
     }; // Ende show
 
     /**
-     * kla1627dec.showall - Aufruf aller Funktionen für die Standardauswertung
-     * @param {*} ret
-     */
-    kla1627dec.showall = function (ret) {
-        return;
-    };
-
-    /**
-     * paintX - gemischte Auswertung TMAX, TMIN und "all years"
+     * paintDec - gemischte Auswertung TMAX, TMIN und "all years"
      * mit Super-Sparkline auf Basis klirecords
      * superParam.sunwinter - das ist schon ein Brocken
      */
     var outrecords = [];
-    kla1627dec.paintX = function (selvariablename, selsource, selstationid, callbackshm9) {
+    kla1627dec.paintDec = function (selvariablename, selsource, selstationid, callbackshm9) {
         try {
             outrecords = [];
             if (typeof klirecords === "undefined" || klirecords.length < 1) {
@@ -491,6 +490,9 @@
             /**
              * Abschnitt Stammdaten zur Station
              */
+            var htext = stationdata.stationid + " " + stationdata.stationname;
+            htext += " von " + selfromyear;
+            htext += " bis " + seltoyear;
             $("#kla1627decwrapper")
                 .append($("<div/>", {
                         css: {
@@ -500,9 +502,29 @@
                     })
                     .append($("<h2/>", {
                         id: "kla1627dech2",
-                        text: stationdata.stationid + " " + stationdata.stationname
+                        text: htext
                     }))
                 );
+
+            var divid = "div" + Math.floor(Math.random() * 100000) + 1;
+            var chartid = divid + "c";
+            $("#kla1627decwrapper")
+                .append($("<div/>", {
+                        id: divid,
+                        css: {
+                            float: "left",
+                            overflow: "hidden",
+                            "background-color": "white",
+                            margin: "20px",
+                            width: "45%"
+                        }
+                    })
+                    .append($("<h3/>", {
+                        text: "Histogramm 1. Dezimalstelle/Wochentag " + selvariablename,
+                        class: "doprintthis"
+                    }))
+                );
+
 
             /**
              * Abschnitt sparklines
@@ -511,7 +533,9 @@
             $("#kla1627decwrapper")
                 .append($("<div/>", {
                         css: {
-                            width: "100%",
+                            width: "45%",
+                            float: "left",
+                            margin: "20px",
                             overflow: "hidden"
                         }
                     })
@@ -521,7 +545,7 @@
                             rules: "all",
                             id: "kla1627dect1",
                             css: {
-                                "max-width": w + "px"
+                                width: "100%"
                             }
                         })
                         .append($("<thead/>")
@@ -587,7 +611,7 @@
             var pcount = 0; // für die sparklines
             // var rowdata = Array(10).fill(Array(10).fill(0)); ist ein Fehler in der Referenz!!!
             var rowdata = [];
-            for (var irow = 0; irow < 7; irow++) {  // Wochen
+            for (var irow = 0; irow < 7; irow++) { // Wochen
                 rowdata[irow] = new Array(10).fill(0); // Dezimalstelle
             }
             var ccount = 0;
@@ -606,14 +630,14 @@
                             inum = parseInt(numt[1].substr(0, 1));
                         }
 
-                        var mmtt = uihelper.fromTTT2MMTT (iyear, iday);  // 1-based day, month in Object
+                        var mmtt = uihelper.fromTTT2MMTT(iyear, iday); // 1-based day, month in Object
                         var actdate = new Date(syear, mmtt.month - 1, mmtt.day);
-                        var dayofweek = actdate.getDay();  // 0 = Sonntag!!!
+                        var dayofweek = actdate.getDay(); // 0 = Sonntag!!!
                         ccount++;
                         if (ccount % 74 === 0) {
                             console.log(syear, iday, actdate, dayofweek);
                         }
-                        rowdata[dayofweek][inum] ++;
+                        rowdata[dayofweek][inum]++;
                     }
                 }
             }
@@ -622,42 +646,42 @@
              */
             console.log(JSON.stringify(rowdata));
             for (var wday = 0; wday < 7; wday++) {
-            $("#kla1627dect1 tbody")
-                .append($("<tr/>")
-                    .append($("<td/>", {
-                        html: wday + " " +uihelper.getWeekDayText(wday)
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][0]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][1]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][2]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][3]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][4]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][5]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][6]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][7]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][8]
-                    }))
-                    .append($("<td/>", {
-                        html: rowdata[wday][9]
-                    }))
-                );
+                $("#kla1627dect1 tbody")
+                    .append($("<tr/>")
+                        .append($("<td/>", {
+                            html: wday + " " + uihelper.getWeekDayText(wday)
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][0]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][1]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][2]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][3]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][4]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][5]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][6]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][7]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][8]
+                        }))
+                        .append($("<td/>", {
+                            html: rowdata[wday][9]
+                        }))
+                    );
             }
             $(".tablesorter").tablesorter({
                 theme: "blue",
@@ -671,33 +695,18 @@
 
             /**
              * und jetzt noch die Graphik hinterher
-            */
-            var divid = "div" + Math.floor(Math.random() * 100000) + 1;
-            var chartid = divid + "c";
-           $("#kla1627decwrapper")
-                .append($("<div/>", {
-                        id: divid,
-                        css: {
-                            float: "left",
-                            overflow: "hidden",
-                            "background-color": "white",
-                            margin: "20px",
-                            width: "90%"
-                        }
-                    })
-                    .append($("<h3/>", {
-                        text: "Histogramm 1. Dezimalstelle/Wochentag " + selvariablename,
-                        class: "doprintthis"
-                    }))
-                    .append($("<canvas/>", {
-                        id: chartid,
-                        class: "doprintthis",
-                        selvariable: selvariablename,
-                        css: {
-                            "text-align": "center"
-                        }
-                    }))
-                );
+             */
+
+            $("#" + divid)
+                .append($("<canvas/>", {
+                    id: chartid,
+                    class: "doprintthis",
+                    selvariable: selvariablename,
+                    css: {
+                        "text-align": "center"
+                    }
+                }));
+
             var ctx = document.getElementById(chartid).getContext('2d');
             //Chart.defaults.global.plugins.colorschemes.override = true;
             //Chart.defaults.global.legend.display = true;
@@ -718,11 +727,11 @@
                         }
                     },
                     mytype: selvariablename
-                  }
+                }
             };
             for (var wday = 0; wday < 7; wday++) {
                 config.data.datasets.push({
-                    label: wday + " " +uihelper.getWeekDayText(wday),
+                    label: wday + " " + uihelper.getWeekDayText(wday),
                     data: rowdata[wday],
                     /* backgroundColor: "red", */
                     /* borderColor: "red", */
@@ -745,7 +754,7 @@
 
 
 
-    }; // ende paintX
+    }; // ende paintDec
 
 
 

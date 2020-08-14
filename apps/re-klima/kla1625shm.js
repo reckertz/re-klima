@@ -1685,7 +1685,19 @@
                 }
             ],
             function (error, result) {
-
+                $("#kla1625shmwrapper")
+                    .append($("<div/>", {
+                            css: {
+                                width: "100%",
+                                float: "left",
+                                overflow: "hidden"
+                            }
+                        })
+                        .append($("<br/>"))
+                        .append($("<br/>"))
+                        .append($("<br/>"))
+                        .append($("<br/>"))
+                    );
             });
     };
 
@@ -2281,7 +2293,7 @@
                                 var syears = ylabel.split("-");
                                 /**
                                  * echte Werte später
-                                */
+                                 */
                                 window.parent.sysbase.setCache("regstation", JSON.stringify({
                                     starecord: starecord,
                                     klirecords: klirecords,
@@ -2980,7 +2992,8 @@
                         id: chartid,
                         class: "doprintthis",
                         css: {
-                            "text-align": "center"
+                            "text-align": "center",
+                            "background-color": "white"
                         }
                     }));
                 //);
