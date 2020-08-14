@@ -206,10 +206,9 @@
                         evt.preventDefault();
                         //var gurl = "https://www.google.com/maps/dir/";
                         var gurl = "https://www.google.com/maps/search/?api=1&query=";
-
-                        gurl += selparms.latitude;
+                        gurl += stationrecord.latitude;
                         gurl += ",";
-                        gurl += selparms.longitude;
+                        gurl += stationrecord.longitude;
                         var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
                         window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
 
@@ -226,19 +225,11 @@
                     },
                     click: function (evt) {
                         evt.preventDefault();
-                        var variablename = "popc_";
-                        var latitude = 50.941278;
-                        var longitude = 6.958281;
-                        var dftfullname = "G:\\Projekte\\klimadaten\\HYDE_lu_pop_proxy";
-                        dftfullname += "\\baseline\\asc\\2017AD_pop";
-                        dftfullname += "\\popc_2017AD.asc";
-                        // var fullname = dftfullname;
-
                         var gurl = "klaleaflet.html";
                         gurl += "?";
-                        gurl += "latitude=" + encodeURIComponent(selparms.latitude);
+                        gurl += "latitude=" + encodeURIComponent(stationrecord.latitude);
                         gurl += "&";
-                        gurl += "longitude=" + encodeURIComponent(selparms.longitude);
+                        gurl += "longitude=" + encodeURIComponent(stationrecord.longitude);
                         var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
                         window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
 
@@ -1664,7 +1655,7 @@
 
                 function (ret, cb1625g9) {
                     if (kla1625shmconfig.hyde === false) {
-                        cb1625g9(null, ret);
+                        cb1625g9("Finish", ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
@@ -1679,7 +1670,7 @@
                         }));
                     var hmoptions = {};
                     kla1625shm.klihyde2("#" + divid, selstationid, starecord, function (ret) {
-                        cb1625g9(null, ret);
+                        cb1625g9("Finish", ret);
                         return;
                     });
                 }
@@ -2403,8 +2394,57 @@
                     mdtable[1] = 28;
                 }
                 var splfromday = 0;
-                var spltoday = mdtable[0] + mdtable[1] + mdtable[2] + mdtable[3] + mdtable[4] + mdtable[5];
+                var spltoday = 0;
                 var yearvals = years["" + iyear];
+                /**
+                 * Loop über die 12 Monate
+                 * je Monat Zuweisung des "richtigen" Objekts sun oder win als work
+                */
+               var wrk = {};
+                for (var imon = 0; imon < 12; imon++) {
+                    if (imon >= 0 && imon <= 2 || imon >= 9 && imon <= 11) {
+                        wrk = win;
+                    } else {
+                        wrk = sun;
+                    }
+                    spltoday = splfromday + mdtable[imon];
+
+                    for (var iday = splfromday; iday < spltoday; iday++) {
+                        var dval1 = yearvals[iday];
+                        if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
+                            var dval = parseFloat(dval1);
+                            var inum = 0;
+                            var numt = dval1.split(".");
+                            if (numt.length === 2) {
+                                inum = parseInt(numt[1].substr(0, 1));
+                            }
+                            wrk.valsum += dval;
+                            wrk.valcount += 1;
+                            if (wrk.minval === null) {
+                                wrk.minval = dval;
+                            } else if (dval < sun.minval) {
+                                sun.minval = dval;
+                            }
+                            if (sun.maxval === null) {
+                                sun.maxval = dval;
+                            } else if (dval > wrk.maxval) {
+                                wrk.maxval = dval;
+                            }
+                            var itemp = Math.round(dval);
+                            itemp += 50;
+                            if (itemp >= 0 && itemp <= 100) {
+                                wrk.temphisto[itemp] += 1;
+                            } else if (itemp < 0) {
+                                wrk.temphisto[0] += 1;
+                            } else {
+                                wrk.temphisto[100] += 1;
+                            }
+                        }
+                    }
+                    splfromday = splfromday + mdtable[imon];
+                }
+                /*
+                var spltoday = mdtable[0] + mdtable[1] + mdtable[2] + mdtable[3] + mdtable[4] + mdtable[5];
                 // Summer-Loop, 1. Halbjahr
                 for (var iday = splfromday; iday < spltoday; iday++) {
                     var dval1 = yearvals[iday];
@@ -2427,7 +2467,6 @@
                         } else if (dval > sun.maxval) {
                             sun.maxval = dval;
                         }
-                        //numberhisto: [],
                         var itemp = Math.round(dval);
                         itemp += 50;
                         if (itemp >= 0 && itemp <= 100) {
@@ -2437,7 +2476,6 @@
                         } else {
                             sun.temphisto[100] += 1;
                         }
-                        //hmoptions.cbucketdata[buckyear].numberhisto[inum] += 1;
                     }
                 }
                 // Winter-Loop, 2. Halbjahr
@@ -2464,7 +2502,6 @@
                         } else if (dval > win.maxval) {
                             win.maxval = dval;
                         }
-                        //numberhisto: [],
                         var itemp = Math.round(dval);
                         itemp += 50;
                         if (itemp >= 0 && itemp <= 100) {
@@ -2474,9 +2511,9 @@
                         } else {
                             win.temphisto[100] += 1;
                         }
-                        //hmoptions.cbucketdata[buckyear].numberhisto[inum] += 1;
                     }
                 }
+                */
             }
         }
         // Kennziffern Kurtosis, Skewness, Shapiro Wilk-Test mit P und W-Wert
@@ -2503,7 +2540,7 @@
                     id: sparkid + "r"
                 })
                 .append($("<td/>", {
-                    html: splfromyear + "-" + spltoyear + " 01-06"
+                    html: splfromyear + "-" + spltoyear + " 04-09"
                 }))
                 .append($("<td/>")
                     .append($("<span/>", {
@@ -2554,7 +2591,7 @@
         $("#" + sparkid + "r")
             .after($("<tr/>", {})
                 .append($("<td/>", {
-                    html: splfromyear + "-" + spltoyear + " 07-12"
+                    html: splfromyear + "-" + spltoyear + " 01-03, 10-12"
                 }))
                 .append($("<td/>")
                     .append($("<span/>", {
@@ -2689,8 +2726,14 @@
         var avgregvals = [];
         var maxregvals = [];
         var ycount = 0;
+        var baseyear = 0;
         for (var year in hoptions.cbucketdata) {
             if (hoptions.cbucketdata.hasOwnProperty(year)) {
+                var nyear = parseInt(year);
+                if (baseyear === 0) {
+                    baseyear = nyear - 1;
+                }
+                ycount = nyear - baseyear;
                 var yeardata = hoptions.cbucketdata[year];
                 ycount++;
                 var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
@@ -2732,6 +2775,7 @@
         }
         /**
          * Regressionsanalyse minvals, avgvals und maxvals als Array
+         * https://tom-alexander.github.io/regression-js/
         */
         var result = regression.linear(minregvals);
         var mingradient = result.equation[0].toFixed(2);
@@ -3142,7 +3186,10 @@
 
             }
         }
-
+        cb1625j({
+            error: false,
+            message: "HYDE ausgegeben"
+        });
     };
 
 
