@@ -719,7 +719,7 @@
                              */
                             $(actiFrameBody).find('canvas').each(function (index, printcanvas) {
                                 var image = new Image();
-                                image.src = printcanvas.toDataURL("image/png");
+                                image.src = printcanvas.toDataURL("image/jpg");  // png
                                 var w = $(printcanvas).width();
                                 var h = $(printcanvas).height();
                                 $(image).width(w);
@@ -2000,7 +2000,8 @@
                                 css: {
                                     float: "left",
                                     margin: "10px",
-                                    layout: "fixed"
+                                    layout: "fixed",
+                                    "background-color": "white"
                                 }
                             })
                             .append($("<thead/>")
@@ -2653,7 +2654,8 @@
                         css: {
                             width: "95%",
                             float: "left",
-                            margin: "10px"
+                            margin: "10px",
+                            "background-color":  "white"
                         }
                     })
                     .append($("<thead/>")
@@ -2683,9 +2685,14 @@
         var minvals = [];
         var avgvals = [];
         var maxvals = [];
+        var minregvals = [];
+        var avgregvals = [];
+        var maxregvals = [];
+        var ycount = 0;
         for (var year in hoptions.cbucketdata) {
             if (hoptions.cbucketdata.hasOwnProperty(year)) {
                 var yeardata = hoptions.cbucketdata[year];
+                ycount++;
                 var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
                 yeardata.avgval = yeardata.valsum / yeardata.valcount;
                 $("#" + tableid)
@@ -2707,6 +2714,10 @@
                 minvals.push(yeardata.minval.toFixed(1));
                 avgvals.push(yeardata.avgval.toFixed(1));
                 maxvals.push(yeardata.maxval.toFixed(1));
+
+                minregvals.push([ycount, yeardata.minval]);
+                avgregvals.push([ycount, yeardata.avgval]);
+                maxregvals.push([ycount, yeardata.maxval]);
                 if (miny === null) {
                     miny = yeardata.minval;
                 } else if (miny < yeardata.minval) {
@@ -2719,7 +2730,80 @@
                 }
             }
         }
+        /**
+         * Regressionsanalyse minvals, avgvals und maxvals als Array
+        */
+        var result = regression.linear(minregvals);
+        var mingradient = result.equation[0].toFixed(2);
+        var minyIntercept = result.equation[1].toFixed(2);
+        var minr2 = Math.round(result.r2 * 100);
 
+        result = regression.linear(avgregvals);
+        var avggradient = result.equation[0].toFixed(2);
+        var avgyIntercept = result.equation[1].toFixed(2);
+        var avgr2 = Math.round(result.r2 * 100);
+
+        result = regression.linear(maxregvals);
+        var maxgradient = result.equation[0].toFixed(2);
+        var maxyIntercept = result.equation[1].toFixed(2);
+        var maxr2 = Math.round(result.r2 * 100);
+
+        var mindelta = minregvals[minregvals.length-1][1] - minregvals[0][1];
+        var avgdelta = avgregvals[avgregvals.length-1][1] - avgregvals[0][1];
+        var maxdelta = maxregvals[maxregvals.length-1][1] - maxregvals[0][1];
+        $("#" + tableid)
+        .find("tbody")
+        .append($("<tr/>")
+            .append($("<td/>", {
+                html: "Delta 1-n"
+            }))
+            .append($("<td/>", {
+                html: mindelta.toFixed(1)
+            }))
+            .append($("<td/>", {
+                html: avgdelta.toFixed(1)
+            }))
+            .append($("<td/>", {
+                html: maxdelta.toFixed(1)
+            }))
+        );
+
+
+
+        $("#" + tableid)
+        .find("tbody")
+        .append($("<tr/>")
+            .append($("<td/>", {
+                html: "Steigung g"
+            }))
+            .append($("<td/>", {
+                html: mingradient
+            }))
+            .append($("<td/>", {
+                html: avggradient
+            }))
+            .append($("<td/>", {
+                html: maxgradient
+            }))
+        );
+
+
+        $("#" + tableid)
+        .find("tbody")
+        .append($("<tr/>")
+            .append($("<td/>", {
+                html: "Bestimmtheit r2 %"
+            }))
+            .append($("<td/>", {
+                html: minr2
+            }))
+            .append($("<td/>", {
+                html: avgr2
+            }))
+            .append($("<td/>", {
+                html: maxr2
+            }))
+        );
 
         var chartid = ciddiv + "chart";
         $("#" + ciddiv + "L1")
