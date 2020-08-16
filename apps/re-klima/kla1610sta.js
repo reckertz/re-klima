@@ -1117,7 +1117,7 @@
                 sqlStmt += " KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
                 sqlStmt += " KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
                 sqlStmt += " KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
-                sqlStmt += " KLISTATIONS.continentname,";
+                sqlStmt += " KLISTATIONS.continent, KLISTATIONS.continentname,";
                 sqlStmt += " KLISTATIONS.temperature,";
                 sqlStmt += " KLISTATIONS.lats, KLISTATIONS.longitude, KLISTATIONS.latitude, KLISTATIONS.height, ";
                 /*
@@ -1154,9 +1154,7 @@
                 if (where2.length > 0) {
                     sqlStmt += " AND KLISTATIONS.stationid IN(SELECT stationid FROM KLIINVENTORY WHERE " + where2 + ")";
                 }
-                debugger;
                 sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-
 
                  /*
                 var checkwhere = where;
@@ -1308,14 +1306,14 @@
                             stationarray[record.stationid] = record.stationname;
                             //delete record.stationid;
                             //delete record.name;
-                            reprecord.region = record.alpha2 + "-";
-                            reprecord.region += record.region;
+                            reprecord.region = record.continent;
+                            reprecord.region += "-" + record.continentname;
                             reprecord.region += "<br>";
+                            /*
+                            reprecord.region += record.alpha2 + "-";
+                            reprecord.region += record.region;
+                            */
                             reprecord.region += record.countryname;
-                            var continentname = record.continentname;
-                            if (reprecord.region.indexOf(continentname) < 0) {
-                                reprecord.region += " " + continentname;
-                            }
 
                             reprecord.anzyears = record.anzyears;
                             reprecord.anzyears += "<br>";

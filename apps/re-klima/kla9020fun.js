@@ -168,6 +168,32 @@
         }
         var anzcols = 0;
         var anzrows = 0;
+        var iyear0 = parseInt(hmatrix.rowheaders[0]);
+        var iyearl = parseInt(hmatrix.rowheaders[hmatrix.rowheaders.length - 1]);
+        var ihits = 0;
+        var newheaders = [];
+        var newdata = [];
+        var icount = 0;
+        var newyears = {};
+        for (var iyear = 0; iyear < hmatrix.rowheaders.length; iyear++) {
+            var nyear = hmatrix.rowheaders[iyear];
+            newyears[nyear] = ihits;
+            ihits++;
+        }
+        for (var numyear = iyear0; numyear <= iyearl; numyear++) {
+            var charyear = "" + numyear;
+            if (typeof newyears[charyear] === "undefined") {
+                newheaders.push(charyear);
+                newdata.push(Array(365).fill(null));
+            } else {
+                newheaders.push(charyear);
+                var ind = newyears[numyear];
+                newdata.push(hmatrix.data[ind]);
+            }
+        }
+        hmatrix.data = newdata;
+        hmatrix.rowheaders = newheaders;
+
         anzrows = hmatrix.data.length;
         if (typeof hmatrix.rowheaders === "undefined" || hmatrix.rowheaders.length === 0) {
             var anz2 = hmatrix.length;

@@ -2778,7 +2778,6 @@
          * Regressionsanalyse minvals, avgvals und maxvals als Array
          * https://tom-alexander.github.io/regression-js/
         */
-        debugger;
         var result = regression.linear(minregvals, {
             order: 2,
             precision: 3
