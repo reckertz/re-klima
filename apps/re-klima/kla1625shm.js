@@ -2757,10 +2757,11 @@
                 minvals.push(yeardata.minval.toFixed(1));
                 avgvals.push(yeardata.avgval.toFixed(1));
                 maxvals.push(yeardata.maxval.toFixed(1));
+                // Umrechnung auf Kelvin
+                minregvals.push([ycount, yeardata.minval + 273.15]);
+                avgregvals.push([ycount, yeardata.avgval + 273.15]);
+                maxregvals.push([ycount, yeardata.maxval + 273.15]);
 
-                minregvals.push([ycount, yeardata.minval]);
-                avgregvals.push([ycount, yeardata.avgval]);
-                maxregvals.push([ycount, yeardata.maxval]);
                 if (miny === null) {
                     miny = yeardata.minval;
                 } else if (miny < yeardata.minval) {
@@ -2777,18 +2778,28 @@
          * Regressionsanalyse minvals, avgvals und maxvals als Array
          * https://tom-alexander.github.io/regression-js/
         */
-        var result = regression.linear(minregvals);
-        var mingradient = result.equation[0].toFixed(2);
+        debugger;
+        var result = regression.linear(minregvals, {
+            order: 2,
+            precision: 3
+        });
+        var mingradient = result.equation[0].toFixed(3);
         var minyIntercept = result.equation[1].toFixed(2);
         var minr2 = Math.round(result.r2 * 100);
 
-        result = regression.linear(avgregvals);
-        var avggradient = result.equation[0].toFixed(2);
+        result = regression.linear(avgregvals, {
+            order: 2,
+            precision: 3
+        });
+        var avggradient = result.equation[0].toFixed(3);
         var avgyIntercept = result.equation[1].toFixed(2);
         var avgr2 = Math.round(result.r2 * 100);
 
-        result = regression.linear(maxregvals);
-        var maxgradient = result.equation[0].toFixed(2);
+        result = regression.linear(maxregvals, {
+            order: 2,
+            precision: 3
+        });
+        var maxgradient = result.equation[0].toFixed(3);
         var maxyIntercept = result.equation[1].toFixed(2);
         var maxr2 = Math.round(result.r2 * 100);
 
