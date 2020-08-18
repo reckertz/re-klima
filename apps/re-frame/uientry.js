@@ -504,10 +504,13 @@
 
                         );
                     if (typeof epfield.maxlength !== "undefined" && !isNaN(epfield.maxlength)) {
-                        $("#" + pageprefix + epfield.name).attr("maxLength", epfield.maxlength);
+                        $("#" + pageprefix + epfieldname).attr("maxLength", epfield.maxlength);
                     }
                     if (typeof epfield.size !== "undefined" && !isNaN(epfield.size)) {
-                        $("#" + pageprefix + epfield.name).attr("size", epfield.size);
+                        $("#" + pageprefix + epfieldname).attr("size", epfield.size);
+                    }
+                    if (typeof epfield.width !== "undefined" && epfield.width.length > 0) {
+                        $("#" + pageprefix + epfieldname).css("width", epfield.width);
                     }
                 } else if (epfield.type === "string" && epfield.class === "uiearea") {
                     var rows = epfield.rows || 5;
@@ -533,7 +536,7 @@
                             }))
                         );
                     if (typeof epfield.maxlength !== "undefined" && !isNaN(epfield.maxlength)) {
-                        $("#" + pageprefix + epfield.name).attr("maxLength", epfield.maxlength);
+                        $("#" + pageprefix + epfieldname).attr("maxLength", epfield.maxlength);
                     }
                 } else if (epfield.type === "string" && epfield.class === "uiecurrency") {
                     /**

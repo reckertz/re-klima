@@ -634,9 +634,6 @@
                         var actdate = new Date(syear, mmtt.month - 1, mmtt.day);
                         var dayofweek = actdate.getDay(); // 0 = Sonntag!!!
                         ccount++;
-                        if (ccount % 74 === 0) {
-                            console.log(syear, iday, actdate, dayofweek);
-                        }
                         rowdata[dayofweek][inum]++;
                     }
                 }

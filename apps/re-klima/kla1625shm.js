@@ -56,7 +56,7 @@
     poprecord.total = false;
     poprecord.mixed = true;
     poprecord.moon = false;
-    poprecord.sunwinter = true;
+    poprecord.tempdistribution = true;
     poprecord.export = false;
 
     kla1625shm.show = function (parameters, navigatebucket) {
@@ -82,7 +82,7 @@
             hyde: false
             master: true
             qonly: false
-            sunwinter: false
+            tempdistribution: false
             tempchart: false
             temptable: false
             */
@@ -93,7 +93,7 @@
                 hyde: true,
                 master: true,
                 qonly: true,
-                sunwinter: true,
+                tempdistribution: true,
                 tempchart: true,
                 temptable: true
             }, selparms.config);
@@ -710,7 +710,7 @@
                              */
                             $(actiFrameBody).find('canvas').each(function (index, printcanvas) {
                                 var image = new Image();
-                                image.src = printcanvas.toDataURL("image/jpg");  // png
+                                image.src = printcanvas.toDataURL("image/jpg"); // png
                                 var w = $(printcanvas).width();
                                 var h = $(printcanvas).height();
                                 $(image).width(w);
@@ -1234,6 +1234,7 @@
                     master.longitude = klirecords[0].longitude;
                     master.latitude = klirecords[0].latitude;
                     master.height = klirecords[0].height;
+                    ret.master = master;
                     var html = uihelper.iterateJSON2HTML(master, "", "");
                     $("#" + divid)
                         .append($("<div/>", {
@@ -1267,7 +1268,6 @@
                     /**
                      * Prüfung der Datenqualität je Jahr in klirecords.years
                      */
-
                     for (var irec = 0; irec < klirecords.length; irec++) {
                         var klirecord = klirecords[irec];
                         var years = JSON.parse(klirecord.years)
@@ -1325,7 +1325,6 @@
                                 }
                             }));
                     }
-
                     cb1625g0(null, ret);
                     return;
                 },
@@ -1334,7 +1333,7 @@
                      * Heatmap-1
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    if (kla1625shmconfig.heatmaps === true) {
+                    if (kla1625shmconfig.heatmaps === true || kla1625shmconfig.heatmapsx === true) {
                         $("#kla1625shmwrapper")
                             .append($("<div/>", {
                                     css: {
@@ -1512,6 +1511,67 @@
                         return;
                     });
                 },
+                function (ret, cb1625g5a) {
+                    /**
+                     * Heat-Distribution mit ChartJS TMAX
+                     */
+
+                    if (kla1625shmconfig.tempdistribution === false) {
+                        cb1625g5a(null, ret);
+                        return;
+                    }
+                    var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                    $("#kla1625shmwrapper")
+                        .append($("<div/>", {
+                                css: {
+                                    width: "100%",
+                                    float: "left",
+                                    overflow: "hidden"
+                                }
+                            })
+                            .append($("<div/>", {
+                                id: divid + "L",
+                                css: {
+                                    width: "49%",
+                                    float: "left",
+                                    overflow: "hidden"
+                                }
+                            }))
+                            .append($("<div/>", {
+                                id: divid + "R",
+                                css: {
+                                    width: "49%",
+                                    float: "left",
+                                    overflow: "hidden"
+                                }
+                            }))
+
+                        );
+
+                    kla1625shm.klidistr2("#" + divid + "L", "TMAX", selsource, selstationid, ret, function (ret1) {
+                        ret.divid = divid;
+                        cb1625g5a(null, ret);
+                        return;
+                    });
+                },
+
+                function (ret, cb1625g5b) {
+                    /**
+                     * Heat-Distribution mit ChartJS TMIN
+                     */
+
+                    if (kla1625shmconfig.tempdistribution === false) {
+                        cb1625g5b(null, ret);
+                        return;
+                    }
+                    var divid = ret.divid;
+                    kla1625shm.klidistr2("#" + divid + "R", "TMIN", selsource, selstationid, ret, function (ret) {
+                        cb1625g5b(null, ret);
+                        return;
+                    });
+                },
+
+
 
                 function (ret, cb1625g5) {
                     /**
@@ -1676,6 +1736,15 @@
                 }
             ],
             function (error, result) {
+                $(".tablesorter").tablesorter({
+                    theme: "blue",
+                    widgets: ['filter'],
+                    widthFixed: true,
+                    widgetOptions: {
+                        filter_hideFilters: false,
+                        filter_ignoreCase: true
+                    }
+                }); // so funktioniert es
                 $("#kla1625shmwrapper")
                     .append($("<div/>", {
                             css: {
@@ -1750,7 +1819,10 @@
                         mtitle += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
                         mtitle += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
                         mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
-
+                        ret.record.fromyear = kla1625shmconfig.fromyear;
+                        ret.record.toyear = kla1625shmconfig.toyear;
+                        mtitle += (ret.record.fromyear || "").length > 0 ? " Filter von " + ret.record.fromyear : "";
+                        mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
                         // Aufruf Heatmap mit Container und Matrix
                         matrix1 = {
                             title: mtitle,
@@ -1766,6 +1838,9 @@
                         var numberhisto = new Array(10).fill(0);
                         for (var year in years) {
                             if (years.hasOwnProperty(year)) {
+                                if (parseInt(year) < kla1625shmconfig.fromyear || parseInt(year) > kla1625shmconfig.toyear) {
+                                    continue;
+                                }
                                 matrix1.rowheaders.push(year);
                                 var rowvalues = years[year];
                                 matrix1.data[irow] = [];
@@ -1811,12 +1886,13 @@
                                                     var buck0 = parseInt(year);
                                                     var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
                                                     // oder 1661 als Basisjahr und damit rechnen
-                                                    var buck2 = Math.floor(buck1 / 30);
-                                                    var buck3 = 1661 + (buck2) * 30;
+                                                    var steps = parseInt(kla1625shmconfig.step || 30);
+                                                    var buck2 = Math.floor(buck1 / steps);
+                                                    var buck3 = 1661 + (buck2) * steps;
                                                     var buckyear = "" + buck3;
                                                     if (typeof hmoptions.cbucketdata[buckyear] === "undefined") {
                                                         hmoptions.cbucketdata[buckyear] = {
-                                                            toyear: buck3 + 29,
+                                                            toyear: buck3 + steps - 1,
                                                             histo: [],
                                                             minval: null,
                                                             maxval: null,
@@ -1865,7 +1941,7 @@
                         // hier ist das Layout nochmal zu kontrollieren
                         hmoptions.histo = histo1;
                         if (kla1625shmconfig.heatmaps === true) {
-                            var erg = kla9020fun.getHeatmap(cid, matrix1, hmoptions, function (ret) {
+                            var erg = kla9020fun.getHeatmap(cid, kla1625shmconfig.heatmapsx, matrix1, hmoptions, function (ret) {
                                 sysbase.putMessage("Heatmap ausgegeben", 1);
                                 // if (hmoptions.minmax === true) debugger;
                                 callbackshm2(null, {
@@ -1974,6 +2050,7 @@
 
             }
             var tableid;
+            var bigchart = {};
             if (hoptions.cbuckets === true && typeof hoptions.cbucketdata === "object" && Object.keys(hoptions.cbucketdata).length > 0) {
                 tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
 
@@ -1987,10 +2064,11 @@
                                 id: tableid,
                                 border: "2",
                                 rules: "all",
-                                class: "doprintthis",
+                                class: "doprintthis tablesorter",
                                 css: {
                                     float: "left",
                                     margin: "10px",
+                                    width: "95%",
                                     layout: "fixed",
                                     "background-color": "white"
                                 }
@@ -2207,8 +2285,8 @@
                         fillColor: false,
                         defaultPixelsPerValue: 3,
                         chartRangeMin: mincount,
-                        chartRangeMax: maxcount,
-                        composite: false
+                        chartRangeMax: maxcount
+
                     });
                 }
             }
@@ -2354,6 +2432,8 @@
         var splvariable = $(this).closest("tr").attr("selvariable");
         var splfromyear = $(this).closest("tr").attr("fromyear");
         var spltoyear = $(this).closest("tr").attr("toyear");
+
+        var oldsparkid = $(this).closest("tr").find("span").attr("id");
         // from - to Logik mit den years
         //var years = JSON.parse(ret.record.years);
         var splrecord = klirecords[0];
@@ -2399,8 +2479,8 @@
                 /**
                  * Loop über die 12 Monate
                  * je Monat Zuweisung des "richtigen" Objekts sun oder win als work
-                */
-               var wrk = {};
+                 */
+                var wrk = {};
                 for (var imon = 0; imon < 12; imon++) {
                     if (imon >= 0 && imon <= 2 || imon >= 9 && imon <= 11) {
                         wrk = win;
@@ -2422,11 +2502,11 @@
                             wrk.valcount += 1;
                             if (wrk.minval === null) {
                                 wrk.minval = dval;
-                            } else if (dval < sun.minval) {
-                                sun.minval = dval;
+                            } else if (dval < wrk.minval) {
+                                wrk.minval = dval;
                             }
-                            if (sun.maxval === null) {
-                                sun.maxval = dval;
+                            if (wrk.maxval === null) {
+                                wrk.maxval = dval;
                             } else if (dval > wrk.maxval) {
                                 wrk.maxval = dval;
                             }
@@ -2443,77 +2523,6 @@
                     }
                     splfromday = splfromday + mdtable[imon];
                 }
-                /*
-                var spltoday = mdtable[0] + mdtable[1] + mdtable[2] + mdtable[3] + mdtable[4] + mdtable[5];
-                // Summer-Loop, 1. Halbjahr
-                for (var iday = splfromday; iday < spltoday; iday++) {
-                    var dval1 = yearvals[iday];
-                    if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
-                        var dval = parseFloat(dval1);
-                        var inum = 0;
-                        var numt = dval1.split(".");
-                        if (numt.length === 2) {
-                            inum = parseInt(numt[1].substr(0, 1));
-                        }
-                        sun.valsum += dval;
-                        sun.valcount += 1;
-                        if (sun.minval === null) {
-                            sun.minval = dval;
-                        } else if (dval < sun.minval) {
-                            sun.minval = dval;
-                        }
-                        if (sun.maxval === null) {
-                            sun.maxval = dval;
-                        } else if (dval > sun.maxval) {
-                            sun.maxval = dval;
-                        }
-                        var itemp = Math.round(dval);
-                        itemp += 50;
-                        if (itemp >= 0 && itemp <= 100) {
-                            sun.temphisto[itemp] += 1;
-                        } else if (itemp < 0) {
-                            sun.temphisto[0] += 1;
-                        } else {
-                            sun.temphisto[100] += 1;
-                        }
-                    }
-                }
-                // Winter-Loop, 2. Halbjahr
-                splfromday = spltoday;
-                spltoday = yearvals.length;
-                for (var iday = splfromday; iday < spltoday; iday++) {
-                    var dval1 = yearvals[iday];
-                    if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
-                        var dval = parseFloat(dval1);
-                        var inum = 0;
-                        var numt = dval1.split(".");
-                        if (numt.length === 2) {
-                            inum = parseInt(numt[1].substr(0, 1));
-                        }
-                        win.valsum += dval;
-                        win.valcount += 1;
-                        if (win.minval === null) {
-                            win.minval = dval;
-                        } else if (dval < win.minval) {
-                            win.minval = dval;
-                        }
-                        if (win.maxval === null) {
-                            win.maxval = dval;
-                        } else if (dval > win.maxval) {
-                            win.maxval = dval;
-                        }
-                        var itemp = Math.round(dval);
-                        itemp += 50;
-                        if (itemp >= 0 && itemp <= 100) {
-                            win.temphisto[itemp] += 1;
-                        } else if (itemp < 0) {
-                            win.temphisto[0] += 1;
-                        } else {
-                            win.temphisto[100] += 1;
-                        }
-                    }
-                }
-                */
             }
         }
         // Kennziffern Kurtosis, Skewness, Shapiro Wilk-Test mit P und W-Wert
@@ -2537,10 +2546,10 @@
         var sparkid = "S" + Math.floor(Math.random() * 100000) + 1;
         $(baserow)
             .after($("<tr/>", {
-                    id: sparkid + "r"
+                    id: sparkid + "s"
                 })
                 .append($("<td/>", {
-                    html: splfromyear + "-" + spltoyear + " 04-09"
+                    html: splfromyear + "-" + spltoyear + " 04-09 sun"
                 }))
                 .append($("<td/>")
                     .append($("<span/>", {
@@ -2587,11 +2596,22 @@
             composite: false
         });
 
+        // auf oldsparkid
+        $("#" + oldsparkid).sparkline(sun.temphisto, {
+            type: 'line',
+            defaultPixelsPerValue: 3,
+            lineColor: "black",
+            fillColor: false,
+            composite: true
+        });
+
         var sparkid1 = "S" + Math.floor(Math.random() * 100000) + 1;
-        $("#" + sparkid + "r")
-            .after($("<tr/>", {})
+        $("#" + sparkid + "s")
+            .after($("<tr/>", {
+                    id: sparkid + "w"
+                })
                 .append($("<td/>", {
-                    html: splfromyear + "-" + spltoyear + " 01-03, 10-12"
+                    html: splfromyear + "-" + spltoyear + " 01-03, 10-12 win"
                 }))
                 .append($("<td/>")
                     .append($("<span/>", {
@@ -2639,10 +2659,330 @@
         });
 
 
+        // auf oldsparkid
+        $("#" + oldsparkid).sparkline(win.temphisto, {
+            type: 'line',
+            defaultPixelsPerValue: 3,
+            lineColor: "blue",
+            fillColor: false,
+            composite: true
+        });
 
-
+        $(".tablesorter").tablesorter({
+            theme: "blue",
+            widgets: ['filter', 'cssStickyHeaders'],
+            widthFixed: true,
+            widgetOptions: {
+                filter_hideFilters: false,
+                filter_ignoreCase: true
+            }
+        }); // so funktioniert es
     });
 
+
+    /**
+     * kla1625shm.klidistr2 - tempdistribution
+     * Separate Charts für Sommer und Winter für die Distribution
+     * starecord hat source, stationid
+     * klirecords[0] oder [1] mit variable
+     */
+    kla1625shm.klidistr2 = function (cid, selvariable, selsource, selstationid, ret1, cb1625p) {
+        try {
+            var divid = "div" + Math.floor(Math.random() * 100000) + 1;
+            var chartidsun = divid + "sun";
+            var chartidwin = divid + "win";
+            $(cid)
+                .append($("<div/>", {
+                        id: divid,
+                        css: {
+                            float: "left",
+                            overflow: "hidden",
+                            "background-color": "white",
+                            margin: "10px",
+                            width: "100%"
+                        }
+                    })
+                    .append($("<h3/>", {
+                        text: "Distribution " + selvariable + " Summer",
+                        class: "doprintthis"
+                    }))
+                    .append($("<canvas/>", {
+                        id: chartidsun,
+                        class: "doprintthis",
+                        selvariable: selvariable,
+                        css: {
+                            "text-align": "center",
+                            margin: "10px",
+                            width: "90%"
+                        }
+                    }))
+                    .append($("<div/>", {
+                            css: {
+                                "background-color": "lime",
+                                width: "100%"
+                            }
+                        })
+                        .append($("<br/>"))
+                        .append($("<br/>"))
+                    )
+
+                    .append($("<h3/>", {
+                        text: "Distribution " + selvariable + " Winter",
+                        class: "doprintthis"
+                    }))
+                    .append($("<canvas/>", {
+                        id: chartidwin,
+                        class: "doprintthis",
+                        selvariable: selvariable,
+                        css: {
+                            "text-align": "center",
+                            margin: "10px",
+                            width: "90%"
+                        }
+                    }))
+
+                );
+            //Chart.defaults.global.plugins.colorschemes.override = true;
+            //Chart.defaults.global.legend.display = true;
+            // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+            var yAxesticks = [];
+            var newArr;
+            var sunconfig = {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [],
+                    backgroundColor: "yellow"
+                },
+                options: {
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.Paired12'
+                        }
+                    },
+                    mytype: selvariable,
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                minRotation: 88,
+                                autoskip: true
+                                /* autoSkipPadding: 10 */
+                            },
+                        }]
+                    }
+                }
+            };
+
+            var winconfig = {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [],
+                    backgroundColor: "yellow"
+                },
+                options: {
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.Paired12'
+                        }
+                    },
+                    mytype: selvariable,
+                    scales: {
+                        xAxes: [{
+                            ticks: {
+                                minRotation: 88,
+                                autoskip: true
+                                /* autoSkipPadding: 10 */
+                            },
+                        }]
+                    }
+                }
+            };
+            for (var ilabel = 0; ilabel <= 100; ilabel++) {
+                var itemp = ilabel - 50;
+                var lab;
+                if (itemp % 10 === 0) {
+                    lab = "" + itemp;
+                } else {
+                    lab = "";
+                }
+                sunconfig.data.labels.push(lab);
+                winconfig.data.labels.push(lab);
+            }
+
+            /**
+             * sunconfig und winconfig für die Differenzierung
+             */
+            var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            //sun.temphisto = new Array(101).fill(0); // von -50 bis +50
+            //win.temphisto = new Array(101).fill(0); // von -50 bis +50
+            var distfromyear = parseInt(kla1625shmconfig.fromyear);
+            var disttoyear = parseInt(kla1625shmconfig.toyear);
+            var diststep = parseInt(kla1625shmconfig.step);
+            var sunbucket = {};
+            var winbucket = {};
+            var ibucket = 0;
+            var ebucket = distfromyear + diststep - 1;
+            var sunbuckets = [];
+            var winbuckets = [];
+            // Initialisieren und auf Standard-Buckets runden oder vorher setzen!!!
+            for (var ibuck = distfromyear; ibuck <= disttoyear; ibuck += diststep) {
+                sunbuckets.push({
+                    fromyear: ibuck,
+                    toyear: ibuck + diststep - 1,
+                    temphisto: new Array(101).fill(0),
+                    valsum: 0,
+                    valcount: 0,
+                    minval: null,
+                    maxval: null
+                });
+                winbuckets.push({
+                    fromyear: ibuck,
+                    toyear: ibuck + diststep - 1,
+                    temphisto: new Array(101).fill(0),
+                    valsum: 0,
+                    valcount: 0,
+                    minval: null,
+                    maxval: null
+                });
+            }
+
+            // years bereitstellen
+
+            if (selvariable === "TMAX" && klirecords.length > 0) {
+                ret1.record = klirecords[0];
+            } else if (selvariable === "TMIN" && klirecords.length > 1) {
+                ret1.record = klirecords[1];
+            }
+
+            var years = JSON.parse(ret1.record.years);
+            for (var iyear = parseInt(distfromyear); iyear <= parseInt(disttoyear); iyear++) {
+                if (typeof years[iyear] !== "undefined") {
+                    if (uihelper.isleapyear(iyear)) {
+                        mdtable[1] = 29;
+                    } else {
+                        mdtable[1] = 28;
+                    }
+                    var splfromday = 0;
+                    var spltoday = 0;
+                    var yearvals = years["" + iyear];
+                    /**
+                     * Loop über die 12 Monate
+                     * je Monat Zuweisung des "richtigen" Objekts sun oder win als work
+                     */
+                    var wrk = {};
+                    for (var imon = 0; imon < 12; imon++) {
+                        if (imon >= 0 && imon <= 2 || imon >= 9 && imon <= 11) {
+                            for (var ibuck1 = 0; ibuck1 < winbuckets.length; ibuck1++) {
+                                if (iyear >= winbuckets[ibuck1].fromyear && iyear <= winbuckets[ibuck1].toyear) {
+                                    wrk = winbuckets[ibuck1];
+                                    break;
+                                }
+                            }
+                        } else {
+                            for (var ibuck2 = 0; ibuck2 < sunbuckets.length; ibuck2++) {
+                                if (iyear >= sunbuckets[ibuck2].fromyear && iyear <= sunbuckets[ibuck2].toyear) {
+                                    wrk = sunbuckets[ibuck2];
+                                    break;
+                                }
+                            }
+                        }
+                        spltoday = splfromday + mdtable[imon];
+                        for (var iday = splfromday; iday < spltoday; iday++) {
+                            var dval1 = yearvals[iday];
+                            if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
+                                var dval = parseFloat(dval1);
+                                var inum = 0;
+                                var numt = dval1.split(".");
+                                if (numt.length === 2) {
+                                    inum = parseInt(numt[1].substr(0, 1));
+                                } else {
+                                    debugger;
+                                }
+                                wrk.valsum += dval;
+                                wrk.valcount += 1;
+                                if (wrk.minval === null) {
+                                    wrk.minval = dval;
+                                } else if (dval < wrk.minval) {
+                                    wrk.minval = dval;
+                                }
+                                if (wrk.maxval === null) {
+                                    wrk.maxval = dval;
+                                } else if (dval > wrk.maxval) {
+                                    wrk.maxval = dval;
+                                }
+                                var itemp = Math.round(dval);
+                                itemp += 50;
+                                if (itemp >= 0 && itemp <= 100) {
+                                    wrk.temphisto[itemp] += 1;
+                                } else if (itemp < 0) {
+                                    wrk.temphisto[0] += 1;
+                                } else {
+                                    wrk.temphisto[100] += 1;
+                                }
+                            }
+                        }
+                        splfromday = splfromday + mdtable[imon];
+                    }
+                }
+            }
+
+            for (var ibuck = 0; ibuck < sunbuckets.length; ibuck++) {
+                sunconfig.data.datasets.push({
+                    label: sunbuckets[ibuck].fromyear + "-" + sunbuckets[ibuck].toyear,
+                    data: sunbuckets[ibuck].temphisto,
+                    pointStyle: 'line',
+                    fill: false,
+                    borderWidth: 2
+                });
+            }
+            var ctx1 = document.getElementById(chartidsun).getContext('2d');
+            myCharts[selvariable + "D1"] = new Chart(ctx1, sunconfig);
+
+            for (var ibuck = 0; ibuck < winbuckets.length; ibuck++) {
+                winconfig.data.datasets.push({
+                    label: winbuckets[ibuck].fromyear + "-" + winbuckets[ibuck].toyear,
+                    data: winbuckets[ibuck].temphisto,
+                    pointStyle: 'line',
+                    fill: false,
+                    borderWidth: 2
+                });
+            }
+            var ctx2 = document.getElementById(chartidwin).getContext('2d');
+            myCharts[selvariable + "D2"] = new Chart(ctx2, winconfig);
+            cb1625p({
+                error: false,
+                message: "Distribution-Chart ausgegeben"
+            });
+            return;
+        } catch (err) {
+            console.log(err);
+            cb1625p({
+                error: true,
+                message: "Distribution-Chart:" + err
+            });
+            return;
+        }
+
+
+
+        /*
+        // Kennziffern Kurtosis, Skewness, Shapiro Wilk-Test mit P und W-Wert
+        var kur = ss.sampleKurtosis(sun.temphisto);
+        var skew = ss.sampleSkewness(sun.temphisto);
+        sun.calc1 = kur.toFixed(2) + "<br>" + skew.toFixed(2) + "<br>" + (kur - skew ** 2).toFixed(2);
+        var w = new Vector(sun.temphisto);
+        var wperg = new Normality.shapiroWilk(w);
+        sun.calc2 = "W: " + wperg.w.toFixed(4) + "<br>P: " + wperg.p.toFixed(4);
+
+        var kur = ss.sampleKurtosis(win.temphisto);
+        var skew = ss.sampleSkewness(win.temphisto);
+        win.calc1 = kur.toFixed(2) + "<br>" + skew.toFixed(2) + "<br>" + (kur - skew ** 2).toFixed(2);
+        var w = new Vector(win.temphisto);
+        var wperg = new Normality.shapiroWilk(w);
+        win.calc2 = "W: " + wperg.w.toFixed(4) + "<br>P: " + wperg.p.toFixed(4);
+        */
+    };
 
 
     /**
@@ -2685,14 +3025,14 @@
                 })
                 .append($("<table/>", {
                         id: tableid,
-                        class: "doprintthis",
+                        class: "doprintthis tablesorter",
                         border: "2",
                         rules: "all",
                         css: {
                             width: "95%",
                             float: "left",
                             margin: "10px",
-                            "background-color":  "white"
+                            "background-color": "white"
                         }
                     })
                     .append($("<thead/>")
@@ -2777,7 +3117,7 @@
         /**
          * Regressionsanalyse minvals, avgvals und maxvals als Array
          * https://tom-alexander.github.io/regression-js/
-        */
+         */
         var result = regression.linear(minregvals, {
             order: 2,
             precision: 3
@@ -2802,62 +3142,62 @@
         var maxyIntercept = result.equation[1].toFixed(2);
         var maxr2 = Math.round(result.r2 * 100);
 
-        var mindelta = minregvals[minregvals.length-1][1] - minregvals[0][1];
-        var avgdelta = avgregvals[avgregvals.length-1][1] - avgregvals[0][1];
-        var maxdelta = maxregvals[maxregvals.length-1][1] - maxregvals[0][1];
+        var mindelta = minregvals[minregvals.length - 1][1] - minregvals[0][1];
+        var avgdelta = avgregvals[avgregvals.length - 1][1] - avgregvals[0][1];
+        var maxdelta = maxregvals[maxregvals.length - 1][1] - maxregvals[0][1];
         $("#" + tableid)
-        .find("tbody")
-        .append($("<tr/>")
-            .append($("<td/>", {
-                html: "Delta 1-n"
-            }))
-            .append($("<td/>", {
-                html: mindelta.toFixed(1)
-            }))
-            .append($("<td/>", {
-                html: avgdelta.toFixed(1)
-            }))
-            .append($("<td/>", {
-                html: maxdelta.toFixed(1)
-            }))
-        );
+            .find("tbody")
+            .append($("<tr/>")
+                .append($("<td/>", {
+                    html: "Delta 1-n"
+                }))
+                .append($("<td/>", {
+                    html: mindelta.toFixed(1)
+                }))
+                .append($("<td/>", {
+                    html: avgdelta.toFixed(1)
+                }))
+                .append($("<td/>", {
+                    html: maxdelta.toFixed(1)
+                }))
+            );
 
-
-
-        $("#" + tableid)
-        .find("tbody")
-        .append($("<tr/>")
-            .append($("<td/>", {
-                html: "Steigung g"
-            }))
-            .append($("<td/>", {
-                html: mingradient
-            }))
-            .append($("<td/>", {
-                html: avggradient
-            }))
-            .append($("<td/>", {
-                html: maxgradient
-            }))
-        );
 
 
         $("#" + tableid)
-        .find("tbody")
-        .append($("<tr/>")
-            .append($("<td/>", {
-                html: "Bestimmtheit r2 %"
-            }))
-            .append($("<td/>", {
-                html: minr2
-            }))
-            .append($("<td/>", {
-                html: avgr2
-            }))
-            .append($("<td/>", {
-                html: maxr2
-            }))
-        );
+            .find("tbody")
+            .append($("<tr/>")
+                .append($("<td/>", {
+                    html: "Steigung g"
+                }))
+                .append($("<td/>", {
+                    html: mingradient
+                }))
+                .append($("<td/>", {
+                    html: avggradient
+                }))
+                .append($("<td/>", {
+                    html: maxgradient
+                }))
+            );
+
+
+        $("#" + tableid)
+            .find("tbody")
+            .append($("<tr/>")
+                .append($("<td/>", {
+                    html: "Bestimmtheit r2 %"
+                }))
+                .append($("<td/>", {
+                    html: minr2
+                }))
+                .append($("<td/>", {
+                    html: avgr2
+                }))
+                .append($("<td/>", {
+                    html: maxr2
+                }))
+            );
 
         var chartid = ciddiv + "chart";
         $("#" + ciddiv + "L1")
@@ -3029,7 +3369,7 @@
                             })
                             .append($("<table/>", {
                                     id: tableid,
-                                    class: "doprintthis",
+                                    class: "doprintthis tablesorter",
                                     border: "2",
                                     rules: "all",
                                     css: {

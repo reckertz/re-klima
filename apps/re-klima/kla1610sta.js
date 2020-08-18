@@ -398,9 +398,9 @@
                     source: defaultsource,
                     variablename: defaultvariablename,
                     /* name: "berlin" */
-                    /* anzyears: ">=150", */
-                    fromyear: "<=1850",
-                    toyear: ">=1850",
+                    anzyears: ">=150"
+                    /* fromyear: "<=1850", */
+                    /* toyear: ">=1850", */
                 };
                 uientry.fromRecord2UI($("#kla1610staform"), starecord, staschema);
                 uientry.init();
@@ -907,7 +907,9 @@
                 variablename: selvariablename,
                 starecord: starecord,
                 latitude: $(this).closest("tr").attr("latitude"),
-                longitude: $(this).closest("tr").attr("longitude")
+                longitude: $(this).closest("tr").attr("longitude"),
+                fromyear: $(this).closest("tr").attr("fromyear"),
+                toyear: $(this).closest("tr").attr("toyear"),
             }));
             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
             var stationname = stationarray[stationid];
@@ -1435,6 +1437,8 @@
         var stationid = $(this).closest("tr").attr("rowid");
         var longitude = $(this).closest("tr").attr("longitude");
         var latitude = $(this).closest("tr").attr("latitude");
+        var fromyear = $(this).closest("tr").attr("fromyear");
+        var toyear = $(this).closest("tr").attr("toyear");
 
         var source = starecord.source;
         var variablename = starecord.variablename;
@@ -1486,6 +1490,42 @@
                             class: "uiecheckbox",
                             io: "i"
                         },
+                        heatmapsx: {
+                            title: "Heatmaps+",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uiecheckbox",
+                            io: "i"
+                        },
+                        fromyear: {
+                            title: "Von Jahr",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            maxlength: 4,
+                            size: 4,
+                            width: "70px",
+                            default: "",
+                            io: "i"
+                        },
+                        toyear: {
+                            title: "Bis Jahr",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            maxlength: 4,
+                            size: 4,
+                            width: "70px",
+                            default: "",
+                            io: "i"
+                        },
+                        step: {
+                            title: "Bucket",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uietext",
+                            maxlength: 4,
+                            size: 4,
+                            width: "70px",
+                            default: "",
+                            io: "i"
+                        },
                         decimals: {
                             title: "Dezimalstelle",
                             type: "string", // currency, integer, datum, text, key
@@ -1505,8 +1545,8 @@
                             class: "uiecheckbox",
                             io: "i"
                         },
-                        sunwinter: {
-                            title: "Sommer/Winter",
+                        tempdistribution: {
+                            title: "Distribution",
                             type: "string", // currency, integer, datum, text, key
                             class: "uiecheckbox",
                             default: true,
@@ -1563,15 +1603,19 @@
         if (Object.keys(confrecord).length === 0) {
             // Default-Setzungen
             confrecord = {
-                comment: "",
                 decimals: true,
                 heatmaps: true,
+                heatmapsx: true,
                 hyde: true,
                 master: true,
                 qonly: true,
-                sunwinter: true,
+                tempdistribution: true,
                 tempchart: true,
-                temptable: true
+                temptable: true,
+                comment: "",
+                fromyear: fromyear,
+                toyear: toyear,
+                step: 30
             };
         }
         // Hidden der aktuellen variablen Daten
