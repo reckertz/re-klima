@@ -1508,7 +1508,6 @@
                     /**
                      * Heat-Distribution mit ChartJS TMAX
                      */
-
                     if (kla1625shmconfig.tempdistribution === false) {
                         cb1625g5a(null, ret);
                         return;
@@ -1585,7 +1584,6 @@
                     /**
                      * Heat-Distribution mit ChartJS TMIN
                      */
-
                     if (kla1625shmconfig.tempdistribution === false) {
                         cb1625g5b(null, ret);
                         return;

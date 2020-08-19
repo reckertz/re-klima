@@ -193,7 +193,8 @@
                             "ASCII Esri Grid",
                             "ASCII spezial",
                             "netCDF",
-                            "ASCII netCDF"
+                            "ASCII netCDF",
+                            "special"
                         ]
                     },
                     separator: {
@@ -514,7 +515,7 @@
                 id: "kla1400raw_entry",
                 class: "col3of3",
                 css: {
-                    width: "35%",
+                    width: "32%",
                     "background-color": "lime",
                     overflow: "auto"
                 }
@@ -2051,6 +2052,7 @@
                                 uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                                     if (ret.error === false && ret.record !== null) {
                                         klirecord = ret.record;
+                                        debugger;
                                         uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                                         $("#kla1400rawform")
                                             .append($("<div/>", {
@@ -2125,6 +2127,13 @@
              * Differenzieren der Dateitypen, Default ist Anzeige aus dem Inhalt,
              * spezielle Dateien werden abgefangen, GHCND vorgezogen
              */
+            /*
+            if (kla1400raw.checkfragments(fullname, "ipcczonecoordinates \.txt")) {
+                kla1400raw.ghcndstations("GHCND", "", fullname, function (ret) {
+
+                });
+            } else
+            */
             if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily stations \.txt")) {
                 kla1400raw.ghcndstations("GHCND", "", fullname, function (ret) {
 
@@ -2151,6 +2160,8 @@
                             uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                                 if (ret.error === false && ret.record !== null) {
                                     klirecord = ret.record;
+                                    klirecord.metadata = JSON.parse(klirecord.metadata);
+                                    debugger;
                                     uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                                     $("#kla1400rawform")
                                         .append($("<div/>", {
@@ -2215,6 +2226,7 @@
                                                         });
                                                     } else {
                                                         $(".kla1400rawActionLoad").prop('disabled', true);
+                                                        debugger;
                                                         var jqxhr = $.ajax({
                                                             method: "POST",
                                                             crossDomain: false,
@@ -2374,6 +2386,7 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
+                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");
@@ -2514,6 +2527,7 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
+                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");
@@ -2652,6 +2666,7 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
+                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");
@@ -2791,6 +2806,7 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
+                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");
@@ -2941,7 +2957,7 @@
                 }));
         }
         $(target).empty();
-        kla1400raw.setResizeObserver();
+        //kla1400raw.setResizeObserver();
         $(target).height($("#kla1400raw_right").height() - $(target).position().top - 3);
         if (fullname.endsWith(".zip") || fullname.endsWith(".tar") || fullname.endsWith(".gz")) {
             /**
@@ -2968,7 +2984,7 @@
                             width: "100%"
                         }
                     }));
-                kla1400raw.setResizeObserver();
+                //kla1400raw.setResizeObserver();
                 document.getElementById("kla1400raw").style.cursor = "default";
                 callbackf();
                 return;
@@ -3004,7 +3020,7 @@
                             width: "100%"
                         }
                     }));
-                kla1400raw.setResizeObserver();
+                //kla1400raw.setResizeObserver();
                 document.getElementById("kla1400raw").style.cursor = "default";
                 // Buttons für das Blättern ausgeben oder nicht
                 if (ret.error === false) {

@@ -1185,7 +1185,63 @@ app.post('/loadcsvdata', function (req, res) {
         return;
     }
     var counter = 0;
-    if (filetype === "csv mit Header") {
+    if (filetype === "special") {
+
+        var readInterface = readline.createInterface({
+            input: fs.createReadStream(fullname),
+            console: false
+        });
+        readInterface.on('line', function (line) {
+            counter++;
+            /*
+            Region Label and Number Coordinates (Latitude [°], Longitude [°]) of Region Corners
+            ALA 1 (60.000N, 105.000W) (60.000N, 168.022W) (72.554N, 168.022W) (72.554N, 105.000W)
+            */
+            var record = {
+                ipcczone: "",
+                label: "",
+                coordinates: ""
+            };
+            var wrkline = line;
+            var idis = 0;
+            idis = wrkline.indexOf(" ");
+            if (idis > 0) {
+                record.ipcczone = wrkline.substr(0, idis);
+                wrkline = wrkline.substr(idis);
+            }
+            idis = wrkline.indexOf(" ");
+            if (idis > 0) {
+                record.label = wrkline.substr(0, idis);
+                wrkline = wrkline.substr(idis);
+            }
+            // jetzt noch die Koordinaten
+            return true;
+        });
+        readInterface.on('close', function (err) {
+            console.log(">>>done readInterface<<<");
+            var ret = {};
+            ret.error = false;
+            ret.message = "Importiert " + counter + " records from " + fullname;
+            ret.filename = dir;
+            ret.counter = counter;
+            res.writeHead(200, {
+                'Content-Type': 'application/text',
+                "Access-Control-Allow-Origin": "*"
+            });
+            res.end(JSON.stringify(ret));
+            return;
+        });
+
+
+
+
+
+
+
+
+
+
+    } else if (filetype === "csv mit Header") {
         var fileschema = "";
         var fieldarray = [];
         try {

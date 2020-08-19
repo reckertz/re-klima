@@ -169,6 +169,101 @@
                             }
                         }))
 
+
+                        .append($("<li/>", {
+                            class: "dropdown-menuepoint",
+                            html: "IPCC-Zonen",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var ipcczones = uihelper.setIpccZones();
+                                // https://github.com/neveldo/jQuery-Mapael/blob/master/UPGRADE.md
+                                var newLinks = {};
+                                var ilink = 0;
+                                for (var icon = 0; icon < ipcczones.length; icon++) {
+                                    var ipcczone = ipcczones[icon];
+                                    if (ipcczone.label !== "8") {
+                                       // continue;
+                                    }
+                                    for (var iko = 0; iko < (ipcczone.lat.length - 1); iko++) {
+                                        ilink++;
+                                        var name = ipcczone.value + ilink;
+                                        var fakt = 1.0;
+                                        if (ipcczone.lat[iko] === ipcczone.lat[iko + 1]) {
+                                            fakt = 1.001;
+                                        }
+                                        newLinks[name] = {
+                                            factor: 0.01,
+                                            // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                                            between: [{
+                                                latitude: ipcczone.lat[iko],
+                                                longitude: ipcczone.lon[iko]
+                                            }, {
+                                                latitude: "" + ipcczone.lat[iko + 1] * fakt,
+                                                longitude: ipcczone.lon[iko + 1]
+                                            }],
+                                            attrs: {
+                                                "stroke-width": 2,
+                                                stroke: "red",
+                                                /* "#a4e100", */
+                                                opacity: 0.6
+                                            },
+                                            tooltip: {
+                                                content: ipcczone.text + " " + ipcczone.label
+                                            }
+                                        };
+                                    }
+                                    // Rück-Linie - letzte zu erster Linie - ist notwendig
+
+                                    ilink++;
+                                    iko = ipcczone.lat.length - 1; // letzter zu erstem
+                                    var name = ipcczone.value + ilink;
+                                    var fakt = 1.0;
+                                    if (ipcczone.lat[iko] === ipcczone.lat[0]) {
+                                        fakt = 1.001;
+                                    }
+                                    newLinks[name] = {
+                                        factor: 0.01,
+                                        // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                                        between: [{
+                                            latitude: ipcczone.lat[iko],
+                                            longitude: ipcczone.lon[iko]
+                                        }, {
+                                            latitude: "" + ipcczone.lat[0] * fakt,
+                                            longitude: ipcczone.lon[0]
+                                        }],
+                                        attrs: {
+                                            "stroke-width": 2,
+                                            stroke: "red",
+                                            /* "#a4e100", */
+                                            opacity: 0.6
+                                        },
+                                        tooltip: {
+                                            content: ipcczone.text + " " + ipcczone.label
+                                        }
+                                    };
+
+                                }
+                                // dahin muss die Ausgabe
+                                // http://jsfiddle.net/neveldo/dk3ers47/
+                                // https://github.com/neveldo/jQuery-Mapael/blob/master/UPGRADE.md
+                                var options = {
+                                    mapOptions: {}, // was updatedOptions
+                                    replaceOptions: false, // replace opt.resetPlots/resetAreas: whether mapsOptions should entirely replace current map options, or just extend it,
+                                    newPlots: {}, // was newPlots
+                                    newLinks: newLinks, // was opt.newLinks
+                                    deletePlotKeys: [], // was deletedPlots
+                                    deleteLinkKeys: [], // was opt.deletedLinks
+                                    setLegendElemsState: true, // is new
+                                    animDuration: 0, // was opt.animDuration
+                                    afterUpdate: function () {} // was opt.afterUpdate
+                                };
+                                $(".mapcontainer").trigger('update', [options]);
+
+                            }
+                        }))
+
+
+
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
                             html: "Klimazonen",
@@ -264,10 +359,10 @@
             kla1630map.showMap(stationarray);
         } else {
             stationarray = [];
-                kla1630map.prepeditor(function (ret) {
-                    sysbase.putMessage(ret.message);
-                    return;
-                });
+            kla1630map.prepeditor(function (ret) {
+                sysbase.putMessage(ret.message);
+                return;
+            });
         }
         /*
         stationarray.push({
@@ -421,7 +516,7 @@
                     text: {content: "Rennes"},
             */
             //plots.push({
-                console.log(contenthtml);
+
             plots[station.stationid] = {
                 type: "square", // circle
                 size: 5,
@@ -440,7 +535,7 @@
                 },
                 myText: sitename + " lon:" + longitude + " lat:" + latitude,
                 selstationid: station.stationid
-            //});
+                //});
             };
 
         }

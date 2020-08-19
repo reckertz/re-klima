@@ -2222,6 +2222,10 @@
         return continents;
     };
 
+
+
+
+
     /**
      * finden des Kontinents zu einem Punkt
      * https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon/17490923#17490923
@@ -2265,6 +2269,144 @@
             message: "no continent found"
         };
     };
+
+
+
+    /**
+     * setIpccZones - setzt Zone nach IPCC Definition
+     */
+    uihelper.setIpccZones = function () {
+        var ipcczones = uihelper.getCache("ipcczones");
+        if (typeof ipcczones === "undefined" || ipcczones === null) {
+            ipcczones = [];
+            var wrk = [];
+            wrk.push("ALA 1 (60.000N, 105.000W) (60.000N, 168.022W) (72.554N, 168.022W) (72.554N, 105.000W)");
+            wrk.push("AMZ 7 (20.000S, 66.377W) (1.239S, 79.729W) (11.439N, 68.800W) (11.439N, 50.000W) (20.000S, 50.000W)");
+            wrk.push("CAM 6 (11.439N, 68.800W) (1.239S, 79.729W) (28.566N, 118.323W) (28.566N, 90.315W)");
+            wrk.push("CAS 20 (30.000N, 60.000E) (50.000N, 60.000E) (50.000N, 75.000E) (30.000N, 75.000E)");
+            wrk.push("CEU 12 (45.000N, 10.000W) (48.000N, 10.000W) (61.320N, 40.000E) (45.000N, 40.000E)");
+            wrk.push("CGI 2 (50.000N, 10.000W) (50.000N, 105.000W) (85.000N, 105.000W) (85.000N, 10.000W)");
+            wrk.push("CNA 4 (50.000N, 85.000W) (28.566N, 85.000W) (28.566N, 105.000W) (50.000N, 105.000W)");
+            wrk.push("EAF 16 (11.365S, 25.000E) (15.000N, 25.000E) (15.000N, 51.990E) (11.365S, 51.990E)");
+            wrk.push("EAS 22 (20.000N, 100.000E) (50.000N, 100.000E) (50.000N, 145.000E) (20.000N, 145.000E)");
+            wrk.push("ENA 5 (25.000N, 60.000W) (25.000N, 85.000W) (50.000N, 85.000W) (50.000N, 60.000W)");
+            wrk.push("MED 13 (30.000N, 10.000W) (45.000N, 10.000W) (45.000N, 40.000E) (30.000N, 40.000E)");
+            wrk.push("NAS 18 (50.000N, 40.000E) (70.000N, 40.000E) (70.000N, 180.000E) (50.000N, 180.000E)");
+            wrk.push("NAU 25 (30.000S, 110.000E) (10.000S, 110.000E) (10.000S, 155.000E) (30.000S, 155.000E)");
+            wrk.push("NEB 8 (20.000S, 34.000W) (20.000S, 50.000W) (0.000N, 50.000W) (0.000N, 34.000W)");
+            wrk.push("NEU 11 (48.000N, 10.000W) (75.000N, 10.000W) (75.000N, 40.000E) (61.320N, 40.000E)");
+            wrk.push("SAF 17 (35.000S, 10.000W) (11.365S, 10.000W) (11.365S, 51.990E) (35.000S, 51.990E)");
+            wrk.push("SAH 14 (15.000N, 20.000W) (30.000N, 20.000W) (30.000N, 40.000E) (15.000N, 40.000E)");
+            wrk.push("SAS 23 (5.000N, 60.000E) (30.000N, 60.000E) (30.000N, 100.000E) (20.000N, 100.000E) (20.000N, 95.000E) (5.000N, 95.000E)");
+            wrk.push("SAU 26 (50.000S, 110.000E) (30.000S, 110.000E) (30.000S, 180.000E) (50.000S, 180.000E)");
+            wrk.push("SSA 10 (20.000S, 39.376W) (56.704S, 39.376W) (56.704S, 67.348W) (50.000S, 72.141W) (20.000S, 66.377W)");
+            wrk.push("SEA 24 (10.000S, 95.000E) (20.000N, 95.000E) (20.000N, 155.000E) (10.000S, 155.000E)");
+            wrk.push("TIB 21 (30.000N, 75.000E) (50.000N, 75.000E) (50.000N, 100.000E) (30.000N, 100.000E)");
+            wrk.push("WAF 15 (11.365S, 20.000W) (15.000N, 20.000W) (15.000N, 25.000E) (11.365S, 25.000E)");
+            wrk.push("WAS 19 (15.000N, 40.000E) (50.000N, 40.000E) (50.000N, 60.000E) (15.000N, 60.000E)");
+            wrk.push("WSA 9 (1.239S, 79.729W) (20.000S, 66.377W) (50.000S, 72.141W) (56.704S, 67.348W) (56.704S, 82.022W) (0.530N, 82.022W)");
+            wrk.push("WNA 3 (28.566N, 105.000W) (28.566N, 130.000W) (60.000N, 130.000W) (60.000N, 105.000W)");
+            for (var iwork = 0; iwork < wrk.length; iwork++) {
+                var wrkline = wrk[iwork];
+                var zrecord = {};
+                var idis = 0;
+                idis = wrkline.indexOf(" ");
+                if (idis > 0) {
+                    zrecord.ipcczone = wrkline.substr(0, idis);
+                    wrkline = wrkline.substr(idis).trim();
+                }
+                idis = wrkline.indexOf(" ");
+                if (idis > 0) {
+                    zrecord.ipcclabel = wrkline.substr(0, idis);
+                    wrkline = wrkline.substr(idis).trim();
+                }
+                zrecord.ipcccoords = wrkline.trim();
+                // var regExp = /\(([^()]+)\)*/g;
+                // var matches = regExp.exec(zrecord.ipcccoords);
+                var lats = [];
+                var lons = [];
+                var matches = zrecord.ipcccoords.match(/\(([^()]+)\)*/g);
+                for (var imatch = 0; imatch < matches.length; imatch++) {
+                    matches[imatch] = matches[imatch].replace(/[\(\) ]/g,"");
+                    var latlon = matches[imatch].split(",");
+                    var lat = latlon[0];
+                    if (lat.endsWith("S")) {
+                        lat = "-" + lat.substr(0, lat.length-1);
+                    } else {
+                        lat = lat.substr(0, lat.length-1);
+                    }
+                    if (lat === "0.000") {
+                        lat = "0.001";
+                    }
+                    lats.push(lat);
+                    var lon = latlon[1];
+                    if (lon.endsWith("W")) {
+                        lon = "-" + lon.substr(0, lon.length-1);
+                    } else {
+                        lon = lon.substr(0, lon.length-1);
+                    }
+                    lons.push(lon);
+                }
+                ipcczones.push({
+                    value: zrecord.ipcczone,
+                    label: zrecord.ipcclabel,
+                    text: zrecord.ipcczone,
+                    lat: lats,
+                    lon: lons
+                });
+            }
+            uihelper.setCache("ipcczones", ipcczones);
+        }
+        return ipcczones;
+    };
+
+
+
+    /**
+     * getIpccZone - finden der ipcc-Zone zu einem Punkt
+     * https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon/17490923#17490923
+     * x=longitude, y=latitude
+     * @param {*} longitude - Längegrad, senkrecht zu Greenich
+     * @param {*} latitude - Breitengrad, waagerecht zu Äquator
+     * returns ipcczone, name
+     */
+    uihelper.getIpccZone = function (longitude, latitude) {
+        var ipcczones = [];
+        if (ipcczones.length === 0) {
+            ipcczones = uihelper.setIpccZones();
+        }
+        for (var icon = 0; icon < ipcczones.length; icon++) {
+            var ipcczone = ipcczones[icon];
+            // konvertieren contient zu polygon
+            var polygon = [];
+            for (var ilat = 0; ilat < ipcczone.lat.length; ilat++) {
+                polygon.push({
+                    y: ipcczone.lat[ilat],
+                    x: ipcczone.lon[ilat]
+                });
+            }
+            var p = {
+                x: longitude,
+                y: latitude
+            };
+            if (uihelper.pointIsInPolygon(p, polygon)) {
+                return {
+                    error: false,
+                    message: "found:" + ipcczone.value,
+                    ipcczone: ipcczone.value,
+                    ipccname: ipcczone.text,
+                    label: ipcczone.label,
+                    polygon: polygon
+                };
+            }
+        }
+        return {
+            error: true,
+            message: "no IPCC-Zone found"
+        };
+    };
+
+
 
     /**
      * geodistance - rechnet mit externem Server, virtualearth.net
@@ -2494,7 +2636,7 @@
      * - fromyear number
      * - toyear number
      * - step konstant 30
-    */
+     */
 
 
     /**
@@ -2536,7 +2678,7 @@
         if (tint < 31) {
             // zuordnen 1. Monat explizit
             return {
-                month:  1,
+                month: 1,
                 day: tint + 1
             }
         }

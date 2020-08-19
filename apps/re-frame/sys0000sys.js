@@ -905,7 +905,8 @@
                             set += property;
                             set += " = ";
                             if (ptype === "object") {
-                                set += JSON.stringify(pvalue);
+                                var updobjstring = JSON.stringify(pvalue);
+                                set += "'" + updobjstring.replace(/'/g, "''") + "'";
                             } else if (ptype === "string") {
                                 set += "'" + pvalue.replace(/'/g, "''") + "'";
                             } else if (ptype === "number") {
