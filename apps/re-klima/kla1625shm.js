@@ -96,9 +96,11 @@
                 tempdistribution: true,
                 tempchart: true,
                 temptable: true
+
             }, selparms.config);
 
         }
+
         if (typeof navigatebucket === "object") {
             if (navigatebucket.navigate === "back") {
                 if (typeof navigatebucket.oldparameters === "object") {
@@ -728,11 +730,6 @@
                                 }
                                 $(printcanvas).replaceWith(image);
                             });
-
-
-
-
-
                         }, 2000);
                         if (1 === 1) return;
 
@@ -806,10 +803,6 @@
                             }
                         });
                         */
-
-
-
-
                         /*
                         var a = document.body.appendChild(
                             document.createElement("a")
@@ -1520,6 +1513,38 @@
                         cb1625g5a(null, ret);
                         return;
                     }
+                    /**
+                     * Berechnen aller Werte für die Ausgabeoptimierung
+                     */
+                    var distrs = {};
+                    var maxy = 0;
+                    distrs["TMAX"] = kla1625shm.klidistr2calc("TMAX", selsource, selstationid, ret);
+                    distrs["TMIN"] = kla1625shm.klidistr2calc("TMIN", selsource, selstationid, ret);
+
+                    // Konsolidierung
+                    if (distrs["TMAX"].winconfig.options.maxcount > maxy) {
+                        maxy = distrs["TMAX"].winconfig.options.maxcount;
+                    }
+                    if (distrs["TMAX"].sunconfig.options.maxcount > maxy) {
+                        maxy = distrs["TMAX"].sunconfig.options.maxcount;
+                    }
+
+                    if (distrs["TMIN"].winconfig.options.maxcount > maxy) {
+                        maxy = distrs["TMIN"].winconfig.options.maxcount;
+                    }
+                    if (distrs["TMIN"].sunconfig.options.maxcount > maxy) {
+                        maxy = distrs["TMIN"].sunconfig.options.maxcount;
+                    }
+                    // Aufrunden auf die nächste 50
+                    if (maxy % 50 !== 0) {
+                        var yrest = maxy % 50;
+                        var maxy = maxy - yrest + 50;
+                    }
+                    distrs["TMAX"].winconfig.options.scales.yAxes[0].ticks.max = maxy;
+                    distrs["TMAX"].sunconfig.options.scales.yAxes[0].ticks.max = maxy;
+                    distrs["TMIN"].winconfig.options.scales.yAxes[0].ticks.max = maxy;
+                    distrs["TMIN"].sunconfig.options.scales.yAxes[0].ticks.max = maxy;
+
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     $("#kla1625shmwrapper")
                         .append($("<div/>", {
@@ -1547,9 +1572,10 @@
                             }))
 
                         );
-
+                    ret.distrs = distrs;
                     kla1625shm.klidistr2("#" + divid + "L", "TMAX", selsource, selstationid, ret, function (ret1) {
                         ret.divid = divid;
+                        ret.distrs = distrs;
                         cb1625g5a(null, ret);
                         return;
                     });
@@ -2681,6 +2707,265 @@
 
 
     /**
+     * klidistr2calc
+     * @param {*} selvariable
+     * @param {*} selsource
+     * @param {*} selstationid
+     * @param {*} ret1
+     * returns object mit
+     *  - sunconfig und winconfig
+     */
+    kla1625shm.klidistr2calc = function (selvariable, selsource, selstationid, ret1) {
+        //Chart.defaults.global.plugins.colorschemes.override = true;
+        //Chart.defaults.global.legend.display = true;
+        // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+        var yAxesticks = [];
+        var newArr;
+
+        var sunconfig = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [],
+                backgroundColor: "yellow"
+            },
+            options: {
+                plugins: {
+                    colorschemes: {
+                        scheme: 'brewer.Paired12'
+                    }
+                },
+                mytype: selvariable,
+                maxcount: 0,
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            minRotation: 88,
+                            autoskip: true
+                            /* autoSkipPadding: 10 */
+                        },
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: 500
+                        }
+                    }]
+                }
+            }
+        };
+
+        var winconfig = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [],
+                backgroundColor: "yellow"
+            },
+            options: {
+                plugins: {
+                    colorschemes: {
+                        scheme: 'brewer.Paired12'
+                    }
+                },
+                mytype: selvariable,
+                maxcount: 0,
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            minRotation: 88,
+                            autoskip: true
+                            /* autoSkipPadding: 10 */
+                        },
+                    }],
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            min: 0,
+                            max: 500
+                        }
+                    }]
+                }
+            }
+        };
+
+        for (var ilabel = 0; ilabel <= 100; ilabel++) {
+            var itemp = ilabel - 50;
+            var lab;
+            if (itemp % 10 === 0) {
+                lab = "" + itemp;
+            } else {
+                lab = "";
+            }
+            sunconfig.data.labels.push(lab);
+            winconfig.data.labels.push(lab);
+        }
+
+        /**
+         * sunconfig und winconfig für die Differenzierung
+         */
+        var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        //sun.temphisto = new Array(101).fill(0); // von -50 bis +50
+        //win.temphisto = new Array(101).fill(0); // von -50 bis +50
+        if (typeof kla1625shmconfig.fromyear === "undefined") {
+            var year1 = uihelper.getwmobucket(selparms.fromyear).fromyear;
+            var year2 = uihelper.getwmobucket(selparms.toyear).toyear;
+            kla1625shmconfig.fromyear = year1;
+            kla1625shmconfig.toyear = year2;
+            kla1625shmconfig.step = 30;
+        }
+
+        var distfromyear = parseInt(kla1625shmconfig.fromyear);
+        var disttoyear = parseInt(kla1625shmconfig.toyear);
+        var diststep = parseInt(kla1625shmconfig.step);
+        var sunbucket = {};
+        var winbucket = {};
+        var ibucket = 0;
+        var ebucket = distfromyear + diststep - 1;
+        var sunbuckets = [];
+        var winbuckets = [];
+        // Initialisieren und auf Standard-Buckets runden oder vorher setzen!!!
+        for (var ibuck = distfromyear; ibuck <= disttoyear; ibuck += diststep) {
+            sunbuckets.push({
+                fromyear: ibuck,
+                toyear: ibuck + diststep - 1,
+                temphisto: new Array(101).fill(0),
+                valsum: 0,
+                valcount: 0,
+                minval: null,
+                maxval: null
+            });
+            winbuckets.push({
+                fromyear: ibuck,
+                toyear: ibuck + diststep - 1,
+                temphisto: new Array(101).fill(0),
+                valsum: 0,
+                valcount: 0,
+                minval: null,
+                maxval: null
+            });
+        }
+
+        // years bereitstellen
+        if (selvariable === "TMAX" && klirecords.length > 0) {
+            ret1.record = klirecords[0];
+        } else if (selvariable === "TMIN" && klirecords.length > 1) {
+            ret1.record = klirecords[1];
+        }
+
+        var years = JSON.parse(ret1.record.years);
+        for (var iyear = parseInt(distfromyear); iyear <= parseInt(disttoyear); iyear++) {
+            if (typeof years[iyear] !== "undefined") {
+                if (uihelper.isleapyear(iyear)) {
+                    mdtable[1] = 29;
+                } else {
+                    mdtable[1] = 28;
+                }
+                var splfromday = 0;
+                var spltoday = 0;
+                var yearvals = years["" + iyear];
+                /**
+                 * Loop über die 12 Monate
+                 * je Monat Zuweisung des "richtigen" Objekts sun oder win als work
+                 */
+                var wrk = {};
+                for (var imon = 0; imon < 12; imon++) {
+                    if (imon >= 0 && imon <= 2 || imon >= 9 && imon <= 11) {
+                        for (var ibuck1 = 0; ibuck1 < winbuckets.length; ibuck1++) {
+                            if (iyear >= winbuckets[ibuck1].fromyear && iyear <= winbuckets[ibuck1].toyear) {
+                                wrk = winbuckets[ibuck1];
+                                break;
+                            }
+                        }
+                    } else {
+                        for (var ibuck2 = 0; ibuck2 < sunbuckets.length; ibuck2++) {
+                            if (iyear >= sunbuckets[ibuck2].fromyear && iyear <= sunbuckets[ibuck2].toyear) {
+                                wrk = sunbuckets[ibuck2];
+                                break;
+                            }
+                        }
+                    }
+                    spltoday = splfromday + mdtable[imon];
+                    for (var iday = splfromday; iday < spltoday; iday++) {
+                        var dval1 = yearvals[iday];
+                        if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
+                            var dval = parseFloat(dval1);
+                            var inum = 0;
+                            var numt = dval1.split(".");
+                            if (numt.length === 2) {
+                                inum = parseInt(numt[1].substr(0, 1));
+                            } else {
+                                debugger;
+                            }
+                            wrk.valsum += dval;
+                            wrk.valcount += 1;
+                            if (wrk.minval === null) {
+                                wrk.minval = dval;
+                            } else if (dval < wrk.minval) {
+                                wrk.minval = dval;
+                            }
+                            if (wrk.maxval === null) {
+                                wrk.maxval = dval;
+                            } else if (dval > wrk.maxval) {
+                                wrk.maxval = dval;
+                            }
+                            var itemp = Math.round(dval);
+                            itemp += 50;
+                            if (itemp >= 0 && itemp <= 100) {
+                                wrk.temphisto[itemp] += 1;
+                            } else if (itemp < 0) {
+                                wrk.temphisto[0] += 1;
+                            } else {
+                                wrk.temphisto[100] += 1;
+                            }
+                        }
+                    }
+                    splfromday = splfromday + mdtable[imon];
+                }
+            }
+        }
+        sunconfig.options.maxcount = 0;
+        for (var ibuck = 0; ibuck < sunbuckets.length; ibuck++) {
+            for (var imax = 0; imax <= 100; imax++) {
+                if (sunbuckets[ibuck].temphisto[imax] > sunconfig.options.maxcount) {
+                    sunconfig.options.maxcount = sunbuckets[ibuck].temphisto[imax];
+                }
+            }
+            sunconfig.data.datasets.push({
+                label: sunbuckets[ibuck].fromyear + "-" + sunbuckets[ibuck].toyear,
+                data: sunbuckets[ibuck].temphisto,
+                pointStyle: 'line',
+                fill: false,
+                borderWidth: 2
+            });
+        }
+
+        winconfig.options.maxcount = 0;
+        for (var ibuck = 0; ibuck < winbuckets.length; ibuck++) {
+            for (var imax = 0; imax <= 100; imax++) {
+                if (winbuckets[ibuck].temphisto[imax] > winconfig.options.maxcount) {
+                    winconfig.options.maxcount = winbuckets[ibuck].temphisto[imax];
+                }
+            }
+            winconfig.data.datasets.push({
+                label: winbuckets[ibuck].fromyear + "-" + winbuckets[ibuck].toyear,
+                data: winbuckets[ibuck].temphisto,
+                pointStyle: 'line',
+                fill: false,
+                borderWidth: 2
+            });
+        }
+
+        winconfig.options.scales.yAxes[0].ticks.max = 100;
+
+        return {
+            sunconfig: sunconfig,
+            winconfig: winconfig
+        };
+    };
+
+    /**
      * kla1625shm.klidistr2 - tempdistribution
      * Separate Charts für Sommer und Winter für die Distribution
      * starecord hat source, stationid
@@ -2745,211 +3030,13 @@
             //Chart.defaults.global.plugins.colorschemes.override = true;
             //Chart.defaults.global.legend.display = true;
             // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
-            var yAxesticks = [];
-            var newArr;
-            var sunconfig = {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [],
-                    backgroundColor: "yellow"
-                },
-                options: {
-                    plugins: {
-                        colorschemes: {
-                            scheme: 'brewer.Paired12'
-                        }
-                    },
-                    mytype: selvariable,
-                    scales: {
-                        xAxes: [{
-                            ticks: {
-                                minRotation: 88,
-                                autoskip: true
-                                /* autoSkipPadding: 10 */
-                            },
-                        }]
-                    }
-                }
-            };
 
-            var winconfig = {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [],
-                    backgroundColor: "yellow"
-                },
-                options: {
-                    plugins: {
-                        colorschemes: {
-                            scheme: 'brewer.Paired12'
-                        }
-                    },
-                    mytype: selvariable,
-                    scales: {
-                        xAxes: [{
-                            ticks: {
-                                minRotation: 88,
-                                autoskip: true
-                                /* autoSkipPadding: 10 */
-                            },
-                        }]
-                    }
-                }
-            };
-            for (var ilabel = 0; ilabel <= 100; ilabel++) {
-                var itemp = ilabel - 50;
-                var lab;
-                if (itemp % 10 === 0) {
-                    lab = "" + itemp;
-                } else {
-                    lab = "";
-                }
-                sunconfig.data.labels.push(lab);
-                winconfig.data.labels.push(lab);
-            }
 
-            /**
-             * sunconfig und winconfig für die Differenzierung
-             */
-            var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-            //sun.temphisto = new Array(101).fill(0); // von -50 bis +50
-            //win.temphisto = new Array(101).fill(0); // von -50 bis +50
-            var distfromyear = parseInt(kla1625shmconfig.fromyear);
-            var disttoyear = parseInt(kla1625shmconfig.toyear);
-            var diststep = parseInt(kla1625shmconfig.step);
-            var sunbucket = {};
-            var winbucket = {};
-            var ibucket = 0;
-            var ebucket = distfromyear + diststep - 1;
-            var sunbuckets = [];
-            var winbuckets = [];
-            // Initialisieren und auf Standard-Buckets runden oder vorher setzen!!!
-            for (var ibuck = distfromyear; ibuck <= disttoyear; ibuck += diststep) {
-                sunbuckets.push({
-                    fromyear: ibuck,
-                    toyear: ibuck + diststep - 1,
-                    temphisto: new Array(101).fill(0),
-                    valsum: 0,
-                    valcount: 0,
-                    minval: null,
-                    maxval: null
-                });
-                winbuckets.push({
-                    fromyear: ibuck,
-                    toyear: ibuck + diststep - 1,
-                    temphisto: new Array(101).fill(0),
-                    valsum: 0,
-                    valcount: 0,
-                    minval: null,
-                    maxval: null
-                });
-            }
-
-            // years bereitstellen
-
-            if (selvariable === "TMAX" && klirecords.length > 0) {
-                ret1.record = klirecords[0];
-            } else if (selvariable === "TMIN" && klirecords.length > 1) {
-                ret1.record = klirecords[1];
-            }
-
-            var years = JSON.parse(ret1.record.years);
-            for (var iyear = parseInt(distfromyear); iyear <= parseInt(disttoyear); iyear++) {
-                if (typeof years[iyear] !== "undefined") {
-                    if (uihelper.isleapyear(iyear)) {
-                        mdtable[1] = 29;
-                    } else {
-                        mdtable[1] = 28;
-                    }
-                    var splfromday = 0;
-                    var spltoday = 0;
-                    var yearvals = years["" + iyear];
-                    /**
-                     * Loop über die 12 Monate
-                     * je Monat Zuweisung des "richtigen" Objekts sun oder win als work
-                     */
-                    var wrk = {};
-                    for (var imon = 0; imon < 12; imon++) {
-                        if (imon >= 0 && imon <= 2 || imon >= 9 && imon <= 11) {
-                            for (var ibuck1 = 0; ibuck1 < winbuckets.length; ibuck1++) {
-                                if (iyear >= winbuckets[ibuck1].fromyear && iyear <= winbuckets[ibuck1].toyear) {
-                                    wrk = winbuckets[ibuck1];
-                                    break;
-                                }
-                            }
-                        } else {
-                            for (var ibuck2 = 0; ibuck2 < sunbuckets.length; ibuck2++) {
-                                if (iyear >= sunbuckets[ibuck2].fromyear && iyear <= sunbuckets[ibuck2].toyear) {
-                                    wrk = sunbuckets[ibuck2];
-                                    break;
-                                }
-                            }
-                        }
-                        spltoday = splfromday + mdtable[imon];
-                        for (var iday = splfromday; iday < spltoday; iday++) {
-                            var dval1 = yearvals[iday];
-                            if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
-                                var dval = parseFloat(dval1);
-                                var inum = 0;
-                                var numt = dval1.split(".");
-                                if (numt.length === 2) {
-                                    inum = parseInt(numt[1].substr(0, 1));
-                                } else {
-                                    debugger;
-                                }
-                                wrk.valsum += dval;
-                                wrk.valcount += 1;
-                                if (wrk.minval === null) {
-                                    wrk.minval = dval;
-                                } else if (dval < wrk.minval) {
-                                    wrk.minval = dval;
-                                }
-                                if (wrk.maxval === null) {
-                                    wrk.maxval = dval;
-                                } else if (dval > wrk.maxval) {
-                                    wrk.maxval = dval;
-                                }
-                                var itemp = Math.round(dval);
-                                itemp += 50;
-                                if (itemp >= 0 && itemp <= 100) {
-                                    wrk.temphisto[itemp] += 1;
-                                } else if (itemp < 0) {
-                                    wrk.temphisto[0] += 1;
-                                } else {
-                                    wrk.temphisto[100] += 1;
-                                }
-                            }
-                        }
-                        splfromday = splfromday + mdtable[imon];
-                    }
-                }
-            }
-
-            for (var ibuck = 0; ibuck < sunbuckets.length; ibuck++) {
-                sunconfig.data.datasets.push({
-                    label: sunbuckets[ibuck].fromyear + "-" + sunbuckets[ibuck].toyear,
-                    data: sunbuckets[ibuck].temphisto,
-                    pointStyle: 'line',
-                    fill: false,
-                    borderWidth: 2
-                });
-            }
             var ctx1 = document.getElementById(chartidsun).getContext('2d');
-            myCharts[selvariable + "D1"] = new Chart(ctx1, sunconfig);
+            myCharts[selvariable + "D1"] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
 
-            for (var ibuck = 0; ibuck < winbuckets.length; ibuck++) {
-                winconfig.data.datasets.push({
-                    label: winbuckets[ibuck].fromyear + "-" + winbuckets[ibuck].toyear,
-                    data: winbuckets[ibuck].temphisto,
-                    pointStyle: 'line',
-                    fill: false,
-                    borderWidth: 2
-                });
-            }
             var ctx2 = document.getElementById(chartidwin).getContext('2d');
-            myCharts[selvariable + "D2"] = new Chart(ctx2, winconfig);
+            myCharts[selvariable + "D2"] = new Chart(ctx2, ret1.distrs[selvariable].winconfig);
             cb1625p({
                 error: false,
                 message: "Distribution-Chart ausgegeben"

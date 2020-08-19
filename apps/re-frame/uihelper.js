@@ -2488,6 +2488,43 @@
     };
 
     /**
+     *
+     * calyear - kann number oder string sein
+     * returns object mit
+     * - fromyear number
+     * - toyear number
+     * - step konstant 30
+    */
+
+
+    /**
+     * getwmobucket - WMO 30-er Jahre Periode holen für Jahr Basis 1991
+     * @param {*} calyear - string oder number
+     * returns object mit
+     * - fromyear number
+     * - toyear number
+     * - step konstant 30
+     */
+    uihelper.getwmobucket = function (calyear) {
+        var calyear0;
+        if (typeof calyear === "string") {
+            calyear0 = parseInt(calyear);
+        } else {
+            calyear0 = calyear;
+        }
+        var calyear1 = calyear0 - 1661; // 65 * 30 = 1950 Rest 11
+        // oder 1661 als Basisjahr und damit rechnen
+        var calyearsteps = 30;
+        var calyear2 = Math.floor(calyear1 / calyearsteps);
+        var calyear3 = 1661 + (calyear2) * calyearsteps;
+        return {
+            fromyear: calyear3,
+            toyear: calyear3 + calyearsteps - 1,
+            step: calyearsteps
+        };
+    };
+
+    /**
      * fromTTT2MMTT - Konvertiert laufenden Tag im Jahr zu Monat und Tag in dem Jahr
      * @param {*} tyear
      * @param {*} tint - zero-based ("Tagesindex")
