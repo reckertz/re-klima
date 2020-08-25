@@ -28,6 +28,8 @@
     var myCharts = {};
 
     var selparms;
+    var selstations = []; // die Massenabfrage kann je station unterschiedliche source haben!!!,
+    // daher Strukur mit selstationid und selsource je Eintrag
     var selstationid = null;
     var selsource = null;
     var selvariablename = null;
@@ -60,7 +62,6 @@
     poprecord.export = false;
 
     kla1625shm.show = function (parameters, navigatebucket) {
-
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
@@ -68,8 +69,12 @@
             selvariablename = parameters[0].variablename;
             starecord = JSON.parse(parameters[0].starecord);
         } else {
+            /**
+             * Prüfen, ob allin - Abarbeiten aller stationid aus der Liste
+             */
             selparms = window.parent.sysbase.getCache("onestation");
             selparms = JSON.parse(selparms);
+            selstations = selparms.selstations || [];
             selstationid = selparms.stationid;
             starecord = selparms.starecord;
             selsource = selparms.starecord.source;
@@ -910,25 +915,48 @@
         /**
          * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
          */
-        kla1625shm.loadalldata(function (ret) {
-            var wmtit = "Auswertung für Station:";
-            // isMember ? '$2.00' : '$10.00'
-            wmtit += selstationid;
-            wmtit += (stationrecord.stationname || "").length > 0 ? " " + stationrecord.stationname : "";
-            wmtit += (stationrecord.fromyear || "").length > 0 ? " von " + stationrecord.fromyear : "";
-            wmtit += (stationrecord.toyear || "").length > 0 ? " bis " + stationrecord.toyear : "";
-            wmtit += (stationrecord.anzyears || 0).length > 0 ? " für " + stationrecord.anzyears + " Jahre" : "";
-            wmtit += (stationrecord.region || "").length > 0 ? " Region:" + stationrecord.region : "";
-            wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
-            wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
-            $(".headertitle").html(wmtit);
-            kla1625shm.showall(ret);
-        });
+        if (kla1625shmconfig.allin === false) {
+            kla1625shm.loadalldata(function (ret) {
+                var wmtit = "Auswertung für Station:";
+                // isMember ? '$2.00' : '$10.00'
+                wmtit += selstationid;
+                wmtit += (stationrecord.stationname || "").length > 0 ? " " + stationrecord.stationname : "";
+                wmtit += (stationrecord.fromyear || "").length > 0 ? " von " + stationrecord.fromyear : "";
+                wmtit += (stationrecord.toyear || "").length > 0 ? " bis " + stationrecord.toyear : "";
+                wmtit += (stationrecord.anzyears || 0).length > 0 ? " für " + stationrecord.anzyears + " Jahre" : "";
+                wmtit += (stationrecord.region || "").length > 0 ? " Region:" + stationrecord.region : "";
+                wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
+                wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
+                $(".headertitle").html(wmtit);
+                kla1625shm.showall(ret);
+            });
+        } else {
+            kla1625shm.getmoredata(function (ret) {
+                var wmtit = "Auswertung für Station:";
+                // isMember ? '$2.00' : '$10.00'
+                wmtit += "Auswertung aller selektierten Stationen";
+                /*
+                wmtit += (stationrecord.stationname || "").length > 0 ? " " + stationrecord.stationname : "";
+                wmtit += (stationrecord.fromyear || "").length > 0 ? " von " + stationrecord.fromyear : "";
+                wmtit += (stationrecord.toyear || "").length > 0 ? " bis " + stationrecord.toyear : "";
+                wmtit += (stationrecord.anzyears || 0).length > 0 ? " für " + stationrecord.anzyears + " Jahre" : "";
+                wmtit += (stationrecord.region || "").length > 0 ? " Region:" + stationrecord.region : "";
+                wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
+                wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
+                */
+                $(".headertitle").html(wmtit);
+                kla1625shm.showall(ret);
+            });
+
+
+        }
 
     }; // Ende show
 
     /**
-     * alle Daten laden
+     * alle Daten laden - kla1625shmconfig.allin auswerten für Differenzierung
+     * allin === false, dann selstationid abfragen
+     * allin === true, dann selstationids als Array abfragen
      */
     kla1625shm.loadalldata = function (cb1625g) {
         async.waterfall([
@@ -939,10 +967,6 @@
                     $("body").css("cursor", "progress");
                     var sqlStmt = "";
                     selvariablename = "TMAX,TMIN";
-                    var sel = {
-                        source: selsource,
-                        stationid: selstationid
-                    };
                     var projection = {};
                     sqlStmt += "SELECT ";
                     sqlStmt += "KLISTATIONS.source, ";
@@ -1169,10 +1193,375 @@
     };
 
     /**
+     * getmoredata - kla1625shmconfig.allin === true
+     * allin === true, dann selstations mit stationid und source als Array abfragen
+     * im server:
+     * - create temporary table
+     * - dann laden der temporary table
+     * - dann eigentlicher SQL-Zugriff
+     * - Rückgabe records - das eigentliche Ziel
+     * tricky mit temporary table
+     */
+    kla1625shm.getmoredata = function (cb1625n) {
+        var ttid = "STA" + Math.floor(Math.random() * 100000) + 1;
+        async.waterfall([
+                function (cb1625n0) {
+                    kla1625shmclock = kla1625shm.showclock("#kla1625shmclock");
+                    //$("button").hide();
+                    $(':button').prop('disabled', true); // Disable all the buttons
+                    $("body").css("cursor", "progress");
+                    /**
+                     * Aufbau temporary table
+                     */
+                    var crtsql = "CREATE TEMPORARY TABLE " + ttid + " (stationid text, source text)";
+                    /**
+                     * Daten zum Laden der temporary table: selstations
+                     */
+                    /**
+                     * sql SELECT mit temptable
+                     */
+                    var sqlStmt = "";
+                    selvariablename = "TMAX,TMIN";
+                    var projection = {};
+                    sqlStmt += "SELECT ";
+                    sqlStmt += "KLISTATIONS.source, ";
+                    sqlStmt += "KLISTATIONS.stationid, ";
+                    sqlStmt += "stationname, ";
+                    sqlStmt += "climatezone, ";
+                    sqlStmt += "region, ";
+                    sqlStmt += "subregion, ";
+                    sqlStmt += "countryname, ";
+                    sqlStmt += "continent, ";
+                    sqlStmt += "continentname, ";
+                    sqlStmt += "lats, ";
+                    sqlStmt += "longitude, ";
+                    sqlStmt += "latitude, ";
+                    sqlStmt += "variable, ";
+                    sqlStmt += "anzyears, ";
+                    sqlStmt += "realyears, ";
+                    sqlStmt += "fromyear, ";
+                    sqlStmt += "toyear, ";
+                    sqlStmt += "height, ";
+                    sqlStmt += "years ";
+                    sqlStmt += " FROM " + ttid;
+                    sqlStmt += " INNER JOIN KLISTATIONS ";
+                    sqlStmt += " ON " + ttid + ".source = KLISTATIONS.source";
+                    sqlStmt += " AND " + ttid + ".stationid = KLISTATIONS.stationid";
+                    sqlStmt += " LEFT JOIN KLIDATA ";
+                    sqlStmt += " ON " + ttid + ".source = KLIDATA.source ";
+                    sqlStmt += " AND " + ttid + ".stationid = KLIDATA.stationid ";
+                    sqlStmt += " WHERE (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
+                    sqlStmt += " ORDER BY " + ttid + ".source, " + ttid + ".stationid, KLIDATA.variable";
+                    var api = "getallsqlrecords";
+                    var table = "KLISTATIONS";
+
+                    //uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
+                    var jqxhr = $.ajax({
+                        method: "POST",
+                        crossDomain: false,
+                        url: sysbase.getServer("getmoredata"),
+                        data: {
+                            timeout: 10 * 60 * 1000,
+                            crtsql: crtsql,
+                            selstations: selstations,
+                            sqlStmt: sqlStmt,
+                            temptable: ttid
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        sysbase.checkSessionLogin(r1);
+                        var ret1 = JSON.parse(r1);
+                        sysbase.putMessage(ret1.message, 1);
+                        if (ret1.error === true) {
+                            cb1625n0("Error", {
+                                error: ret1.error,
+                                message: ret1.message
+                            });
+                            return;
+                        } else {
+                            cb1625n0(null, {
+                                error: ret1.error,
+                                message: ret1.message,
+                                records: ret1.records
+                            });
+                            return;
+                        }
+                    }).fail(function (err) {
+                        //$("#kli1400raw_rightwdata").empty();
+                        //document.getElementById("kli1400raw").style.cursor = "default";
+                        sysbase.putMessage("getmoredata:" + err, 3);
+                        cb1625n0("Error", {
+                            error: true,
+                            message: err.message || err
+                        });
+                        return;
+                    }).always(function () {
+                        // nope
+                    });
+
+                },
+                function (ret1, cb1625n1) {
+                    /**
+                     * hier kommt eine async loop-Steuerung, um die Daten sequentiell abzuarbeite
+                     * in der bisherigen Logik
+                     */
+                    var vglsource = "";
+                    var vglstationid = "";
+                    klirecords = [];
+                    async.eachSeries(ret1.records, function (klirow, nextklirow) {
+                        if (vglsource === "" && vglstationid === "") {
+                            // 1. mal
+                            vglsource = klirow.source;
+                            vglstationid = klirow.stationid;
+                            klirecords.push(klirow);
+                            nextklirow();
+                            return;
+                        } else if (vglsource !== klirow.source || vglstationid !== klirow.stationid) {
+                            // Gruppenwechsel-Verarbeitung, Komplettierung und Ausgabe
+                            kla1625shm.execmoredata(vglsource, vglstationid, function (ret2) {
+                                // neue Gruppe einleiten
+                                vglsource = klirow.source;
+                                vglstationid = klirow.stationid;
+                                klirecords = [];
+                                klirecords.push(klirow);
+                                nextklirow();
+                                return;
+                            });
+                        } else {
+                            klirecords.push(klirow);
+                            nextklirow();
+                            return;
+                        }
+                    }, function (err) {
+                        // zum Ablschluss
+                        kla1625shm.execmoredata(vglsource, vglstationid, function (ret2) {
+                            cb1625n1(null, ret2);
+                            return;
+                        });
+                    });
+                }
+            ],
+            function (error, result) {
+
+            });
+
+    };
+
+
+
+    /**
+     * execmoredata - in Loop die Verarbeitung eines Pair in klirecords
+     * durchführen, teilweise von altem loadall und dann showall
+     * @param {*} newsource
+     * @param {*} newstationid
+     * @param {*} cbexec
+     */
+    kla1625shm.execmoredata = function (newsource, newstationid, cb1625p) {
+        selsource = newsource;
+        selstationid = newstationid;
+        async.waterfall([
+                function (cb1625p1) {
+                    /*
+                    intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
+                    wenn die Station komplette Temperaturdaten geliefert hat
+                    */
+                   debugger;
+                    if (typeof klirecords[0].years !== "undefined" || klirecords[0].years.length > 0) {
+                        // Sortierfolge ist TMAX, TMIN alphabetisch
+                        stationrecord = klirecords[0];
+                        cb1625p1(null, {
+                            error: false,
+                            message: "Daten gefunden"
+                        });
+                        return;
+                    } else {
+                        /**
+                         * Abfrage, ob Daten geladen werden sollen
+                         */
+                        var qmsg = "Für Station:" + selstationid + " aus " + selsource;
+                        qmsg += " und " + selvariablename;
+                        qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                        var check = window.confirm(qmsg);
+                        if (check === false) {
+                            sysbase.putMessage("Keine Daten zur Station gefunden", 3);
+                            cb1625p1("Error", {
+                                error: true,
+                                message: "Keine Temperatur-Daten gefunden"
+                            });
+                            return;
+                        } else {
+                            // TODO: neues SQL und beide Variablen bereitstellen
+                            cb1625p1(null, {
+                                error: true,
+                                operation: "loadghcn",
+                                message: "Keine Temperatur-Daten gefunden",
+                                sqlStmt: sqlStmt,
+                                selvariablename: selvariablename,
+                                selsource: selsource,
+                                selstationid: selstationid
+                            });
+                            return;
+                        }
+                    }
+                },
+                function (ret, cb1625p2) {
+                    /**
+                     * Laden der GHCN-Daily-Daten, falls angefordert
+                     * Laden aus den Urdaten (*.dly-Files)
+                     */
+                    if (ret.error === false) {
+                        cb1625p2(null, ret);
+                        return;
+                    }
+                    if (ret.error === true && (typeof ret.operation === "undefined" || typeof ret.operation !== "undefined" && ret.operation !== "loadghcn")) {
+                        cb1625p2(null, ret);
+                        return;
+                    }
+
+                    $(that).attr("disabled", true);
+                    var jqxhr = $.ajax({
+                        method: "GET",
+                        crossDomain: false,
+                        url: sysbase.getServer("ghcnddata"),
+                        data: {
+                            timeout: 10 * 60 * 1000,
+                            source: selsource,
+                            stationid: selstationid
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        sysbase.checkSessionLogin(r1);
+                        var ret1 = JSON.parse(r1);
+                        sysbase.putMessage(ret1.message, 1);
+                        if (ret1.error === true) {
+                            cb1625p2("Error", {
+                                error: ret1.error,
+                                message: ret1.message
+                            });
+                            return;
+                        } else {
+                            cb1625p2(null, {
+                                error: ret1.error,
+                                operation: "repeat",
+                                message: ret1.message,
+                                sqlStmt: ret.sqlStmt,
+                                selvariablename: ret.selvariablename,
+                                selsource: ret.selsource,
+                                selstationid: ret.selstationid
+                            });
+                            return;
+                        }
+                    }).fail(function (err) {
+                        //$("#kli1400raw_rightwdata").empty();
+                        //document.getElementById("kli1400raw").style.cursor = "default";
+                        sysbase.putMessage("ghcnddata:" + err, 3);
+                        cb1625p2("Error", {
+                            error: true,
+                            message: err.message || err
+                        });
+                        return;
+                    }).always(function () {
+                        // nope
+                        $(that).attr("disabled", false);
+                    });
+                },
+                function (ret, cb1625p3) {
+                    /**
+                     * nochmaliges Lesen, falls erforderlich
+                     */
+                    if (typeof ret.operation === "undefined" || ret.operation !== "repeat") {
+                        cb1625p3(null, ret);
+                        return;
+                    }
+                    uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, ret.api, ret.table, function (ret1) {
+                        if (ret1.error === false && ret1.record !== null) {
+                            stationrecord = ret1.record;
+                            klirecords = [];
+                            // Sortierfolge ist TMAX, TMIN alphabetisch
+                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
+                            if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
+                            cb1625p3(null, {
+                                error: false,
+                                message: "Daten gefunden"
+                            });
+                            return;
+                        } else {
+                            cb1625p3(null, {
+                                error: true,
+                                message: "Endgültig keine Temperatur-Daten gefunden"
+                            });
+                            return;
+                        }
+                    });
+                },
+                function (ret, cb1625p4) {
+                    /**
+                     * Holen der HYDE-Daten
+                     */
+                    if (kla1625shmconfig.hyde === false) {
+                        cb1625p4(null, ret);
+                        return;
+                    }
+                    var jqxhr = $.ajax({
+                        method: "GET",
+                        crossDomain: false,
+                        url: sysbase.getServer("stationhyde"),
+                        data: {
+                            stationid: selstationid,
+                            longitude: stationrecord.longitude,
+                            latitude: stationrecord.latitude,
+                            name: stationrecord.stationname,
+                            globals: false,
+                            selyears: "",
+                            selvars: "popc,rurc,urbc,uopp,cropland,tot_irri"
+                        }
+                    }).done(function (r1, textStatus, jqXHR) {
+                        sysbase.checkSessionLogin(r1);
+                        var ret = JSON.parse(r1);
+                        sysbase.putMessage(ret.message, 1);
+                        if (ret.error === true) {
+                            cb1625p4(null, ret);
+                            return;
+                        } else {
+                            klihyde = ret.klihyde;
+                            // klihyde.data muss mit JSON.parse noch entpackt werden
+                            cb1625p4(null, ret);
+                            return;
+                        }
+                    }).fail(function (err) {
+                        sysbase.putMessage(err, 1);
+                        cb1625p4(null, ret);
+                        return;
+                    }).always(function () {
+                        // nope
+                    });
+                },
+                function (ret, cb1625p5) {
+                    // hier die Ausgabe durchführen
+                    kla1625shm.showall(ret, function(ret1) {
+                        cb1625p5("Finish", ret1);
+                        return;
+                    });
+                }
+            ],
+            function (error, result) {
+                clearInterval(kla1625shmclock);
+                $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
+                //$("button").show();
+                $(':button').prop('disabled', false); // Enable all the buttons
+                $("body").css("cursor", "default");
+                cb1625p(result);
+                return;
+            });
+    };
+
+
+
+
+
+    /**
      * kla1625shm.showall - Aufruf aller Funktionen für die Standardauswertung
      * @param {*} ret
      */
-    kla1625shm.showall = function (ret) {
+    kla1625shm.showall = function (ret, cball) {
         /**
          * zweibahnige Ausgabe nach kla1625shmwrapper
          */
@@ -1216,7 +1605,7 @@
                     var master = {};
                     master.stationid = klirecords[0].stationid;
                     master.source = klirecords[0].source,
-                        master.stationname = klirecords[0].stationname;
+                    master.stationname = klirecords[0].stationname;
                     master.climatezone = klirecords[0].climatezone;
                     master.region = klirecords[0].region;
                     master.subregion = klirecords[0].subregion;
@@ -1782,6 +2171,12 @@
                         .append($("<br/>"))
                         .append($("<br/>"))
                     );
+                // finaler Callback, wenn vorgegeben
+                        if (typeof cball !== "undefined") {
+                            cball(result);
+                            return;
+                        }
+
             });
     };
 
@@ -2471,7 +2866,7 @@
             minval: null,
             maxval: null,
             maxcount: 0
-        }
+        };
         var win = {
             numberhisto: [],
             valsum: 0,
@@ -2479,7 +2874,7 @@
             minval: null,
             maxval: null,
             maxcount: 0
-        }
+        };
         var years = JSON.parse(splrecord.years);
         /*
         for (var year in years) {
@@ -3526,7 +3921,7 @@
                         if (miny === null) {
                             miny = yeardata.L1;
                         } else if (miny < yeardata.L1) {
-                            miny = yeardata.L1
+                            miny = yeardata.L1;
                         }
                         if (maxy === null) {
                             maxy = yeardata.L1 + yeardata.L2 + yeardata.L3;

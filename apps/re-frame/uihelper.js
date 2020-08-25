@@ -2336,7 +2336,7 @@
                         lat = lat.substr(0, lat.length-1);
                     }
                     if (lat === "0.000") {
-                        lat = "0.001";
+                        lat = "0.010";
                     }
                     lats.push(lat);
                     var lon = latlon[1];
@@ -2347,6 +2347,9 @@
                     }
                     lons.push(lon);
                 }
+                // round robin Wiederholung
+                lats.push(lats[0]);
+                lons.push(lons[0]);
                 ipcczones.push({
                     value: zrecord.ipcczone,
                     label: zrecord.ipcclabel,
@@ -2354,7 +2357,11 @@
                     lat: lats,
                     lon: lons
                 });
+                if (zrecord.ipcclabel === "8") {
+                    console.log(JSON.stringify(ipcczones[ipcczones.length-1]));
+                }
             }
+
             uihelper.setCache("ipcczones", ipcczones);
         }
         return ipcczones;

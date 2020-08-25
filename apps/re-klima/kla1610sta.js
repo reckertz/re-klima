@@ -33,6 +33,7 @@
     var starecord;
     var selvariablename;
     var stationarray = [];
+    var selstations = [];
     var stationrecords = {};
     var sqlStmt = "";
     var origin = "";
@@ -1046,7 +1047,7 @@
                 //where = uihelper.getSqlCompareString ("KLIDATA.anzyears", starecord.anzyears, where);
                 if (typeof starecord.anzyears !== "undefined" && starecord.anzyears.trim().length > 0) {
                     if (where2.length > 0) where2 += " AND ";
-                    where2 += uihelper.getSqlCompareString ("(KLIINVENTORY.toyear - KLIINVENTORY.fromyear + 1)", starecord.anzyears, where);
+                    where2 += uihelper.getSqlCompareString("(KLIINVENTORY.toyear - KLIINVENTORY.fromyear + 1)", starecord.anzyears, where);
                 }
                 if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
                     if (where2.length > 0) where2 += " AND ";
@@ -1158,7 +1159,7 @@
                 }
                 sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
 
-                 /*
+                /*
                 var checkwhere = where;
                 checkwhere = checkwhere.replace(/KLISTATIONS.source/g, " ");
                 if (checkwhere.indexOf("KLISTATIONS") >= 0) {
@@ -1344,6 +1345,7 @@
                             } catch (err) {}
                             var rowprop = {
                                 rowid: rowid,
+                                source: record.source,
                                 longitude: record.longitude,
                                 latitude: record.latitude,
                                 fromyear: record.fromyear,
@@ -1429,7 +1431,7 @@
 
     /**
      * kla1610staconf - Konfigurierte Analyse
-    */
+     */
     $(document).on("click", ".kla1610staconf", function (evt) {
         evt.preventDefault();
         evt.stopImmediatePropagation();
@@ -1559,6 +1561,13 @@
                             default: false,
                             io: "i"
                         },
+                        allin: {
+                            title: "Alle in der Liste",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uiecheckbox",
+                            default: false,
+                            io: "i"
+                        },
                         comment: {
                             title: "Kommentar",
                             type: "string", // currency, integer, datum, text, key
@@ -1584,21 +1593,45 @@
             evt.stopImmediatePropagation();
             console.log(extraParam);
             confrecord = JSON.parse(extraParam).props;
-
-            window.parent.sysbase.setCache("onestation", JSON.stringify({
-                stationid: confrecord.stationid,
-                source: confrecord.source,
-                variablename: confrecord.variable,
-                starecord: starecord,
-                latitude: $(this).closest("tr").attr("latitude"),
-                longitude: $(this).closest("tr").attr("longitude"),
-                config: confrecord
-            }));
-            var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
-            var stationname = stationarray[confrecord.stationid];
-            var tabname = confrecord.stationid + " " + stationname;
-            var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+            if (confrecord.allin === false) {
+                window.parent.sysbase.setCache("onestation", JSON.stringify({
+                    stationid: confrecord.stationid,
+                    source: confrecord.source,
+                    variablename: confrecord.variable,
+                    starecord: starecord,
+                    latitude: $(this).closest("tr").attr("latitude"),
+                    longitude: $(this).closest("tr").attr("longitude"),
+                    config: confrecord
+                }));
+                var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+                var stationname = stationarray[confrecord.stationid];
+                var tabname = confrecord.stationid + " " + stationname;
+                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+            } else {
+                selstations = [];
+                $(".kla1610staid").each(function(index, item) {
+                    selstations.push({
+                        stationid: $(this).attr("rowid"),
+                        source: $(this).attr("source")
+                    });
+                });
+                window.parent.sysbase.setCache("onestation", JSON.stringify({
+                    selstations: selstations,
+                    stationid: confrecord.stationid,
+                    source: confrecord.source,
+                    variablename: confrecord.variable,
+                    starecord: starecord,
+                    latitude: $(this).closest("tr").attr("latitude"),
+                    longitude: $(this).closest("tr").attr("longitude"),
+                    config: confrecord
+                }));
+                var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+                var stationname = stationarray[confrecord.stationid];
+                var tabname = confrecord.stationid + " " + stationname;
+                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+            }
         });
         if (Object.keys(confrecord).length === 0) {
             // Default-Setzungen

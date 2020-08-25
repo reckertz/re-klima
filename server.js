@@ -309,10 +309,56 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'static'))); // __dirname is always root verzeichnis #denglisch
 
 /**
+ * createtemptable - API - Erstellen temporary table sqlite3
+ */
+app.get('/createtemptable', function (req, res) {
+    if (checkSession(req, res)) return;
+    // var cousername = req.query.username;
+    try {
+        var crtsql = "";
+        if (req.query && typeof req.query.crtsql !== "undefined" && req.query.crtsql.length > 0) {
+            crtsql = req.query.crtsql;
+        }
+        db.serialize(function () {
+            db.run(crtsql, function (err) {
+                var ret = {};
+                if (err) {
+                    ret.error = true;
+                    ret.message = err;
+                } else {
+                    ret.error = false;
+                    ret.message = "CREATE TABLE ausgeführt";
+                    var smsg = JSON.stringify(ret);
+                    res.writeHead(200, {
+                        'Content-Type': 'application/text',
+                        "Access-Control-Allow-Origin": "*"
+                    });
+                    res.end(smsg);
+                    return;
+                }
+            });
+        });
+    } catch (err) {
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: err.message,
+            records: null
+        }));
+        return;
+    }
+});
+
+
+
+
+/**
  * getsql3tables - API - Sammlung der Tabellen einer Datenbank,
  * gleiche Rückgabestruktur - wird spannend
  */
-
 app.get('/getsql3tables', function (req, res) {
     if (checkSession(req, res)) return;
     // var cousername = req.query.username;
@@ -850,6 +896,107 @@ app.post('/delonerecord', function (req, res) {
 });
 
 
+/**
+ * getmoredata - spezielle Funktion, TEMPORARY für stationids, dann Zugriff
+ * crtsql: crtsql,
+ * selstations: selstations,
+ * sqlStmt: sqlStmt
+ */
+app.post('/getmoredata', function (req, res) {
+    if (checkSession(req, res)) return;
+    var timeout = 70 * 60 * 1000; // hier: gesetzter Default
+    if (req.body && typeof req.body.timeout !== "undefined" && req.body.timeout.length > 0) {
+        timeout = req.body.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var crtsql = "";
+    if (req.body && typeof req.body.crtsql !== "undefined" && req.body.crtsql.length > 0) {
+        crtsql = req.body.crtsql;
+    }
+    var selstations = [];
+    if (req.body && typeof req.body.selstations !== "undefined" && req.body.selstations.length > 0) {
+        selstations = req.body.selstations;
+    }
+    var temptable = "";
+    if (req.body && typeof req.body.temptable !== "undefined" && req.body.temptable.length > 0) {
+        temptable = req.body.temptable;
+    }
+    var sqlStmt = "";
+    if (req.body && typeof req.body.sqlStmt !== "undefined" && req.body.sqlStmt.length > 0) {
+        sqlStmt = req.body.sqlStmt;
+    }
+    async.waterfall([
+        function (cbmd1) {
+            /**
+             * CREATE TEMPORARY TABLE
+             */
+            db.serialize(function () {
+                db.run(crtsql, function (err) {
+                    var ret = {};
+                    if (err) {
+                        ret.error = true;
+                        ret.message = crtsql + " " + err;
+                        cbmd1("error", ret);
+                        return;
+                    } else {
+                        ret.error = false;
+                        ret.message = crtsql + "  ausgeführt";
+                        cbmd1(null, ret);
+                        return;
+                    }
+                });
+            });
+        },
+        function (ret, cbmd2) {
+            async.eachSeries(selstations, function (newstation, nextstation) {
+                var newsource = newstation.source;
+                var newstationid = newstation.stationid;
+                var reqparm = {};
+                reqparm.selfields = {};
+                reqparm.selfields.source = newsource;
+                reqparm.selfields.stationid = newstationid;
+
+                reqparm.updfields = {};
+                reqparm.updfields["$setOnInsert"] = {};
+                reqparm.updfields["$setOnInsert"].source = newsource;
+                reqparm.updfields["$setOnInsert"].stationid = newstationid;
+                reqparm.updfields["$set"] = {};
+                reqparm.table = temptable;
+                sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret) {
+                    //console.log("setonerecord-returned:" + JSON.stringify(ret));
+                    nextstation(); // holt den nächsten Satz
+                    return;
+                });
+            }, function (err) {
+                cbmd2(null, ret);
+                return;
+            });
+        },
+        function (ret, cbmd3) {
+            var reqparm = {};
+            reqparm.sel = sqlStmt;
+            reqparm.limit = 0;
+            reqparm.offset = 0;
+            sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret) {
+                // in ret liegen error, message und record
+                cbmd3 ("Finish", ret);
+                return;
+            });
+
+
+
+        }
+    ], function (error, result) {
+        var smsg = JSON.stringify(result);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+
+});
 
 
 
@@ -1231,16 +1378,6 @@ app.post('/loadcsvdata', function (req, res) {
             res.end(JSON.stringify(ret));
             return;
         });
-
-
-
-
-
-
-
-
-
-
     } else if (filetype === "csv mit Header") {
         var fileschema = "";
         var fieldarray = [];

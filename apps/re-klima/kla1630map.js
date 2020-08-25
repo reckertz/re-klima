@@ -187,19 +187,20 @@
                                     for (var iko = 0; iko < (ipcczone.lat.length - 1); iko++) {
                                         ilink++;
                                         var name = ipcczone.value + ilink;
-                                        var fakt = 1.0;
+                                        var diff = 0.0;
                                         if (ipcczone.lat[iko] === ipcczone.lat[iko + 1]) {
-                                            fakt = 1.001;
+                                            //fakt = 1.001;
+                                            diff = 0.001;
                                         }
                                         newLinks[name] = {
                                             factor: 0.01,
                                             // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
                                             between: [{
-                                                latitude: ipcczone.lat[iko],
-                                                longitude: ipcczone.lon[iko]
+                                                latitude: parseFloat(ipcczone.lat[iko]),
+                                                longitude: parseFloat(ipcczone.lon[iko])
                                             }, {
-                                                latitude: "" + ipcczone.lat[iko + 1] * fakt,
-                                                longitude: ipcczone.lon[iko + 1]
+                                                latitude: (parseFloat(ipcczone.lat[iko + 1]) + diff),
+                                                longitude: parseFloat(ipcczone.lon[iko + 1])
                                             }],
                                             attrs: {
                                                 "stroke-width": 2,
@@ -211,9 +212,13 @@
                                                 content: ipcczone.text + " " + ipcczone.label
                                             }
                                         };
+                                        if (ipcczone.label === "8") {
+                                            console.log(JSON.stringify(newLinks[name].between));
+                                        }
                                     }
-                                    // Rück-Linie - letzte zu erster Linie - ist notwendig
 
+                                    // Rück-Linie - letzte zu erster Linie - ist notwendig
+                                    /*
                                     ilink++;
                                     iko = ipcczone.lat.length - 1; // letzter zu erstem
                                     var name = ipcczone.value + ilink;
@@ -234,14 +239,13 @@
                                         attrs: {
                                             "stroke-width": 2,
                                             stroke: "red",
-                                            /* "#a4e100", */
                                             opacity: 0.6
                                         },
                                         tooltip: {
                                             content: ipcczone.text + " " + ipcczone.label
                                         }
                                     };
-
+                                    */
                                 }
                                 // dahin muss die Ausgabe
                                 // http://jsfiddle.net/neveldo/dk3ers47/
