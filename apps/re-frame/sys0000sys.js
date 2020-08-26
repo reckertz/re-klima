@@ -497,7 +497,9 @@
             }
         }
         // console.log("updfields-raw:" + JSON.stringify(updfields, null, " "));
-
+        if (table === "KLIDATA") {
+            debugger;
+        }
 
         //try {
         if (db === null) {
@@ -2688,6 +2690,7 @@
         var adbc = "AD";
         var stationids = []; // aufbereitetes Array, aus kommaseparierter Liste
         var stationid = "";
+        var source = "";
         var name = "";
         var longitude = 0;
         var latitude = 0;
@@ -2724,6 +2727,10 @@
             if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
                 stationid = req.query.stationid;
             }
+            if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                source = req.query.source;
+            }
+
             if (req.query && typeof req.query.name !== "undefined" && req.query.name.length > 0) {
                 name = req.query.name;
             }
@@ -2762,6 +2769,12 @@
             if (reqparm && typeof reqparm.stationids !== "undefined" && reqparm.stationids.length > 0) {
                 stationids = reqparm.stationids.split(",");
             }
+            if (reqparm && typeof reqparm.stationid !== "undefined" && reqparm.stationid.length > 0) {
+                stationid = reqparm.stationid;
+            }
+            if (reqparm && typeof reqparm.source !== "undefined" && reqparm.source.length > 0) {
+                source = reqparm.source;
+            }
 
             if (reqparm.query && typeof reqparm.globals !== "undefined") {
                 if (typeof reqparm.globals === "string" && reqparm.globals.length > 0 &&
@@ -2771,7 +2784,9 @@
             }
         }
         selvars = selvars.replace(/_/g, "");
-        debugger;
+        if (source.length === 0) {
+            source = "HYDE";
+        }
         if (fullname.length === 0) {
             // "G:\\Projekte\klimadaten\"HYDE_lu_pop_proxy"\baseline\asc\2008AD_pop\rurc_2008AD.asc"
             fullname = path.join("G:", "Projekte");
@@ -2822,7 +2837,7 @@
         var filecounter = 0;
         var valcounter = 0;
         var klihyde = {
-            source: "HYDE",
+            source: source,
             stationid: stationid,
             name: name,
             longitude: longitude,

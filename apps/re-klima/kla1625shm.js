@@ -100,7 +100,9 @@
                 qonly: true,
                 tempdistribution: true,
                 tempchart: true,
-                temptable: true
+                temptable: true,
+                allin: false,
+                autoload: false
 
             }, selparms.config);
 
@@ -1151,6 +1153,7 @@
                         crossDomain: false,
                         url: sysbase.getServer("stationhyde"),
                         data: {
+                            source: klirecords[0].source,
                             stationid: selstationid,
                             longitude: stationrecord.longitude,
                             latitude: stationrecord.latitude,
@@ -1366,6 +1369,7 @@
                     */
                     if (typeof klirecords[0].years !== "undefined" || klirecords[0].years.length > 0) {
                         // Sortierfolge ist TMAX, TMIN alphabetisch
+                        debugger;
                         stationrecord = klirecords[0];
                         cb1625p1(null, {
                             error: false,
@@ -1504,6 +1508,7 @@
                         crossDomain: false,
                         url: sysbase.getServer("stationhyde"),
                         data: {
+                            source: klirecords[0].source,
                             stationid: selstationid,
                             longitude: stationrecord.longitude,
                             latitude: stationrecord.latitude,

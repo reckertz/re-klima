@@ -1164,16 +1164,23 @@ app.get('/stationhyde', function (req, res) {
         req.setTimeout(parseInt(timeout));
     }
     var rootdir = __dirname;
+    var source = "";
+    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+        source = req.query.source;
+    }
     var stationid = "";
     if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
         stationid = req.query.stationid;
+    }
+    if (source.length === 0) {
+        source = "HYDE";
     }
     var ret = {};
     async.waterfall([
             function (cbsh1) {
                 var reqparm = {
                     sel: {
-                        source: "HYDE",
+                        source: source,
                         stationid: stationid
                     },
                     projection: {},

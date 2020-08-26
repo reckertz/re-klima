@@ -1570,6 +1570,13 @@
                             default: false,
                             io: "i"
                         },
+                        autoload: {
+                            title: "Automatisch Laden",
+                            type: "string", // currency, integer, datum, text, key
+                            class: "uiecheckbox",
+                            default: false,
+                            io: "i"
+                        },
                         comment: {
                             title: "Kommentar",
                             type: "string", // currency, integer, datum, text, key
@@ -1647,6 +1654,8 @@
                 tempdistribution: true,
                 tempchart: true,
                 temptable: true,
+                allin: false,
+                autoload: false,
                 comment: "",
                 fromyear: fromyear,
                 toyear: toyear,
