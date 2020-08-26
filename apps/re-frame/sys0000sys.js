@@ -2666,7 +2666,7 @@
         der mit den Quadratmetern anfängt.
     */
 
-    sys0000sys.stationhyde = function (db, rootname, fs, async, req, reqparm, res, callbackh) {
+    sys0000sys.stationhyde = function (db, rootname, fs, async, req, reqparm, res, callbackh1) {
         var hydedata = {};
 
         var files = [];
@@ -2771,7 +2771,7 @@
             }
         }
         selvars = selvars.replace(/_/g, "");
-
+        debugger;
         if (fullname.length === 0) {
             // "G:\\Projekte\klimadaten\"HYDE_lu_pop_proxy"\baseline\asc\2008AD_pop\rurc_2008AD.asc"
             fullname = path.join("G:", "Projekte");
@@ -2785,7 +2785,7 @@
             }
             if (!fs.existsSync(fullname)) {
                 // hier ausweichverzeichnis prüfen
-                callbackh(res, {
+                callbackh1(res, {
                     error: true,
                     message: "keine HYDE-Datenverzeichnis vorgegeben"
                 });
@@ -2794,7 +2794,7 @@
         } else {
             if (!fs.existsSync(fullname)) {
                 // hier ausweichverzeichnis prüfen
-                callbackh(res, {
+                callbackh1(res, {
                     error: true,
                     message: "keine HYDE-Datenverzeichnis vorgegeben"
                 });
@@ -2851,7 +2851,7 @@
                 console.log(fullfilename + " Started");
                 valcounter = 0;
                 async.waterfall([
-                        function (callbackn) {
+                        function (callbackn1) {
                             // fullfilename zerlegen für Feldname, Jahr
                             var filename = path.basename(fullfilename);
                             var fparts = filename.match(/([a-zA-Z_]*)(\d*)(BC|AD)/);
@@ -2884,10 +2884,10 @@
                                 year: year,
                                 variablename: variablename
                             };
-                            callbackn(null, res, ret);
+                            callbackn1(null, res, ret);
                             return;
                         },
-                        function (res, ret, callbacko) {
+                        function (res, ret, callbacko1) {
                             // file lesen und Update der Zielstruktur
                             var year = ret.year;
                             var variablename = ret.variablename;
@@ -3034,7 +3034,6 @@
                                 // do something on finish here
                                 console.log("Finished:" + valcounter);
                                 console.log("Hydeerg:" + JSON.stringify(hydeerg));
-
                                 klihyde.rasterx = metafields.x;
                                 klihyde.rastery = metafields.y;
                                 // year / L1,L2,L3 / variable / summe
@@ -3066,7 +3065,7 @@
                                 klihyde.data[year].L2[variablename] += hydeerg.L2;
                                 klihyde.data[year].L3[variablename] += hydeerg.L3;
 
-                                callbacko("Finish", res, ret);
+                                callbacko1("Finish", res, ret);
                                 return;
                             });
                         }
@@ -3100,7 +3099,7 @@
                 updparm.table = "KLIHYDE";
                 sys0000sys.setonerecord(db, async, null, updparm, res, function (res, ret) {
                     ret.klihyde = klihyde;
-                    callbackh(res, ret);
+                    callbackh1(res, ret);
                     return;
                 });
             });

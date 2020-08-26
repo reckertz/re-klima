@@ -1202,6 +1202,10 @@ app.get('/stationhyde', function (req, res) {
                 });
             },
             function (res, ret, cbsh2) {
+                /**
+                 * TODO: reqparm sollte hier besser sein!!!
+                 * speziell weil der API umgestellt wurde für "allin"
+                */
                 sys0000sys.stationhyde(db, rootdir, fs, async, req, null, res, function (res, ret) {
                     // in ret liegen error, message und record
                     cbsh2("Finish", res, ret);

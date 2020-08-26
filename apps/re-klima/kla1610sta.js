@@ -963,6 +963,7 @@
                 typeof starecord.variablename === "string" && starecord.variablename.length > 0 &&
                 typeof starecord.fromyear === "string" && starecord.fromyear.length > 0) {
                 sqlStmt += "SELECT ";
+                sqlStmt += " DISTINCT";
                 sqlStmt += " KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
                 sqlStmt += " KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
                 sqlStmt += " KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
@@ -1117,6 +1118,7 @@
                 }
 
                 sqlStmt += "SELECT ";
+                sqlStmt += " DISTINCT";
                 sqlStmt += " KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
                 sqlStmt += " KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
                 sqlStmt += " KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";

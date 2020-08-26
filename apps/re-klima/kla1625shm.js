@@ -1364,7 +1364,6 @@
                     intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
                     wenn die Station komplette Temperaturdaten geliefert hat
                     */
-                   debugger;
                     if (typeof klirecords[0].years !== "undefined" || klirecords[0].years.length > 0) {
                         // Sortierfolge ist TMAX, TMIN alphabetisch
                         stationrecord = klirecords[0];
@@ -1536,7 +1535,7 @@
                 },
                 function (ret, cb1625p5) {
                     // hier die Ausgabe durchführen
-                    kla1625shm.showall(ret, function(ret1) {
+                    kla1625shm.showall(ret, function (ret1) {
                         cb1625p5("Finish", ret1);
                         return;
                     });
@@ -1581,6 +1580,24 @@
 
         async.waterfall([
                 function (cb1625g0a) {
+                    if (kla1625shmconfig.allin === true) {
+                        $("#kla1625shmwrapper")
+                            .append($("<div/>", {
+                                    class: "doprintthis",
+                                    css: {
+                                        width: "100%",
+                                        float: "left",
+                                        overflow: "hidden"
+                                    }
+                                })
+                                .append($("<br/>"))
+                                .append($("<br/>"))
+                                .append($("<h2/>", {
+                                    html: klirecords[0].stationid + " " + klirecords[0].stationname + " (" + klirecords[0].source + ")",
+                                    class: "doprintthis"
+                                }))
+                            );
+                    }
                     /**
                      * Datenqualität missing/bad data
                      */
@@ -1592,19 +1609,21 @@
                     $("#kla1625shmwrapper")
                         .append($("<div/>", {
                             id: divid,
+                            class: "doprintthis",
                             css: {
                                 width: "100%",
                                 float: "left",
                                 overflow: "hidden"
                             }
                         }));
+
                     $("#" + divid)
                         .append($("<h2/>", {
                             html: "Stammdaten"
                         }));
                     var master = {};
                     master.stationid = klirecords[0].stationid;
-                    master.source = klirecords[0].source,
+                    master.source = klirecords[0].source;
                     master.stationname = klirecords[0].stationname;
                     master.climatezone = klirecords[0].climatezone;
                     master.region = klirecords[0].region;
@@ -1637,6 +1656,7 @@
                     $("#kla1625shmwrapper")
                         .append($("<div/>", {
                             id: divid,
+                            class: "doprintthis",
                             css: {
                                 width: "100%",
                                 float: "left",
@@ -2172,10 +2192,10 @@
                         .append($("<br/>"))
                     );
                 // finaler Callback, wenn vorgegeben
-                        if (typeof cball !== "undefined") {
-                            cball(result);
-                            return;
-                        }
+                if (typeof cball !== "undefined") {
+                    cball(result);
+                    return;
+                }
 
             });
     };
