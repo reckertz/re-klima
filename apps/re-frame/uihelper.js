@@ -1957,7 +1957,6 @@
      * Datei aus String vom Client speichern und dann downloaden
      */
     uihelper.downloadfile = function (filename, largestring, callback) {
-
         var jqxhr = $.ajax({
             method: "POST",
             url: sysbase.getServer("getbackasfile"),
@@ -1993,7 +1992,6 @@
      * Datei aus String vom Client in Server speichern
      */
     uihelper.storeasfile = function (filename, largestring, callbacksf) {
-
         var jqxhr = $.ajax({
             method: "POST",
             url: sysbase.getServer("getbackasfile"),
@@ -2327,13 +2325,13 @@
                 var lons = [];
                 var matches = zrecord.ipcccoords.match(/\(([^()]+)\)*/g);
                 for (var imatch = 0; imatch < matches.length; imatch++) {
-                    matches[imatch] = matches[imatch].replace(/[\(\) ]/g,"");
+                    matches[imatch] = matches[imatch].replace(/[\(\) ]/g, "");
                     var latlon = matches[imatch].split(",");
                     var lat = latlon[0];
                     if (lat.endsWith("S")) {
-                        lat = "-" + lat.substr(0, lat.length-1);
+                        lat = "-" + lat.substr(0, lat.length - 1);
                     } else {
-                        lat = lat.substr(0, lat.length-1);
+                        lat = lat.substr(0, lat.length - 1);
                     }
                     if (lat === "0.000") {
                         lat = "0.010";
@@ -2341,9 +2339,9 @@
                     lats.push(lat);
                     var lon = latlon[1];
                     if (lon.endsWith("W")) {
-                        lon = "-" + lon.substr(0, lon.length-1);
+                        lon = "-" + lon.substr(0, lon.length - 1);
                     } else {
-                        lon = lon.substr(0, lon.length-1);
+                        lon = lon.substr(0, lon.length - 1);
                     }
                     lons.push(lon);
                 }
@@ -2358,7 +2356,7 @@
                     lon: lons
                 });
                 if (zrecord.ipcclabel === "8") {
-                    console.log(JSON.stringify(ipcczones[ipcczones.length-1]));
+                    console.log(JSON.stringify(ipcczones[ipcczones.length - 1]));
                 }
             }
 
@@ -3028,7 +3026,7 @@
         var copyText = document.getElementById(clipid);
         /* Select the text field */
         copyText.select();
-        copyText.setSelectionRange(0, 9999999);   // cliptext.length - 1); /*For mobile devices*/
+        copyText.setSelectionRange(0, 9999999); // cliptext.length - 1); /*For mobile devices*/
         /* Copy the text inside the text field */
         document.execCommand("copy");
         /* Alert the copied text */
@@ -3036,6 +3034,103 @@
         $("#" + clipid).remove();
         return;
     };
+
+    /**
+     * uihelper.copyHtml2clipboard
+     * @param {*} eHtml - kann jQuery-Object, DOM-Object, id-String oder HTML-String sein
+     * return true oder false
+     */
+    uihelper.copyHtml2clipboard = function (eHtml, htmlfilename) {
+        var urlField = "";
+        // https://stackoverflow.com/questions/26053004/copy-whole-html-table-to-clipboard-javascript
+        /*
+        var body = document.body, range, sel;
+        if (document.createRange && window.getSelection) {
+            range = document.createRange();
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            try {
+                range.selectNodeContents(eHtml);
+                sel.addRange(range);
+            } catch (e) {
+                range.selectNode(eHtml);
+                sel.addRange(range);
+            }
+        } else if (body.createTextRange) {
+            range = body.createTextRange();
+            range.moveToElementText(eHtml);
+            range.select();
+            document.execCommand("copy");
+        }
+        */
+        debugger;
+        if (typeof eHtml === "object") {
+            if (eHtml instanceof jQuery) {
+                urlField = $(eHtml).html();
+            } else {
+                urlField = $(eHtml).html();
+            }
+        } else if (typeof eHtml === "string") {
+            if (eHtml.startsWith("#")) {
+                urlField = $(eHtml).html();
+            } else if (eHtml.startsWith("<")) {
+                var template = document.createElement('template');
+                var tHtml = eHtml.trim(); // Never return a text node of whitespace as the result
+                template.innerHTML = tHtml;
+                urlField = template;
+            } else {
+                urlField = $("#" + eHtml).html(); // $(this).parent().find("div")[0];
+            }
+        }
+
+
+
+        var copyh = "";
+        copyh += "<html>";
+        copyh += "<head>";
+        copyh += "<meta charset='UTF-8'>";
+        copyh += "</head>";
+        copyh += "<body ";
+        copyh += " styles='font-family:Calibri,sans-serif'>";
+        copyh += urlField;   // $(this).parent().html();
+        copyh += "</body>";
+        copyh += "</html>";
+        if (typeof htmlfilename === "undefined") {
+            htmlfilename = "station.html";
+        }
+        if (!htmlfilename.endsWith(".html")) {
+            htmlfilename += ".html";
+        }
+        uihelper.downloadfile(htmlfilename, copyh, function (ret) {
+            //console.log("Downloaded");
+            sysbase.putMessage("HTML-Element bereitgestellt");
+            return true;
+        });
+
+
+
+        /*
+        var range = document.createRange();
+        range.selectNode(urlField);
+        window.getSelection().addRange(range);
+
+        document.execCommand('copy');
+        if (window.getSelection) {
+            window.getSelection().removeAllRanges();
+        } else if (document.selection) {
+            document.selection.empty();
+        }
+        */
+       /*
+        sysbase.putMessage("HTML-Element copied to clipboard");
+        return true;
+        */
+    };
+
+
+
+
+
 
     uihelper.getScrollbarHeight = function (el) {
 

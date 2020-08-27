@@ -693,7 +693,6 @@
 
                         var actdiv = window.parent.$("#" + idc21);
                         var actiFrame = $(actdiv).find("iframe").get(0);
-
                         var actiFrameBody = $(actiFrame).contents();
                         /**
                          * Loop über alle doprintthis-Elemente
@@ -709,9 +708,7 @@
                                         clear: "both"
                                     }
                                 }));
-
                         });
-
                         /**
                          * Konvertieren canvas zu image
                          */
@@ -1663,50 +1660,80 @@
                         }));
 
                     $("#" + divid)
-                        .append($("<h2/>", {
-                            html: "Stammdaten"
-                        }))
                         .append($("<a/>", {
                                 title: "Copy to Clipboard",
+                                css: {
+                                    margin: "10px"
+                                },
                                 click: function (evt) {
                                     evt.preventDefault();
-                                    var html = $(this).parent().find("div").html();
-                                    var eHtml = "";
-                                    eHtml += "<html>";
-                                    eHtml += "<head>";
-                                    eHtml += "<meta charset='UTF-8'>";
-                                    eHtml += "</head>";
-                                    eHtml += "<body>";
-                                    eHtml += html;
-                                    eHtml += "</body>";
-                                    eHtml += "</html>";
-                                    // uihelper.copy2clipboard(eHtml);
-                                    //window.clipboardData.setData('text/plain', "TEST");
-                                    var urlField = document.getElementById(divid); // $(this).parent().find("div")[0];
+                                    var cHtml = $(this).parent()[0];
+                                    // uihelper.copyHtml2clipboard(cHtml);
+                                    debugger;
+
+
+                                    var copyh = "";
+                                    copyh += "<html>";
+                                    copyh += "<head>";
+                                    copyh += "<meta charset='UTF-8'>";
+                                    copyh += "</head>";
+                                    copyh += "<body ";
+                                    copyh += " styles='font-family:Calibri,sans-serif'>";
+                                    copyh += $(this).parent().html();
+                                    copyh += "</body>";
+                                    copyh += "</html>";
+                                    uihelper.downloadfile("station.html", copyh, function (ret) {
+                                        console.log("Downloaded");
+                                    });
+
+
+                                    // https://stackoverflow.com/questions/44908329/copy-text-innerhtml-of-element-to-clipboard
+                                    /*
+                                    var el = document.createElement("textarea");
+                                    var copyh = "";
+                                    copyh += "<html>";
+                                    copyh += "<head>";
+                                    copyh += "<meta charset='UTF-8'>";
+                                    copyh += "</head>";
+                                    copyh += "<body>";
+                                    copyh += $(this).parent().html();
+                                    copyh += "</body>";
+                                    copyh += "</html>";
+                                    el.value = copyh;
+                                    document.body.appendChild(el);
+                                    el.select();
+                                    document.execCommand("copy");
+                                    document.body.removeChild(el);
+                                    */
+
+                                    // https://stackoverflow.com/questions/34191780/javascript-copy-string-to-clipboard-as-text-html
+                                    /*
+                                    window.getSelection().removeAllRanges();
+                                    var range = document.createRange();
+                                    var element = cHtml;
+                                    range.selectNode(typeof element === 'string' ? document.getElementById(element) : element);
+                                    window.getSelection().addRange(range);
+                                    document.execCommand('copy');
+                                    window.getSelection().removeAllRanges();
+                                    */
+                                    // var urlField = document.getElementById(el);
+                                    /*
+                                    var divid = $(this).parent().attr("id");
+                                    var urlField = document.getElementById(divid);
                                     var range = document.createRange();
                                     range.selectNode(urlField);
                                     window.getSelection().addRange(range);
-
-                                    var range1 = document.createRange();
-                                    range1.selectNode(urlField);
-                                    window.getSelection().addRange(range1);
-
                                     document.execCommand('copy');
-                                    if (window.getSelection) {
-                                        window.getSelection().removeAllRanges();
-                                    } else if (document.selection) {
-                                        document.selection.empty();
-                                    }
+                                    */
 
 
-                                    sysbase.putMessage("copied to Clipboard");
+
                                 }
                             })
-                            .append($("<img/>", {
-                                src: '/images/icons-png/star-black.png'
+                            .append($("<h2/>", {
+                                html: "Stammdaten"
                             }))
                         );
-
 
                     var master = {};
                     master.stationid = klirecords[0].stationid;
@@ -1751,10 +1778,33 @@
                                 overflow: "hidden"
                             }
                         }));
+
                     $("#" + divid)
-                        .append($("<h2/>", {
-                            html: "Datenqualität, Jahresdaten"
-                        }));
+                        .append($("<a/>", {
+                                title: "Copy to Clipboard",
+                                css: {
+                                    margin: "10px"
+                                },
+                                click: function (evt) {
+                                    evt.preventDefault();
+                                    var cHtml = $(this).closest("div");
+                                    debugger;
+                                    if ($(cHtml).attr("id") !== null) {
+                                        cHtml = $(cHtml).attr("id");
+                                        uihelper.copyHtml2clipboard(cHtml);
+                                    } else {
+                                        var newid = "I" + Math.floor(Math.random() * 100000) + 1;
+                                        $(cHtml).attr("id", newid);
+                                        uihelper.copyHtml2clipboard(newid);
+                                    }
+                                }
+                            })
+                            .append($("<h2/>", {
+                                html: "Datenqualität, Jahresdaten"
+                            }))
+                        );
+
+
                     /**
                      * Prüfung der Datenqualität je Jahr in klirecords.years
                      */
