@@ -196,14 +196,16 @@
         $("#kla1625shm.content").empty();
         $("#kla1625shm.content")
             .append($("<div/>", {
-                    id: "kla1625shmbuttons",
-                    css: {
-                        width: "100%",
-                        float: "left"
-                    }
-                })
+                id: "kla1625shmbuttons",
+                css: {
+                    width: "100%",
+                    float: "left"
+                }
+            }));
 
+        if (kla1625shmconfig.allin === false) {
 
+            $("#kla1625shmbuttons")
                 .append($("<button/>", {
                     html: "Google-Maps",
                     id: "kla1625shmgoogle",
@@ -223,8 +225,6 @@
 
                     }
                 }))
-
-
                 .append($("<button/>", {
                     html: "Leaflet-Raster",
                     id: "kla1625shmleaf",
@@ -243,632 +243,628 @@
                         window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
 
                     }
-                }))
+                }));
+        }
 
+        // Auswahl selvariablename
+        /*
+        .append($("<button/>", {
+            html: "Sparklines/Periode anzeigen",
+            css: {
+                float: "left",
+                margin: "10px"
+            },
+            click: function (evt) {
+                evt.preventDefault();
+                kla1625shm.paintS(selvariablename, selsource, selstationid, matrix1);
+            }
+        }))
+        */
+        /*
+         .append($("<button/>", {
+             html: "Sparklines/Jahr anzeigen",
+             css: {
+                 float: "left",
+                 margin: "10px"
+             },
+             click: function (evt) {
+                 evt.preventDefault();
+                 // stationrecord - heatworld
+                 kla1625shm.paintT(selvariablename, selsource, selstationid, matrix1);
+             }
+         }))
+         */
 
+        $("#kla1625shmbuttons")
 
-
-
-
-                // Auswahl selvariablename
-                /*
-                .append($("<button/>", {
-                    html: "Sparklines/Periode anzeigen",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        kla1625shm.paintS(selvariablename, selsource, selstationid, matrix1);
-                    }
-                }))
-                */
-                /*
-                 .append($("<button/>", {
-                     html: "Sparklines/Jahr anzeigen",
-                     css: {
-                         float: "left",
-                         margin: "10px"
-                     },
-                     click: function (evt) {
-                         evt.preventDefault();
-                         // stationrecord - heatworld
-                         kla1625shm.paintT(selvariablename, selsource, selstationid, matrix1);
-                     }
-                 }))
-                 */
-
-                .append($("<button/>", {
-                    html: "Super-Heatmaps",
-                    id: "kla1625shmsuper",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        async.waterfall([
-                            function (cb1625a) {
-                                // brutal auf die rechte Seite
-                                $("#kla1625shmwrapper").empty();
-                                $("#kla1625shmwrapper").css({
-                                    overflow: "auto"
-                                });
-                                $("#kla1625shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1625shmd1",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: false,
-                                    minmaxhistogram: false,
-                                    cbuckets: false,
-                                    hyde: false
-                                };
-                                kla1625shm.kliheatmap2("kla1625shmd1", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    cb1625a(null);
-                                });
-                            },
-                            function (cb1625b) {
-                                $("#kla1625shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1625shmd2",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: false,
-                                    minmaxhistogram: false,
-                                    cbuckets: false,
-                                    hyde: false
-                                };
-                                kla1625shm.kliheatmap2("kla1625shmd2", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    cb1625b(null);
-                                });
-                            },
-                            function (cb1625c) {
-                                /**
-                                 * für TMAX min und max bestimmen, Histogramm als Sparkline
-                                 */
-                                $("#kla1625shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1625shmd3",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: true,
-                                    minmaxhistogram: true,
-                                    cbuckets: true,
-                                    hyde: true
-                                };
-                                kla1625shm.kliheatmap2("kla1625shmd3", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    // über ret kommen hier options in ret zurück
-                                    /*
-                                        error: false,
-                                        message: "Heatmap ausgegeben",
-                                        matrix: matrix1,
-                                        options: uihelper.cloneObject(hmoptions),
-                                        hoptions: ret.hoptions,
-                                        histo: hmoptions.histo,
-                                        temparray: ret.temparray,
-                                        matrix: hmatrix
-                                    */
-                                    cb1625c(null);
-                                });
-                            },
-                            function (cb1625d) {
-                                /**
-                                 * für TMIN min und max bestimmen, Histogramm als Sparkline
-                                 */
-                                $("#kla1625shmwrapper")
-                                    .append($("<div/>", {
-                                        id: "kla1625shmd4",
-                                        css: {
-                                            width: $("#heatmap").width(),
-                                            height: $("#heatmap").height(),
-                                            float: "left"
-                                        }
-                                    }));
-                                var hmoptions = {
-                                    minmax: true,
-                                    minmaxhistogram: true,
-                                    cbuckets: true,
-                                    hyde: false
-                                };
-                                kla1625shm.kliheatmap2("kla1625shmd4", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                    cb1625d(null);
-                                });
-                            }
-
-                        ]);
-                    }
-                }))
-
-
-                /*
-                .append($("<button/>", {
-                    html: "Bucketanalyse (10)",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1625shm.bucketAnalysis(10, selvariablename, selsource, selstationid);
-                    }
-                }))
-                */
-
-
-
-                /*
-                .append($("<button/>", {
-                    html: "Sparklines-Kelvin",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        var matrix2 = uihelper.cloneObject(matrix1);
-                        for (var i1 = 0; i1 < matrix2.data.length; i1++) {
-                            for (var i2 = 0; i2 < matrix2.data[i1].length; i2++) {
-                                var temp1 = matrix2.data[i1][i2];
-                                if (temp1 !== null) {
-                                    var tkelvin = (parseFloat(temp1) + 273).toFixed(1);
-                                    matrix2.data[i1][i2] = tkelvin;
-                                }
-                            }
-                        }
-                        kla1625shm.paintT(selvariablename, selsource, selstationid, matrix2);
-                    }
-                }))
-                */
-
-
-                .append($("<button/>", {
-                    html: "Super-Sparklines",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        var username = uihelper.getUsername();
-                        window.parent.sysbase.setCache("regstation", JSON.stringify({
-                            starecord: starecord,
-                            klirecords: klirecords,
-                            fromyear: klirecords[0].fromyear,
-                            toyear: "" + (parseInt(klirecords[0].fromyear) + 29)
-                        }));
-                        var tourl = "klaheatmap.html" + "?" + "stationid=" + klirecords[0].stationid + "&source=" + klirecords[0].source + "&variablename=" + klirecords[0].variable;
-                        var tabname = klirecords[0].stationname;
-                        var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626reg", tourl);
-                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-                    }
-                }))
-
-
-                /*
-                .append($("<button/>", {
-                    html: "Sparklines-Download",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
-                        var canliste = $('#kla1625shmt1 tbody tr td span canvas');
-                        $(canliste).each(function (index, element) {
-                            var dataurl = element.toDataURL('image/png');
-                            var par = $(element).parent();
-                            $(par).append($("<img/>", {
-                                src: dataurl
-                            }));
-                            $(element).remove();
-                        });
-                        // Filterzeile clone und löschen
-                        // wenn hasClass u.a. hasFilters
-                        var clonerow;
-                        if ($("#kla1625shmt1").hasClass("hasFilters")) {
-                            clonerow = $("#kla1625shmt1 thead tr").eq(1).clone();
-                            $("#kla1625shmt1 thead tr").eq(1).remove();
-                        }
-                        var elHtml = "";
-                        elHtml += "<html>";
-                        elHtml += "<head>";
-                        elHtml += "<meta charset='UTF-8'>";
-                        elHtml += "<style type='text/css'> @page { size: 29.5cm 21.0cm; margin-left: 1cm; margin-right: 1cm }</style>";
-                        elHtml += "</head>";
-                        elHtml += "<body style='font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px'>";
-                        elHtml += "<h2>" + $("#kla1625shmh2").text() + "</h2>";
-                        elHtml += "<p style='page-break-before: always'>";
-                        var oldwidth = $("#kla1625shmt1").width();
-                        $("#kla1625shmt1").width("100%");
-                        elHtml += $("#kla1625shmt1").parent().html();
-                        elHtml += "</body>";
-                        elHtml += "<html>";
-                        // Filterzeile clone wieder einfügen
-                        if ($("#kla1625shmt1").hasClass("hasFilters")) {
-                            $("#kla1625shmt1 thead").append(clonerow);
-                        }
-                        var filename = "sparklines.html";
-                        if (elHtml.length > 100) {
-                            var jqxhr = $.ajax({
-                                method: "POST",
-                                crossDomain: false,
-                                url: sysbase.getServer("getbackasfile"),
-                                data: {
-                                    timeout: 10 * 60 * 1000,
-                                    largestring: elHtml,
-                                    filename: filename
-                                }
-                            }).done(function (r1, textStatus, jqXHR) {
-                                sysbase.checkSessionLogin(r1);
-                                console.log("getbackasfile:" + filename + "=>" + r1);
-                                var j1 = JSON.parse(r1);
-                                if (j1.error === false) {
-                                    var download_path = j1.path;
-                                    // Could also use the link-click method.
-                                    // window.location = download_path;
-                                    window.open(download_path, '_blank');
-                                    sysbase.putMessage(filename + " download erfolgt", 1);
-                                } else {
-                                    sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
-                                }
-                                return;
-                            }).fail(function (err) {
-                                sysbase.putMessage("download:" + err, 3);
-                                return;
-                            }).always(function () {
-                                // nope
-                            });
-                        }
-                    }
-                }))
-                */
-                /*
-                .append($("<button/>", {
-                    html: "Scattergram",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1625shm.scatter(selvariablename, selsource, selstationid, matrix1);
-                    }
-                }))
-                */
-
-                /*
-                .append($("<button/>", {
-                    html: "Regression testen",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1625shm.paintU(selvariablename, selsource, selstationid, matrix1);
-                    }
-                }))
-                .append($("<button/>", {
-                    html: "Chart anzeigen",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1625shm.paintChart(30, selvariablename, selsource, selstationid);
-                    }
-                }))
-                */
-                /*
-                .append($("<button/>", {
-                    html: "Clusteranalyse",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1625shm.clusterAnalysis(selvariablename, selsource, selstationid);
-                    }
-                }))
-                */
-                /*
-                .append($("<button/>", {
-                    html: "Bucketanalyse (30)",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // stationrecord - heatworld
-                        kla1625shm.bucketAnalysis(30, selvariablename, selsource, selstationid);
-                    }
-                }))
-                */
-
-
-
-                .append($("<button/>", {
-                    html: "Drucken",
-                    css: {
-                        "text-align": "center",
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        // sysbase.printDivAll($("#kla1625shmwrapper").html());
-                        // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
-                        $('canvas').each(function (e) {
-                            var image = new Image();
-                            var that = this;
-                            image.src = this.toDataURL("image/png");
-                            var w = $(this).width();
-                            var h = $(this).height();
-                            $(image).width(w);
-                            $(image).height(h);
-                            // doprintthis, wenn die Klasse schon da war
-                            if ($(this).hasClass("doprintthis")) {
-                                $(image).addClass("doprintthis");
-                            }
-
-                            var parspan = $(this).parent();
-                            if ($(parspan).prop("tagName") === "SPAN") {
-                                $(parspan).css({
-                                    width: w + "px",
-                                    height: h + "px"
-                                });
-                            }
-                            $(this).replaceWith(image);
-                        });
-                        evt.preventDefault();
-                        // https://github.com/jasonday/printThis
-                        $('.doprintthis').printThis({
-                            canvas: true,
-                            afterPrint: function () {
-                                //var lsid = $("iframe").find("[name=printIframe]").attr("id");
-                                var lsid = $('iframe[name="printIframe"]').attr('id');
-
-                                var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
-                                uihelper.downloadfile("station.html", largestring, function (ret) {
-                                    console.log("Downloaded");
-                                });
-                                /*
-                                var canvas = document.getElementById("mycanvas");
-                                var imgString = canvas.toDataURL("image/png");
-                                var image1 = new Image();
-                                image1.src = imgString;
-
-                                var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
-                                window.location.href = image;
-                                */
-                            }
-                        });
-
-                    }
-                }))
-
-                .append($("<button/>", {
-                    html: "Aufbereiten HTML",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // evt.stopPropagation();
-                        // evt.stopImmediatePropagation();
-                        // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
-                        /**
-                         * Konvertieren svg zu image
-                         * http://bl.ocks.org/biovisualize/8187844
-                         */
-                        var tourl = "klaheatmap.html" + "?" + "stationid=" + selstationid + "&source=" + selsource + "&variablename=" + selvariablename;
-                        var idc21 = window.parent.sysbase.tabcreateiframe(selstationid, "", "re-klima", "kla1990htm", tourl);
-                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click(); // das legt erst den iFrame an
-                        setTimeout(function () {
-
-                            var actdiv = window.parent.$("#" + idc21);
-                            var actiFrame = $(actdiv).find("iframe").get(0);
-
-                            var actiFrameBody = $(actiFrame).contents();
-                            /**
-                             * Loop über alle doprintthis-Elemente
-                             */
-                            var aktwrapper = $(actiFrameBody).find(".kla1990htmwrapper");
-                            $('.doprintthis').each(function (index, printelement) {
-                                $(aktwrapper)
-                                    .append($(printelement));
-                                $(aktwrapper)
-                                    .append($("<div/>", {
-                                        html: "&nbsp;",
-                                        css: {
-                                            clear: "both"
-                                        }
-                                    }));
-
-                            });
-
-                            /**
-                             * Konvertieren canvas zu image
-                             */
-                            $(actiFrameBody).find('canvas').each(function (index, printcanvas) {
-                                var image = new Image();
-                                image.src = printcanvas.toDataURL("image/jpg"); // png
-                                var w = $(printcanvas).width();
-                                var h = $(printcanvas).height();
-                                $(image).width(w);
-                                $(image).height(h);
-                                // doprintthis, wenn die Klasse schon da war
-                                if ($(printcanvas).hasClass("doprintthis")) {
-                                    $(image).addClass("doprintthis");
-                                }
-                                var parspan = $(printcanvas).parent();
-                                if ($(parspan).prop("tagName") === "SPAN") {
-                                    $(parspan).css({
-                                        width: w + "px",
-                                        height: h + "px"
-                                    });
-                                }
-                                $(printcanvas).replaceWith(image);
-                            });
-                        }, 2000);
-                        if (1 === 1) return;
-
-
-
-                        $(actiFrame).find('svg').each(function (index, svgelement) {
-                            var svgString = new XMLSerializer().serializeToString(svgelement);
-                            //var canvas = document.getElementById("canvas");
-                            var canvas = document.createElement("canvas");
-                            var ctx = canvas.getContext("2d");
-                            var DOMURL = self.URL || self.webkitURL || self;
-                            var svg = new Blob([svgString], {
-                                type: "image/svg+xml;charset=utf-8"
-                            });
-                            var url = DOMURL.createObjectURL(svg);
-                            var image = new Image();
-                            image.src = url;
-                            var w = $(svgelement).width();
-                            var h = $(svgelement).height();
-                            $(image).width(w);
-                            $(image).height(h);
-                            // doprintthis, wenn die Klasse schon da war
-                            if ($(svgelement).hasClass("doprintthis")) {
-                                $(svgelement).addClass("doprintthis");
-                            }
-                            var parspan = $(svgelement).parent();
-                            if ($(parspan).prop("tagName") === "SPAN") {
-                                $(parspan).css({
-                                    width: w + "px",
-                                    height: h + "px"
-                                });
-                            }
-                            $(svgelement).replaceWith(image);
-                            /*
-                            var img = new Image();
-                            img.onload = function () {
-                                ctx.drawImage(img, 0, 0);
-                                var png = canvas.toDataURL("image/png");
-                                document.querySelector('#png-container').innerHTML = '<img src="' + png + '"/>';
-                                DOMURL.revokeObjectURL(png);
-                            };
-                            img.src = url;
-                            */
-                        });
-                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-                        /*
-                        var largestring = $("#kla1625shmwrapper").html();
-                        uihelper.downloadfile("station.html", largestring, function (ret) {
-                            console.log("Downloaded");
-                        });
-                        */
-                        // https://github.com/jasonday/printThis
-                        /*
-                        $('.doprintthis').printThis({
-                            canvas: true,
-                            afterPrint: function () {
-                                //var lsid = $("iframe").find("[name=printIframe]").attr("id");
-                                var lsid = $('iframe[name="printIframe"]').attr('id');
-                                var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
-                                uihelper.downloadfile("station.html", largestring, function (ret) {
-                                    console.log("Downloaded");
-                                });
-                                var canvas = document.getElementById("mycanvas");
-                                var imgString = canvas.toDataURL("image/png");
-                                var image1 = new Image();
-                                image1.src = imgString;
-
-                                var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
-                                window.location.href = image;
-
-                            }
-                        });
-                        */
-                        /*
-                        var a = document.body.appendChild(
-                            document.createElement("a")
-                        );
-                        a.download = "export.html";
-                        a.href = "data:text/html," + document.getElementById("kla1625shmwrapper").innerHTML;
-                        //a.innerHTML = "[Export content]";
-                        a.click();
-                        */
-                    }
-                }))
-
-
-                .append($("<button/>", {
-                    html: "Heatmap Colortest",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // evt.stopPropagation();
-                        // evt.stopImmediatePropagation();
-                        if ($("#kliheattable").is(":visible")) {
-                            $("#kliheattable").hide();
-                        } else {
+            .append($("<button/>", {
+                html: "Super-Heatmaps",
+                id: "kla1625shmsuper",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // stationrecord - heatworld
+                    async.waterfall([
+                        function (cb1625a) {
+                            // brutal auf die rechte Seite
                             $("#kla1625shmwrapper").empty();
-                            var h = $("#heatmap").height();
-                            var w = $("#kla1625shm.content").width();
-                            w -= 0; // $("#heatmap").position().left;
-                            w -= 0; // $("#heatmap").width();
-                            w -= 0; // 40;
+                            $("#kla1625shmwrapper").css({
+                                overflow: "auto"
+                            });
                             $("#kla1625shmwrapper")
                                 .append($("<div/>", {
-                                    id: "kla1625shmcolormap",
+                                    id: "kla1625shmd1",
                                     css: {
-                                        "background-color": "yellow",
-                                        height: h,
-                                        width: w,
-                                        overflow: "auto"
+                                        width: $("#heatmap").width(),
+                                        height: $("#heatmap").height(),
+                                        float: "left"
                                     }
                                 }));
-                            $("#kla1625shmcolormap").show();
-                            kla9020fun.getColorPaletteX1("kla1625shmcolormap", 7);
+                            var hmoptions = {
+                                minmax: false,
+                                minmaxhistogram: false,
+                                cbuckets: false,
+                                hyde: false
+                            };
+                            kla1625shm.kliheatmap2("kla1625shmd1", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                cb1625a(null);
+                            });
+                        },
+                        function (cb1625b) {
+                            $("#kla1625shmwrapper")
+                                .append($("<div/>", {
+                                    id: "kla1625shmd2",
+                                    css: {
+                                        width: $("#heatmap").width(),
+                                        height: $("#heatmap").height(),
+                                        float: "left"
+                                    }
+                                }));
+                            var hmoptions = {
+                                minmax: false,
+                                minmaxhistogram: false,
+                                cbuckets: false,
+                                hyde: false
+                            };
+                            kla1625shm.kliheatmap2("kla1625shmd2", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                cb1625b(null);
+                            });
+                        },
+                        function (cb1625c) {
+                            /**
+                             * für TMAX min und max bestimmen, Histogramm als Sparkline
+                             */
+                            $("#kla1625shmwrapper")
+                                .append($("<div/>", {
+                                    id: "kla1625shmd3",
+                                    css: {
+                                        width: $("#heatmap").width(),
+                                        height: $("#heatmap").height(),
+                                        float: "left"
+                                    }
+                                }));
+                            var hmoptions = {
+                                minmax: true,
+                                minmaxhistogram: true,
+                                cbuckets: true,
+                                hyde: true
+                            };
+                            kla1625shm.kliheatmap2("kla1625shmd3", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                // über ret kommen hier options in ret zurück
+                                /*
+                                    error: false,
+                                    message: "Heatmap ausgegeben",
+                                    matrix: matrix1,
+                                    options: uihelper.cloneObject(hmoptions),
+                                    hoptions: ret.hoptions,
+                                    histo: hmoptions.histo,
+                                    temparray: ret.temparray,
+                                    matrix: hmatrix
+                                */
+                                cb1625c(null);
+                            });
+                        },
+                        function (cb1625d) {
+                            /**
+                             * für TMIN min und max bestimmen, Histogramm als Sparkline
+                             */
+                            $("#kla1625shmwrapper")
+                                .append($("<div/>", {
+                                    id: "kla1625shmd4",
+                                    css: {
+                                        width: $("#heatmap").width(),
+                                        height: $("#heatmap").height(),
+                                        float: "left"
+                                    }
+                                }));
+                            var hmoptions = {
+                                minmax: true,
+                                minmaxhistogram: true,
+                                cbuckets: true,
+                                hyde: false
+                            };
+                            kla1625shm.kliheatmap2("kla1625shmd4", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                cb1625d(null);
+                            });
                         }
-                        return false;
-                    }
-                }))
 
-                .append($("<div/>", {
-                    id: "kla1625shmclock",
+                    ]);
+                }
+            }))
+
+
+            /*
+            .append($("<button/>", {
+                html: "Bucketanalyse (10)",
+                css: {
                     float: "left",
-                    css: {
-                        float: "left",
-                        margin: "10px"
-                    }
-                }))
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // stationrecord - heatworld
+                    kla1625shm.bucketAnalysis(10, selvariablename, selsource, selstationid);
+                }
+            }))
+            */
 
-            );
+
+
+            /*
+            .append($("<button/>", {
+                html: "Sparklines-Kelvin",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    var matrix2 = uihelper.cloneObject(matrix1);
+                    for (var i1 = 0; i1 < matrix2.data.length; i1++) {
+                        for (var i2 = 0; i2 < matrix2.data[i1].length; i2++) {
+                            var temp1 = matrix2.data[i1][i2];
+                            if (temp1 !== null) {
+                                var tkelvin = (parseFloat(temp1) + 273).toFixed(1);
+                                matrix2.data[i1][i2] = tkelvin;
+                            }
+                        }
+                    }
+                    kla1625shm.paintT(selvariablename, selsource, selstationid, matrix2);
+                }
+            }))
+            */
+
+
+            .append($("<button/>", {
+                html: "Super-Sparklines",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    var username = uihelper.getUsername();
+                    window.parent.sysbase.setCache("regstation", JSON.stringify({
+                        starecord: starecord,
+                        klirecords: klirecords,
+                        fromyear: klirecords[0].fromyear,
+                        toyear: "" + (parseInt(klirecords[0].fromyear) + 29)
+                    }));
+                    var tourl = "klaheatmap.html" + "?" + "stationid=" + klirecords[0].stationid + "&source=" + klirecords[0].source + "&variablename=" + klirecords[0].variable;
+                    var tabname = klirecords[0].stationname;
+                    var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626reg", tourl);
+                    window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                }
+            }))
+
+
+            /*
+            .append($("<button/>", {
+                html: "Sparklines-Download",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
+                    var canliste = $('#kla1625shmt1 tbody tr td span canvas');
+                    $(canliste).each(function (index, element) {
+                        var dataurl = element.toDataURL('image/png');
+                        var par = $(element).parent();
+                        $(par).append($("<img/>", {
+                            src: dataurl
+                        }));
+                        $(element).remove();
+                    });
+                    // Filterzeile clone und löschen
+                    // wenn hasClass u.a. hasFilters
+                    var clonerow;
+                    if ($("#kla1625shmt1").hasClass("hasFilters")) {
+                        clonerow = $("#kla1625shmt1 thead tr").eq(1).clone();
+                        $("#kla1625shmt1 thead tr").eq(1).remove();
+                    }
+                    var elHtml = "";
+                    elHtml += "<html>";
+                    elHtml += "<head>";
+                    elHtml += "<meta charset='UTF-8'>";
+                    elHtml += "<style type='text/css'> @page { size: 29.5cm 21.0cm; margin-left: 1cm; margin-right: 1cm }</style>";
+                    elHtml += "</head>";
+                    elHtml += "<body style='font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px'>";
+                    elHtml += "<h2>" + $("#kla1625shmh2").text() + "</h2>";
+                    elHtml += "<p style='page-break-before: always'>";
+                    var oldwidth = $("#kla1625shmt1").width();
+                    $("#kla1625shmt1").width("100%");
+                    elHtml += $("#kla1625shmt1").parent().html();
+                    elHtml += "</body>";
+                    elHtml += "<html>";
+                    // Filterzeile clone wieder einfügen
+                    if ($("#kla1625shmt1").hasClass("hasFilters")) {
+                        $("#kla1625shmt1 thead").append(clonerow);
+                    }
+                    var filename = "sparklines.html";
+                    if (elHtml.length > 100) {
+                        var jqxhr = $.ajax({
+                            method: "POST",
+                            crossDomain: false,
+                            url: sysbase.getServer("getbackasfile"),
+                            data: {
+                                timeout: 10 * 60 * 1000,
+                                largestring: elHtml,
+                                filename: filename
+                            }
+                        }).done(function (r1, textStatus, jqXHR) {
+                            sysbase.checkSessionLogin(r1);
+                            console.log("getbackasfile:" + filename + "=>" + r1);
+                            var j1 = JSON.parse(r1);
+                            if (j1.error === false) {
+                                var download_path = j1.path;
+                                // Could also use the link-click method.
+                                // window.location = download_path;
+                                window.open(download_path, '_blank');
+                                sysbase.putMessage(filename + " download erfolgt", 1);
+                            } else {
+                                sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
+                            }
+                            return;
+                        }).fail(function (err) {
+                            sysbase.putMessage("download:" + err, 3);
+                            return;
+                        }).always(function () {
+                            // nope
+                        });
+                    }
+                }
+            }))
+            */
+            /*
+            .append($("<button/>", {
+                html: "Scattergram",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // stationrecord - heatworld
+                    kla1625shm.scatter(selvariablename, selsource, selstationid, matrix1);
+                }
+            }))
+            */
+
+            /*
+            .append($("<button/>", {
+                html: "Regression testen",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // stationrecord - heatworld
+                    kla1625shm.paintU(selvariablename, selsource, selstationid, matrix1);
+                }
+            }))
+            .append($("<button/>", {
+                html: "Chart anzeigen",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // stationrecord - heatworld
+                    kla1625shm.paintChart(30, selvariablename, selsource, selstationid);
+                }
+            }))
+            */
+            /*
+            .append($("<button/>", {
+                html: "Clusteranalyse",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // stationrecord - heatworld
+                    kla1625shm.clusterAnalysis(selvariablename, selsource, selstationid);
+                }
+            }))
+            */
+            /*
+            .append($("<button/>", {
+                html: "Bucketanalyse (30)",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // stationrecord - heatworld
+                    kla1625shm.bucketAnalysis(30, selvariablename, selsource, selstationid);
+                }
+            }))
+            */
+
+
+
+            .append($("<button/>", {
+                html: "Drucken",
+                css: {
+                    "text-align": "center",
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    // sysbase.printDivAll($("#kla1625shmwrapper").html());
+                    // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
+                    $('canvas').each(function (e) {
+                        var image = new Image();
+                        var that = this;
+                        image.src = this.toDataURL("image/png");
+                        var w = $(this).width();
+                        var h = $(this).height();
+                        $(image).width(w);
+                        $(image).height(h);
+                        // doprintthis, wenn die Klasse schon da war
+                        if ($(this).hasClass("doprintthis")) {
+                            $(image).addClass("doprintthis");
+                        }
+
+                        var parspan = $(this).parent();
+                        if ($(parspan).prop("tagName") === "SPAN") {
+                            $(parspan).css({
+                                width: w + "px",
+                                height: h + "px"
+                            });
+                        }
+                        $(this).replaceWith(image);
+                    });
+                    evt.preventDefault();
+                    // https://github.com/jasonday/printThis
+                    $('.doprintthis').printThis({
+                        canvas: true,
+                        afterPrint: function () {
+                            //var lsid = $("iframe").find("[name=printIframe]").attr("id");
+                            var lsid = $('iframe[name="printIframe"]').attr('id');
+
+                            var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+                            uihelper.downloadfile("station.html", largestring, function (ret) {
+                                console.log("Downloaded");
+                            });
+                            /*
+                            var canvas = document.getElementById("mycanvas");
+                            var imgString = canvas.toDataURL("image/png");
+                            var image1 = new Image();
+                            image1.src = imgString;
+
+                            var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
+                            window.location.href = image;
+                            */
+                        }
+                    });
+
+                }
+            }))
+
+            .append($("<button/>", {
+                html: "Aufbereiten HTML",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // evt.stopPropagation();
+                    // evt.stopImmediatePropagation();
+                    // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
+                    /**
+                     * Konvertieren svg zu image
+                     * http://bl.ocks.org/biovisualize/8187844
+                     */
+                    var tourl = "klaheatmap.html" + "?" + "stationid=" + selstationid + "&source=" + selsource + "&variablename=" + selvariablename;
+                    var idc21 = window.parent.sysbase.tabcreateiframe(selstationid, "", "re-klima", "kla1990htm", tourl);
+                    window.parent.$(".tablinks[idhash='#" + idc21 + "']").click(); // das legt erst den iFrame an
+                    setTimeout(function () {
+
+                        var actdiv = window.parent.$("#" + idc21);
+                        var actiFrame = $(actdiv).find("iframe").get(0);
+
+                        var actiFrameBody = $(actiFrame).contents();
+                        /**
+                         * Loop über alle doprintthis-Elemente
+                         */
+                        var aktwrapper = $(actiFrameBody).find(".kla1990htmwrapper");
+                        $('.doprintthis').each(function (index, printelement) {
+                            $(aktwrapper)
+                                .append($(printelement));
+                            $(aktwrapper)
+                                .append($("<div/>", {
+                                    html: "&nbsp;",
+                                    css: {
+                                        clear: "both"
+                                    }
+                                }));
+
+                        });
+
+                        /**
+                         * Konvertieren canvas zu image
+                         */
+                        $(actiFrameBody).find('canvas').each(function (index, printcanvas) {
+                            var image = new Image();
+                            image.src = printcanvas.toDataURL("image/jpg"); // png
+                            var w = $(printcanvas).width();
+                            var h = $(printcanvas).height();
+                            $(image).width(w);
+                            $(image).height(h);
+                            // doprintthis, wenn die Klasse schon da war
+                            if ($(printcanvas).hasClass("doprintthis")) {
+                                $(image).addClass("doprintthis");
+                            }
+                            var parspan = $(printcanvas).parent();
+                            if ($(parspan).prop("tagName") === "SPAN") {
+                                $(parspan).css({
+                                    width: w + "px",
+                                    height: h + "px"
+                                });
+                            }
+                            $(printcanvas).replaceWith(image);
+                        });
+                    }, 2000);
+                    if (1 === 1) return;
+
+
+
+                    $(actiFrame).find('svg').each(function (index, svgelement) {
+                        var svgString = new XMLSerializer().serializeToString(svgelement);
+                        //var canvas = document.getElementById("canvas");
+                        var canvas = document.createElement("canvas");
+                        var ctx = canvas.getContext("2d");
+                        var DOMURL = self.URL || self.webkitURL || self;
+                        var svg = new Blob([svgString], {
+                            type: "image/svg+xml;charset=utf-8"
+                        });
+                        var url = DOMURL.createObjectURL(svg);
+                        var image = new Image();
+                        image.src = url;
+                        var w = $(svgelement).width();
+                        var h = $(svgelement).height();
+                        $(image).width(w);
+                        $(image).height(h);
+                        // doprintthis, wenn die Klasse schon da war
+                        if ($(svgelement).hasClass("doprintthis")) {
+                            $(svgelement).addClass("doprintthis");
+                        }
+                        var parspan = $(svgelement).parent();
+                        if ($(parspan).prop("tagName") === "SPAN") {
+                            $(parspan).css({
+                                width: w + "px",
+                                height: h + "px"
+                            });
+                        }
+                        $(svgelement).replaceWith(image);
+                        /*
+                        var img = new Image();
+                        img.onload = function () {
+                            ctx.drawImage(img, 0, 0);
+                            var png = canvas.toDataURL("image/png");
+                            document.querySelector('#png-container').innerHTML = '<img src="' + png + '"/>';
+                            DOMURL.revokeObjectURL(png);
+                        };
+                        img.src = url;
+                        */
+                    });
+                    window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                    /*
+                    var largestring = $("#kla1625shmwrapper").html();
+                    uihelper.downloadfile("station.html", largestring, function (ret) {
+                        console.log("Downloaded");
+                    });
+                    */
+                    // https://github.com/jasonday/printThis
+                    /*
+                    $('.doprintthis').printThis({
+                        canvas: true,
+                        afterPrint: function () {
+                            //var lsid = $("iframe").find("[name=printIframe]").attr("id");
+                            var lsid = $('iframe[name="printIframe"]').attr('id');
+                            var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+                            uihelper.downloadfile("station.html", largestring, function (ret) {
+                                console.log("Downloaded");
+                            });
+                            var canvas = document.getElementById("mycanvas");
+                            var imgString = canvas.toDataURL("image/png");
+                            var image1 = new Image();
+                            image1.src = imgString;
+
+                            var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
+                            window.location.href = image;
+
+                        }
+                    });
+                    */
+                    /*
+                    var a = document.body.appendChild(
+                        document.createElement("a")
+                    );
+                    a.download = "export.html";
+                    a.href = "data:text/html," + document.getElementById("kla1625shmwrapper").innerHTML;
+                    //a.innerHTML = "[Export content]";
+                    a.click();
+                    */
+                }
+            }))
+
+
+            .append($("<button/>", {
+                html: "Heatmap Colortest",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    // evt.stopPropagation();
+                    // evt.stopImmediatePropagation();
+                    if ($("#kliheattable").is(":visible")) {
+                        $("#kliheattable").hide();
+                    } else {
+                        $("#kla1625shmwrapper").empty();
+                        var h = $("#heatmap").height();
+                        var w = $("#kla1625shm.content").width();
+                        w -= 0; // $("#heatmap").position().left;
+                        w -= 0; // $("#heatmap").width();
+                        w -= 0; // 40;
+                        $("#kla1625shmwrapper")
+                            .append($("<div/>", {
+                                id: "kla1625shmcolormap",
+                                css: {
+                                    "background-color": "yellow",
+                                    height: h,
+                                    width: w,
+                                    overflow: "auto"
+                                }
+                            }));
+                        $("#kla1625shmcolormap").show();
+                        kla9020fun.getColorPaletteX1("kla1625shmcolormap", 7);
+                    }
+                    return false;
+                }
+            }))
+
+            .append($("<div/>", {
+                id: "kla1625shmclock",
+                float: "left",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                }
+            }));
         /**
          * Beginn des initialen Aufbaus kla1625shmwrapper
          */
@@ -946,7 +942,7 @@
                 wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
                 wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
                 */
-                $(".headertitle").html(wmtit);
+                $(".headertitle").html("Sammelauswertung");
                 kla1625shm.showall(ret);
             });
 
@@ -1369,7 +1365,6 @@
                     */
                     if (typeof klirecords[0].years !== "undefined" || klirecords[0].years.length > 0) {
                         // Sortierfolge ist TMAX, TMIN alphabetisch
-                        debugger;
                         stationrecord = klirecords[0];
                         cb1625p1(null, {
                             error: false,
@@ -1586,9 +1581,12 @@
         async.waterfall([
                 function (cb1625g0a) {
                     if (kla1625shmconfig.allin === true) {
+                        var gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
+
                         $("#kla1625shmwrapper")
                             .append($("<div/>", {
                                     class: "doprintthis",
+                                    id: gldivid,
                                     css: {
                                         width: "100%",
                                         float: "left",
@@ -1602,6 +1600,48 @@
                                     class: "doprintthis"
                                 }))
                             );
+                        // Spezielle Buttons mit Vor-Aufbereitung
+                        var gurl = "https://www.google.com/maps/search/?api=1&query=";
+                        gurl += klirecords[0].latitude;
+                        gurl += ",";
+                        gurl += klirecords[0].longitude;
+
+                        var lurl = "klaleaflet.html";
+                        lurl += "?";
+                        lurl += "latitude=" + encodeURIComponent(klirecords[0].latitude);
+                        lurl += "&";
+                        lurl += "longitude=" + encodeURIComponent(klirecords[0].longitude);
+
+                        $("#" + gldivid)
+                            .append($("<button/>", {
+                                html: "Google-Maps",
+                                gurl: gurl,
+                                css: {
+                                    float: "left",
+                                    margin: "10px"
+                                },
+                                click: function (evt) {
+                                    evt.preventDefault();
+                                    //var gurl = "https://www.google.com/maps/dir/";
+                                    var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                                    var newurl = $(this).attr("gurl");
+                                    window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
+                                }
+                            }))
+                            .append($("<button/>", {
+                                html: "Leaflet-Raster",
+                                lurl: lurl,
+                                css: {
+                                    float: "left",
+                                    margin: "10px"
+                                },
+                                click: function (evt) {
+                                    evt.preventDefault();
+                                    var newurl = $(this).attr("lurl");
+                                    var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                                    window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
+                                }
+                            }));
                     }
                     /**
                      * Datenqualität missing/bad data
@@ -1625,7 +1665,49 @@
                     $("#" + divid)
                         .append($("<h2/>", {
                             html: "Stammdaten"
-                        }));
+                        }))
+                        .append($("<a/>", {
+                                title: "Copy to Clipboard",
+                                click: function (evt) {
+                                    evt.preventDefault();
+                                    var html = $(this).parent().find("div").html();
+                                    var eHtml = "";
+                                    eHtml += "<html>";
+                                    eHtml += "<head>";
+                                    eHtml += "<meta charset='UTF-8'>";
+                                    eHtml += "</head>";
+                                    eHtml += "<body>";
+                                    eHtml += html;
+                                    eHtml += "</body>";
+                                    eHtml += "</html>";
+                                    // uihelper.copy2clipboard(eHtml);
+                                    //window.clipboardData.setData('text/plain', "TEST");
+                                    var urlField = document.getElementById(divid); // $(this).parent().find("div")[0];
+                                    var range = document.createRange();
+                                    range.selectNode(urlField);
+                                    window.getSelection().addRange(range);
+
+                                    var range1 = document.createRange();
+                                    range1.selectNode(urlField);
+                                    window.getSelection().addRange(range1);
+
+                                    document.execCommand('copy');
+                                    if (window.getSelection) {
+                                        window.getSelection().removeAllRanges();
+                                    } else if (document.selection) {
+                                        document.selection.empty();
+                                    }
+
+
+                                    sysbase.putMessage("copied to Clipboard");
+                                }
+                            })
+                            .append($("<img/>", {
+                                src: '/images/icons-png/star-black.png'
+                            }))
+                        );
+
+
                     var master = {};
                     master.stationid = klirecords[0].stationid;
                     master.source = klirecords[0].source;
@@ -1642,6 +1724,7 @@
                     master.height = klirecords[0].height;
                     ret.master = master;
                     var html = uihelper.iterateJSON2HTML(master, "", "");
+
                     $("#" + divid)
                         .append($("<div/>", {
                             html: html

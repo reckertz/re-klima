@@ -979,7 +979,7 @@ app.post('/getmoredata', function (req, res) {
             reqparm.offset = 0;
             sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret) {
                 // in ret liegen error, message und record
-                cbmd3 ("Finish", ret);
+                cbmd3("Finish", ret);
                 return;
             });
 
@@ -1178,6 +1178,9 @@ app.get('/stationhyde', function (req, res) {
     var ret = {};
     async.waterfall([
             function (cbsh1) {
+                /**
+                 * Prüfung, ob Vorhanden mit source gemäß KLISTATIONS
+                 */
                 var reqparm = {
                     sel: {
                         source: source,
@@ -1208,11 +1211,88 @@ app.get('/stationhyde', function (req, res) {
 
                 });
             },
+            function (res, ret, cbsh1a) {
+                /**
+                 * Prüfung, ob Vorhanden mit alter source mit HYDE und Umsetzung, wenn erforderlich
+                 * vorher Aussprung, wenn der korrekte Satz bereits gefunden wurde!
+                 */
+                var reqparm = {
+                    sel: {
+                        source: "HYDE",
+                        stationid: stationid
+                    },
+                    projection: {},
+                    table: "KLIHYDE"
+                };
+                sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                    if (ret1.error === true) {
+                        ret.message = ret1.message;
+                        ret.error = ret1.error;
+                        cbsh1a("Error", res, ret);
+                        return;
+                    }
+                    if (ret1.error === false && typeof ret1.record !== "undefined" && ret1.record !== null) {
+                        ret.message = ret1.message;
+                        ret.error = false;
+                        ret.operation = "change";
+                        ret.klihyde = ret1.record;
+                        cbsh1a(null, res, ret);
+                        return;
+                    } else {
+                        ret.message = ret1.message;
+                        ret.error = true;
+                        ret.operation = "load";
+                        cbsh1a(null, res, ret);
+                        return;
+                    }
+                });
+            },
+
+            function (res, ret, cbsh1b) {
+                /**
+                 * Update source in KLIHYDE und Rückgabe ret wie übernommen
+                 */
+                if (ret.operation !== "change") {
+                    cbsh1b(null, res, ret);
+                    return;
+                }
+
+                var reqparm = {};
+                reqparm.selfields = {
+                    source: "HYDE",
+                    stationid: stationid
+                };
+                reqparm.updfields = {};
+                reqparm.updfields["$setOnInsert"] = {};
+                reqparm.updfields["$set"] = {};
+                reqparm.updfields["$set"].source = source;
+                reqparm.table = "KLIHYDE";
+                sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                    if (ret1.error === true) {
+                        ret.message = ret1.message;
+                        ret.error = ret1.error;
+                        cbsh1b("Error", res, ret);
+                        return;
+                    }
+                    if (ret1.error === false && typeof ret1.record !== "undefined" && ret1.record !== null) {
+                        ret.message = ret1.message;
+                        ret.error = false;
+                        ret.klihyde = ret1.record;
+                        cbsh1b("Finish", res, ret);
+                        return;
+                    } else {
+                        ret.message = ret1.message;
+                        ret.error = true;
+                        cbsh1b("Error", res, ret);
+                        return;
+                    }
+                });
+            },
             function (res, ret, cbsh2) {
                 /**
                  * TODO: reqparm sollte hier besser sein!!!
                  * speziell weil der API umgestellt wurde für "allin"
-                */
+                 */
                 sys0000sys.stationhyde(db, rootdir, fs, async, req, null, res, function (res, ret) {
                     // in ret liegen error, message und record
                     cbsh2("Finish", res, ret);
