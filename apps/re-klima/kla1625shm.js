@@ -634,7 +634,6 @@
                         if ($(this).hasClass("doprintthis")) {
                             $(image).addClass("doprintthis");
                         }
-
                         var parspan = $(this).parent();
                         if ($(parspan).prop("tagName") === "SPAN") {
                             $(parspan).css({
@@ -651,23 +650,12 @@
                         afterPrint: function () {
                             //var lsid = $("iframe").find("[name=printIframe]").attr("id");
                             var lsid = $('iframe[name="printIframe"]').attr('id');
-
                             var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
                             uihelper.downloadfile("station.html", largestring, function (ret) {
                                 console.log("Downloaded");
                             });
-                            /*
-                            var canvas = document.getElementById("mycanvas");
-                            var imgString = canvas.toDataURL("image/png");
-                            var image1 = new Image();
-                            image1.src = imgString;
-
-                            var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
-                            window.location.href = image;
-                            */
                         }
                     });
-
                 }
             }))
 
@@ -732,88 +720,43 @@
                             }
                             $(printcanvas).replaceWith(image);
                         });
+
+                        /**
+                         * Konvertieren svg zu Image
+                         */
+                        $(actiFrame).find('svg').each(function (index, svgelement) {
+                            var svgString = new XMLSerializer().serializeToString(svgelement);
+                            //var canvas = document.getElementById("canvas");
+                            var canvas = document.createElement("canvas");
+                            var ctx = canvas.getContext("2d");
+                            var DOMURL = self.URL || self.webkitURL || self;
+                            var svg = new Blob([svgString], {
+                                type: "image/svg+xml;charset=utf-8"
+                            });
+                            var url = DOMURL.createObjectURL(svg);
+                            var image = new Image();
+                            image.src = url;
+                            var w = $(svgelement).width();
+                            var h = $(svgelement).height();
+                            $(image).width(w);
+                            $(image).height(h);
+                            // doprintthis, wenn die Klasse schon da war
+                            if ($(svgelement).hasClass("doprintthis")) {
+                                $(svgelement).addClass("doprintthis");
+                            }
+                            var parspan = $(svgelement).parent();
+                            if ($(parspan).prop("tagName") === "SPAN") {
+                                $(parspan).css({
+                                    width: w + "px",
+                                    height: h + "px"
+                                });
+                            }
+                            $(svgelement).replaceWith(image);
+                        });
+
                     }, 2000);
                     if (1 === 1) return;
-
-
-
-                    $(actiFrame).find('svg').each(function (index, svgelement) {
-                        var svgString = new XMLSerializer().serializeToString(svgelement);
-                        //var canvas = document.getElementById("canvas");
-                        var canvas = document.createElement("canvas");
-                        var ctx = canvas.getContext("2d");
-                        var DOMURL = self.URL || self.webkitURL || self;
-                        var svg = new Blob([svgString], {
-                            type: "image/svg+xml;charset=utf-8"
-                        });
-                        var url = DOMURL.createObjectURL(svg);
-                        var image = new Image();
-                        image.src = url;
-                        var w = $(svgelement).width();
-                        var h = $(svgelement).height();
-                        $(image).width(w);
-                        $(image).height(h);
-                        // doprintthis, wenn die Klasse schon da war
-                        if ($(svgelement).hasClass("doprintthis")) {
-                            $(svgelement).addClass("doprintthis");
-                        }
-                        var parspan = $(svgelement).parent();
-                        if ($(parspan).prop("tagName") === "SPAN") {
-                            $(parspan).css({
-                                width: w + "px",
-                                height: h + "px"
-                            });
-                        }
-                        $(svgelement).replaceWith(image);
-                        /*
-                        var img = new Image();
-                        img.onload = function () {
-                            ctx.drawImage(img, 0, 0);
-                            var png = canvas.toDataURL("image/png");
-                            document.querySelector('#png-container').innerHTML = '<img src="' + png + '"/>';
-                            DOMURL.revokeObjectURL(png);
-                        };
-                        img.src = url;
-                        */
-                    });
                     window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-                    /*
-                    var largestring = $("#kla1625shmwrapper").html();
-                    uihelper.downloadfile("station.html", largestring, function (ret) {
-                        console.log("Downloaded");
-                    });
-                    */
-                    // https://github.com/jasonday/printThis
-                    /*
-                    $('.doprintthis').printThis({
-                        canvas: true,
-                        afterPrint: function () {
-                            //var lsid = $("iframe").find("[name=printIframe]").attr("id");
-                            var lsid = $('iframe[name="printIframe"]').attr('id');
-                            var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
-                            uihelper.downloadfile("station.html", largestring, function (ret) {
-                                console.log("Downloaded");
-                            });
-                            var canvas = document.getElementById("mycanvas");
-                            var imgString = canvas.toDataURL("image/png");
-                            var image1 = new Image();
-                            image1.src = imgString;
-
-                            var image = img.replace("image/png", "image/octet-stream"); //Convert image to 'octet-stream' (Just a download, really)
-                            window.location.href = image;
-
-                        }
-                    });
-                    */
-                    /*
-                    var a = document.body.appendChild(
-                        document.createElement("a")
-                    );
-                    a.download = "export.html";
-                    a.href = "data:text/html," + document.getElementById("kla1625shmwrapper").innerHTML;
-                    //a.innerHTML = "[Export content]";
-                    a.click();
-                    */
                 }
             }))
 
@@ -1577,6 +1520,8 @@
 
         async.waterfall([
                 function (cb1625g0a) {
+                    klirecords[0].titel = klirecords[0].stationid + " " + klirecords[0].stationname + " (" + klirecords[0].source + ")";
+
                     if (kla1625shmconfig.allin === true) {
                         var gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
 
@@ -1668,10 +1613,6 @@
                                 click: function (evt) {
                                     evt.preventDefault();
                                     var cHtml = $(this).parent()[0];
-                                    // uihelper.copyHtml2clipboard(cHtml);
-                                    debugger;
-
-
                                     var copyh = "";
                                     copyh += "<html>";
                                     copyh += "<head>";
@@ -1685,53 +1626,10 @@
                                     uihelper.downloadfile("station.html", copyh, function (ret) {
                                         console.log("Downloaded");
                                     });
-
-
-                                    // https://stackoverflow.com/questions/44908329/copy-text-innerhtml-of-element-to-clipboard
-                                    /*
-                                    var el = document.createElement("textarea");
-                                    var copyh = "";
-                                    copyh += "<html>";
-                                    copyh += "<head>";
-                                    copyh += "<meta charset='UTF-8'>";
-                                    copyh += "</head>";
-                                    copyh += "<body>";
-                                    copyh += $(this).parent().html();
-                                    copyh += "</body>";
-                                    copyh += "</html>";
-                                    el.value = copyh;
-                                    document.body.appendChild(el);
-                                    el.select();
-                                    document.execCommand("copy");
-                                    document.body.removeChild(el);
-                                    */
-
-                                    // https://stackoverflow.com/questions/34191780/javascript-copy-string-to-clipboard-as-text-html
-                                    /*
-                                    window.getSelection().removeAllRanges();
-                                    var range = document.createRange();
-                                    var element = cHtml;
-                                    range.selectNode(typeof element === 'string' ? document.getElementById(element) : element);
-                                    window.getSelection().addRange(range);
-                                    document.execCommand('copy');
-                                    window.getSelection().removeAllRanges();
-                                    */
-                                    // var urlField = document.getElementById(el);
-                                    /*
-                                    var divid = $(this).parent().attr("id");
-                                    var urlField = document.getElementById(divid);
-                                    var range = document.createRange();
-                                    range.selectNode(urlField);
-                                    window.getSelection().addRange(range);
-                                    document.execCommand('copy');
-                                    */
-
-
-
                                 }
                             })
                             .append($("<h2/>", {
-                                html: "Stammdaten"
+                                html: "Stammdaten " + klirecords[0].titel
                             }))
                         );
 
@@ -1800,7 +1698,7 @@
                                 }
                             })
                             .append($("<h2/>", {
-                                html: "Datenqualität, Jahresdaten"
+                                html: "Datenqualität, Jahresdaten " + klirecords[0].titel
                             }))
                         );
 
@@ -1889,7 +1787,7 @@
                                         }
                                     })
                                     .append($("<h2>", {
-                                        text: "Heatmaps"
+                                        text: "Heatmaps " + klirecords[0].titel
                                     }))
                                 )
                                 .append($("<div/>", {
@@ -2634,7 +2532,7 @@
                 if (kla1625shmconfig.temptable === true) {
                     $(cid)
                         .append($("<h3/>", {
-                            text: "Histogramm Temperaturverteilung " + selvariable,
+                            text: "Histogramm Temperaturverteilung " + selvariable + " "  + klirecords[0].titel,
                             class: "doprintthis"
                         }))
                         .append($("<table/>", {
@@ -2726,7 +2624,7 @@
                             }))
                             .append($("<td/>", {
                                 align: "center",
-                                html: "&nbsp;"
+                                html: "&nbsp;<br>&nbsp;<br>&nbsp;<br>"
                             }))
                         );
                     $("#" + sparkid).sparkline(sparkpoints, {
@@ -2892,7 +2790,7 @@
                             }
                         })
                         .append($("<h3/>", {
-                            text: "Histogramm 1. Dezimalstelle " + selvariable,
+                            text: "Histogramm 1. Dezimalstelle " + selvariable + " "  + klirecords[0].titel,
                             class: "doprintthis"
                         }))
                         .append($("<canvas/>", {
@@ -3539,7 +3437,7 @@
                         }
                     })
                     .append($("<h3/>", {
-                        text: "Distribution " + selvariable + " Summer",
+                        text: "Distribution " + selvariable + " Summer " + klirecords[0].titel,
                         class: "doprintthis"
                     }))
                     .append($("<canvas/>", {
@@ -3563,7 +3461,7 @@
                     )
 
                     .append($("<h3/>", {
-                        text: "Distribution " + selvariable + " Winter",
+                        text: "Distribution " + selvariable + " Winter " + klirecords[0].titel,
                         class: "doprintthis"
                     }))
                     .append($("<canvas/>", {
@@ -3640,7 +3538,7 @@
         var tableid = cid.substr(1) + "tbl";
         $(cid)
             .append($("<h3/>", {
-                text: "Temperaturverlauf " + selvariable,
+                text: "Temperaturverlauf " + selvariable + " " + klirecords[0].titel,
                 class: "doprintthis",
             }))
             .append($("<div/>", {
@@ -3958,7 +3856,7 @@
                     }
                 })
                 .append($("<h2>", {
-                    text: "Auswertung HYDE-Daten",
+                    text: "Auswertung HYDE-Daten "  + klirecords[0].titel,
                     class: "doprintthis"
 
                 }))

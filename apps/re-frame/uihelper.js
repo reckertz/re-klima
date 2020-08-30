@@ -380,7 +380,7 @@
             d.setUTCMilliseconds(0);
             var date = d; // new Date(UTC); // das System unterstellt GMT + 1 und das ist nicht korrekt, date ist schon falsch
             var tag = date.toISOString();
-            hdiff = date.getTimezoneOffset(); // in Minuten
+            var hdiff = date.getTimezoneOffset(); // in Minuten
             var thisday = new Date(date - hdiff * 60 * 1000);
             var thisdayISO = thisday.toISOString();
             return uihelper.convertISO2D(thisdayISO.substring(0, 10)) + " " + thisdayISO.substr(11, 8);
@@ -1547,7 +1547,7 @@
                         res += ")";
                         res += ":";
                         if (typeof obj[property] === "string" && obj[property].startsWith("<")) {
-                            htmlx = obj[property].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                            var htmlx = obj[property].replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
                             htmlx = htmlx.replace(/\&lt;form/g, "<br><b>&lt;form</b>");
                             htmlx = htmlx.replace(/\&lt;table/g, "<br><b>&lt;table</b>");
                             htmlx = htmlx.replace(/\&lt;tr/g, "<br><b>&lt;tr</b>");
@@ -1660,6 +1660,7 @@
         var line = "";
         var res = "";
         var attrs = [];
+        var cont = "";
         try {
             delete format.attributes;
             for (var property in format) {
@@ -2586,9 +2587,6 @@
         return esriy;
     };
 
-
-
-
     /**
      * moonphase - berechnet aus dem Datum die Mondphase
      * https://gist.github.com/endel/dfe6bb2fbe679781948c
@@ -2685,7 +2683,7 @@
             return {
                 month: 1,
                 day: tint + 1
-            }
+            };
         }
         var uihelpermd = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         if (uihelper.isleapyear(tyear)) {
@@ -2703,13 +2701,13 @@
                 return {
                     month: itmon + 1,
                     day: tint - ttt.mend + uihelpermd[itmon] + 1 + 1
-                }
+                };
             } else {
-                ttt.mend += uihelpermd[itmon]
+                ttt.mend += uihelpermd[itmon];
             }
         }
         return false;
-    }
+    };
 
     /**
      * Qualitätsdaten in einem Jahr prüfen
@@ -3038,32 +3036,11 @@
     /**
      * uihelper.copyHtml2clipboard
      * @param {*} eHtml - kann jQuery-Object, DOM-Object, id-String oder HTML-String sein
-     * return true oder false
+     * @param {*} htmlfilename - optional, Default ist "station.html"
+     * return true
      */
     uihelper.copyHtml2clipboard = function (eHtml, htmlfilename) {
         var urlField = "";
-        // https://stackoverflow.com/questions/26053004/copy-whole-html-table-to-clipboard-javascript
-        /*
-        var body = document.body, range, sel;
-        if (document.createRange && window.getSelection) {
-            range = document.createRange();
-            sel = window.getSelection();
-            sel.removeAllRanges();
-            try {
-                range.selectNodeContents(eHtml);
-                sel.addRange(range);
-            } catch (e) {
-                range.selectNode(eHtml);
-                sel.addRange(range);
-            }
-        } else if (body.createTextRange) {
-            range = body.createTextRange();
-            range.moveToElementText(eHtml);
-            range.select();
-            document.execCommand("copy");
-        }
-        */
-        debugger;
         if (typeof eHtml === "object") {
             if (eHtml instanceof jQuery) {
                 urlField = $(eHtml).html();
@@ -3082,8 +3059,6 @@
                 urlField = $("#" + eHtml).html(); // $(this).parent().find("div")[0];
             }
         }
-
-
 
         var copyh = "";
         copyh += "<html>";
@@ -3106,34 +3081,10 @@
             sysbase.putMessage("HTML-Element bereitgestellt");
             return true;
         });
-
-
-
-        /*
-        var range = document.createRange();
-        range.selectNode(urlField);
-        window.getSelection().addRange(range);
-
-        document.execCommand('copy');
-        if (window.getSelection) {
-            window.getSelection().removeAllRanges();
-        } else if (document.selection) {
-            document.selection.empty();
-        }
-        */
-       /*
-        sysbase.putMessage("HTML-Element copied to clipboard");
-        return true;
-        */
     };
 
 
-
-
-
-
     uihelper.getScrollbarHeight = function (el) {
-
         return el.getBoundingClientRect().height - el.scrollHeight;
     };
 

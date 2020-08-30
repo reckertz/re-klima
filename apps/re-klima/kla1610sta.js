@@ -1637,7 +1637,10 @@
                 }));
                 var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
                 var stationname = stationarray[confrecord.stationid];
-                var tabname = confrecord.stationid + " " + stationname;
+                var tabname = "Sammelauswertung";  // confrecord.stationid + " " + stationname;
+                if (selstations.length === 1) {
+                    tabname =  confrecord.stationid + " " + stationname;
+                }
                 var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
             }
