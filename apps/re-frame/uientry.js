@@ -515,26 +515,45 @@
                 } else if (epfield.type === "string" && epfield.class === "uiearea") {
                     var rows = epfield.rows || 5;
                     var cols = epfield.cols || 50;
-                    $(containerHash)
-                        .append($('<div/>', {
-                                class: "ui-field-contain",
-                                width: "95%"
-                            })
-                            .append($('<label/>', {
-                                for: pageprefix + epfieldname,
-                                text: epfield.title
-                            }))
-                            .append($("<textarea/>", {
-                                id: pageprefix + epfieldname,
-                                name: epfieldname,
-                                class: "uiearea" + " " + epfield.customclasses,
-                                bctype: bctype,
-                                type: epfield.type,
-                                rows: rows,
-                                cols: cols,
-                                "data-mini": true
-                            }))
-                        );
+                    if (epfield.title.trim().length > 0) {
+                        $(containerHash)
+                            .append($('<div/>', {
+                                    class: "ui-field-contain",
+                                    width: "95%"
+                                })
+                                .append($('<label/>', {
+                                    for: pageprefix + epfieldname,
+                                    text: epfield.title
+                                }))
+                                .append($("<textarea/>", {
+                                    id: pageprefix + epfieldname,
+                                    name: epfieldname,
+                                    class: "uiearea" + " " + epfield.customclasses,
+                                    bctype: bctype,
+                                    type: epfield.type,
+                                    rows: rows,
+                                    cols: cols,
+                                    "data-mini": true
+                                }))
+                            );
+                    } else {
+                        $(containerHash)
+                            .append($('<div/>', {
+                                    class: "ui-field-contain",
+                                    width: "95%"
+                                })
+                                .append($("<textarea/>", {
+                                    id: pageprefix + epfieldname,
+                                    name: epfieldname,
+                                    class: "uiearea" + " " + epfield.customclasses,
+                                    bctype: bctype,
+                                    type: epfield.type,
+                                    rows: rows,
+                                    cols: cols,
+                                    "data-mini": true
+                                }))
+                            );
+                    }
                     if (typeof epfield.maxlength !== "undefined" && !isNaN(epfield.maxlength)) {
                         $("#" + pageprefix + epfieldname).attr("maxLength", epfield.maxlength);
                     }

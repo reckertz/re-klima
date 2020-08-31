@@ -9,7 +9,6 @@ var async = require("async");
 
 var express = require("express");
 var bodyParser = require("body-parser");
-var path = require("path");
 
 var session = require('express-session');
 var FileStore = require('session-file-store')(session);
@@ -573,6 +572,89 @@ app.get('/getsql3index', function (req, res) {
 });
 
 
+/**
+ * getcontfiles  - generische Funktion
+ * holt content eines Directory mit direkter Vorgabe
+ * directory als array oder string
+ * wenn es nicht gefunden wird, dann wird es zu root versucht.
+ */
+app.get('/getdirectory', function (req, res) {
+    if (checkSession(req, res)) return;
+    var directory = "";
+    if (req.query && typeof req.query.directory !== "undefined" && req.query.directory.length > 0) {
+        directory = req.query.directory;
+    }
+    var rootdir = path.dirname(require.main.filename);
+
+    if (typeof directory === "object" && Array.isArray(directory)) {
+        var startdir = directory[0] || "";
+        for (var idir = 1; idir < directory.length; idir++) {
+            startdir = path.join(startdir, directory[idir]);
+        }
+        directory = startdir;
+    }
+
+    var searchdir = "";
+    if (fs.existsSync(directory)) {
+        searchdir = directory;
+    } else if (fs.existsSync(path.join(rootdir, directory))) {
+        searchdir = path.join(rootdir, directory);
+    } else {
+        var smsg = JSON.stringify({
+            error: true,
+            message: "directory not found:" + directory
+        });
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    }
+    async.waterfall([
+        function (cbdir) {
+            fs.readdir(searchdir, function (error, dirs) {
+                var ret = {};
+                ret.files = [];
+                for (var i = 0; i < dirs.length; i++) {
+                    try {
+                        var dirinfo = {};
+                        dirinfo.name = dirs[i];
+                        dirinfo.directory = directory;
+                        dirinfo.fullname = path.join(directory, dirs[i]);
+                        var info = fs.lstatSync(dirinfo.fullname);
+                        dirinfo.isFile = info.isFile();
+                        dirinfo.isDirectory = info.isDirectory();
+                        ret.files.push(dirinfo);
+                    } catch (err) {
+                        var errinfo = {};
+                        errinfo.name = err.message;
+                        errinfo.error = true;
+                        ret.files.push(errinfo);
+                    }
+                }
+                cbdir ("finish", ret);
+                return;
+            });
+        }
+    ],
+    function(error, ret) {
+        ret.error = false;
+        if (error !== "finish") {
+            ret.error = true;
+            ret.message = error;
+        }
+        ret.message = "Directory aufgelöst:" + ret.files.length;
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
 
 
 /**

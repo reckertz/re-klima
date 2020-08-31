@@ -329,7 +329,7 @@ body:not(:-moz-handler-blocked) .ui-field-contain {
     margin-left: 20px;
     */
     height: 20px;
-    width: 250px;
+    width: 350;
     /* border: 1px solid #000; */
     margin-top: 10px;
     float: left;

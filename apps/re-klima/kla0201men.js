@@ -145,6 +145,13 @@
                 htmlpage: "klatext.html"
             },
             {
+                id: "admin0028",
+                text: "Redaktionssystem",
+                app: "re-system",
+                module: "contadm",
+                htmlpage: "klatext.html"
+            },
+            {
                 id: "admin0030",
                 text: "Codes and Keys",
                 app: "re-frame",
