@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Image-Dateien auswaehlen</title>
+    <meta name="description" content="Klima Image-App" />
+    <meta name="cache-control" content="no-cache, no-store">
+    <meta name="keywords" content="Node.js, JavaScript, CKEditor, Images">
+    <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
+    <!-- https://ckeditor.com/docs/ckeditor4/latest/guide/dev_file_browser_api.html#interaction-between-ckeditor-4-and-file-manager  -->
+    <link href="css/klistyles.css" rel="stylesheet" />
+    <script src="lib/async.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.backDetect.js"></script>
+    <script src="lib/jquery.cookie.min.js"></script>
+    <script type="text/javascript" src="/apps/re-frame/sysbase.js"></script>
+    <style>
+        .gallery {
+            list-style: none outside none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .gallery li {
+            float: left;
+            width: 33%;
+
+            overflow: hidden;
+            margin: 0;
+            padding: 0;
+        }
+
+        .gallery li img {
+            width: 100%;
+            height: auto;
+        }
+
+        .comment-image,
+        .gallery li,
+        .post-small .image,
+        .post-image,
+        .portfolio-item {
+            display: block;
+            position: relative;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
+        <span class="headertitle" style="color:red;font-weight:bold;">CKEditor 2- Image Auswahl mit ckbrowser</span>
+        <noscript>
+            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+                <span style="color:blue">
+                    Your browser does not support scripts, you have to enable it to run this page
+                </span>
+            </div>
+        </noscript>
+    </div>
+    <div class="content">
+
+        <ul class="gallery">
+            <li> <a href="#">
+                    <img src="http://archangle.mink7.com/img/portfolios/video.jpg" alt="video" />
+                    <span><i class="fa fa-link"></i></span>
+                </a>
+            </li>
+        </ul>
+        <button onclick="returnFileUrl()">Select File</button>
+        <button onclick='showfiles("list", "", "images")'>Load Files</button>
+    </div>
+    <div class="footer">
+    </div>
+    <script>
+        console.log("document ready ckbrowser");
+        $(window).off("resize");
+        $(window).resize(function () {
+            var hh = $(".header").outerHeight();
+            var fh = $(".footer").outerHeight();
+            var wh = $(window).height();
+            $(".content").height(wh - hh - fh - 1);
+            // $(".content").css("overflow", "auto");
+        });
+        $(document).ready(function () {
+            console.log("document ready ckbrowser");
+            console.log("vor showfiles");
+            showfiles("list", "", "images", function (ret) {
+                // hier werden die Bilder angezeigt mit Hintergrund
+                console.log("nach showfiles");
+            });
+            $('body').backDetect(function () {
+                alert("The back-button terminates the app (2)");
+            });
+            if (window.location.href.indexOf("localhost") >= 0) {
+                $("body").css({
+                    "background-color": "#5ff80611"
+                });
+            }
+            var app = "";
+            var target = "";
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                app = urlParams.get('app');
+                target = urlParams.get('target');
+            } catch (err) {
+
+            }
+
+        });
+        /**
+         * showfiles - holt die vorhandenen Datendateien aus dem Verzeichnis
+         * fileopcode: list
+         * url: deprecated
+         * directory - Verzeichnis der Images und evtl Unterverzeichnisse
+         * ret.files - Array der gefundenen Dateien (Metadaten der Dateien)
+         *    die Daten werden ausgegeben in Listen
+         */
+        function showfiles(fileopcode, url, directory, callback) {
+            console.log("showfiles gestartet");
+            var jqxhr = $.ajax({
+                method: "GET",
+                crossDomain: false,
+                url: sysbase.getServer("getdirectory"),
+                data: {
+                    fileopcode: fileopcode,
+                    url: url,
+                    directory: directory
+                }
+            }).done(function (r1, textStatus, jqXHR) {
+                console.log("showfiles nach API");
+                sysbase.checkSessionLogin(r1);
+                sysbase.putMessage(r1, 1);
+                var ret = JSON.parse(r1);
+                // Ausgabe in Map rechts
+                $(".gallery").empty();
+
+                var h = $(".content").height();
+                var hh = $(".header").height();
+                h += hh;
+                var fh = $(".footer").height();
+                h -= fh - 3;
+                // $("#ckbrowser_leftw").height(h);
+
+                var filenodes = [];
+                debugger;
+                for (var ilink = 0; ilink < ret.files.length; ilink++) {
+                    var ftype = "File";
+                    if (ret.files[ilink].isDirectory === true) {
+                        ftype = "Directory";
+                        $(".gallery")
+                            .append($("<li/>", {
+                                    fullname: ret.files[ilink].fullname,
+                                    urlname: ret.files[ilink].urlname,
+                                    ftype: ftype
+                                })
+                                .append($("<a/>", {
+                                        href: "#",
+                                        class: "ckbrowserdir"
+                                    })
+                                    .append($("<span/>", {
+                                        html: ret.files[ilink].urlname
+                                    }))
+                                    .append($("<span/>", {
+                                        html: ftype
+                                    }))
+                                )
+                            );
+                    } else {
+                        $(".gallery")
+                            .append($("<li/>", {
+                                    fullname: ret.files[ilink].fullname,
+                                    urlname: ret.files[ilink].urlname,
+                                    ftype: ftype
+                                })
+                                .append($("<a/>", {
+                                        href: "#",
+                                        class: "ckbrowserfile"
+                                    })
+                                    .append($("<img/>", {
+                                        src: ret.files[ilink].urlname,
+                                        alt: ret.files[ilink].urlname
+                                    }))
+                                    .append($("<span/>", {
+                                        class: "fa fa-link",
+                                        html: ret.files[ilink].urlname
+                                    }))
+                                    .append($("<span/>", {
+                                        html: ftype
+                                    }))
+                                )
+                            );
+                    }
+                    /*
+                    var linksize = ret.files[ilink].size || "?";
+                    var tsfilecreated = ret.files[ilink].tsfilecreated || "?";
+                    */
+                }
+            }).fail(function (err) {
+                document.getElementById("ckbrowser").style.cursor = "default";
+                sysbase.putMessage(err, 1);
+                return;
+            }).always(function () {
+                // nope
+            });
+        }
+
+        // Helper function to get parameters from the query string.
+        function getUrlParam(paramName) {
+            var reParam = new RegExp('(?:[\?&]|&)' + paramName + '=([^&]+)', 'i');
+            var match = window.location.search.match(reParam);
+            return (match && match.length > 1) ? match[1] : null;
+        }
+
+
+
+        $(document).on("click", ".ckbrowserdir", function (evt) {
+            evt.preventDefault();
+            var urlname = $(this).parent().attr("urlname");
+            showfiles("list", "", urlname, function (ret) {
+                console.log("Subdirectory");
+            });
+        });
+
+
+        $(document).on("click", ".ckbrowserfile", function (evt) {
+            evt.preventDefault();
+            var urlname = $(this).parent().attr("urlname");
+            var funcNum = getUrlParam('CKEditorFuncNum');
+            var fileUrl = urlname;
+            window.opener.CKEDITOR.tools.callFunction(funcNum, fileUrl);
+            window.close();
+        });
+    </script>
+
+</body>
+
+</html>

@@ -593,12 +593,13 @@ app.get('/getdirectory', function (req, res) {
         }
         directory = startdir;
     }
-
     var searchdir = "";
     if (fs.existsSync(directory)) {
         searchdir = directory;
     } else if (fs.existsSync(path.join(rootdir, directory))) {
         searchdir = path.join(rootdir, directory);
+    } else if (fs.existsSync(path.join(rootdir, "static", directory))) {
+        searchdir = path.join(rootdir, "static", directory);
     } else {
         var smsg = JSON.stringify({
             error: true,
@@ -621,7 +622,8 @@ app.get('/getdirectory', function (req, res) {
                         var dirinfo = {};
                         dirinfo.name = dirs[i];
                         dirinfo.directory = directory;
-                        dirinfo.fullname = path.join(directory, dirs[i]);
+                        dirinfo.fullname = path.join(searchdir, dirs[i]);
+                        dirinfo.urlname = path.join(directory, dirs[i]);
                         var info = fs.lstatSync(dirinfo.fullname);
                         dirinfo.isFile = info.isFile();
                         dirinfo.isDirectory = info.isDirectory();
@@ -873,6 +875,41 @@ app.get('/getfileasstring', function (req, res) {
         }
     });
 });
+
+/**
+ * /upload für CKEditor
+*/
+app.post("/upload", function (req, res) {
+    var dest, fileName, fs, l, tmpPath;
+    fs = require('fs');
+    tmpPath = req.files.upload.path;
+    l = tmpPath.split('/').length;
+    fileName = tmpPath.split('/')[l - 1] + "_" + req.files.upload.name;
+    dest = __dirname + "/public/uploads/" + fileName;
+    fs.readFile(req.files.upload.path, function(err, data) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      fs.writeFile(dest, data, function(err) {
+        var html;
+        if (err) {
+          console.log(err);
+          return;
+        }
+        html = "";
+        html += "<script type='text/javascript'>";
+        html += "    var funcNum = " + req.query.CKEditorFuncNum + ";";
+        html += "    var url     = \"/uploads/" + fileName + "\";";
+        html += "    var message = \"Uploaded file successfully\";";
+        html += "";
+        html += "    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);";
+        html += "</script>";
+        res.send(html);
+      });
+    });
+});
+
 
 
 
@@ -1392,12 +1429,6 @@ app.get('/stationhyde', function (req, res) {
             return;
         }
     );
-
-
-
-
-
-
 });
 
 

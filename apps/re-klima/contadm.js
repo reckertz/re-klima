@@ -1,6 +1,6 @@
 /*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
-/*global sysbase,uihelper,uientry */
+/*global sysbase,uihelper,uientry,CKEDITOR */
 (function () {
     var contadm = {};
 
@@ -600,10 +600,11 @@
                         contrecord.fullname = fullname;
                         uientry.fromRecord2UI("#contadmform1", contrecord, contschema);
                     }
+                    // AJAX
                     CKEDITOR.replace( 'contadmcontent', {
                         width: "100%",
-                        "extraPlugins": "imagebrowser",
-		                "imageBrowser_listUrl": "/path/to/images_list.json"
+                        filebrowserBrowseUrl: '/ckbrowser.html'
+
                       });
                     // $("#contadmform1")
                     $("#contadmcontdatadiv")
