@@ -620,51 +620,51 @@ app.get('/getdirectory', function (req, res) {
         return;
     }
     async.waterfall([
-        function (cbdir) {
-            fs.readdir(searchdir, function (error, dirs) {
-                var ret = {};
-                ret.files = [];
-                for (var i = 0; i < dirs.length; i++) {
-                    try {
-                        var dirinfo = {};
-                        dirinfo.name = dirs[i];
-                        dirinfo.directory = directory;
-                        dirinfo.fullname = path.join(searchdir, dirs[i]);
-                        dirinfo.urlname = path.join(directory, dirs[i]);
-                        var info = fs.lstatSync(dirinfo.fullname);
-                        dirinfo.isFile = info.isFile();
-                        dirinfo.isDirectory = info.isDirectory();
-                        dirinfo.size = info.size;
-                        ret.files.push(dirinfo);
-                    } catch (err) {
-                        var errinfo = {};
-                        errinfo.name = err.message;
-                        errinfo.error = true;
-                        ret.files.push(errinfo);
+            function (cbdir) {
+                fs.readdir(searchdir, function (error, dirs) {
+                    var ret = {};
+                    ret.files = [];
+                    for (var i = 0; i < dirs.length; i++) {
+                        try {
+                            var dirinfo = {};
+                            dirinfo.name = dirs[i];
+                            dirinfo.directory = directory;
+                            dirinfo.fullname = path.join(searchdir, dirs[i]);
+                            dirinfo.urlname = path.join(directory, dirs[i]);
+                            var info = fs.lstatSync(dirinfo.fullname);
+                            dirinfo.isFile = info.isFile();
+                            dirinfo.isDirectory = info.isDirectory();
+                            dirinfo.size = info.size;
+                            ret.files.push(dirinfo);
+                        } catch (err) {
+                            var errinfo = {};
+                            errinfo.name = err.message;
+                            errinfo.error = true;
+                            ret.files.push(errinfo);
+                        }
                     }
-                }
-                cbdir ("finish", ret);
-                return;
+                    cbdir("finish", ret);
+                    return;
+                });
+            }
+        ],
+        function (error, ret) {
+            ret.error = false;
+            if (error !== "finish") {
+                ret.error = true;
+                ret.message = error;
+            }
+            ret.message = "Directory aufgelöst:" + ret.files.length;
+            ret.parentdirectory = parentdirectory;
+            // in ret liegen error, message und record
+            var smsg = JSON.stringify(ret);
+            res.writeHead(200, {
+                'Content-Type': 'application/text',
+                "Access-Control-Allow-Origin": "*"
             });
-        }
-    ],
-    function(error, ret) {
-        ret.error = false;
-        if (error !== "finish") {
-            ret.error = true;
-            ret.message = error;
-        }
-        ret.message = "Directory aufgelöst:" + ret.files.length;
-        ret.parentdirectory = parentdirectory;
-        // in ret liegen error, message und record
-        var smsg = JSON.stringify(ret);
-        res.writeHead(200, {
-            'Content-Type': 'application/text',
-            "Access-Control-Allow-Origin": "*"
+            res.end(smsg);
+            return;
         });
-        res.end(smsg);
-        return;
-    });
 });
 
 
@@ -887,7 +887,7 @@ app.get('/getfileasstring', function (req, res) {
 
 /**
  * /upload für CKEditor
-*/
+ */
 app.post("/upload", function (req, res) {
     var dest, fileName, fs, l, tmpPath;
     fs = require('fs');
@@ -895,27 +895,27 @@ app.post("/upload", function (req, res) {
     l = tmpPath.split('/').length;
     fileName = tmpPath.split('/')[l - 1] + "_" + req.files.upload.name;
     dest = __dirname + "/public/uploads/" + fileName;
-    fs.readFile(req.files.upload.path, function(err, data) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      fs.writeFile(dest, data, function(err) {
-        var html;
+    fs.readFile(req.files.upload.path, function (err, data) {
         if (err) {
-          console.log(err);
-          return;
+            console.log(err);
+            return;
         }
-        html = "";
-        html += "<script type='text/javascript'>";
-        html += "    var funcNum = " + req.query.CKEditorFuncNum + ";";
-        html += "    var url     = \"/uploads/" + fileName + "\";";
-        html += "    var message = \"Uploaded file successfully\";";
-        html += "";
-        html += "    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);";
-        html += "</script>";
-        res.send(html);
-      });
+        fs.writeFile(dest, data, function (err) {
+            var html;
+            if (err) {
+                console.log(err);
+                return;
+            }
+            html = "";
+            html += "<script type='text/javascript'>";
+            html += "    var funcNum = " + req.query.CKEditorFuncNum + ";";
+            html += "    var url     = \"/uploads/" + fileName + "\";";
+            html += "    var message = \"Uploaded file successfully\";";
+            html += "";
+            html += "    window.parent.CKEDITOR.tools.callFunction(funcNum, url, message);";
+            html += "</script>";
+            res.send(html);
+        });
     });
 });
 
@@ -2426,8 +2426,54 @@ app.post("/saveBase64ToGif", function (req, res) {
     ]);
 });
 
+app.get("/generate", function (req, res) {
+    if (req.query && typeof req.query.contentpath !== "undefined" && req.query.contentpath.length > 0) {}
+    /**
+     * template lesen in den Speicher als string
+     * Sätze in KLICONTFILES lesen - alle
+     * jeweils template aufbereiten mit den Platzhaltern nach Ausgabestring
+     * Ausgabestring in Zieldatei schreiben
+     */
+    var rootdir = path.dirname(require.main.filename);
+    var contentpath = path.join(rootdir, "content");
+    var templatepath = path.join(contentpath, "template.html");
+    var template = fs.readFileSync(templatepath, "utf8");
+
+    var reqparm = {};
+    reqparm.table = "KLICONTFILES";
+    reqparm.sel = {};
+    reqparm.projection = {};
+    sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+        var ret = {};
+        if (ret1.error === true) {
+            ret.message += " keine KLICONTFILES:" + ret1.error;
+        } else {
+            if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                for (var recordind in ret1.records) {
+                    var record = ret1.records[recordind];
+                    var newtemplate = template;
+                    newtemplate = newtemplate.replace("&header&", record.title);
+                    newtemplate = newtemplate.replace("&content&", record.content);
+                    var fullname = path.join(contentpath, record.filename);
+                    fs.writeFileSync(fullname, newtemplate);
+                }
+            }
+        }
+        ret = {
+            error: false,
+            message: "Dateien generiert",
+            path: path
+        };
+        var smsg1 = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text'
+        });
+        res.end(smsg1);
+        return;
 
 
+    });
+});
 
 
 

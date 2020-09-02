@@ -9,6 +9,7 @@
         this;
 
     var predir = ["C:", "Projekte", "re-klima", "content"];
+    var editor;
     var contschema = {
         entryschema: {
             contdata: {
@@ -202,198 +203,70 @@
                         width: "100%"
                     }
                 })
-                .append($("<button/>", {
-                    html: "Tree Save",
+                .append($("<input/>", {
+                    type: "search",
+                    id: "contadmsearch",
                     css: {
                         float: "left",
-                        "margin-left": "10px",
-                        "background-color": "navyblue"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        var selfields = {
-                            username: uihelper.getUsername(),
-                            configname: "CONTTREE"
-                        };
-                        var updfields = {};
-                        var api = "setonerecord";
-                        var table = "KLICONFIG";
-                        var confrecord = {};
-                        try {
-                            var treeData = $('#contadmt0').jstree(true).get_json('#', {
-                                flat: false
-                            });
-                            // set flat:true to get all nodes in 1-level json
-                            var jsonString = JSON.stringify(treeData);
-                            updfields["$setOnInsert"] = {
-                                username: uihelper.getUsername(),
-                                configname: "CONTTREE"
-                            };
-                            updfields["$set"] = {
-                                jsonString: jsonString
-                            };
-                            uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
-                                if (ret.error === false) {
-                                    sysbase.putMessage("contadm" + " saved:" + ret.message, 1);
-                                    return;
-                                } else {
-                                    sysbase.putMessage("contadm" + " NOT saved:" + ret.message, 3);
-                                    return;
-                                }
-                            });
-                        } catch (err) {
-                            sysbase.putMessage("contadm" + " ERROR:" + err, 3);
-                            return;
-                        }
-                    }
-                }))
-                .append($("<button/>", {
-                    html: "Tree Restore",
-                    css: {
-                        float: "left",
-                        "margin-left": "10px",
-                        "background-color": "navyblue"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        var sel = {
-                            username: uihelper.getUsername(),
-                            configname: "CONTTREE"
-                        };
-                        var projection = {
-                            history: 0
-                        };
-                        var api = "getonerecord";
-                        var table = "KLICONFIG";
-                        uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-                            if (ret.error === false && ret.record !== null) {
-                                /*
-                                    var treeData = $('#MyTree').jstree(true).get_json('#', {flat:false})
-                                    // set flat:true to get all nodes in 1-level json
-                                    var jsonData = JSON.stringify(treeData );
-                                */
-                                var filenodes = JSON.parse(ret.record.jsonString);
-                                if ($("#contadmt0").hasClass("jstree")) $("#contadmt0").jstree(true).destroy();
-                                // "checkbox"
-                                $("#contadmt0").jstree({
-                                    "plugins": ["state"],
-                                    core: {
-                                        'check_callback': true,
-                                        data: filenodes
-                                    }
-                                });
-                                sysbase.putMessage("Konfiguration geladen");
-                            } else {
-                                sysbase.putMessage("Konfiguration nicht vorhanden");
-                            }
-                        });
-                    }
-                }))
-                .append($("<button/>", {
-                    html: "Tree Refresh",
-                    css: {
-                        float: "left",
-                        "margin-left": "10px",
-                        "background-color": "navyblue"
-                    },
-                    click: function (evt) {
-                        evt.preventDefault();
-                        // C:\Projekte\re-klima\content
-                        contadm.showfiles("list", "", predir, "", function (ret) {
-                            return;
-                        });
+                        margin: "10px"
                     }
                 }))
 
                 .append($("<button/>", {
-                    html: "KLICONTFILES-Reorg",
-                    title: "Dateieinträge ohne physische Datei werden entfernt, History wird geschrieben",
+                    html: "Filter",
+                    title: "Selektive Anzeige",
                     css: {
                         float: "left",
-                        "margin-left": "10px",
+                        "margin": "10px",
                         "background-color": "navyblue"
                     },
                     click: function (evt) {
                         evt.preventDefault();
-                        contadm.showfiles("list", "", predir, "", function (ret) {
+                        $("#contadmt0").jstree("search", $("#contadmsearch").val());
+                    }
+                }))
+                .append($("<button/>", {
+                    html: "Generieren",
+                    title: "Generierunge der HTML-Seiten mit den Bildverweisen",
+                    css: {
+                        float: "left",
+                        "margin": "10px",
+                        "background-color": "navyblue"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // $("#contadmt0").jstree("search",$("#contadmsearch").val());
+
+                        var jqxhr = $.ajax({
+                            method: "GET",
+                            crossDomain: false,
+                            url: sysbase.getServer("generate"),
+                            data: {
+                               contentpath: "content"
+                            }
+                        }).done(function (r1, textStatus, jqXHR) {
+                            sysbase.checkSessionLogin(r1);
+                            var j1 = JSON.parse(r1);
+                            if (j1.error === false) {
+                                sysbase.putMessage(" Generierung erfolgt", 1);
+                            } else {
+                                sysbase.putMessage("Generierung ERROR:" + j1.message, 3);
+                            }
                             return;
+                        }).fail(function (err) {
+                            sysbase.putMessage("Generierung AJAX ERROR:" + err.message);
+                            return;
+                        }).always(function () {
+                            // nope
                         });
                     }
                 }))
+
                 .append($("<br/>"))
                 .append($("<br/>"))
             );
-
-        var sel = {
-            username: uihelper.getUsername(),
-            configname: "CONTTREE"
-        };
-        var projection = {
-            history: 0
-        };
-        var api = "getonerecord";
-        var table = "KLICONFIG";
-        uihelper.getOneRecord(sel, projection, api, table, function (ret) {
-            if (ret.error === false && ret.record !== null) {
-                /*
-                    var treeData = $('#MyTree').jstree(true).get_json('#', {flat:false})
-                    // set flat:true to get all nodes in 1-level json
-                    var jsonData = JSON.stringify(treeData );
-                */
-                var filenodes = JSON.parse(ret.record.jsonString);
-                $("#contadm_leftw").remove();
-                $("#contadm_left")
-                    .append($("<div/>", {
-                        id: "contadm_leftw",
-                        css: {
-                            overflow: "auto",
-                            float: "left",
-                            width: "100%"
-                        }
-                    }));
-                var h = $(".content").height();
-                var loff = $("#contadm_leftw").position();
-                var ot = loff.top;
-                h -= ot;
-                var hh = $(".header").height();
-                h += hh;
-                var fh = $(".footer").height();
-                h -= fh - 3;
-                $("#contadm_leftw").height(h);
-                $("#contadm_leftw").hide();
-                $("#contadmt0").remove();
-
-                $("#contadm_leftw")
-                    .append($("<div/>", {
-                        id: "contadmt0",
-                        css: {
-                            width: "100%"
-                        }
-                    }));
-
-                if ($("#contadmt0").hasClass("jstree")) $("#contadmt0").jstree(true).destroy();
-                $("#contadmt0").jstree({
-                    "plugins": ["state"],
-                    core: {
-                        'check_callback': true,
-                        data: filenodes
-                    }
-                });
-                $("#contadm_leftw").show();
-                $('#contadmt0').on("select_node.jstree", function (e, data) {
-                    var node = $('#contadmt0').jstree(true).get_node(data.node.id);
-                    contadm.clicknode(node, function (ret) {
-
-                    });
-                    //alert("node_id: " + data.node.id + " " + node.text);
-                });
-                sysbase.putMessage("Konfiguration geladen");
-            } else {
-                sysbase.putMessage("Konfiguration nicht vorhanden");
-                contadm.showfiles("list", url, predir, "", function (ret) {
-                    return;
-                });
-            }
+        contadm.showfiles("list", url, predir, "", function (ret) {
+            return;
         });
     };
 
@@ -444,20 +317,21 @@
      */
     contadm.showfiles = function (fileopcode, url, predirectory, directory, callback) {
         document.getElementById("contadm").style.cursor = "progress";
-        var jqxhr = $.ajax({
-            method: "GET",
-            crossDomain: false,
-            url: sysbase.getServer("getdirectory"),
-            data: {
-                fileopcode: fileopcode,
-                url: url,
-                directory: predirectory
+        var sqlStmt = "SELECT filename, fullname ";
+        sqlStmt += " FROM KLICONTFILES";
+        sqlStmt += " ORDER BY filename";
+        var table = "KLICONTFILES";
+        var api = "getallrecords";
+        uihelper.getAllRecords(sqlStmt, {}, [], 0, 0, api, table, function (ret) {
+            if (ret.error === true) {
+                sysbase.putMessage(ret.message, 3);
+                if (typeof callback !== "undefined") {
+                    callback(ret);
+                    return;
+                } else {
+                    return;
+                }
             }
-        }).done(function (r1, textStatus, jqXHR) {
-            sysbase.checkSessionLogin(r1);
-            sysbase.putMessage(r1, 1);
-            var ret = JSON.parse(r1);
-            // Ausgabe in Map rechts
             $("#contadm_leftw").remove();
             $("#contadm_left")
                 .append($("<div/>", {
@@ -488,47 +362,87 @@
                     }
                 }));
             var filenodes = [];
-            for (var ilink = 0; ilink < ret.files.length; ilink++) {
-                var linkname = ret.files[ilink].name;
-                var linksize = ret.files[ilink].size || "?";
-                var tsfilecreated = ret.files[ilink].tsfilecreated || "?";
-                /*
-                    // Expected format of the node (there are no required fields)
-                    {
-                    id          : "string" // will be autogenerated if omitted
-                    text        : "string" // node text
-                    icon        : "string" // string for custom
-                    state       : {
-                        opened    : boolean  // is the node open
-                        disabled  : boolean  // is the node disabled
-                        selected  : boolean  // is the node selected
-                    },
-                    children    : []  // array of strings or objects
-                    li_attr     : {}  // attributes for the generated LI node
-                    a_attr      : {}  // attributes for the generated A node
+            if (typeof ret.records !== "undefined" && ret.records !== null && Object.keys(ret.records).length > 0) {
+                // Ausgabe in jstree links
+                for (var ilink in ret.records) {
+                    if (ret.records.hasOwnProperty(ilink)) {
+                        var record = ret.records[ilink];
+                        var linkname = record.filename;
+                        var filenode = {
+                            text: linkname,
+                        };
+                        filenode.li_attr = {
+                            fullname: record.fullname,
+                            filename: record.filename,
+                        };
+                        filenode.icon = "jstree-file";
+                        filenode.li_attr.what = "file";
+                        filenodes.push(filenode);
                     }
-                */
-                var filenode = {
-                    text: linkname,
-                };
-                filenode.li_attr = {
-                    fullname: ret.files[ilink].fullname,
-                    filename: ret.files[ilink].name,
-                };
-                if (ret.files[ilink].isDirectory === true || ret.files[ilink].isDirectory === "1") {
-                    filenode.children = [];
-                    filenode.li_attr.what = "directory";
-                } else {
-                    filenode.icon = "jstree-file";
-                    filenode.li_attr.what = "file";
                 }
-                filenodes.push(filenode);
-            }
+            } else {
+                $("#contadmform1").empty();
+                // einfache Dateianzeige, inhalt
+                // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
+                uientry.getSchemaUI("contadm", contschema, "contadm", "contadm" + "form1", function (ret) {
+                    if (ret.error === false) {
+                        // Formatierung
+                        $("#contadmcontdatadiv")
+                            .append($("<div/>", {
+                                    css: {
+                                        "text-align": "center",
+                                        width: "100%"
+                                    }
+                                })
+                                .append($("<button/>", {
+                                    class: "contadmActionSave",
+                                    css: {
+                                        "margin-left": "10px"
+                                    },
+                                    html: "Speichern",
+                                }))
+                                .append($("<button/>", {
+                                    class: "contadmActionDelete",
+                                    css: {
+                                        "margin-left": "10px"
+                                    },
+                                    html: "Löschen",
+                                }))
+                            );
+                        $("#contadmcontdatadiv").css({
+                            overflow: "auto"
+                        });
+                        var h = $("#contadm_entry").height();
+                        $("#contadmform1").height(h);
+                        var h1 = $("#contadmcontdatadiv").height();
+                        var h2 = h - h1 - 20;
+                        $("#contadmcontareadiv").height(h2);
 
+                        editor = CKEDITOR.replace('contadmcontent', {
+                            width: "100%",
+                            filebrowserBrowseUrl: '/ckbrowser.html',
+                            extraPlugins: 'smiley',
+
+                        });
+                        // https://stackoverflow.com/questions/13617111/i-cant-add-the-source-button-to-ckeditor-4s-toolbar
+                        editor.ui.addButton('InsertCustomImage', {
+                            label: "Speichern",
+                            command: 'insertImgCmd',
+                            toolbar: 'insert',
+                            icon: '/images/icons-png/arrow-d-black.png'
+                        });
+
+                    }
+                });
+            }
             if ($("#contadmt0").hasClass("jstree")) $("#contadmt0").jstree(true).destroy();
             // "checkbox"
             $("#contadmt0").jstree({
-                "plugins": ["state"],
+                "plugins": ["state", "search"],
+                "search": {
+                    case_sensitive: false,
+                    show_only_matches: true
+                },
                 core: {
                     'check_callback': true,
                     data: filenodes
@@ -540,23 +454,9 @@
             $('#contadmt0').on("select_node.jstree", function (e, data) {
                 var node = $('#contadmt0').jstree(true).get_node(data.node.id);
                 contadm.clicknode(node, function (ret) {
-
+                    //alert("node_id: " + data.node.id + " " + node.text);
                 });
-                //alert("node_id: " + data.node.id + " " + node.text);
             });
-
-            /*
-            $('#contadmt0').on("changed.jstree", function (e, data) {
-                console.log("The selected nodes are:");
-                console.log(data.selected);
-            });
-            */
-        }).fail(function (err) {
-            document.getElementById("contadm").style.cursor = "default";
-            sysbase.putMessage(err, 1);
-            return;
-        }).always(function () {
-            // nope
         });
     };
 
@@ -573,7 +473,6 @@
         // dirty-flag später
 
         $("#contadmform1").empty();
-
         // einfache Dateianzeige, inhalt
         // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
         uientry.getSchemaUI("contadm", contschema, "contadm", "contadm" + "form1", function (ret) {
@@ -592,6 +491,13 @@
                                 "margin-left": "10px"
                             },
                             html: "Speichern",
+                        }))
+                        .append($("<button/>", {
+                            class: "contadmActionDelete",
+                            css: {
+                                "margin-left": "10px"
+                            },
+                            html: "Löschen",
                         }))
                     );
                 $("#contadmcontdatadiv").css({
@@ -627,10 +533,18 @@
                     var h2 = h - h1 - 20;
                     $("#contadmcontareadiv").height(h2);
                     // AJAX
-                    CKEDITOR.replace('contadmcontent', {
+                    editor = CKEDITOR.replace('contadmcontent', {
                         width: "100%",
                         filebrowserBrowseUrl: '/ckbrowser.html',
-                        extraPlugins: 'smiley'
+                        extraPlugins: 'smiley',
+
+                    });
+                    // https://stackoverflow.com/questions/13617111/i-cant-add-the-source-button-to-ckeditor-4s-toolbar
+                    editor.ui.addButton('InsertCustomImage', {
+                        label: "Speichern",
+                        command: 'insertImgCmd',
+                        toolbar: 'insert',
+                        icon: '/images/icons-png/arrow-d-black.png'
                     });
                     // $("#contadmform1")
                     supercallback({
@@ -664,6 +578,38 @@
         try {
             contrecord = uientry.fromUI2Record("#contadmform1", contrecord, contschema);
             contrecord.content = CKEDITOR.instances.contadmcontent.getData();
+            // https://stackoverflow.com/questions/18101673/jquery-get-all-src-of-images-in-div-and-put-into-field
+            var imgsrcs = $(contrecord.content).find("img").map(function () {
+                return $(this).attr("src");
+            }).get();
+
+            var filename = contrecord.contdata.filename.trim().replace(/ /g, "_");
+            contrecord.contdata.filename = filename;
+            var foundid = "";
+            $("#contadmt0").find("[filename='" + filename + "']").each(function () {
+                //alert($(this).attr("id"));
+                foundid = $(this).attr("id");
+            });
+            if (foundid.length === 0) {
+                // neu hinzufügen
+                var filenode = {
+                    text: contrecord.contdata.filename
+                };
+                filenode.li_attr = {
+                    fullname: contrecord.contdata.fullname,
+                    filename: contrecord.contdata.filename
+                };
+                filenode.icon = "jstree-file";
+                filenode.li_attr.what = "file";
+
+                $("#contadmt0").jstree()
+                    .create_node('#', filenode, "last", function (newid) {
+                        sysbase.putMessage("Zugefügt:" + contrecord.contdata.filename + "=>" + newid);
+                        // $('#contadmt0').jstree('refresh');
+                        $('#contadmt0').jstree('redraw');
+                        $("#contadmb1").click();
+                    });
+            }
             selfields = {
                 filename: contrecord.contdata.filename
             };
@@ -673,7 +619,8 @@
             updfields["$set"] = {
                 title: contrecord.contdata.title,
                 fullname: contrecord.contdata.fullname,
-                content: contrecord.content
+                content: contrecord.content,
+                imgsrcs: JSON.stringify(imgsrcs)
             };
             uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
                 if (ret.error === false) {
@@ -690,6 +637,60 @@
             console.log(err.stack);
         }
     });
+
+
+    /**
+     * click on actionDelete, speichert nach Editierung
+     */
+    $(document).on("click", ".contadmActionDelete", function (event) {
+        event.preventDefault();
+
+        try {
+            contrecord = uientry.fromUI2Record("#contadmform1", contrecord, contschema);
+            contrecord.content = CKEDITOR.instances.contadmcontent.getData();
+            // https://stackoverflow.com/questions/18101673/jquery-get-all-src-of-images-in-div-and-put-into-field
+            var imgsrcs = $(contrecord.content).find("img").map(function () {
+                return $(this).attr("src");
+            }).get();
+            var filename = contrecord.contdata.filename.trim().replace(/ /g, "_");
+            contrecord.contdata.filename = filename;
+
+            var qmsg = "Sollen die Daten gelöscht werden für:" + filename;
+            var check = window.confirm(qmsg);
+            if (check === false) {
+                return;
+            }
+
+            var delStmt = "DELETE FROM KLICONTFILES";
+            delStmt += " WHERE filename = '" + filename + "'";
+            var api = "delonerecord";
+            var table = "KLICONTFILES";
+            var record = {};
+            $("body").css("cursor", "progress");
+            uihelper.delOneRecord(delStmt, api, table, record, function (ret) {
+                if (ret.error === false) {
+                    var foundid = "";
+                    debugger;
+                    $("#contadmt0").find("[filename='" + filename + "']").each(function () {
+                        //alert($(this).attr("id"));
+                        foundid = $(this).attr("id");
+                        $("#contadmt0").jstree("delete_node", "#" + foundid);
+                        $('#contadmt0').jstree('redraw');
+                    });
+                    sysbase.putMessage(filename + " gelöscht", 1);
+                } else {
+                    sysbase.putMessage(filename + " nicht gelöscht " + ret.message, 3);
+                }
+            });
+        } catch (err) {
+            alert(err);
+            sysbase.putMessage("contadm:" + err, 3);
+            console.log(err);
+            console.log(err.stack);
+        }
+    });
+
+
 
     /**
      * standardisierte Mimik zur Integration mit App, Browser und node.js
