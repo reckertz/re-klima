@@ -575,6 +575,11 @@
                         perftimer.sor.SELECT = new Date() - perftimer.sor.start;
                         perftimer.sor.start = new Date();
                         ret.alter = false;
+                        /**
+                         * Eine Fehlermeldung kann aus der WHERE-Klausel kommen oder aus fehlender Tabelle
+                         * das wird hier nicht differenziert!
+                         * also erst mal die Existenz abfragen!
+                         */
                         if (err) {
                             // wenn Tabelle nicht vorhanden, dann CREATE TABLE
                             if (err.message.indexOf("SQLITE_ERROR: no such table:") >= 0) {
@@ -602,6 +607,37 @@
                             ret.message += " " + ret.sorparms.table + " selected";
                         }
                         callback210(null, res, ret);
+                        return;
+                    });
+                },
+                function (res, ret, callback210a1) {
+                    /**
+                     * Es ist zu prüfen, ob der error wegen fehlender Tabelle oder fehlendem Feld kam
+                     */
+                    if (ret.createTable === false) {
+                        callback210a1(null, res, ret);
+                        return;
+                    }
+                    // SELECT name FROM sqlite_master WHERE type='table' AND name='yourTableName';
+                    var metaStmt = "SELECT name FROM sqlite_master WHERE type='table' AND name='" + table + "';";
+                    db.get(metaStmt, function (err, row) {
+                        if (err) {
+                            ret.alter = false;
+                            ret.createTable = true;
+                            ret.insert = true;
+                            ret.update = false;
+                        } else {
+                            if (row === null || row < 1) {
+                                ret.alter = false;
+                                ret.createTable = true;
+                                ret.insert = true;
+                                ret.update = false;
+                            } else {
+                                ret.alter = true;
+                                ret.createTable = false;
+                            }
+                        }
+                        callback210a1(null, res, ret);
                         return;
                     });
                 },

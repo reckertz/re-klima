@@ -8,30 +8,36 @@
         typeof global === 'object' && global.global === global && global ||
         this;
 
+    var predir = ["C:", "Projekte", "re-klima", "content"];
     var contschema = {
         entryschema: {
             contdata: {
-                title: "Vergleichsvorgaben",
+                title: "Dateiname",
                 description: "",
                 type: "object", // currency, integer, datum, text, key, object
                 class: "uiefieldset",
                 width: "90%",
                 properties: {
-                    fullname: {
-                        title: "Dateiname",
+                    title: {
+                        title: "Überschrift",
                         type: "string", // currency, integer, datum, text, key
                         class: "uietext",
-                        size: 150,
+                        width: "40em",
                         default: "",
                         io: "i"
                     },
-                    titel: {
-                        title: "Titel",
+                    filename: {
+                        title: "Dateiname",
                         type: "string", // currency, integer, datum, text, key
                         class: "uietext",
-                        size: 150,
-                        default: "",
+                        width: "25em",
                         io: "i"
+                    },
+                    fullname: {
+                        title: "Voller Name",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        io: "h"
                     }
                 }
             },
@@ -293,7 +299,6 @@
                     click: function (evt) {
                         evt.preventDefault();
                         // C:\Projekte\re-klima\content
-                        var predir = ["C:", "Projekte", "re-klima", "content"];
                         contadm.showfiles("list", "", predir, "", function (ret) {
                             return;
                         });
@@ -310,7 +315,6 @@
                     },
                     click: function (evt) {
                         evt.preventDefault();
-                        var predir = ["C:", "Projekte", "re-klima", "content"];
                         contadm.showfiles("list", "", predir, "", function (ret) {
                             return;
                         });
@@ -386,15 +390,12 @@
                 sysbase.putMessage("Konfiguration geladen");
             } else {
                 sysbase.putMessage("Konfiguration nicht vorhanden");
-                var predir = ["C:", "Projekte", "re-klima", "content"];
                 contadm.showfiles("list", url, predir, "", function (ret) {
                     return;
                 });
             }
         });
     };
-
-
 
     contadm.showclock = function (clockcontainer) {
         // Update the count down every 1 second
@@ -431,9 +432,6 @@
         }, 1000);
         return xclock;
     };
-
-
-
 
 
     /**
@@ -514,7 +512,8 @@
                     text: linkname,
                 };
                 filenode.li_attr = {
-                    fullname: ret.files[ilink].fullname
+                    fullname: ret.files[ilink].fullname,
+                    filename: ret.files[ilink].name,
                 };
                 if (ret.files[ilink].isDirectory === true || ret.files[ilink].isDirectory === "1") {
                     filenode.children = [];
@@ -570,6 +569,7 @@
      */
     contadm.clicknode = function (node, supercallback) {
         var fullname = node.li_attr.fullname;
+        var filename = node.li_attr.filename;
         // dirty-flag später
 
         $("#contadmform1").empty();
@@ -578,13 +578,32 @@
         // nur bei erste Anzeige, nicht beim Blättern neue Anzeige
         uientry.getSchemaUI("contadm", contschema, "contadm", "contadm" + "form1", function (ret) {
             if (ret.error === false) {
+                // Formatierung
+                $("#contadmcontdatadiv")
+                    .append($("<div/>", {
+                            css: {
+                                "text-align": "center",
+                                width: "100%"
+                            }
+                        })
+                        .append($("<button/>", {
+                            class: "contadmActionSave",
+                            css: {
+                                "margin-left": "10px"
+                            },
+                            html: "Speichern",
+                        }))
+                    );
+                $("#contadmcontdatadiv").css({
+                    overflow: "auto"
+                });
                 //sysbase.putMessage("kli1020evt" + " aufgebaut", 0);
                 console.log("contadm" + " aufgebaut", 0);
                 // Initialisierung des UI
                 contrecord = {};
                 // den Satz holen zum Editieren
                 var sel = {
-                    fullname: fullname
+                    filename: filename
                 };
                 var projection = {
                     history: 0
@@ -598,37 +617,22 @@
                     } else {
                         contrecord = {};
                         contrecord.fullname = fullname;
+                        contrecord.filename = filename;
                         uientry.fromRecord2UI("#contadmform1", contrecord, contschema);
                     }
+                    $("#contadm_entry").height($("#contadm_left").height());
+                    var h = $("#contadm_entry").height();
+                    $("#contadmform1").height(h);
+                    var h1 = $("#contadmcontdatadiv").height();
+                    var h2 = h - h1 - 20;
+                    $("#contadmcontareadiv").height(h2);
                     // AJAX
-                    CKEDITOR.replace( 'contadmcontent', {
+                    CKEDITOR.replace('contadmcontent', {
                         width: "100%",
-                        filebrowserBrowseUrl: '/ckbrowser.html'
-
-                      });
-                    // $("#contadmform1")
-                    $("#contadmcontdatadiv")
-                        .append($("<div/>", {
-                                css: {
-                                    "text-align": "center",
-                                    width: "100%"
-                                }
-                            })
-                            .append($("<button/>", {
-                                class: "contadmActionSave",
-                                css: {
-                                    "margin-left": "10px"
-                                },
-                                html: "Speichern",
-                            }))
-                        );
-
-                    $("#contadmselections").attr("rules", "all");
-                    $("#contadmselections").css({
-                        border: "1px solid black",
-                        margin: "10px"
+                        filebrowserBrowseUrl: '/ckbrowser.html',
+                        extraPlugins: 'smiley'
                     });
-                    $("#contadmselections tbody tr:nth-child(2)").hide();
+                    // $("#contadmform1")
                     supercallback({
                         error: false,
                         message: "erledigt"
@@ -657,18 +661,18 @@
         var api = "setonerecord";
         var table = "KLICONTFILES";
         var usrrecord = {};
-        debugger;
         try {
             contrecord = uientry.fromUI2Record("#contadmform1", contrecord, contschema);
             contrecord.content = CKEDITOR.instances.contadmcontent.getData();
             selfields = {
-                fullname: contrecord.contdata.fullname
+                filename: contrecord.contdata.filename
             };
             updfields["$setOnInsert"] = {
-                metadata: contrecord.contdata.fullname
+                filename: contrecord.contdata.filename
             };
             updfields["$set"] = {
-                titel: contrecord.contdata.titel,
+                title: contrecord.contdata.title,
+                fullname: contrecord.contdata.fullname,
                 content: contrecord.content
             };
             uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {

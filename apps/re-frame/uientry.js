@@ -484,25 +484,41 @@
                     if (epfield.customclasses.indexOf("password") >= 0) {
                         uietype = "password";
                     }
-                    $(containerHash)
-                        .append($('<div/>', {
-                                class: "ui-field-contain",
-                                width: "95%"
-                            })
-                            .append($('<label/>', {
-                                for: pageprefix + epfieldname,
-                                text: epfield.title
-                            }))
-                            .append($("<input/>", {
-                                id: pageprefix + epfieldname,
-                                name: epfieldname,
-                                class: "uietext" + " " + epfield.customclasses,
-                                bctype: bctype,
-                                type: uietype,
-                                "data-mini": true
-                            }))
-
-                        );
+                    if (epfield.title.trim().length > 0) {
+                        $(containerHash)
+                            .append($('<div/>', {
+                                    class: "ui-field-contain",
+                                    width: "95%"
+                                })
+                                .append($('<label/>', {
+                                    for: pageprefix + epfieldname,
+                                    text: epfield.title
+                                }))
+                                .append($("<input/>", {
+                                    id: pageprefix + epfieldname,
+                                    name: epfieldname,
+                                    class: "uietext" + " " + epfield.customclasses,
+                                    bctype: bctype,
+                                    type: uietype,
+                                    "data-mini": true
+                                }))
+                            );
+                    } else {
+                        $(containerHash)
+                            .append($('<div/>', {
+                                    class: "ui-field-contain",
+                                    width: "95%"
+                                })
+                                .append($("<input/>", {
+                                    id: pageprefix + epfieldname,
+                                    name: epfieldname,
+                                    class: "uietext" + " " + epfield.customclasses,
+                                    bctype: bctype,
+                                    type: uietype,
+                                    "data-mini": true
+                                }))
+                            );
+                    }
                     if (typeof epfield.maxlength !== "undefined" && !isNaN(epfield.maxlength)) {
                         $("#" + pageprefix + epfieldname).attr("maxLength", epfield.maxlength);
                     }

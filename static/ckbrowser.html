@@ -25,7 +25,6 @@
         .gallery li {
             float: left;
             width: 33%;
-
             overflow: hidden;
             margin: 0;
             padding: 0;
@@ -48,7 +47,7 @@
 </head>
 
 <body>
-    <div class="header">
+    <div class="header" style="height:2em;">
         <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
         <span class="headertitle" style="color:red;font-weight:bold;">CKEditor 2- Image Auswahl mit ckbrowser</span>
         <noscript>
@@ -59,8 +58,7 @@
             </div>
         </noscript>
     </div>
-    <div class="content">
-
+    <div class="content" style="overflow:auto;">
         <ul class="gallery">
             <li> <a href="#">
                     <img src="http://archangle.mink7.com/img/portfolios/video.jpg" alt="video" />
@@ -68,8 +66,6 @@
                 </a>
             </li>
         </ul>
-        <button onclick="returnFileUrl()">Select File</button>
-        <button onclick='showfiles("list", "", "images")'>Load Files</button>
     </div>
     <div class="footer">
     </div>
@@ -141,10 +137,31 @@
                 h += hh;
                 var fh = $(".footer").height();
                 h -= fh - 3;
-                // $("#ckbrowser_leftw").height(h);
 
+                var w = $(".content").width();
+                var maximgwidth = Math.floor(w * .3);
+
+                // $("#ckbrowser_leftw").height(h);
+                var parentdirectory = ret.parentdirectory;
+                $("body")
+                    .prepend($("<button/>", {
+                        html: "Zurück zu:" + parentdirectory,
+                        css: {
+                            float: "left",
+                            height: "2em",
+                            "background-color": "lime",
+                            "font-weight": "bold",
+                            position: "absolute",
+                            "z-index": 10
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            showfiles("list", "", parentdirectory, function (ret) {
+                                console.log("parentdirectory");
+                            });
+                        }
+                    }));
                 var filenodes = [];
-                debugger;
                 for (var ilink = 0; ilink < ret.files.length; ilink++) {
                     var ftype = "File";
                     if (ret.files[ilink].isDirectory === true) {
@@ -168,6 +185,11 @@
                                 )
                             );
                     } else {
+                        var imgwidth = "auto";
+                        var imgheight = "auto";
+                        if (ret.files[ilink].size > 10000) {
+                            imgwidth = "auto";
+                        }
                         $(".gallery")
                             .append($("<li/>", {
                                     fullname: ret.files[ilink].fullname,
@@ -180,14 +202,22 @@
                                     })
                                     .append($("<img/>", {
                                         src: ret.files[ilink].urlname,
-                                        alt: ret.files[ilink].urlname
+                                        alt: ret.files[ilink].name,
+                                        css: {
+                                            margin: "5px",
+                                            float: "left",
+                                            "max-width": maximgwidth,
+                                            width: imgwidth,
+                                            height: imgheight
+                                        }
                                     }))
                                     .append($("<span/>", {
                                         class: "fa fa-link",
-                                        html: ret.files[ilink].urlname
-                                    }))
-                                    .append($("<span/>", {
-                                        html: ftype
+                                        html: ret.files[ilink].name,
+                                        css: {
+                                            margin: "5px",
+                                            float: "left"
+                                        }
                                     }))
                                 )
                             );

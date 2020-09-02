@@ -919,7 +919,6 @@
                     // https://stackoverflow.com/questions/9584892/can-you-set-event-data-with-jquery-trigger
                     console.log(extraParam);
                     // extraParam hat den poprecord
-                    debugger;
                     var poprecord = JSON.parse(extraParam);
                     var delStmt = "DELETE FROM " + poprecord.tablename;
                     var where = "";

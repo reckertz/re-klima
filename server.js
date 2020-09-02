@@ -577,6 +577,7 @@ app.get('/getsql3index', function (req, res) {
  * holt content eines Directory mit direkter Vorgabe
  * directory als array oder string
  * wenn es nicht gefunden wird, dann wird es zu root versucht.
+ * parentdirectory wird zurückgegeben, problematisch: wenn der leer wird, dann wird gestoppt
  */
 app.get('/getdirectory', function (req, res) {
     if (checkSession(req, res)) return;
@@ -592,6 +593,12 @@ app.get('/getdirectory', function (req, res) {
             startdir = path.join(startdir, directory[idir]);
         }
         directory = startdir;
+    }
+    var parentdirectory = directory;
+    var dirs = directory.split(path.sep);
+    if (dirs.length > 1) {
+        dirs.pop();
+        parentdirectory = dirs.join(path.sep);
     }
     var searchdir = "";
     if (fs.existsSync(directory)) {
@@ -627,6 +634,7 @@ app.get('/getdirectory', function (req, res) {
                         var info = fs.lstatSync(dirinfo.fullname);
                         dirinfo.isFile = info.isFile();
                         dirinfo.isDirectory = info.isDirectory();
+                        dirinfo.size = info.size;
                         ret.files.push(dirinfo);
                     } catch (err) {
                         var errinfo = {};
@@ -647,6 +655,7 @@ app.get('/getdirectory', function (req, res) {
             ret.message = error;
         }
         ret.message = "Directory aufgelöst:" + ret.files.length;
+        ret.parentdirectory = parentdirectory;
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
         res.writeHead(200, {
