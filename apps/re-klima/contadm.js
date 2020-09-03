@@ -227,7 +227,7 @@
                 }))
                 .append($("<button/>", {
                     html: "Generieren",
-                    title: "Generierunge der HTML-Seiten mit den Bildverweisen",
+                    title: "Generierung der HTML-Seiten mit den Bildverweisen",
                     css: {
                         float: "left",
                         "margin": "10px",
@@ -242,13 +242,18 @@
                             crossDomain: false,
                             url: sysbase.getServer("generate"),
                             data: {
-                               contentpath: "content"
+                                contentpath: "content"
                             }
                         }).done(function (r1, textStatus, jqXHR) {
                             sysbase.checkSessionLogin(r1);
                             var j1 = JSON.parse(r1);
                             if (j1.error === false) {
                                 sysbase.putMessage(" Generierung erfolgt", 1);
+                                //var root_node = $('#contadmt0').jstree(true).get_node('root');
+                                var root_node = $('#contadmt0').jstree('select_node', 'ul > li:first');
+                                var filename = root_node[0].textContent; //  .li_attr.filename;
+                                var gurl = sysbase.getServer("content/" + filename);
+                                window.open(gurl, "Klima", 'height=' + screen.height + ', width=' + screen.width);
                             } else {
                                 sysbase.putMessage("Generierung ERROR:" + j1.message, 3);
                             }
@@ -262,11 +267,66 @@
                     }
                 }))
 
+
+                .append($("<button/>", {
+                    html: "Tree Sichern",
+                    title: "Sichern des Strukturbaums",
+                    css: {
+                        float: "left",
+                        "margin": "10px",
+                        "background-color": "navyblue"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        // $("#contadmt0").jstree("search",$("#contadmsearch").val());
+                        contadm.savetree(function (ret) {
+                            console.log(ret.message);
+                        });
+
+                    }
+                }))
+
+
+
                 .append($("<br/>"))
                 .append($("<br/>"))
             );
-        contadm.showfiles("list", url, predir, "", function (ret) {
-            return;
+
+        $("#contadm_leftw").remove();
+        $("#contadm_left")
+            .append($("<div/>", {
+                id: "contadm_leftw",
+                css: {
+                    overflow: "auto",
+                    float: "left",
+                    width: "100%"
+                }
+            }));
+        var h = $(".content").height();
+        var loff = $("#contadm_leftw").position();
+        var ot = loff.top;
+        h -= ot;
+        var hh = $(".header").height();
+        h += hh;
+        var fh = $(".footer").height();
+        h -= fh - 3;
+        $("#contadm_leftw").height(h);
+        $("#contadm_leftw").hide();
+        $("#contadmform1").height(h);
+        $(".contadmt0").remove();
+        $("#contadm_leftw")
+            .append($("<div/>", {
+                id: "contadmt0",
+                css: {
+                    width: "100%"
+                }
+            }));
+        contadm.restoretree(function (ret) {
+            if (ret.error === true) {
+                contadm.showfiles("list", url, predir, "", function (ret) {
+                    return;
+                });
+            }
         });
     };
 
@@ -308,7 +368,7 @@
 
 
     /**
-     * showfiles - holt die vorhandenen Datendateien aus dem Verzeichnis
+     *  - holt die vorhandenen Datendateien aus dem Verzeichnis
      * fileopcode: show oder prep
      * url: ist informatorisch zu sehen "https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/"
      * predirectory: hier das klima1001-Verzeichnis
@@ -332,35 +392,6 @@
                     return;
                 }
             }
-            $("#contadm_leftw").remove();
-            $("#contadm_left")
-                .append($("<div/>", {
-                    id: "contadm_leftw",
-                    css: {
-                        overflow: "auto",
-                        float: "left",
-                        width: "100%"
-                    }
-                }));
-            var h = $(".content").height();
-            var loff = $("#contadm_leftw").position();
-            var ot = loff.top;
-            h -= ot;
-            var hh = $(".header").height();
-            h += hh;
-            var fh = $(".footer").height();
-            h -= fh - 3;
-            $("#contadm_leftw").height(h);
-            $("#contadm_leftw").hide();
-            $("#contadmform1").height(h);
-            $(".contadmt0").remove();
-            $("#contadm_leftw")
-                .append($("<div/>", {
-                    id: "contadmt0",
-                    css: {
-                        width: "100%"
-                    }
-                }));
             var filenodes = [];
             if (typeof ret.records !== "undefined" && ret.records !== null && Object.keys(ret.records).length > 0) {
                 // Ausgabe in jstree links
@@ -427,7 +458,7 @@
                         // https://stackoverflow.com/questions/13617111/i-cant-add-the-source-button-to-ckeditor-4s-toolbar
                         editor.ui.addButton('InsertCustomImage', {
                             label: "Speichern",
-                            command: 'insertImgCmd',
+                            command: 'contadmActionSave',
                             toolbar: 'insert',
                             icon: '/images/icons-png/arrow-d-black.png'
                         });
@@ -438,7 +469,7 @@
             if ($("#contadmt0").hasClass("jstree")) $("#contadmt0").jstree(true).destroy();
             // "checkbox"
             $("#contadmt0").jstree({
-                "plugins": ["state", "search"],
+                "plugins": ["state", "search", "dnd"],
                 "search": {
                     case_sensitive: false,
                     show_only_matches: true
@@ -539,13 +570,27 @@
                         extraPlugins: 'smiley',
 
                     });
+                    // https://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
+                    editor.addCommand("storeRecord", { // create named command
+                        exec: function(edt) {
+                            //alert(edt.getData());
+                            $(".contadmActionSave").click();
+                        }
+                    });
+
                     // https://stackoverflow.com/questions/13617111/i-cant-add-the-source-button-to-ckeditor-4s-toolbar
-                    editor.ui.addButton('InsertCustomImage', {
+                    editor.ui.addButton('speichern', {
                         label: "Speichern",
-                        command: 'insertImgCmd',
+                        command: 'storeRecord',
                         toolbar: 'insert',
                         icon: '/images/icons-png/arrow-d-black.png'
                     });
+
+
+
+
+
+
                     // $("#contadmform1")
                     supercallback({
                         error: false,
@@ -602,13 +647,26 @@
                 filenode.icon = "jstree-file";
                 filenode.li_attr.what = "file";
 
-                $("#contadmt0").jstree()
-                    .create_node('#', filenode, "last", function (newid) {
-                        sysbase.putMessage("Zugefügt:" + contrecord.contdata.filename + "=>" + newid);
-                        // $('#contadmt0').jstree('refresh');
-                        $('#contadmt0').jstree('redraw');
-                        $("#contadmb1").click();
-                    });
+                var refnode = $("#contadmt0").jstree().get_selected(true)[0];
+                if (typeof refnode === "undefined" || refnode === null) {
+                    $("#contadmt0").jstree()
+                        .create_node('#', filenode, "last", function (newid) {
+                            sysbase.putMessage("Zugefügt:" + contrecord.contdata.filename + "=>" + newid);
+                            // $('#contadmt0').jstree('refresh');
+                            $('#contadmt0').jstree('redraw');
+                            $("#contadmb1").click();
+                        });
+                } else {
+                    // insert as sibling
+                    debugger;
+                    var $parent = $('#' + refnode.id).parent();
+                    var index = $parent.children().index($('#' + refnode.id)) + 1;
+                    if (refnode.parent === '#') {
+                        $parent = '#';
+                    }
+                    $("#contadmt0").jstree().create_node($parent, filenode, index);
+                }
+
             }
             selfields = {
                 filename: contrecord.contdata.filename
@@ -625,6 +683,9 @@
             uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
                 if (ret.error === false) {
                     sysbase.putMessage("contadm" + " saved:" + ret.message, 1);
+                    contadm.savetree(function (ret1) {
+
+                    });
                 } else {
                     sysbase.putMessage("contadm-ERROR" + " saved:" + ret.message, 3);
                 }
@@ -660,7 +721,6 @@
             if (check === false) {
                 return;
             }
-
             var delStmt = "DELETE FROM KLICONTFILES";
             delStmt += " WHERE filename = '" + filename + "'";
             var api = "delonerecord";
@@ -670,7 +730,6 @@
             uihelper.delOneRecord(delStmt, api, table, record, function (ret) {
                 if (ret.error === false) {
                     var foundid = "";
-                    debugger;
                     $("#contadmt0").find("[filename='" + filename + "']").each(function () {
                         //alert($(this).attr("id"));
                         foundid = $(this).attr("id");
@@ -690,6 +749,110 @@
         }
     });
 
+    contadm.savetree = function (cbsave) {
+        var selfields = {
+            configname: "CONTREE"
+        };
+        var updfields = {};
+        var api = "setonerecord";
+        var table = "KLICONFIG";
+        var confrecord = {};
+        try {
+            var treeData = $('#contadmt0').jstree(true).get_json('#', {
+                flat: false
+            });
+            // set flat:true to get all nodes in 1-level json
+            var jsonString = JSON.stringify(treeData);
+            updfields["$setOnInsert"] = {
+                username: uihelper.getUsername(),
+                configname: "CONTREE"
+            };
+            updfields["$set"] = {
+                jsonString: jsonString
+            };
+            uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
+                if (ret.error === false) {
+                    sysbase.putMessage("contadm" + " saved:" + ret.message, 1);
+                    cbsave({
+                        error: false,
+                        message: "contadm" + " saved:" + ret.message
+                    });
+                    return;
+                } else {
+                    cbsave({
+                        error: true,
+                        message: "contadm" + " NOT saved:" + ret.message
+                    });
+                    return;
+                }
+            });
+        } catch (err) {
+            cbsave({
+                error: true,
+                message: "contadm" + " saved:" + err
+            });
+            return;
+        }
+    };
+
+
+    contadm.restoretree = function (cbrest) {
+
+        var sel = {
+            configname: "CONTREE"
+        };
+        var projection = {
+            history: 0
+        };
+        var api = "getonerecord";
+        var table = "KLICONFIG";
+        uihelper.getOneRecord(sel, projection, api, table, function (ret) {
+            if (ret.error === false && ret.record !== null) {
+                /*
+                    var treeData = $('#MyTree').jstree(true).get_json('#', {flat:false})
+                    // set flat:true to get all nodes in 1-level json
+                    var jsonData = JSON.stringify(treeData );
+                */
+                var filenodes = JSON.parse(ret.record.jsonString);
+
+                if ($("#contadmt0").hasClass("jstree")) $("#contadmt0").jstree(true).destroy();
+                // "checkbox"
+                $("#contadmt0").jstree({
+                    "plugins": ["state", "search", "dnd"],
+                    "search": {
+                        case_sensitive: false,
+                        show_only_matches: true
+                    },
+                    core: {
+                        'check_callback': true,
+                        data: filenodes
+                    }
+                });
+
+                $("#contadm_leftw").show();
+                document.getElementById("contadm").style.cursor = "default";
+                $('#contadmt0').on("select_node.jstree", function (e, data) {
+                    var node = $('#contadmt0').jstree(true).get_node(data.node.id);
+                    contadm.clicknode(node, function (ret) {
+                        //alert("node_id: " + data.node.id + " " + node.text);
+                    });
+                });
+                sysbase.putMessage("contadm geladen");
+                cbrest({
+                    error: false,
+                    message: "contadm" + " Tree restored"
+                });
+                return;
+            } else {
+                sysbase.putMessage("contadm nicht vorhanden");
+                cbrest({
+                    error: true,
+                    message: "contadm" + " Tree not restored:" + ret.message
+                });
+                return;
+            }
+        });
+    };
 
 
     /**

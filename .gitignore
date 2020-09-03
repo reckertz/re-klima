@@ -6,6 +6,8 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 static/lib/ckeditor/
+static/content/
+content/
 *.db3
 data/
 temp/

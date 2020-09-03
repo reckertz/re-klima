@@ -2435,7 +2435,8 @@ app.get("/generate", function (req, res) {
      * Ausgabestring in Zieldatei schreiben
      */
     var rootdir = path.dirname(require.main.filename);
-    var contentpath = path.join(rootdir, "content");
+    var contentpath = path.join(rootdir, "static", "content");
+    var contentimagespath = path.join(contentpath, "images");
     var templatepath = path.join(contentpath, "template.html");
     var template = fs.readFileSync(templatepath, "utf8");
 
@@ -2449,20 +2450,43 @@ app.get("/generate", function (req, res) {
             ret.message += " keine KLICONTFILES:" + ret1.error;
         } else {
             if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
-                for (var recordind in ret1.records) {
+                for (var recordind = 0; recordind < ret1.records.length; recordind++) {
                     var record = ret1.records[recordind];
                     var newtemplate = template;
                     newtemplate = newtemplate.replace("&header&", record.title);
                     newtemplate = newtemplate.replace("&content&", record.content);
                     var fullname = path.join(contentpath, record.filename);
                     fs.writeFileSync(fullname, newtemplate);
+                    console.log("html-Transfer:" + record.filename);
+                    // Loop für die Images
+                    var imgarray = JSON.parse(record.imgsrcs);
+                    for (var iimg = 0; iimg < imgarray.length; iimg++) {
+                        // physical image source file
+                        var imgsourcefile =  path.join(rootdir, "static", imgarray[iimg]);
+                        // physical image destination file and check/make Destination-Subdirectories
+                        var imgdestinationfile =  path.join(rootdir, "static", "content", imgarray[iimg]);
+
+                        var imgdirs = imgdestinationfile.split(path.sep);
+                        var checkdir = imgdirs[0];
+                        // Subdirectories ohne die Datei selbst
+                        for (var iimgdirs = 1; iimgdirs < imgdirs.length -1; iimgdirs++) {
+                            console.log(checkdir + "=>" + imgdirs[iimgdirs]);
+                            checkdir = path.join(checkdir, imgdirs[iimgdirs]);
+                            if (checkdir.indexOf("content") > 0) {
+                                if (!fs.existsSync(checkdir)) {
+                                    fs.mkdirSync(checkdir);
+                                }
+                            }
+                        }
+                        fs.copyFileSync(imgsourcefile, imgdestinationfile);
+                        console.log("img-Transfer:" + imgarray[iimg]);
+                    }
                 }
             }
         }
         ret = {
             error: false,
-            message: "Dateien generiert",
-            path: path
+            message: "Dateien generiert"
         };
         var smsg1 = JSON.stringify(ret);
         res.writeHead(200, {
