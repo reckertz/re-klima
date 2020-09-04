@@ -249,9 +249,15 @@
                             var j1 = JSON.parse(r1);
                             if (j1.error === false) {
                                 sysbase.putMessage(" Generierung erfolgt", 1);
-                                //var root_node = $('#contadmt0').jstree(true).get_node('root');
-                                var root_node = $('#contadmt0').jstree('select_node', 'ul > li:first');
-                                var filename = root_node[0].textContent; //  .li_attr.filename;
+                                /**
+                                 * kein "echter" Root-Node, etwas komplizierte Mimik
+                                 * li_attr("filename") geht nicht
+                                */
+                                $('#contadmt0').jstree('select_node', 'ul:first > li:first');
+                                var root_nodes = $('#contadmt0').jstree('get_selected');
+                                var root_nodeid = root_nodes[root_nodes.length - 1];
+                                var filename = $("#" + root_nodeid).attr("filename");
+
                                 var gurl = sysbase.getServer("content/" + filename);
                                 window.open(gurl, "Klima", 'height=' + screen.height + ', width=' + screen.width);
                             } else {
@@ -400,11 +406,14 @@
                         var record = ret.records[ilink];
                         var linkname = record.filename;
                         var filenode = {
-                            text: linkname,
+                            text: record.title + " (" + record.filename + ")",
                         };
                         filenode.li_attr = {
                             fullname: record.fullname,
                             filename: record.filename,
+                        };
+                        filenode.a_attr = {
+                            title: record.filename
                         };
                         filenode.icon = "jstree-file";
                         filenode.li_attr.what = "file";
@@ -623,11 +632,13 @@
         try {
             contrecord = uientry.fromUI2Record("#contadmform1", contrecord, contschema);
             contrecord.content = CKEDITOR.instances.contadmcontent.getData();
+            /**
+             * Sammlung der Imager-Verweise img src
+            */
             // https://stackoverflow.com/questions/18101673/jquery-get-all-src-of-images-in-div-and-put-into-field
             var imgsrcs = $(contrecord.content).find("img").map(function () {
                 return $(this).attr("src");
             }).get();
-
             var filename = contrecord.contdata.filename.trim().replace(/ /g, "_");
             contrecord.contdata.filename = filename;
             var foundid = "";
@@ -635,14 +646,21 @@
                 //alert($(this).attr("id"));
                 foundid = $(this).attr("id");
             });
-            if (foundid.length === 0) {
+            if (foundid.length > 0) {
+                // Aktualisieren alter Knoten
+                var newtext = contrecord.contdata.title  + " (" + contrecord.contdata.filename + ")";
+                $('#contadmt0').jstree('rename_node', foundid , newtext);
+            } else {
                 // neu hinzufügen
                 var filenode = {
-                    text: contrecord.contdata.filename
+                    text: contrecord.contdata.title  + " (" + contrecord.contdata.filename + ")"
                 };
                 filenode.li_attr = {
                     fullname: contrecord.contdata.fullname,
                     filename: contrecord.contdata.filename
+                };
+                filenode.a_attr = {
+                    title: contrecord.contdata.filename
                 };
                 filenode.icon = "jstree-file";
                 filenode.li_attr.what = "file";
