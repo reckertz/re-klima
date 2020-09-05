@@ -206,6 +206,7 @@
                 .append($("<input/>", {
                     type: "search",
                     id: "contadmsearch",
+                    class: "contadmsearch",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -215,6 +216,7 @@
                 .append($("<button/>", {
                     html: "Filter",
                     title: "Selektive Anzeige",
+                    class: "contadmsearchbut",
                     css: {
                         float: "left",
                         "margin": "10px",
@@ -253,7 +255,7 @@
                                 /**
                                  * kein "echter" Root-Node, etwas komplizierte Mimik
                                  * li_attr("filename") geht nicht
-                                */
+                                 */
                                 $('#contadmt0').jstree('select_node', 'ul:first > li:first');
                                 var root_nodes = $('#contadmt0').jstree('get_selected');
                                 var root_nodeid = root_nodes[root_nodes.length - 1];
@@ -290,7 +292,9 @@
                         var root_nodeid = root_nodes[root_nodes.length - 1];
                         var filename = $("#" + root_nodeid).attr("filename");
                         var gurl = sysbase.getServer("content/" + filename);
-                        window.open(gurl, "Klima", 'height=' + screen.height + ', width=' + screen.width);
+                        debugger;
+                        var urlstyles = "resizable,scrollbars,status"; //'height=' + screen.height + ',width=' + screen.width + ',resizable=yes,scrollbars=yes,toolbar=yes,menubar=yes,location=yes';
+                        window.open(gurl, "Klima", urlstyles);
 
                     }
                 }))
@@ -318,6 +322,19 @@
                 .append($("<br/>"))
                 .append($("<br/>"))
             );
+
+        $(document).on("keypress", ".contadmsearch", function (evt) {
+            if (evt.keyCode === 13) {
+                // Cancel the default action, if needed
+                evt.preventDefault();
+                evt.stopPropagation();
+                evt.stopImmediatePropagation();
+                // Trigger the button element with a click
+                //document.getElementById("myBtn").click();
+
+                $(".contadmsearchbut").click();
+            }
+        });
 
         $("#contadm_leftw").remove();
         $("#contadm_left")
@@ -482,7 +499,7 @@
                         editor = CKEDITOR.replace('contadmcontent', {
                             width: "100%",
                             filebrowserBrowseUrl: '/ckurlbrowser.html',
-                            filebrowserImageUploadUrl:'/ckbrowser.html',
+                            filebrowserImageUploadUrl: '/ckbrowser.html',
                             extraPlugins: 'smiley,font',
                             extraCss: "body{font-family:Calibri, serif;font-size:16px}"
                         });
@@ -513,6 +530,9 @@
 
             $("#contadm_leftw").show();
             document.getElementById("contadm").style.cursor = "default";
+
+            //$(document).on('click', '.jstree-anchor', function(e) {...});
+
             $('#contadmt0').on("select_node.jstree", function (e, data) {
                 var node = $('#contadmt0').jstree(true).get_node(data.node.id);
                 contadm.clicknode(node, function (ret) {
@@ -598,13 +618,13 @@
                     editor = CKEDITOR.replace('contadmcontent', {
                         width: "100%",
                         filebrowserBrowseUrl: '/ckurlbrowser.html',
-                        filebrowserImageBrowseUrl:'/ckbrowser.html',
+                        filebrowserImageBrowseUrl: '/ckbrowser.html',
                         extraPlugins: 'smiley,font',
                         extraCss: "body{font-family:Calibri, serif;font-size:16px}"
                     });
                     // https://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
                     editor.addCommand("storeRecord", { // create named command
-                        exec: function(edt) {
+                        exec: function (edt) {
                             //alert(edt.getData());
                             $(".contadmActionSave").click();
                         }
@@ -657,7 +677,7 @@
             contrecord.content = CKEDITOR.instances.contadmcontent.getData();
             /**
              * Sammlung der Imager-Verweise img src
-            */
+             */
             // https://stackoverflow.com/questions/18101673/jquery-get-all-src-of-images-in-div-and-put-into-field
             var imgsrcs = $(contrecord.content).find("img").map(function () {
                 return $(this).attr("src");
@@ -671,12 +691,12 @@
             });
             if (foundid.length > 0) {
                 // Aktualisieren alter Knoten
-                var newtext = contrecord.contdata.title  + " (" + contrecord.contdata.filename + ")";
-                $('#contadmt0').jstree('rename_node', foundid , newtext);
+                var newtext = contrecord.contdata.title + " (" + contrecord.contdata.filename + ")";
+                $('#contadmt0').jstree('rename_node', foundid, newtext);
             } else {
                 // neu hinzufügen
                 var filenode = {
-                    text: contrecord.contdata.title  + " (" + contrecord.contdata.filename + ")"
+                    text: contrecord.contdata.title + " (" + contrecord.contdata.filename + ")"
                 };
                 filenode.li_attr = {
                     fullname: contrecord.contdata.fullname,

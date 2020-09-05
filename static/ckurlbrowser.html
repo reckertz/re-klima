@@ -110,15 +110,70 @@
          *    die Daten werden ausgegeben in Listen
          */
         function showfiles(fileopcode, url, directory, callback) {
-
             // https: //stackoverflow.com/questions/13311812/popup-window-accessing-parent-dom
             var opener = window.opener;
             if (opener) {
                 var oDom = opener.document;
-                var elem = oDom.getElementById("contadm_left");      // contadmt0");
+                var elem = oDom.getElementById("contadm_left"); // contadmt0");
                 if (elem) {
                     var val = elem.value;
-                    $(".content").html($(elem).html());
+                    try {
+                        $(".content").html($(elem).html());
+
+                        $('.content li').removeClass('jstree-hidden');
+                        $('.content a').removeClass('jstree-search');
+                        $('.content a').removeClass('jstree-clicked');
+                        $('.content li').attr('aria-selected', 'false');
+
+                        // ohne state !!!
+                        $("#contadmt0").jstree({
+                            "plugins": ["search", "dnd"],
+                            "search": {
+                                case_sensitive: false,
+                                show_only_matches: true
+                            },
+                            core: {
+                                'check_callback': true
+                            }
+                        });
+                        console.log("nach jstree mit plugins ...");
+
+                        $("#contadmt0").jstree().deselect_all(true);
+
+                        $('#contadmt0').on("select_node.jstree", function (e, data) {
+                            var node = $('#contadmt0').jstree(true).get_node(data.node.id);
+                            console.log("selektiert:" + node.text);
+                            //alert("node_id: " + data.node.id + " " + node.text);
+                            var urlname = $(this).parent().attr("urlname");
+                            var funcNum = getUrlParam('CKEditorFuncNum');
+                            var fileUrl = node.li_attr.filename;
+                            window.opener.CKEDITOR.tools.callFunction(funcNum, fileUrl);
+                            window.close();
+                        });
+
+
+                        $(document).on("click", ".contadmsearchbut", function (evt) {
+                            evt.preventDefault();
+                            debugger;
+                            $("#contadmt0").jstree("search", $("#contadmsearch").val());
+                        });
+
+                        $(document).on("keypress", ".contadmsearch", function (evt) {
+                            if (evt.keyCode === 13) {
+                                // Cancel the default action, if needed
+                                evt.preventDefault();
+                                evt.stopPropagation();
+                                evt.stopImmediatePropagation();
+                                // Trigger the button element with a click
+                                //document.getElementById("myBtn").click();
+                                debugger;
+                                $(".contadmsearchbut").click();
+                            }
+                        });
+
+                    } catch (err) {
+                        console.log(err);
+                    }
                 }
             }
         }
@@ -131,7 +186,7 @@
         }
 
 
-
+        /*
         $(document).on("click", ".ckbrowserdir", function (evt) {
             evt.preventDefault();
             var urlname = $(this).parent().attr("urlname");
@@ -139,8 +194,8 @@
                 console.log("Subdirectory");
             });
         });
-
-
+        */
+        /*
         $(document).on("click", ".ckbrowserfile", function (evt) {
             evt.preventDefault();
             var urlname = $(this).parent().attr("urlname");
@@ -149,6 +204,7 @@
             window.opener.CKEDITOR.tools.callFunction(funcNum, fileUrl);
             window.close();
         });
+        */
     </script>
 
 </body>
