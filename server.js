@@ -2608,8 +2608,26 @@ function createRefHtml(targetnode, search) {
  */
 function createFooterLinks(targetnode, search) {
     var footerlinks = {};
-    footerlinks.prev = "www.google.com";
-    footerlinks.next = "www.bing.com";
+    /**
+     * Feststellen des Index von currentNode in den children von parentNode innerhalb von targetnode
+    */
+   if (typeof targetnode.parentNode === "undefined" || targetnode.parentNode === null) {
+       return footerlinks;
+   }
+   var lastpos = targetnode.parentNode.children.length - 1;
+    for (var ipos = 0; ipos <= lastpos; ipos++) {
+        if (search === targetnode.parentNode.children[ipos].li_attr.filename) {
+            if (ipos > 0) {
+                footerlinks.prev = targetnode.parentNode.children[ipos - 1].li_attr.filename;
+            }
+            if (ipos < lastpos) {
+                footerlinks.prev = targetnode.parentNode.children[ipos + 1].li_attr.filename;
+            }
+
+        }
+    }
+
+
     return footerlinks;
 }
 
