@@ -225,6 +225,7 @@
                         $("#contadmt0").jstree("search", $("#contadmsearch").val());
                     }
                 }))
+
                 .append($("<button/>", {
                     html: "Generieren",
                     title: "Generierung der HTML-Seiten mit den Bildverweisen",
@@ -273,6 +274,26 @@
                     }
                 }))
 
+
+                .append($("<button/>", {
+                    html: "Testen",
+                    title: "Aufruf der Startseite in neuem Fenster",
+                    css: {
+                        float: "left",
+                        "margin": "10px",
+                        "background-color": "navyblue"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        $('#contadmt0').jstree('select_node', 'ul:first > li:first');
+                        var root_nodes = $('#contadmt0').jstree('get_selected');
+                        var root_nodeid = root_nodes[root_nodes.length - 1];
+                        var filename = $("#" + root_nodeid).attr("filename");
+                        var gurl = sysbase.getServer("content/" + filename);
+                        window.open(gurl, "Klima", 'height=' + screen.height + ', width=' + screen.width);
+
+                    }
+                }))
 
                 .append($("<button/>", {
                     html: "Tree Sichern",
@@ -460,9 +481,10 @@
 
                         editor = CKEDITOR.replace('contadmcontent', {
                             width: "100%",
-                            filebrowserBrowseUrl: '/ckbrowser.html',
-                            extraPlugins: 'smiley',
-
+                            filebrowserBrowseUrl: '/ckurlbrowser.html',
+                            filebrowserImageUploadUrl:'/ckbrowser.html',
+                            extraPlugins: 'smiley,font',
+                            extraCss: "body{font-family:Calibri, serif;font-size:16px}"
                         });
                         // https://stackoverflow.com/questions/13617111/i-cant-add-the-source-button-to-ckeditor-4s-toolbar
                         editor.ui.addButton('InsertCustomImage', {
@@ -575,9 +597,10 @@
                     // AJAX
                     editor = CKEDITOR.replace('contadmcontent', {
                         width: "100%",
-                        filebrowserBrowseUrl: '/ckbrowser.html',
-                        extraPlugins: 'smiley',
-
+                        filebrowserBrowseUrl: '/ckurlbrowser.html',
+                        filebrowserImageBrowseUrl:'/ckbrowser.html',
+                        extraPlugins: 'smiley,font',
+                        extraCss: "body{font-family:Calibri, serif;font-size:16px}"
                     });
                     // https://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
                     editor.addCommand("storeRecord", { // create named command

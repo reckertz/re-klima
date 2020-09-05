@@ -2610,24 +2610,29 @@ function createFooterLinks(targetnode, search) {
     var footerlinks = {};
     /**
      * Feststellen des Index von currentNode in den children von parentNode innerhalb von targetnode
-    */
-   if (typeof targetnode.parentNode === "undefined" || targetnode.parentNode === null) {
-       return footerlinks;
-   }
-   var lastpos = targetnode.parentNode.children.length - 1;
-    for (var ipos = 0; ipos <= lastpos; ipos++) {
-        if (search === targetnode.parentNode.children[ipos].li_attr.filename) {
-            if (ipos > 0) {
-                footerlinks.prev = targetnode.parentNode.children[ipos - 1].li_attr.filename;
+     */
+    if (typeof targetnode.parentNode !== "undefined" && targetnode.parentNode !== null) {
+        var lastpos = targetnode.parentNode.children.length - 1;
+        for (var ipos = 0; ipos <= lastpos; ipos++) {
+            if (search === targetnode.parentNode.children[ipos].li_attr.filename) {
+                if (ipos > 0) {
+                    footerlinks.prev = targetnode.parentNode.children[ipos - 1].li_attr.filename;
+                    footerlinks.prevTitle = targetnode.parentNode.children[ipos - 1].text;
+                }
             }
             if (ipos < lastpos) {
-                footerlinks.prev = targetnode.parentNode.children[ipos + 1].li_attr.filename;
+                footerlinks.next = targetnode.parentNode.children[ipos + 1].li_attr.filename;
+                footerlinks.nextTitle = targetnode.parentNode.children[ipos + 1].text;
             }
-
+            break;
         }
+        footerlinks.up = targetnode.parentNode.li_attr.filename;
+        footerlinks.upTitle = targetnode.parentNode.text;
     }
-
-
+    if (targetnode.currentNode.children.length > 0) {
+        footerlinks.down = targetnode.currentNode.children[0].li_attr.filename;
+        footerlinks.downTitle = targetnode.currentNode.children[0].text;
+    }
     return footerlinks;
 }
 

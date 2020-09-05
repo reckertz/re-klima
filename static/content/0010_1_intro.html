@@ -24,9 +24,9 @@
     <script type="application/javascript" src="js/eckcobase.js"></script>
 </head>
 
-<body>
+<body style="overflow:auto">
     <div class="header">
-        <span class="headertitle" style="color:red;font-weight:bold;">Temperaturdaten aus der vorindustriellen Zeit</span>
+        <span class="headertitle" style="color:red;font-weight:bold;">Temperaturdaten ab Beginn der Industrialisierung</span>
         <noscript>
             <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
                 <span style="color:blue">
@@ -36,13 +36,37 @@
         </noscript>
     </div>
     <div class="content">
-        <p>das wird spannend</p>
+        <div class="contentwrapper" style="margin: 15px">
+            <p><span style="font-size:16px">Das&nbsp;IPCC - Intergovernmental Panel on Climate Change benennt als Datenquelle f&uuml;r historische Daten u.a das GHCN - Global Historical Climate Network, das Daten aggregierte Daten auf Monatsebene und Detaildaten auf Tagesebene bereitgestellt.&nbsp;</span></p>
 
-<p><img alt="" src="images\2020\002_1 worldmap 1850.jpg" style="float:left; margin-left:10px; margin-right:10px; width:40%" />und bedeutend xxxxxxxxxxxxxxxxxxxxxxxxxxxxx</p>
+<p><span style="font-size:16px">Diese Datenquelle wird genutzt, genauer GHCN-Daily. Die Daten werden als ASCII-Dateien bereitgestellt und zun&auml;chst in SQL-Tabellen geladen. Auswertungen finden dann aus diesen SQL-Tabellen statt.</span></p>
 
+<p><span style="font-size:16px">Die Temperaturdaten liegen zun&auml;chst als Strings vor mit einer logischen Dezimalstelle. Diese Daten werden als String in die SQL-Tabellen &uuml;bernommen, es wird dabei ein Dezimalpunkt&nbsp; eingef&uuml;hrt, so dass mit diesen Daten mit trivialer&nbsp;Konvertierung gerechnet werden kann. Gleichzeitig k&ouml;nnen Aussagen unverf&auml;lscht &uuml;ber die Ursprungsdaten berechnet werden. Es werden folgende Pr&uuml;fungen bereitgestellt:</span></p>
+
+<ul>
+	<li><span style="font-size:16px">Pr&uuml;fung der Vollst&auml;ndigkeit der Daten auf Jahresebene</span></li>
+	<li><span style="font-size:16px">Pr&uuml;fung der Werteverteilung auf der ersten Dezimalstelle</span></li>
+	<li><span style="font-size:16px">Pr&uuml;fung der Temperaturverteilung mit Historgrammen</span></li>
+</ul>
+
+<p><span style="font-size:16px">Nach diesen Pr&uuml;fungen werden die eigentlichen Auswertungen vorgenommen: </span></p>
+
+<ul>
+	<li><span style="font-size:16px">Auswertung des Temperaturverlaufs</span></li>
+	<li><span style="font-size:16px">Auswertung der Regressionsgerade durch den Temperaturverlauf</span></li>
+	<li><span style="font-size:16px">Gegen&uuml;berstellung des Temperaturverlaufs mit weiteren Daten wie Urbanisierung und Bev&ouml;lkerungsentwicklung</span></li>
+	<li><span style="font-size:16px">Abgleich der Auswertungen mit weiteren Aspekten (Lage, Bew&auml;sserung etc.)</span></li>
+</ul>
+
+<p><span style="font-size:16px">Aufgrund dieser Auswertungen werden dann Bewertungen hinsichtlich des global warming seit Beginn der Industrialsierung vorgenommen.</span></p>
+
+<p>&nbsp;</p>
+
+        </div>
     </div>
     <div class="footer">
-        <input type="hidden" id="footerlinkstring" value='{}'>
+        <input type="hidden" id="footerlinkstring" value='{"up":"0000_1_start.html","upTitle":"Global Warming - wissenschaftlich betrachtet (0000_1_start.html)","down":"0020_1_data.html","downTitle":"Prüfung auf fehlende Daten (0020_1_data.html)"}'>
     </div>
 </body>
+
 </html>
