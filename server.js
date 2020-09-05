@@ -2430,74 +2430,251 @@ app.get("/generate", function (req, res) {
     if (req.query && typeof req.query.contentpath !== "undefined" && req.query.contentpath.length > 0) {}
     /**
      * template lesen in den Speicher als string
+     * Struktur lesen aus KLICONFIG mit CONTREE
      * Sätze in KLICONTFILES lesen - alle
-     * jeweils template aufbereiten mit den Platzhaltern nach Ausgabestring
+     *      jeweils template aufbereiten mit den Platzhaltern nach Ausgabestring
+     *      zusätzlich die Strukturverweise ausgeben
      * Ausgabestring in Zieldatei schreiben
      */
     var rootdir = path.dirname(require.main.filename);
     var contentpath = path.join(rootdir, "static", "content");
     var contentimagespath = path.join(contentpath, "images");
-    var templatepath = path.join(contentpath, "template.html");
+    var templatepath = path.join(rootdir, "static", "template.html");
     var template = fs.readFileSync(templatepath, "utf8");
 
-    var reqparm = {};
-    reqparm.table = "KLICONTFILES";
-    reqparm.sel = {};
-    reqparm.projection = {};
-    sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
-        var ret = {};
-        if (ret1.error === true) {
-            ret.message += " keine KLICONTFILES:" + ret1.error;
-        } else {
-            if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
-                for (var recordind = 0; recordind < ret1.records.length; recordind++) {
-                    var record = ret1.records[recordind];
-                    var newtemplate = template;
-                    newtemplate = newtemplate.replace("&header&", record.title);
-                    newtemplate = newtemplate.replace("&content&", record.content);
-                    var fullname = path.join(contentpath, record.filename);
-                    fs.writeFileSync(fullname, newtemplate);
-                    console.log("html-Transfer:" + record.filename);
-                    // Loop für die Images
-                    var imgarray = JSON.parse(record.imgsrcs);
-                    for (var iimg = 0; iimg < imgarray.length; iimg++) {
-                        // physical image source file
-                        var imgsourcefile =  path.join(rootdir, "static", imgarray[iimg]);
-                        // physical image destination file and check/make Destination-Subdirectories
-                        var imgdestinationfile =  path.join(rootdir, "static", "content", imgarray[iimg]);
-
-                        var imgdirs = imgdestinationfile.split(path.sep);
-                        var checkdir = imgdirs[0];
-                        // Subdirectories ohne die Datei selbst
-                        for (var iimgdirs = 1; iimgdirs < imgdirs.length -1; iimgdirs++) {
-                            console.log(checkdir + "=>" + imgdirs[iimgdirs]);
-                            checkdir = path.join(checkdir, imgdirs[iimgdirs]);
-                            if (checkdir.indexOf("content") > 0) {
-                                if (!fs.existsSync(checkdir)) {
-                                    fs.mkdirSync(checkdir);
+    async.waterfall([
+            function (cbgen1) {
+                var reqparm = {
+                    sel: {
+                        configname: "CONTREE"
+                    },
+                    projection: {},
+                    table: "KLICONFIG"
+                };
+                sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                    var ret = {};
+                    if (ret1.error === true) {
+                        ret.message = ret1.message;
+                        ret.error = ret1.error;
+                        cbgen1("Error", res, ret);
+                        return;
+                    }
+                    if (ret1.error === false && typeof ret1.record !== "undefined" && ret1.record !== null) {
+                        ret.message = "Tree gefunden";
+                        ret.error = false;
+                        ret.tree = JSON.parse(ret1.record.jsonString);
+                    } else {
+                        ret.message = "Tree nicht gefunden";
+                        ret.error = false;
+                        ret.tree = {};
+                    }
+                    cbgen1(null, res, ret);
+                    return;
+                });
+            },
+            function (res, ret, cbgen2) {
+                var reqparm = {};
+                reqparm.table = "KLICONTFILES";
+                reqparm.sel = {};
+                reqparm.projection = {};
+                sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+                    if (ret1.error === true) {
+                        ret.message += " keine KLICONTFILES:" + ret1.error;
+                    } else {
+                        if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                            for (var recordind = 0; recordind < ret1.records.length; recordind++) {
+                                var record = ret1.records[recordind];
+                                /**
+                                 * Holen der Verweise
+                                 * home, top, prev, next
+                                 */
+                                var res1 = {
+                                    anchor: record.filename,
+                                    ready: false
+                                };
+                                // res1 = iterategtree (ret.tree, res1);
+                                // Suchbegriff, Tree, Parent mit init null
+                                var targetnode = findNode(record.filename, ret.tree[0], null);
+                                console.log(record.filename + "=>" + targetnode.currentNode.li_attr.filename || "MIST");
+                                // Generierung der Verweise
+                                var refhtml1 = createRefHtml(targetnode, record.filename);
+                                var footerlinks = createFooterLinks(targetnode, record.filename);
+                                var newtemplate = template;
+                                newtemplate = newtemplate.replace("&header&", record.title);
+                                newtemplate = newtemplate.replace("&content&", record.content);
+                                newtemplate = newtemplate.replace("&footerlinkstring&", JSON.stringify(footerlinks));
+                                var fullname = path.join(contentpath, record.filename);
+                                fs.writeFileSync(fullname, newtemplate);
+                                console.log("html-Transfer:" + record.filename);
+                                // Loop für die Images
+                                var imgarray = JSON.parse(record.imgsrcs);
+                                for (var iimg = 0; iimg < imgarray.length; iimg++) {
+                                    // physical image source file
+                                    var imgsourcefile = path.join(rootdir, "static", imgarray[iimg]);
+                                    // physical image destination file and check/make Destination-Subdirectories
+                                    var imgdestinationfile = path.join(rootdir, "static", "content", imgarray[iimg]);
+                                    var imgdirs = imgdestinationfile.split(path.sep);
+                                    var checkdir = imgdirs[0];
+                                    // Subdirectories ohne die Datei selbst
+                                    for (var iimgdirs = 1; iimgdirs < imgdirs.length - 1; iimgdirs++) {
+                                        checkdir = path.join(checkdir, imgdirs[iimgdirs]);
+                                        if (checkdir.indexOf("content") > 0) {
+                                            if (!fs.existsSync(checkdir)) {
+                                                fs.mkdirSync(checkdir);
+                                            }
+                                        }
+                                    }
+                                    fs.copyFileSync(imgsourcefile, imgdestinationfile);
+                                    console.log("img-Transfer:" + imgarray[iimg]);
                                 }
                             }
                         }
-                        fs.copyFileSync(imgsourcefile, imgdestinationfile);
-                        console.log("img-Transfer:" + imgarray[iimg]);
+                    }
+                    cbgen2("finish", res, ret);
+                    return;
+                });
+            }
+        ],
+        function (error, res, ret) {
+            var smsg1 = JSON.stringify(ret);
+            res.writeHead(200, {
+                'Content-Type': 'application/text'
+            });
+            res.end(smsg1);
+            return;
+        });
+});
+
+
+/**
+ * findNode  * https: //stackoverflow.com/questions/53390440/how-to-find-a-object-in-a-nested-array-using-recursion-in-js
+ * @param {*} searchname
+ * @param {*} currentNode
+ * @param {*} parentNode
+ * returns object mit currentNode, parentNode oder false wenn gescheitert.
+ */
+function findNode(searchname, currentNode, parentNode) {
+    var i, currentChild, result;
+    if (searchname === currentNode.li_attr.filename) {
+        return {
+            currentNode: currentNode,
+            parentNode: parentNode
+        };
+    } else {
+        // Use a for loop instead of forEach to avoid nested functions
+        // Otherwise "return" will not work properly
+        for (i = 0; i < currentNode.children.length; i += 1) {
+            currentChild = currentNode.children[i];
+            // Search in the current child
+            result = findNode(searchname, currentChild, currentNode);
+            // Return the result if the node has been found
+            if (result !== false) {
+                return result;
+            }
+        }
+        // The node has not been found and we have no more options
+        return false;
+    }
+}
+
+/**
+ * createRefHtml - generiert Verweise
+ * @param {*} targetnode
+ * @param {*} search
+ * returns refhtml
+ */
+function createRefHtml(targetnode, search) {
+    var refhtml = "";
+    refhtml += "<div ";
+    refhtml += " style='clear:both;text-align:center;font-weight: bold;padding-top:1em;'";
+    refhtml += ">";
+    refhtml += "<span>";
+    if (targetnode.parentNode === null) {
+        refhtml += "<br>Parent:" + "root";
+    } else {
+        refhtml += "<br>Parent:" + targetnode.parentNode.li_attr.filename;
+    }
+    refhtml += "<br>Current:" + targetnode.currentNode.li_attr.filename || "";
+    refhtml += "</span>";
+    refhtml += "</div>";
+    return refhtml;
+}
+
+/**
+ * createFooterLinks - erzeugt die Links für den Footer
+ * @param {*} targetnode
+ * @param {*} search
+ * returns footerlinks
+ */
+function createFooterLinks(targetnode, search) {
+    var footerlinks = {};
+    footerlinks.prev = "www.google.com";
+    footerlinks.next = "www.bing.com";
+    return footerlinks;
+}
+
+
+
+/**
+ * findNode
+ * https://stackoverflow.com/questions/22222599/javascript-recursive-search-in-json-object
+ * @param {} searchname - Suchkriterium
+ * @param {*} currentNode - Übergabeobjekt oder Childobjekte
+ */
+function findNode1(searchname, currentNode) {
+    if (searchname === currentNode.li_attr.filename) {
+        return currentNode;
+    } else {
+        for (var index in currentNode.children) {
+            var node = currentNode.children[index];
+            if (searchname === node.li_attr.filename) {
+                return node;
+            }
+            findNode(searchname, node);
+        }
+        return "No Node found";
+    }
+}
+
+
+
+
+/**
+ * iterategtree - Rekursive Iteration Generierungstree
+ * @param {*} obj - Tree zum Ausgangspunkt
+ * @param {*} res - Ergebnisobjekt
+ */
+function iterategtree(obj, res) {
+    try {
+        for (var property in obj) {
+            if (obj.hasOwnProperty(property)) {
+                var node = obj[property];
+                if (typeof res.home === "undefined") {
+                    res.home = node.li_attr.filename;
+                    res.top = node.li_attr.filename;
+                }
+                if (node.li_attr.filename === res.anchor) {
+                    // found und es geht los
+                    for (var ichild = 0; ichild < res.top.children.length; ichild++) {
+                        var sibl = res.top.children[ichild];
+                        node.li_attr.filename === res.anchor
+                    }
+
+                } else {
+                    if (node.children.length > 0) {
+                        res.top = node.li_attr.filename;
+                        res = iterategtree(node, res);
+                        if (res.ready === true) break;
                     }
                 }
             }
         }
-        ret = {
-            error: false,
-            message: "Dateien generiert"
-        };
-        var smsg1 = JSON.stringify(ret);
-        res.writeHead(200, {
-            'Content-Type': 'application/text'
-        });
-        res.end(smsg1);
-        return;
+    } catch (err) {
+        console.log(err);
+    }
+    return res;
+}
 
-
-    });
-});
 
 
 
