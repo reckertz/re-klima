@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Planetary.js tutorial</title>
+  <style type="text/css">
+    #see-my-location-button {
+      display: block;
+      font-weight: 800;
+      margin: auto;
+      margin-bottom: 15px;
+    }
+    #see-my-location-button[disabled] {
+      background-color: #444;
+    }
+
+    #see-my-location-button.error {
+      background-color: #C62828;
+    }
+  </style>
+</head>
+<body>
+  <button id="see-my-location-button">See my location on the globe</button>
+  <canvas id='globe' width='500' height='500'></canvas>
+  <script type='text/javascript' src='https://d3js.org/d3.v3.min.js'></script>
+  <script type='text/javascript' src='https://d3js.org/topojson.v1.min.js'></script>
+  <script type='text/javascript' src='https://cdn.rawgit.com/BinaryMuse/planetary.js/v1.1.2/dist/planetaryjs.min.js'></script>
+  <script type="text/javascript">
+    var planet = planetaryjs.planet();
+    var counter = 0;
+    var tilt = 0;
+    // You can remove this statement if `world-110m.json`
+    // is in the same path as the HTML page:
+    planet.loadPlugin(planetaryjs.plugins.earth({
+      topojson: { file: 'https://raw.githubusercontent.com/BinaryMuse/planetary.js/v1.1.2/dist/world-110m.json' },
+      /* Let's add some color to the globe */
+      oceans:   { fill:   '#0D47A1' },
+      land:     { fill:   '#4CAF50' },
+      borders:  { stroke: '#1B5E20' }
+    }));
+
+    // Load our custom autorotate plugin
+    planet.loadPlugin(autorotate(10));
+
+    // Load the `pings` plugin to draw animated pings on the globe
+    planet.loadPlugin(planetaryjs.plugins.pings({
+      color: '#ffffff', ttl: 1000, angle: 10
+    }));
+
+    // Make the planet fit well in its canvas
+    planet.projection.scale(250).translate([250, 250]);
+    var canvas = document.getElementById('globe');
+    planet.draw(canvas);
+
+    // Get location when clicking the button
+    var locationButton = window.document.getElementById('see-my-location-button');
+    locationButton.addEventListener('click', function() {
+      // Disable button while we get the location
+      locationButton.setAttribute('disabled', 'true');
+      // Change button label
+      locationButton.innerText = 'Getting location...';
+      navigator.geolocation.getCurrentPosition(function(position) {
+        // Success callback
+        showLocation(position);
+        locationButton.innerText = 'Done, look at the globe';
+      }, geoError);
+    });
+
+    // Helper function to add one ping on the globe
+    function showLocation(position) {
+      var latitude = position.coords.latitude;
+      var longitude = position.coords.longitude;
+      // Add a ping on the globe every second
+      setInterval(function() {
+        planet.plugins.pings.add(longitude, latitude);
+      }, 1000);
+    }
+
+    // Geolocation API error callback
+    function geoError(posError) {
+      locationButton.classList.add('error');
+      locationButton.innerText = posError.message;
+    }
+
+    // This plugin will automatically rotate the globe around its vertical
+    // axis a configured number of degrees every second.
+    function autorotate(degPerSec) {
+      // Planetary.js plugins are functions that take a `planet` instance
+      // as an argument...
+      return function(planet) {
+        var lastTick = null;
+        var paused = false;
+        planet.plugins.autorotate = {
+          pause:  function() { paused = true;  },
+          resume: function() { paused = false; }
+        };
+        // ...and configure hooks into certain pieces of its lifecycle.
+        planet.onDraw(function() {
+          if (paused || !lastTick) {
+            lastTick = new Date();
+          } else {
+            var now = new Date();
+            var delta = now - lastTick;
+            // This plugin uses the built-in projection (provided by D3)
+            // to rotate the globe each time we draw it.
+
+            var rotation = planet.projection.rotate();
+            console.log(JSON.stringify(rotation));
+            rotation[0] += degPerSec * delta / 1000;
+            // [60, -10, 0]
+            if (rotation[0] >= 180) rotation[0] -= 360;
+            counter++;
+            if (counter % 360 === 0) {
+                tilt = tilt + 10;
+                if (tilt > 90) tilt = 0;
+                rotation[2] = tilt;
+            }
+            planet.projection.rotate(rotation);
+            lastTick = now;
+          }
+        });
+      };
+    };
+  </script>
+</body>
+</html>
