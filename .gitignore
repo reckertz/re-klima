@@ -10,6 +10,7 @@ static/lib/earth3d/
 static/content/
 content/
 *.db3
+*.db3old
 data/
 temp/
 uploads/

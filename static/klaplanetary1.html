@@ -41,7 +41,8 @@
         <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
         <span class="headertitle" style="color:red;font-weight:bold;">klaplanetary - World-Globe</span>
         <noscript>
-            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+            <div
+                style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
                 <span style="color:blue">
                     Your browser does not support scripts, you have to enable it to run this page
                 </span>
@@ -52,7 +53,8 @@
         <div class="col1of2">
         </div>
         <div class="col2of2">
-            <canvas id='rotatingGlobe' width='400' height='400' style='width: 400px; height: 400px; cursor: move;'></canvas>
+            <canvas id='rotatingGlobe' width='400' height='400'
+                style='width: 400px; height: 400px; cursor: move;'></canvas>
         </div>
     </div>
     <div class="footer">
@@ -209,26 +211,58 @@
              * Buttons
              */
             $(".col1of2")
-            .append($("<button/>", {
-                html: "Stop Rotation",
-                css: {
-                    margin: "10px"
-                },
-                click: function(evt) {
-                    evt.preventDefault();
-                    globe.plugins.autorotate.pause();
-                }
-            }))
-            .append($("<button/>", {
-                html: "Restart Rotation",
-                css: {
-                    margin: "10px"
-                },
-                click: function(evt) {
-                    evt.preventDefault();
-                    globe.plugins.autorotate.resume();
-                }
-            }));
+                .append($("<button/>", {
+                    html: "Draw Arc",
+                    css: {
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        globe.plugins.autorotate.pause();
+
+                        planet.loadPlugin(function (planet) {
+                            planet.onDraw(function () {
+                                planet.withSavedContext(function (context) {
+                                    var arc = {
+                                        type: "LineString",
+                                        color: "red",
+                                        coordinates: [
+                                            [40, 30],
+                                            [80, -50]
+                                        ]
+                                    };
+                                    context.beginPath();
+                                    planet.path.context(context)(arc);
+                                    context.stroke();
+                                    context.closePath();
+                                });
+                            });
+                        });
+
+
+
+                    }
+                }))
+                .append($("<button/>", {
+                    html: "Stop Rotation",
+                    css: {
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        globe.plugins.autorotate.pause();
+                    }
+                }))
+                .append($("<button/>", {
+                    html: "Restart Rotation",
+                    css: {
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        globe.plugins.autorotate.resume();
+                    }
+                }));
         })();
     </script>
 </body>
