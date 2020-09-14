@@ -153,11 +153,17 @@
                     this.context.restore();
                 }
             };
-
+            /*
             planet.projection = d3.geo.orthographic()
                 .clipAngle(90);
             planet.path = d3.geo.path().projection(planet.projection);
+            */
+            debugger;
+            var projection = d3.geoAlbersUsa();
+            planet.projection = projection;
+            planet.path = d3.geoPath().projection(projection);
 
+            
             return planet;
         }
     };
