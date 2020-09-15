@@ -176,6 +176,34 @@
                 class: "uietext",
                 default: "",
                 io: "i"
+            },
+            latN: {
+                title: "Latitude North",
+                type: "string", // currency, integer, datum, text, key
+                class: "uietext",
+                default: "",
+                io: "h"
+            },
+            latS: {
+                title: "Latitude South",
+                type: "string", // currency, integer, datum, text, key
+                class: "uietext",
+                default: "",
+                io: "h"
+            },
+            lonW: {
+                title: "Longitude West",
+                type: "string", // currency, integer, datum, text, key
+                class: "uietext",
+                default: "",
+                io: "h"
+            },
+            lonE: {
+                title: "Longitude East",
+                type: "string", // currency, integer, datum, text, key
+                class: "uietext",
+                default: "",
+                io: "h"
             }
         }
     };
@@ -999,101 +1027,7 @@
                     if (where2.length > 0) where2 += " AND ";
                     where2 += " KLIINVENTORY.source ='" + starecord.source + "'";
                 }
-                if (typeof starecord.stationid !== "undefined" && starecord.stationid.trim().length > 0) {
-                    if (where1.length > 0) where1 += " AND ";
-                    if (where2.length > 0) where2 += " AND ";
-                    if (starecord.stationid.indexOf("*") >= 0) {
-                        var stationid = starecord.stationid.replace(/\*/g, "%");
-                        where1 += " KLISTATIONS.stationid LIKE '" + stationid + "'";
-                        where2 += " KLIINVENTORY.stationid LIKE '" + stationid + "'";
-                    } else {
-                        where1 += " KLISTATIONS.stationid ='" + starecord.stationid + "'";
-                        where2 += " KLIINVENTORYS.stationid ='" + starecord.stationid + "'";
-                    }
-                }
-                if (typeof starecord.name !== "undefined" && starecord.name.trim().length > 0) {
-                    if (where1.length > 0) where1 += " AND ";
-                    where1 += " lower(KLISTATIONS.stationname) LIKE '%" + starecord.name.toLowerCase() + "%'";
-                }
-                if (typeof starecord.region !== "undefined" && starecord.region.trim().length > 0) {
-                    if (where1.length > 0) where1 += " AND ";
-                    if (starecord.region.toLowerCase().indexOf("is null") >= 0) {
-                        where1 += "(";
-                        where1 += "KLISTATIONS.region is null";
-                        where1 += " OR KLISTATIONS.countryname is null";
-                        where1 += " OR KLISTATIONS.alpha2 is null";
-                        where1 += ")";
-                    } else {
-                        where1 += "(";
-                        where1 += " lower(KLISTATIONS.region) LIKE '%" + starecord.region.toLowerCase() + "%'";
-                        where1 += " OR lower(KLISTATIONS.subregion) LIKE '%" + starecord.region.toLowerCase() + "%'";
-                        where1 += " OR lower(KLISTATIONS.countryname) LIKE '%" + starecord.region.toLowerCase() + "%'";
-                        where1 += " OR lower(KLISTATIONS.continentname) LIKE '%" + starecord.region.toLowerCase() + "%'";
-                        where1 += ")";
-                    }
-                }
 
-                /*
-                if (typeof starecord.anzyears !== "undefined" && starecord.anzyears.trim().length > 0) {
-                    if (where.length > 0) where += " AND ";
-                    var anzparts = starecord.anzyears.match(/(<=|>=|<|>|=)(\d*)/);
-                    if (anzparts !== null && anzparts.length > 2) {
-                        where += " KLIDATA.anzyears " + anzparts[1] + parseInt(anzparts[2]);
-                    } else {
-                        where += " KLIDATA.anzyears >= " + starecord.anzyears.trim();
-                    }
-                }
-                */
-                // geht nur für numerische Vorgaben
-                //where = uihelper.getSqlCompareString ("KLIDATA.anzyears", starecord.anzyears, where);
-                if (typeof starecord.anzyears !== "undefined" && starecord.anzyears.trim().length > 0) {
-                    if (where2.length > 0) where2 += " AND ";
-                    where2 += uihelper.getSqlCompareString("(KLIINVENTORY.toyear - KLIINVENTORY.fromyear + 1)", starecord.anzyears, where);
-                }
-                if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
-                    if (where2.length > 0) where2 += " AND ";
-                    var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)(\d*)/);
-                    if (fromyear !== null && fromyear.length > 2) {
-                        // where += " KLIDATA.fromyear " + fromyear[1] + parseInt(fromyear[2]);
-                        where2 += " KLIINVENTORY.fromyear " + fromyear[1] + parseInt(fromyear[2]);
-                    } else {
-                        //where += " KLIDATA.fromyear >= " + starecord.fromyear.trim();
-                        where2 += " KLIINVENTORY.fromyear >= " + starecord.fromyear.trim();
-                    }
-                }
-                if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
-                    if (where2.length > 0) where2 += " AND ";
-                    var toyear = starecord.toyear.match(/(<=|>=|<|>|=)(\d*)/);
-                    if (toyear !== null && toyear.length > 2) {
-                        //where += " KLIDATA.toyear " + toyear[1] + parseInt(toyear[2]);
-                        where2 += " KLIINVENTORY.toyear " + toyear[1] + parseInt(toyear[2]);
-                    } else {
-                        //where += " KLIDATA.toyear <= " + starecord.toyear.trim();
-                        where2 += " KLIINVENTORY.toyear <= " + starecord.toyear.trim();
-                    }
-                }
-                if (typeof starecord.climatezone !== "undefined" && starecord.climatezone.trim().length > 0) {
-                    var selclimatezone = starecord.climatezone.substr(0, 2);
-                    if (where1.length > 0) where1 += " AND ";
-                    if (selclimatezone.startsWith("G")) {
-                        var cz1 = "N" + starecord.climatezone.substr(1, 1);
-                        var cz2 = "S" + starecord.climatezone.substr(1, 1);
-                        where1 += " (substr(KLISTATIONS.climatezone, 1, 2) = '" + cz1 + "'";
-                        where1 += " OR substr(KLISTATIONS.climatezone, 1, 2) = '" + cz2 + "')";
-                    } else {
-                        where1 += " substr(KLISTATIONS.climatezone, 1, 2) = '" + selclimatezone + "'";
-                    }
-                }
-
-                if (typeof starecord.height !== "undefined" && starecord.height.trim().length > 0) {
-                    var height = starecord.height.match(/(<=|>=|<|>|=)(\d*)/);
-                    if (height !== null && height.length > 2) {
-                        if (where1.length > 0) where1 += " AND ";
-                        where1 += " KLISTATIONS.height " + height[1] + parseInt(height[2]);
-                    } else {
-                        sysbase.putMessage("bitte Vergleichsoperator vor die Höhe setzen", 3);
-                    }
-                }
                 if (typeof starecord.variablename !== "undefined" && starecord.variablename.trim().length > 0) {
                     selvariablename = starecord.variablename;
                     if (selvariablename.indexOf(",") < 0) {
@@ -1114,6 +1048,118 @@
                         // where += " KLIDATA.variable IN (" + liste + ")";
                         where2 += " KLIINVENTORY.variable IN (" + liste + ")";
                         where3 += " KLIDATA.variable IN (" + liste + ")";
+                    }
+                }
+
+                /**
+                 * hier die Geo-Selektion - alternativ zur "normalen" Selektion
+                 */
+                if (typeof starecord.latN !== "undefined" && starecord.latN.trim().length > 0) {
+                    var latN = parseFloat(starecord.latN);
+                    var latS = parseFloat(starecord.latS);
+                    var lonW = parseFloat(starecord.lonW);
+                    var lonE = parseFloat(starecord.lonE);
+                    if (latN > latS) {
+                        if (where1.length > 0) where1 += " AND ";
+                        where1 += " KLISTATIONS.latitude <= " + latN;
+                        where1 += " AND KLISTATIONS.latitude >= " + latS;
+                    } else {
+                        if (where1.length > 0) where1 += " AND ";
+                        where1 += " KLISTATIONS.latitude >= " + latN;
+                        where1 += " AND KLISTATIONS.latitude <= " + latS;
+                    }
+                    if (lonW > lonE) {
+                        if (where1.length > 0) where1 += " AND ";
+                        where1 += " KLISTATIONS.longitude <= " + lonW;
+                        where1 += " AND KLISTATIONS.longitude >= " + lonE;
+                    } else {
+                        if (where1.length > 0) where1 += " AND ";
+                        where1 += " KLISTATIONS.longitude >= " + lonW;
+                        where1 += " AND KLISTATIONS.longitude <= " + lonE;
+                    }
+                } else {
+                    if (typeof starecord.stationid !== "undefined" && starecord.stationid.trim().length > 0) {
+                        if (where1.length > 0) where1 += " AND ";
+                        if (where2.length > 0) where2 += " AND ";
+                        if (starecord.stationid.indexOf("*") >= 0) {
+                            var stationid = starecord.stationid.replace(/\*/g, "%");
+                            where1 += " KLISTATIONS.stationid LIKE '" + stationid + "'";
+                            where2 += " KLIINVENTORY.stationid LIKE '" + stationid + "'";
+                        } else {
+                            where1 += " KLISTATIONS.stationid ='" + starecord.stationid + "'";
+                            where2 += " KLIINVENTORY.stationid ='" + starecord.stationid + "'";
+                        }
+                    }
+                    if (typeof starecord.name !== "undefined" && starecord.name.trim().length > 0) {
+                        if (where1.length > 0) where1 += " AND ";
+                        where1 += " lower(KLISTATIONS.stationname) LIKE '%" + starecord.name.toLowerCase() + "%'";
+                    }
+                    if (typeof starecord.region !== "undefined" && starecord.region.trim().length > 0) {
+                        if (where1.length > 0) where1 += " AND ";
+                        if (starecord.region.toLowerCase().indexOf("is null") >= 0) {
+                            where1 += "(";
+                            where1 += "KLISTATIONS.region is null";
+                            where1 += " OR KLISTATIONS.countryname is null";
+                            where1 += " OR KLISTATIONS.alpha2 is null";
+                            where1 += ")";
+                        } else {
+                            where1 += "(";
+                            where1 += " lower(KLISTATIONS.region) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                            where1 += " OR lower(KLISTATIONS.subregion) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                            where1 += " OR lower(KLISTATIONS.countryname) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                            where1 += " OR lower(KLISTATIONS.continentname) LIKE '%" + starecord.region.toLowerCase() + "%'";
+                            where1 += ")";
+                        }
+                    }
+                    // geht nur für numerische Vorgaben
+                    //where = uihelper.getSqlCompareString ("KLIDATA.anzyears", starecord.anzyears, where);
+                    if (typeof starecord.anzyears !== "undefined" && starecord.anzyears.trim().length > 0) {
+                        if (where2.length > 0) where2 += " AND ";
+                        where2 += uihelper.getSqlCompareString("(KLIINVENTORY.toyear - KLIINVENTORY.fromyear + 1)", starecord.anzyears, where);
+                    }
+                    if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
+                        if (where2.length > 0) where2 += " AND ";
+                        var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)(\d*)/);
+                        if (fromyear !== null && fromyear.length > 2) {
+                            // where += " KLIDATA.fromyear " + fromyear[1] + parseInt(fromyear[2]);
+                            where2 += " KLIINVENTORY.fromyear " + fromyear[1] + parseInt(fromyear[2]);
+                        } else {
+                            //where += " KLIDATA.fromyear >= " + starecord.fromyear.trim();
+                            where2 += " KLIINVENTORY.fromyear >= " + starecord.fromyear.trim();
+                        }
+                    }
+                    if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
+                        if (where2.length > 0) where2 += " AND ";
+                        var toyear = starecord.toyear.match(/(<=|>=|<|>|=)(\d*)/);
+                        if (toyear !== null && toyear.length > 2) {
+                            //where += " KLIDATA.toyear " + toyear[1] + parseInt(toyear[2]);
+                            where2 += " KLIINVENTORY.toyear " + toyear[1] + parseInt(toyear[2]);
+                        } else {
+                            //where += " KLIDATA.toyear <= " + starecord.toyear.trim();
+                            where2 += " KLIINVENTORY.toyear <= " + starecord.toyear.trim();
+                        }
+                    }
+                    if (typeof starecord.climatezone !== "undefined" && starecord.climatezone.trim().length > 0) {
+                        var selclimatezone = starecord.climatezone.substr(0, 2);
+                        if (where1.length > 0) where1 += " AND ";
+                        if (selclimatezone.startsWith("G")) {
+                            var cz1 = "N" + starecord.climatezone.substr(1, 1);
+                            var cz2 = "S" + starecord.climatezone.substr(1, 1);
+                            where1 += " (substr(KLISTATIONS.climatezone, 1, 2) = '" + cz1 + "'";
+                            where1 += " OR substr(KLISTATIONS.climatezone, 1, 2) = '" + cz2 + "')";
+                        } else {
+                            where1 += " substr(KLISTATIONS.climatezone, 1, 2) = '" + selclimatezone + "'";
+                        }
+                    }
+
+                    if (typeof starecord.height !== "undefined" && starecord.height.trim().length > 0) {
+                        var height = starecord.height.match(/(<=|>=|<|>|=)(\d*)/);
+                        if (height !== null && height.length > 2) {
+                            if (where1.length > 0) where1 += " AND ";
+                            where1 += " KLISTATIONS.height " + height[1] + parseInt(height[2]);
+                        } else {
+                            sysbase.putMessage("bitte Vergleichsoperator vor die Höhe setzen", 3);
+                        }
                     }
                 }
 
@@ -1308,6 +1354,18 @@
                             reprecord.station += "<img src='/images/icons-png/star-black.png'";
                             reprecord.station += " title='Config-Auswertung'";
                             reprecord.station += " class='kla1610staconf'>";
+
+                            reprecord.station += " &nbsp;";
+                            reprecord.station += "<img src='/images/icons-png/eye-black.png'";
+                            reprecord.station += " title='Distanz-30 km'";
+                            reprecord.station += " class='kla1610stad30'>";
+
+                            reprecord.station += " &nbsp;";
+                            reprecord.station += "<img src='/images/icons-png/eye-black.png'";
+                            reprecord.station += " title='Distanz-60 km'";
+                            reprecord.station += " class='kla1610stad60'>";
+
+
                             stationarray[record.stationid] = record.stationname;
                             //delete record.stationid;
                             //delete record.name;
@@ -1619,7 +1677,7 @@
                 window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
             } else {
                 selstations = [];
-                $(".kla1610staid").each(function(index, item) {
+                $(".kla1610staid").each(function (index, item) {
                     selstations.push({
                         stationid: $(this).attr("rowid"),
                         source: $(this).attr("source")
@@ -1637,9 +1695,9 @@
                 }));
                 var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
                 var stationname = stationarray[confrecord.stationid];
-                var tabname = "Sammelauswertung";  // confrecord.stationid + " " + stationname;
+                var tabname = "Sammelauswertung"; // confrecord.stationid + " " + stationname;
                 if (selstations.length === 1) {
-                    tabname =  confrecord.stationid + " " + stationname;
+                    tabname = confrecord.stationid + " " + stationname;
                 }
                 var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
@@ -1692,6 +1750,91 @@
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
             */
     });
+
+
+
+    /**
+     * kla1610stad30 - Analyse Stationen im 30 km Umkreis
+     * als Näherungslösung (eher Rechteck als Kreis)
+     */
+    $(document).on("click", ".kla1610stad30", function (evt) {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        evt.stopPropagation();
+        var stationid = $(this).closest("tr").attr("rowid");
+        var longitude = $(this).closest("tr").attr("longitude");
+        var latitude = $(this).closest("tr").attr("latitude");
+        var fromyear = $(this).closest("tr").attr("fromyear");
+        var toyear = $(this).closest("tr").attr("toyear");
+
+        var source = starecord.source;
+        var variablename = starecord.variablename;
+        selvariablename = variablename;
+        console.log("Station:" + stationid + " from:" + source);
+        var selcoordinates = uihelper.lincoordinates(latitude, longitude, 30);
+        // Übernahme in die Hidden-Fields
+
+        if (selcoordinates.error === false) {
+            sysbase.putMessage(" ", 1);
+            // hier muss eine neue Selektion erfolgen - tricky mit hidden values
+            // latN, latS, lonW, lonE
+            $("#kla1610stalatN").val(selcoordinates.latN);
+            $("#kla1610stalatS").val(selcoordinates.latS);
+            $("#kla1610stalonW").val(selcoordinates.lonW);
+            $("#kla1610stalonE").val(selcoordinates.lonE);
+            debugger;
+            kla1610sta.getStations(false, function (ret) {
+                sysbase.putMessage("Liste neu ausgegeben", 1);
+                return;
+            });
+        } else {
+            sysbase.putMessage(selcoordinates.message, 3);
+            return;
+        }
+    });
+
+
+
+    /**
+     * kla1610stad60 - Analyse Stationen im 60 km Umkreis
+     * als Näherungslösung (eher Rechteck als Kreis)
+     */
+    $(document).on("click", ".kla1610stad60", function (evt) {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        evt.stopPropagation();
+        var stationid = $(this).closest("tr").attr("rowid");
+        var longitude = $(this).closest("tr").attr("longitude");
+        var latitude = $(this).closest("tr").attr("latitude");
+        var fromyear = $(this).closest("tr").attr("fromyear");
+        var toyear = $(this).closest("tr").attr("toyear");
+
+        var source = starecord.source;
+        var variablename = starecord.variablename;
+        selvariablename = variablename;
+        console.log("Station:" + stationid + " from:" + source);
+        var selcoordinates = uihelper.lincoordinates(latitude, longitude, 60);
+        // Übernahme in die Hidden-Fields
+
+        if (selcoordinates.error === false) {
+            sysbase.putMessage(" ", 1);
+            // hier muss eine neue Selektion erfolgen - tricky mit hidden values
+            // latN, latS, lonW, lonE
+            $("#kla1610stalatN").val(selcoordinates.latN);
+            $("#kla1610stalatS").val(selcoordinates.latS);
+            $("#kla1610stalonW").val(selcoordinates.lonW);
+            $("#kla1610stalonE").val(selcoordinates.lonE);
+            kla1610sta.getStations(false, function (ret) {
+                sysbase.putMessage("Liste neu ausgegeben", 1);
+                return;
+            });
+        } else {
+            sysbase.putMessage(selcoordinates.message, 3);
+            return;
+        }
+    });
+
+
 
 
     $(document).on("click", ".kla1610staupl", function (evt) {

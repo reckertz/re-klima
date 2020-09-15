@@ -2554,6 +2554,55 @@
         return Math.round(d);
     };
 
+
+
+    /**
+     * lincoordinates - berechnet lon und lat zu Koordinate mit km-Distanz
+     * als Näherung eines Kreies, also für SQL geeignet
+     * https://stackoverflow.com/questions/7477003/calculating-new-longitude-latitude-from-old-n-meters
+     * @param {*} lat1 - Breitengrad Ausgangspunkt
+     * @param {*} lon1 - Längengrad Ausgangspunkt
+     * @param {*} km - Distanz in km
+     * returns Objekt mit:
+     * latN - Breitengrad nördlich
+     * lonW - Längengrad westlich
+     * latS - Breitengrad südlich
+     * lonE - Längengrad östlich (East)
+     * return error und message bei Probleme und Fehlern
+     */
+    uihelper.lincoordinates = function (lat1, lon1, km) {
+        try {
+            lat1 = parseFloat(lat1);
+            lon1 = parseFloat(lon1);
+            // For latitude do - Nord- und Südhalbkugel noch beachten
+            var earth = 6378.137; //radius of the earth in kilometer
+            var pi = Math.PI;
+            var m = (1 / ((2 * pi / 360) * earth)) / 1000; // 1 meter in degree
+            var latN = lat1 + (km * 1000 * m);
+            var latS = lat1 - (km * 1000 * m);
+
+            // For longitude do:
+            var cos = Math.cos;
+            var lonE = lon1 + (km * 1000 * m) / cos(lat1 * (pi / 180));
+            var lonW = lon1 - (km * 1000 * m) / cos(lat1 * (pi / 180));
+            return {
+                error: false,
+                message: "calculated",
+                latN: latN,
+                lonW: lonW,
+                latS: latS,
+                lonE: lonE
+            };
+        } catch (err) {
+            return {
+                error: true,
+                message: err
+            };
+        }
+    };
+
+
+
     /**
      * Unterstützung ESRI ASCII Grid Daten
      * x und y mit Math.floor abrunden nach Berechnung
@@ -3067,7 +3116,7 @@
         copyh += "</head>";
         copyh += "<body ";
         copyh += " styles='font-family:Calibri,sans-serif'>";
-        copyh += urlField;   // $(this).parent().html();
+        copyh += urlField; // $(this).parent().html();
         copyh += "</body>";
         copyh += "</html>";
         if (typeof htmlfilename === "undefined") {
