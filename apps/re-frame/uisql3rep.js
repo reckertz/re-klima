@@ -298,7 +298,6 @@
                                         var download_path = j1.path;
                                         // Could also use the link-click method.
                                         // window.location = download_path;
-                                        debugger;
                                         window.open(download_path, '_blank');
                                         sysbase.putMessage(filename + " download erfolgt", 1);
                                     } else {
@@ -359,7 +358,6 @@
                                 var regex = /from\s+(\w+)/i;
                                 var matches = sqlstmt.match(regex);
                                 var qmsg = "";
-                                debugger;
                                 if (null != matches && matches.length >= 2) {
                                     qmsg = "Soll für Tabelle:" + matches[1] + " die Elimination doppelter Sätze durchgeführt werden?";
                                 } else {
@@ -394,7 +392,6 @@
                                         var download_path = j1.path;
                                         // Could also use the link-click method.
                                         // window.location = download_path;
-                                        debugger;
                                         window.open(download_path, '_blank');
                                         sysbase.putMessage(filename + " download erfolgt", 1);
                                     } else {
@@ -413,9 +410,49 @@
                             }
                         }));
 
+                    $("#uisql3repbutts")
+                        .append($("<button/>", {
+                            html: "Field-Metadata",
+                            css: {
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var htmltable = "<table class='tablesorter'>"; //  style='display:none'>";
+                                var selnodes = $('#uisql3repc1b1').jstree('get_selected', true);
+                                if (selnodes !== null && selnodes.length > 0) {
+                                    if (selnodes[0].a_attr.tablename !== "undefined") {
+                                        var seltable = selnodes[0].a_attr.tablename;
+                                        // Die Felder als Children aufbereiten
+                                        var irec = 0;
+                                        var selfields = selnodes[0].children; // holt die id's der Children!!!
+                                        $.each(selfields, function(nr, field) {
+                                            var fieldnode = $('#uisql3repc1b1').jstree(true).get_node(field);
+                                            var fielddata = {};
+                                            fielddata.name = fieldnode.a_attr.name;
+                                            fielddata.type = fieldnode.a_attr.type;
+                                            var line = uihelper.transformJSON2TableTRX(fielddata, irec - 1, {}, {}, "", "");
+                                            htmltable += line;
+                                        });
+                                    }
+                                }
+                                htmltable += "</body>";
+                                htmltable += "</table>";
+                                $("#uisql3repdata").html(htmltable);
+                                $(".tablesorter").tablesorter({
+                                    theme: "blue",
+                                    widthFixed: true,
+                                    widgets: ['filter'],
+                                    widgetOptions: {
+                                        filter_hideFilters: false,
+                                        filter_ignoreCase: true
+                                    }
+                                }); // so funktioniert es
+                                uihelper.downloadHtmlTable($("#uisql3repdata").find("table"), "html-extrakt");
+                            }
+                        }));
 
-
-                    $("#uisql3repbuttu")
+                    $("#uisql3repbutts")
                         .append($("<button/>", {
                             html: "HTML-Download",
                             css: {
@@ -443,7 +480,6 @@
             }
         });
     };
-
 
     uisql3rep.goprevious = function (event, ui, callback) {
         var username = uihelper.getUsername();

@@ -498,7 +498,7 @@
         }
         // console.log("updfields-raw:" + JSON.stringify(updfields, null, " "));
         if (table === "KLIDATA") {
-            debugger;
+            //debugger;
         }
 
         //try {
@@ -627,7 +627,7 @@
                             ret.insert = true;
                             ret.update = false;
                         } else {
-                            if (row === null || row < 1) {
+                            if (typeof row === "undefined" || row === null || row < 1) {
                                 ret.alter = false;
                                 ret.createTable = true;
                                 ret.insert = true;

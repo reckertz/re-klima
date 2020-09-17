@@ -33,6 +33,235 @@
 
 
     /**
+     * loadwasserstand - HYGRIS-Daten nach KLIDATA
+     * und NRWSTATIONS nach KLISTATIONS
+     * https://www.opengeodata.nrw.de/produkte/umwelt_klima/wasser/hygrisc/
+     * @param {*} gblInfo
+     * @param {*} db
+     * @param {*} fs
+     * @param {*} path
+     * @param {*} rootname
+     * @param {*} async
+     * @param {*} stream
+     * @param {*} StreamZip
+     * @param {*} readline
+     * @param {*} sys0000sys
+     * @param {*} req
+     * @param {*} res
+     * returns function (res, ret)
+     */
+    kla1490srv.loadwasserstand = function (gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, callback291) {
+        async.waterfall([
+                function (callback291a) {
+                    /**
+                     * Dateinamen bereitstellen fullname, source, selyears,
+                     * selyears wird nicht genutzt
+                     */
+                    var fullname = "";
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    var source = "HYGRIS";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    var selyears = "";
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+                    if (!fs.existsSync(fullname)) {
+                        callback291a("Error", res, {
+                            error: false,
+                            message: fullname + " nicht auf dem Server vorhanden"
+                        });
+                        return;
+                    }
+                    var stationfilter = "";
+                    if (req.query && typeof req.query.extraParam !== "undefined" && req.query.extraParam.length > 0) {
+                        stationfilter = JSON.parse(req.query.extraParam).stationfilter;
+                    }
+                    var ret = {};
+                    ret.fullname = fullname;
+                    ret.fullnamestations = fullname;
+                    ret.dirname = path.dirname(fullname);
+                    ret.source = source;
+                    ret.selyears = selyears;
+                    ret.stationfilter = stationfilter;
+                    callback291a(null, res, ret);
+                    return;
+                },
+                function (res, ret, callback291b) {
+                    /**
+                     * KLIINVENTORY fortschreiben aus  opendata.gw_wasserstand.csv
+                     * "sl_nr";"messstelle_id";"datum_messung";"abstich_m";"hinweis";"wasserstd_m";"flurabstd_m";"mph_m";"gok_m";"wwj";"aktual_dat"
+                     * "11958747";"076691895";"19001101";"-1.64";"-";"45.36";"10.46";"43.72";"55.82";"1901";"19961107000000"
+                     */
+                    var counter = 0;
+                    ret.vglstationid = "";
+                    var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    try {
+                        fs.createReadStream(ret.fullname)
+                            /*
+                            .pipe(iconv.decodeStream('iso-8859-15'))
+                            .pipe(iconv.encodeStream('utf8'))
+                            */
+                            .pipe(csv.parse({
+                                headers: true,
+                                delimiter: ';',
+                                ignoreEmpty: true
+                            }))
+                            .on("data", function (data) {
+                                var that = this;
+                                that.pause();
+                                counter++;
+                                // console.log(counter + JSON.stringify(data));
+                                if (data.messstelle_id === "messstelle_id") {
+                                    console.log(counter + " skipped");
+                                    that.resume();
+                                } else {
+                                    if (ret.vglstationid !== data.messstelle_id || ret.vglstationid.length === 0) {
+                                        if (ret.vglstationid.length > 0) {
+                                            // finale Rechnungen
+                                            ret.datarecord.anzyears = parseInt(ret.datarecord.toyear) - parseInt(ret.datarecord.fromyear) + 1;
+                                            ret.datarecord.years = JSON.stringify(ret.datarecord.years);
+                                            // Ausgabe Daten der Station - asynchron, etwas "kriminell"
+
+                                            var reqparm = {};
+                                            reqparm.selfields = {
+                                                source: ret.datarecord.source,
+                                                stationid: ret.datarecord.stationid,
+                                                variable: "WLVL"
+                                            };
+                                            reqparm.updfields = {};
+                                            reqparm.updfields["$setOnInsert"] = reqparm.selfields;
+                                            var updrecord = ret.datarecord;
+                                            delete ret.datarecord.source;
+                                            delete ret.datarecord.stationid;
+                                            delete ret.datarecord.variable;
+                                            reqparm.updfields["$set"] = ret.datarecord;
+                                            reqparm.table = "KLIDATA";
+                                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                if (ret1.error === true) {
+                                                    console.log(counter + " " + ret1.message);
+                                                    callback291b("Error", res, ret1);
+                                                    return;
+                                                }
+                                                // Vorbereiten neuer Datensatz
+                                                ret.datarecord = {};
+                                                ret.datarecord.source = "HYGRIS";
+                                                ret.datarecord.stationid = data.messstelle_id;
+                                                console.log("Messstelle:" + data.messstelle_id);
+                                                ret.datarecord.variable = "WLVL";
+                                                ret.datarecord.years = {}; // wird am Schluss stringified
+                                                ret.datarecord.fromyear = null;
+                                                ret.datarecord.toyear = null;
+                                                ret.vglstationid = ret.datarecord.stationid;
+                                                // den ersten Tag initialisieren
+                                                kla1490srv.updatewlvl(mdtable, data, ret);
+                                                that.resume(); // holt den nächsten Satz, auch aus waterfall
+                                            });
+                                        } else {
+                                            // Vorbereiten erster Datensatz
+                                            ret.datarecord = {};
+                                            ret.datarecord.source = "HYGRIS";
+                                            ret.datarecord.stationid = data.messstelle_id;
+                                            console.log("Messstelle:" + data.messstelle_id);
+                                            ret.datarecord.variable = "WLVL";
+                                            ret.datarecord.years = {}; // wird am Schluss stringified
+                                            ret.datarecord.fromyear = null;
+                                            ret.datarecord.toyear = null;
+                                            // aktuellen Satz verarbeiten
+                                            ret.vglstationid = ret.datarecord.stationid;
+                                            kla1490srv.updatewlvl(mdtable, data, ret);
+                                            if (counter % 500 === 0) console.log(counter + " go next");
+                                            that.resume(); // holt den nächsten Satz, auch aus waterfall
+                                        }
+                                    } else {
+                                        // aktuellen Satz verarbeiten
+                                        ret.vglstationid = ret.datarecord.stationid;
+                                        kla1490srv.updatewlvl(mdtable, data, ret);
+                                        if (counter % 500 === 0) console.log(counter + " go next");
+                                        that.resume(); // holt den nächsten Satz, auch aus waterfall
+                                    }
+                                }
+                            })
+                            .on("end", function () {
+                                // hier muss noch der letzte Satz aus dem Puffer ret.datarecord ausgegeben werden
+                                console.log(">>>done Stream<<<");
+                                ret.error = false;
+                                ret.message = "Importiert";
+                                callback291b(null, res, ret);
+                                return;
+                            });
+                    } catch (err) {
+                        var ret = {};
+                        ret.error = true;
+                        ret.message = err;
+                        console.log(err);
+                        callback291b("Error", res, ret);
+                        return;
+                    }
+                }
+            ],
+            function (error, res, ret) {
+                console.log("FERTIG WLVL");
+                callback291(res, ret);
+                return;
+            });
+    };
+
+    /**
+     * updatewlvl - Fortschreibung ein Tag in years in datarecord
+     * @param {*} mdtable - hilfstabelle mit den Tagesanzahlen je Monat eines Jahres
+     * @param {*} data - akutueller Satz mit Messdaten
+     * @param {*} ret hat ret.datarecord - Zielsatz der stationid mit source und variable
+     */
+    kla1490srv.updatewlvl = function (mdtable, data, ret) {
+        var datum = data.datum_messung;
+        var wert = data.wasserstd_m;
+        var year = datum.substr(0, 4);
+        var month = datum.substr(4, 2);
+        var day = datum.substr(6, 2);
+        var tind = 0;
+        try {
+            if (typeof ret.datarecord.years[year] === "undefined") {
+                ret.datarecord.years[year] = [];
+                if (uihelper.isleapyear(year)) {
+                    ret.datarecord.years[year] = new Array(366).fill("");
+                } else {
+                    ret.datarecord.years[year] = new Array(365).fill("");
+                }
+            }
+            if (uihelper.isleapyear(year)) {
+                mdtable[1] = 29;
+            } else {
+                mdtable[1] = 28;
+            }
+            var baseday = 0;
+            for (var imon = 0; imon < (month - 1); imon++) {
+                baseday += mdtable[imon];
+            }
+            tind = baseday + parseInt(day) - 1;
+            if (ret.datarecord.fromyear === null) {
+                ret.datarecord.fromyear = year;
+            } else if (year < ret.datarecord.fromyear) {
+                ret.datarecord.fromyear = year;
+            }
+            if (ret.datarecord.toyear === null) {
+                ret.datarecord.toyear = year;
+            } else if (year > ret.datarecord.toyear) {
+                ret.datarecord.toyear = year;
+            }
+            ret.datarecord.years[year][tind] = wert;
+        } catch (err) {
+            console.log(data);
+            console.log("Tagesindex:" + tind + " zu Datum:" + datum);
+            console.log(err);
+        }
+    };
+
+
+    /**
      * ghcndcomplete - GHCN daily-Aufbereitung
      * Vorgabe ist fullname von ghcnd-stations.txt
      * damit wird KLISTATIONS fortgeschrieben, die +.dly-Files werden hier NICHT geladen
@@ -679,17 +908,17 @@
                             von: "36",
                             bis: "36",
                             type: "String"
-                        },                        {
+                        }, {
                             name: "fromyear", //
                             von: "37",
                             bis: "40",
                             type: "String"
-                        },                        {
+                        }, {
                             name: "skip5", // Leerstelle
                             von: "41",
                             bis: "41",
                             type: "String"
-                        },                        {
+                        }, {
                             name: "toyear", //
                             von: "42",
                             bis: "45",

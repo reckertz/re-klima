@@ -1805,7 +1805,7 @@
                 doKLIRAWFILES: "true"
             }
         }).done(function (r1, textStatus, jqXHR) {
-            debugger;
+
             sysbase.checkSessionLogin(r1);
             sysbase.putMessage(r1, 1);
             var ret = JSON.parse(r1);
@@ -2052,7 +2052,7 @@
                                 uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                                     if (ret.error === false && ret.record !== null) {
                                         klirecord = ret.record;
-                                        debugger;
+
                                         uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                                         $("#kla1400rawform")
                                             .append($("<div/>", {
@@ -2161,7 +2161,7 @@
                                 if (ret.error === false && ret.record !== null) {
                                     klirecord = ret.record;
                                     klirecord.metadata = JSON.parse(klirecord.metadata);
-                                    debugger;
+
                                     uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                                     $("#kla1400rawform")
                                         .append($("<div/>", {
@@ -2224,9 +2224,42 @@
                                                         }).always(function () {
                                                             // nope
                                                         });
+
+                                                    } else if (kla1400raw.checkfragments(fullname, "opendata gw_wasserstand \.csv")) {
+                                                            aktsource = "HYGRIS";
+                                                            debugger;
+                                                            var jqxhr = $.ajax({
+                                                                method: "GET",
+                                                                crossDomain: false,
+                                                                url: sysbase.getServer("loadwasserstand"),
+                                                                data: {
+                                                                    fullname: fullname,
+                                                                    targettable: klirecord.metadata.targettable,
+                                                                    primarykey: klirecord.metadata.primarykey,
+                                                                    separator: klirecord.metadata.separator,
+                                                                    timeout: 10 * 60 * 1000
+                                                                }
+                                                            }).done(function (r1, textStatus, jqXHR) {
+                                                                clearInterval(ghcnclock);
+                                                                document.getElementById("kla1400raw").style.cursor = "default";
+                                                                $(".kla1400rawActionLoad").prop('disabled', false);
+                                                                $("#kla1400raw_rightw").empty();
+                                                                sysbase.checkSessionLogin(r1);
+                                                                var ret = JSON.parse(r1);
+                                                                sysbase.putMessage(ret.message, 1);
+                                                                return;
+                                                            }).fail(function (err) {
+                                                                clearInterval(ghcnclock);
+                                                                $("#kla1400raw_rightw").empty();
+                                                                document.getElementById("kla1400raw").style.cursor = "default";
+                                                                $(".kla1400rawActionLoad").prop('disabled', false);
+                                                                sysbase.putMessage(err, 1);
+                                                                return;
+                                                            }).always(function () {
+                                                                // nope
+                                                            });
                                                     } else {
                                                         $(".kla1400rawActionLoad").prop('disabled', true);
-                                                        debugger;
                                                         var jqxhr = $.ajax({
                                                             method: "POST",
                                                             crossDomain: false,
@@ -2386,7 +2419,6 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
-                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");
@@ -2527,7 +2559,6 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
-                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");
@@ -2666,7 +2697,6 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
-                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");
@@ -2806,7 +2836,6 @@
                     uihelper.getOneRecord(sel, projection, api, table, function (ret) {
                         if (ret.error === false && ret.record !== null) {
                             klirecord = ret.record;
-                            debugger;
                             uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                             // Post-Processing
                             $("#kla1400rawform").find(".refUITable").removeClass("ui-btn");

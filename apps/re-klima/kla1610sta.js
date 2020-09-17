@@ -963,6 +963,7 @@
 
     /**
      * Aufbau Filter und Listenausgaben zunächst einmal
+     * CAST(Width AS DECIMAL(10,2))
      */
     kla1610sta.getStations = function (isfirst, cb16100) {
         $("#kla1610stalist").empty();
@@ -1061,21 +1062,22 @@
                     var lonE = parseFloat(starecord.lonE);
                     if (latN > latS) {
                         if (where1.length > 0) where1 += " AND ";
-                        where1 += " KLISTATIONS.latitude <= " + latN;
-                        where1 += " AND KLISTATIONS.latitude >= " + latS;
+                        // CAST(Width AS DECIMAL(10,2))
+                        where1 += " CAST(KLISTATIONS.latitude as DECIMAL(4,5)) <= " + latN;
+                        where1 += " AND CAST(KLISTATIONS.latitude as DECIMAL(4,5)) >= " + latS;
                     } else {
                         if (where1.length > 0) where1 += " AND ";
-                        where1 += " KLISTATIONS.latitude >= " + latN;
-                        where1 += " AND KLISTATIONS.latitude <= " + latS;
+                        where1 += " CAST(KLISTATIONS.latitude as DECIMAL(4,5)) >= " + latN;
+                        where1 += " AND CAST(KLISTATIONS.latitude as DECIMAL(4,5)) <= " + latS;
                     }
                     if (lonW > lonE) {
                         if (where1.length > 0) where1 += " AND ";
-                        where1 += " KLISTATIONS.longitude <= " + lonW;
-                        where1 += " AND KLISTATIONS.longitude >= " + lonE;
+                        where1 += " CAST(KLISTATIONS.longitude as DECIMAL(4,5)) <= " + lonW;
+                        where1 += " AND CAST(KLISTATIONS.longitude as DECIMAL(4,5)) >= " + lonE;
                     } else {
                         if (where1.length > 0) where1 += " AND ";
-                        where1 += " KLISTATIONS.longitude >= " + lonW;
-                        where1 += " AND KLISTATIONS.longitude <= " + lonE;
+                        where1 += " CAST(KLISTATIONS.longitude as DECIMAL(4,5)) >= " + lonW;
+                        where1 += " AND CAST(KLISTATIONS.longitude as DECIMAL(4,5)) <= " + lonE;
                     }
                 } else {
                     if (typeof starecord.stationid !== "undefined" && starecord.stationid.trim().length > 0) {
@@ -1782,9 +1784,12 @@
             $("#kla1610stalatS").val(selcoordinates.latS);
             $("#kla1610stalonW").val(selcoordinates.lonW);
             $("#kla1610stalonE").val(selcoordinates.lonE);
-            debugger;
             kla1610sta.getStations(false, function (ret) {
                 sysbase.putMessage("Liste neu ausgegeben", 1);
+                $("#kla1610stalatN").val("");
+                $("#kla1610stalatS").val("");
+                $("#kla1610stalonW").val("");
+                $("#kla1610stalonE").val("");
                 return;
             });
         } else {
