@@ -114,18 +114,39 @@
                                 var that = this;
                                 that.pause();
                                 counter++;
-                                // console.log(counter + JSON.stringify(data));
-                                if (data.messstelle_id === "messstelle_id") {
-                                    console.log(counter + " skipped");
-                                    that.resume();
-                                } else {
-                                    if (ret.vglstationid !== data.messstelle_id || ret.vglstationid.length === 0) {
-                                        if (ret.vglstationid.length > 0) {
+                                async.waterfall([
+                                    function (callback291b1) {
+                                        /**
+                                         * Prüfung auf ungültige Daten und Skip
+                                         */
+                                        if (data.messstelle_id === "messstelle_id") {
+                                            console.log(counter + " skipped:" + JSON.stringify(data));
+                                            ret.that = that;
+                                            ret.error = false;
+                                            ret.message = "skipped";
+                                            callback291b1("skipped", res, ret);
+                                            return;
+                                        } else {
+                                            ret.that = that;
+                                            ret.error = false;
+                                            ret.message = "process";
+                                            ret.data = data;
+                                            callback291b1(null, res, ret);
+                                            return;
+                                        }
+                                    },
+                                    function (res, ret, callback291b2) {
+                                        /**
+                                         * Gruppenwechsel, Nachlauf, wenn nicht erster Satz
+                                         */
+                                        if (ret.vglstationid !== data.messstelle_id && ret.vglstationid.length > 0) {
                                             // finale Rechnungen
                                             ret.datarecord.anzyears = parseInt(ret.datarecord.toyear) - parseInt(ret.datarecord.fromyear) + 1;
-                                            ret.datarecord.years = JSON.stringify(ret.datarecord.years);
+                                            //ret.datarecord.years = JSON.stringify(ret.datarecord.years);
+                                            if (typeof ret.datarecord.years === "object") {
+                                                ret.datarecord.years = JSON.stringify(ret.datarecord.years);
+                                            }
                                             // Ausgabe Daten der Station - asynchron, etwas "kriminell"
-
                                             var reqparm = {};
                                             reqparm.selfields = {
                                                 source: ret.datarecord.source,
@@ -138,30 +159,92 @@
                                             delete ret.datarecord.source;
                                             delete ret.datarecord.stationid;
                                             delete ret.datarecord.variable;
-                                            reqparm.updfields["$set"] = ret.datarecord;
+                                          reqparm.updfields["$set"] = ret.datarecord;
                                             reqparm.table = "KLIDATA";
                                             sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
                                                 if (ret1.error === true) {
-                                                    console.log(counter + " " + ret1.message);
-                                                    callback291b("Error", res, ret1);
+                                                    console.log(counter + " ERROR " + ret1.message);
+                                                    ret.error = false;
+                                                    ret.message = "ERROR:" + ret1.message;
+                                                    callback291b2(null, res, ret);
+                                                    return;
+                                                } else {
+                                                    ret.error = false;
+                                                    ret.message = "process";
+                                                    callback291b2(null, res, ret);
                                                     return;
                                                 }
-                                                // Vorbereiten neuer Datensatz
-                                                ret.datarecord = {};
-                                                ret.datarecord.source = "HYGRIS";
-                                                ret.datarecord.stationid = data.messstelle_id;
-                                                console.log("Messstelle:" + data.messstelle_id);
-                                                ret.datarecord.variable = "WLVL";
-                                                ret.datarecord.years = {}; // wird am Schluss stringified
-                                                ret.datarecord.fromyear = null;
-                                                ret.datarecord.toyear = null;
-                                                ret.vglstationid = ret.datarecord.stationid;
-                                                // den ersten Tag initialisieren
-                                                kla1490srv.updatewlvl(mdtable, data, ret);
-                                                that.resume(); // holt den nächsten Satz, auch aus waterfall
                                             });
                                         } else {
-                                            // Vorbereiten erster Datensatz
+                                            ret.error = false;
+                                            ret.message = "process";
+                                            callback291b2(null, res, ret);
+                                            return;
+                                        }
+                                    },
+                                    function (res, ret, callback291b3) {
+                                        /**
+                                         * Gruppenwechsel Vorlauf
+                                         */
+                                        if (ret.vglstationid !== ret.data.messstelle_id) {
+                                            // Feststellen, ob schon ein alter Datensatz da ist
+                                            var reqparm = {
+                                                sel: {
+                                                    source: "HYGRIS",
+                                                    stationid: ret.data.messstelle_id,
+                                                    variable: "WLVL"
+                                                },
+                                                projection: {},
+                                                table: "KLIDATA"
+                                            };
+                                            sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                if (ret1.error === true) {
+                                                    ret.error = false;
+                                                    ret.message = "no old record" + ret1.message;
+                                                    ret.initialize = true;
+                                                    ret.datarecord = {};
+                                                    callback291b3(null, res, ret);
+                                                    return;
+                                                } else if (typeof ret1.record !== "undefined" && ret1.record !== null && Object.keys(ret1.record).length > 0) {
+                                                    ret.error = false;
+                                                    ret.message = "record found";
+                                                    ret.initialize = false;
+                                                    // ret.datarecord = ret1.record;
+                                                    ret.datarecord = Object.assign({}, ret1.record); // fullcopy
+                                                    if (typeof ret.datarecord.years === "string" && ret.datarecord.years.length > 0) {
+                                                        if (ret.datarecord.years.length === 4) {
+                                                            console.log (ret.datatrecord);
+                                                        }
+                                                        ret.datarecord.years = JSON.parse(ret.datarecord.years);
+                                                    } else {
+                                                        ret.datarecord.years = {};
+                                                    }
+                                                    callback291b3(null, res, ret);
+                                                    return;
+                                                } else {
+                                                    ret.error = false;
+                                                    ret.message = "no old record";
+                                                    ret.initialize = true;
+                                                    ret.datarecord = {};
+                                                    callback291b3(null, res, ret);
+                                                    return;
+                                                }
+                                            });
+                                        } else {
+                                            ret.error = false;
+                                            ret.message = "kein Gruppenwechsel";
+                                            ret.initialize = false;
+                                            callback291b3(null, res, ret);
+                                            return;
+                                        }
+                                    },
+                                    function (res, ret, callback291b3) {
+                                        /**
+                                         * Initialisieren neuer Datensatz, wenn erforderlich
+                                         */
+                                        if (ret.initialize === true) {
+                                            ret.initialize === false;
+                                            // Vorbereiten neuer Datensatz
                                             ret.datarecord = {};
                                             ret.datarecord.source = "HYGRIS";
                                             ret.datarecord.stationid = data.messstelle_id;
@@ -170,20 +253,26 @@
                                             ret.datarecord.years = {}; // wird am Schluss stringified
                                             ret.datarecord.fromyear = null;
                                             ret.datarecord.toyear = null;
-                                            // aktuellen Satz verarbeiten
-                                            ret.vglstationid = ret.datarecord.stationid;
-                                            kla1490srv.updatewlvl(mdtable, data, ret);
-                                            if (counter % 500 === 0) console.log(counter + " go next");
-                                            that.resume(); // holt den nächsten Satz, auch aus waterfall
                                         }
-                                    } else {
-                                        // aktuellen Satz verarbeiten
+                                        if (typeof ret.datarecord.stationid === "undefined") {
+                                            console.log("undefined");
+                                        }
                                         ret.vglstationid = ret.datarecord.stationid;
                                         kla1490srv.updatewlvl(mdtable, data, ret);
+                                        ret.error = false;
+                                        ret.message = "processed";
                                         if (counter % 500 === 0) console.log(counter + " go next");
-                                        that.resume(); // holt den nächsten Satz, auch aus waterfall
+                                        callback291b3(null, res, ret);
+                                        return;
                                     }
-                                }
+                                ], function (error, res, ret) {
+                                    if (typeof ret.vglstationid === "undefined" || ret.vglstationid === null) {
+                                        console.log ("verschwunden vglstationid");
+                                    }
+                                    ret.that.resume();
+                                    return;
+                                });
+                                // console.log(counter + JSON.stringify(data));
                             })
                             .on("end", function () {
                                 // hier muss noch der letzte Satz aus dem Puffer ret.datarecord ausgegeben werden
@@ -194,7 +283,6 @@
                                 return;
                             });
                     } catch (err) {
-                        var ret = {};
                         ret.error = true;
                         ret.message = err;
                         console.log(err);
