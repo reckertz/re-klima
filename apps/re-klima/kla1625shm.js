@@ -63,6 +63,7 @@
 
     kla1625shm.show = function (parameters, navigatebucket) {
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
+
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
             selsource = parameters[0].source;
@@ -904,7 +905,10 @@
                     $(':button').prop('disabled', true); // Disable all the buttons
                     $("body").css("cursor", "progress");
                     var sqlStmt = "";
-                    selvariablename = "TMAX,TMIN";
+                    // das passt nicht mehr
+                    if (selvariablename === "TMAX" || selvariablename === "TMIN") {
+                        selvariablename = "TMAX,TMIN";
+                    }
                     var projection = {};
                     sqlStmt += "SELECT ";
                     sqlStmt += "KLISTATIONS.source, ";
@@ -932,13 +936,17 @@
                     sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
                     sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
                     sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
-                    sqlStmt += "AND (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
+                    if (selvariablename === "TMAX,TMIN") {
+                        sqlStmt += "AND (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
+                    } else {
+                        sqlStmt += "AND KLIDATA.variable ='" + selvariablename + "' ";
+                    }
                     sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid, KLIDATA.variable";
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
-
+                    debugger;
                     uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
-                        if (ret1.error === false && ret1.record !== null) {
+                        if (ret1.error === false && ret1.records !== null) {
                             /*
                             intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
                             wenn die Station komplette Temperaturdaten geliefert hat
@@ -946,11 +954,16 @@
                             klirecords = [];
                             // Sortierfolge ist TMAX, TMIN alphabetisch
                             if (typeof ret1.records[0] !== "undefined") {
+                                ret1.records[0].years.replace(/""/g,null);
                                 klirecords.push(ret1.records[0]);
                                 stationrecord = ret1.records[0];
                             }
                             if (typeof ret1.records[1] !== "undefined") {
+                                ret1.records[1].years.replace(/""/g,null);
                                 klirecords.push(ret1.records[1]);
+                            } else {
+                                klirecords.push(ret1.records[0]);
+                                ret1.records[1] =  ret1.records[0];
                             }
                             cb1625g1(null, {
                                 error: false,
@@ -1160,7 +1173,7 @@
                      * sql SELECT mit temptable
                      */
                     var sqlStmt = "";
-                    selvariablename = "TMAX,TMIN";
+                    // selvariablename = "TMAX,TMIN";
                     var projection = {};
                     sqlStmt += "SELECT ";
                     sqlStmt += "KLISTATIONS.source, ";
@@ -1189,7 +1202,11 @@
                     sqlStmt += " LEFT JOIN KLIDATA ";
                     sqlStmt += " ON " + ttid + ".source = KLIDATA.source ";
                     sqlStmt += " AND " + ttid + ".stationid = KLIDATA.stationid ";
+                    if (selvariablename === "TMAX,TMIN") {
                     sqlStmt += " WHERE (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
+                    } else {
+                        sqlStmt += " WHERE KLIDATA.variable ='" + selvariablename + "' ";
+                    }
                     sqlStmt += " ORDER BY " + ttid + ".source, " + ttid + ".stationid, KLIDATA.variable";
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
@@ -3341,11 +3358,15 @@
                         if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
                             var dval = parseFloat(dval1);
                             var inum = 0;
-                            var numt = dval1.split(".");
-                            if (numt.length === 2) {
-                                inum = parseInt(numt[1].substr(0, 1));
+                            if (selvariablename.indexOf("TMAX") >=0 || selvariablename.indexOf("TMIN") >=0) {
+                                var numt = dval1.split(".");
+                                if (numt.length === 2) {
+                                    inum = parseInt(numt[1].substr(0, 1));
+                                } else {
+                                    debugger;
+                                }
                             } else {
-                                debugger;
+                                inum = parseInt(dval1.substr(dval1.length-1));
                             }
                             wrk.valsum += dval;
                             wrk.valcount += 1;

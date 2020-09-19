@@ -49,6 +49,7 @@
                 io: "i",
                 enum: [
                     "GHCND",
+                    "HYGRIS",
                     "GHCN",
                     "GHCN4",
                     "CRUTEM4",
@@ -63,6 +64,7 @@
                 io: "i",
                 enum: [
                     "TMIN,TMAX",
+                    "WLVL",
                     "TMIN",
                     "TMAX",
                     ""

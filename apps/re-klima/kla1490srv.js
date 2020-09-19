@@ -17,7 +17,6 @@
     var sys0000sys = null;
     var kla9020fun = null;
 
-
     var gbldb = null;
     var res = null;
 
@@ -90,6 +89,43 @@
                     callback291a(null, res, ret);
                     return;
                 },
+                function (res, ret, callback291a1) {
+                    /**
+                     * KLICOUNTRYCODES laden nach countries
+                     */
+                    var reqparm = {};
+                    reqparm.table = "KLICOUNTRYCODES";
+                    reqparm.sel = {};
+                    reqparm.projection = {};
+                    sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+                        if (ret1.error === true) {
+                            ret.message += " keine KLICOUNTRYCODES:" + ret1.message;
+                            countries = {};
+                            callback291a1(null, res, ret);
+                            return;
+                        } else {
+                            if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                                countries = {};
+                                for (var recordind in ret1.records) {
+                                    var record = ret1.records[recordind];
+                                    var alpha3 = record.alpha3;
+                                    delete record.history;
+                                    var countryname = record.name;
+                                    delete record.name;
+                                    record.countryname = countryname;
+                                    countries[alpha3] = record;
+                                }
+                                callback291a1(null, res, ret);
+                                return;
+                            } else {
+                                ret.message += " keine KLICOUNTRYCODES";
+                                countries = {};
+                                callback291a1(null, res, ret);
+                                return;
+                            }
+                        }
+                    });
+                },
                 function (res, ret, callback291b) {
                     /**
                      * KLIINVENTORY fortschreiben aus  opendata.gw_wasserstand.csv
@@ -135,9 +171,63 @@
                                             return;
                                         }
                                     },
+
+
+                                    function (res, ret, callback291b2a) {
+                                        /**
+                                         * Gruppenwechsel, Nachlauf KLIINVENTORY, wenn nicht erster Satz
+                                         */
+                                        if (ret.vglstationid !== data.messstelle_id && ret.vglstationid.length > 0) {
+                                            // finale Rechnungen
+                                            ret.datarecord.anzyears = parseInt(ret.datarecord.toyear) - parseInt(ret.datarecord.fromyear) + 1;
+                                            //ret.datarecord.years = JSON.stringify(ret.datarecord.years);
+                                            if (typeof ret.datarecord.years === "object") {
+                                                ret.datarecord.years = JSON.stringify(ret.datarecord.years);
+                                            }
+                                            // Ausgabe Daten der Station - asynchron, etwas "kriminell"
+                                            var reqparm = {};
+                                            reqparm.selfields = {
+                                                source: ret.datarecord.source,
+                                                stationid: ret.datarecord.stationid,
+                                                variable: "WLVL"
+                                            };
+                                            reqparm.updfields = {};
+                                            reqparm.updfields["$setOnInsert"] = reqparm.selfields;
+
+                                            var updrecord = {
+                                                fromyear: ret.datarecord.fromyear,
+                                                toyear: ret.datarecord.toyear,
+                                                longitude: ret.stationrecord.longitude,
+                                                latitude: ret.stationrecord.latitude
+                                            }
+                                            reqparm.updfields["$set"] = updrecord;
+                                            reqparm.table = "KLIINVENTORY";
+                                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                if (ret1.error === true) {
+                                                    console.log(counter + " ERROR " + ret1.message);
+                                                    ret.error = false;
+                                                    ret.message = "ERROR:" + ret1.message;
+                                                    callback291b2a(null, res, ret);
+                                                    return;
+                                                } else {
+                                                    ret.error = false;
+                                                    ret.message = "process";
+                                                    callback291b2a(null, res, ret);
+                                                    return;
+                                                }
+                                            });
+                                        } else {
+                                            ret.error = false;
+                                            ret.message = "process";
+                                            callback291b2a(null, res, ret);
+                                            return;
+                                        }
+                                    },
+
+
                                     function (res, ret, callback291b2) {
                                         /**
-                                         * Gruppenwechsel, Nachlauf, wenn nicht erster Satz
+                                         * Gruppenwechsel, Nachlauf KLIDATA, wenn nicht erster Satz
                                          */
                                         if (ret.vglstationid !== data.messstelle_id && ret.vglstationid.length > 0) {
                                             // finale Rechnungen
@@ -159,7 +249,7 @@
                                             delete ret.datarecord.source;
                                             delete ret.datarecord.stationid;
                                             delete ret.datarecord.variable;
-                                          reqparm.updfields["$set"] = ret.datarecord;
+                                            reqparm.updfields["$set"] = ret.datarecord;
                                             reqparm.table = "KLIDATA";
                                             sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
                                                 if (ret1.error === true) {
@@ -182,9 +272,171 @@
                                             return;
                                         }
                                     },
-                                    function (res, ret, callback291b3) {
+
+
+                                    function (res, ret, callback291b3a) {
                                         /**
-                                         * Gruppenwechsel Vorlauf
+                                         * Gruppenwechsel Vorlauf KLISTATIONS
+                                         * Übernahme NRWSTATIONS auf KLISTATIONS, wenn Daten vorhanden sind
+                                         */
+                                        if (ret.vglstationid !== ret.data.messstelle_id) {
+                                            // Feststellen, ob schon ein alter Datensatz da ist
+                                            var reqparm = {
+                                                sel: {
+                                                    source: "HYGRIS",
+                                                    stationid: ret.data.messstelle_id
+                                                },
+                                                projection: {},
+                                                table: "KLISTATIONS"
+                                            };
+                                            sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                if (ret1.error === true) {
+                                                    ret.error = false;
+                                                    ret.message = "no KLISTATIONS/Error" + ret1.message;
+                                                    ret.stationinitialize = true;
+                                                    ret.stationrecord = {};
+                                                    callback291b3a(null, res, ret);
+                                                    return;
+                                                } else if (typeof ret1.record !== "undefined" && ret1.record !== null && Object.keys(ret1.record).length > 0) {
+                                                    ret.error = false;
+                                                    ret.message = "KLISTATIONS found";
+                                                    ret.stationinitialize = false;
+                                                    ret.stationrecord = Object.assign({}, ret1.record); // fullcopy
+                                                    callback291b3a(null, res, ret);
+                                                    return;
+                                                } else {
+                                                    ret.error = false;
+                                                    ret.message = "no old KLISTATIONS record";
+                                                    ret.stationinitialize = true;
+                                                    ret.klistationrecord = {};
+                                                    callback291b3a(null, res, ret);
+                                                    return;
+                                                }
+                                            });
+                                        } else {
+                                            ret.error = false;
+                                            ret.message = "kein Gruppenwechsel";
+                                            ret.stationinitialize = false;
+                                            callback291b3a(null, res, ret);
+                                            return;
+                                        }
+                                    },
+                                    function (res, ret, callback291b3b) {
+                                        /**
+                                         * Gruppenwechsel Vorlauf KLISTATIONS - NRWSTATIONS übernehmen
+                                         */
+                                        ret.stationwrite = false;
+                                        if (ret.stationinitialize === false) {
+                                            callback291b3b(null, res, ret);
+                                            return;
+                                        } else {
+                                            // Feststellen, ob schon ein alter Datensatz da ist
+                                            var reqparm = {
+                                                sel: {
+                                                    messstelle_id: ret.data.messstelle_id
+                                                },
+                                                projection: {},
+                                                table: "NRWSTATIONS"
+                                            };
+                                            sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                if (ret1.error === true) {
+                                                    ret.error = false;
+                                                    ret.message = "no old NRWSTATIONS-record" + ret1.message;
+                                                    ret.stationinitialize = true;
+                                                    callback291b3b(null, res, ret);
+                                                    return;
+                                                } else if (typeof ret1.record !== "undefined" && ret1.record !== null && Object.keys(ret1.record).length > 0) {
+                                                    ret.error = false;
+                                                    ret.message = "NRWSTATIONS-record found";
+                                                    ret.stationinitialize = false;
+                                                    ret.stationwrite = true;
+                                                    ret.stationrecord = {};
+                                                    ret.stationrecord.source = "HYGRIS";
+                                                    ret.stationrecord.stationid = ret.data.messstelle_id;
+                                                    ret.stationrecord.stationname = ret1.record.name;
+                                                    ret.stationrecord.temperature = "WLVL";
+                                                    // ;"e32";"n32" Ortskoordinaten, Bsp: "2935xx";"56452xx"; für Unschärfe von Privatgrund
+                                                    var coord = uihelper.convertETRS89UTM("e32", ret1.record.e32, "n32", ret1.record.n32);
+                                                    if (coord.error === false) {
+                                                        ret.stationrecord.longitude = coord.longitude;
+                                                        ret.stationrecord.latitude = coord.latitude;
+
+                                                        var cont = uihelper.getContinent(coord.longitude, coord.latitude);
+                                                        if (cont.error === false) {
+                                                            ret.stationrecord.continent = cont.continentcode;
+                                                            ret.stationrecord.continentname = cont.continentname;
+                                                        }
+                                                        var climatezone = uihelper.getClimateZone(coord.latitude);
+                                                        ret.stationrecord.climatezone = climatezone.value;
+                                                        if (crg === null) {
+                                                            crg = require('country-reverse-geocoding').country_reverse_geocoding();
+                                                        }
+                                                        /**
+                                                         * Land aufgrund latitude/longitude bestimmen
+                                                         */
+                                                        var country = crg.get_country(coord.latitude, coord.longitude);
+                                                        if (typeof country !== "undefined" && country !== null) {
+                                                            ret.stationrecord.alpha3 = country.code;
+                                                            ret.stationrecord.countryname = country.name;
+                                                            var countrydata = countries[country.code];
+
+                                                            if (typeof countrydata !== "undefined" && countrydata !== null) {
+                                                                delete countrydata.history;
+                                                                delete countrydata.tsserverupd;
+                                                                delete countrydata.iostatus;
+                                                                delete countrydata._id;
+                                                                ret.stationrecord = Object.assign(ret.stationrecord, countrydata);
+                                                            }
+                                                        }
+                                                    }
+                                                    callback291b3b(null, res, ret);
+                                                    return;
+                                                } else {
+                                                    ret.error = false;
+                                                    ret.message = "no old record";
+                                                    // TODO: hier kann es eigenlich nicht weitergehen!!!
+                                                    ret.stationinitialize = false;
+                                                    ret.stationrecord = {};
+                                                    callback291b3b(null, res, ret);
+                                                    return;
+                                                }
+                                            });
+                                        }
+                                    },
+                                    function (res, ret, callback291b3c) {
+                                        /**
+                                         * Schreiben KLISTATIONS aus ret.stationrecord
+                                         */
+                                        if (ret.stationwrite === false) {
+                                            callback291b3c(null, res, ret);
+                                            return;
+                                        } else {
+                                            var reqparm = {};
+                                            reqparm.selfields = {
+                                                source: "HYGRIS",
+                                                stationid: ret.stationrecord.stationid
+                                            };
+                                            var updstation = Object.assign({}, ret.stationrecord, true);
+                                            delete updstation.source;
+                                            delete updstation.stationid;
+
+                                            reqparm.updfields = {};
+                                            reqparm.updfields["$setOnInsert"] = {
+                                                source: "HYGRIS",
+                                                stationid: ret.stationrecord.stationid
+                                            };
+                                            reqparm.updfields["$set"] = updstation;
+                                            reqparm.table = "KLISTATIONS";
+                                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                callback291b3c(null, res, ret);
+                                                return;
+                                            });
+                                        }
+                                    },
+                                    function (res, ret, callback291b3d) {
+
+                                        /**
+                                         * Gruppenwechsel Vorlauf KLIDATA
                                          */
                                         if (ret.vglstationid !== ret.data.messstelle_id) {
                                             // Feststellen, ob schon ein alter Datensatz da ist
@@ -200,33 +452,24 @@
                                             sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
                                                 if (ret1.error === true) {
                                                     ret.error = false;
-                                                    ret.message = "no old record" + ret1.message;
+                                                    ret.message = "no KLIDATA/Error" + ret1.message;
                                                     ret.initialize = true;
                                                     ret.datarecord = {};
-                                                    callback291b3(null, res, ret);
+                                                    callback291b3d(null, res, ret);
                                                     return;
                                                 } else if (typeof ret1.record !== "undefined" && ret1.record !== null && Object.keys(ret1.record).length > 0) {
                                                     ret.error = false;
-                                                    ret.message = "record found";
-                                                    ret.initialize = false;
-                                                    // ret.datarecord = ret1.record;
+                                                    ret.message = "KLIDATA found";
+                                                    ret.itialize = false;
                                                     ret.datarecord = Object.assign({}, ret1.record); // fullcopy
-                                                    if (typeof ret.datarecord.years === "string" && ret.datarecord.years.length > 0) {
-                                                        if (ret.datarecord.years.length === 4) {
-                                                            console.log (ret.datatrecord);
-                                                        }
-                                                        ret.datarecord.years = JSON.parse(ret.datarecord.years);
-                                                    } else {
-                                                        ret.datarecord.years = {};
-                                                    }
-                                                    callback291b3(null, res, ret);
+                                                    callback291b3d(null, res, ret);
                                                     return;
                                                 } else {
                                                     ret.error = false;
-                                                    ret.message = "no old record";
+                                                    ret.message = "no old KLIDATA record";
                                                     ret.initialize = true;
                                                     ret.datarecord = {};
-                                                    callback291b3(null, res, ret);
+                                                    callback291b3d(null, res, ret);
                                                     return;
                                                 }
                                             });
@@ -234,10 +477,11 @@
                                             ret.error = false;
                                             ret.message = "kein Gruppenwechsel";
                                             ret.initialize = false;
-                                            callback291b3(null, res, ret);
+                                            callback291b3d(null, res, ret);
                                             return;
                                         }
                                     },
+
                                     function (res, ret, callback291b3) {
                                         /**
                                          * Initialisieren neuer Datensatz, wenn erforderlich
@@ -254,8 +498,12 @@
                                             ret.datarecord.fromyear = null;
                                             ret.datarecord.toyear = null;
                                         }
+                                        if (typeof ret.datarecord === "undefined") {
+                                            console.log("undefined ret.datarecord");
+                                        }
+
                                         if (typeof ret.datarecord.stationid === "undefined") {
-                                            console.log("undefined");
+                                            console.log("undefined ret.datarecord.stationid");
                                         }
                                         ret.vglstationid = ret.datarecord.stationid;
                                         kla1490srv.updatewlvl(mdtable, data, ret);
@@ -267,7 +515,7 @@
                                     }
                                 ], function (error, res, ret) {
                                     if (typeof ret.vglstationid === "undefined" || ret.vglstationid === null) {
-                                        console.log ("verschwunden vglstationid");
+                                        console.log("verschwunden vglstationid");
                                     }
                                     ret.that.resume();
                                     return;
@@ -311,6 +559,9 @@
         var month = datum.substr(4, 2);
         var day = datum.substr(6, 2);
         var tind = 0;
+        if (typeof ret.datarecord.years === "string") {
+            ret.datarecord.years = JSON.parse(ret.datarecord.years);
+        }
         try {
             if (typeof ret.datarecord.years[year] === "undefined") {
                 ret.datarecord.years[year] = [];
