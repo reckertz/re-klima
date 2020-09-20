@@ -50,6 +50,9 @@
                 if (Array.isArray(ret1.records)) {
                     if (ret1.records.length > 0) {
                         ret1.record = ret1.records[0];
+                        if (ret1.records.length > 1) {
+                            console.log("getonerecord:" + ret1.records.length);
+                        }
                     }
                 } else {
                     var key = Object.keys(ret1.records);
@@ -272,7 +275,7 @@
         }
         var ret = {};
         var records = [];
-        console.log("getallsqlrecords-0:" + sel);
+        // console.log("getallsqlrecords-0:" + sel);
         try {
             if (db === null) {
                 ret.error = true;
@@ -300,14 +303,14 @@
                     } else if (rows.length === 0) {
                         ret.error = false;
                         ret.message = "getallsqlrecords-2:Keine Sätze zu " + sqlStmt;
-                        console.log(ret.message);
+                        //console.log(ret.message);
                         callbackgsr(res, ret);
                         return;
                     } else {
                         ret.error = false;
                         ret.message = "getallsqlrecords-5:" + " gefunden:" + rows.length;
                         ret.records = rows;
-                        console.log(ret.message);
+                        //console.log(ret.message);
                         callbackgsr(res, ret);
                         return;
                     }
