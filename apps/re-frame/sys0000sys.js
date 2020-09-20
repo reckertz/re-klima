@@ -51,6 +51,7 @@
                     if (ret1.records.length > 0) {
                         ret1.record = ret1.records[0];
                         if (ret1.records.length > 1) {
+                            throw new Error("getonerecord:" + ret1.records.length);
                             console.log("getonerecord:" + ret1.records.length);
                         }
                     }

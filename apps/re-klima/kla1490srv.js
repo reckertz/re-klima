@@ -50,6 +50,8 @@
      * returns function (res, ret)
      */
     kla1490srv.loadwasserstand = function (gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, callback291) {
+        var sortdata = [];
+        var iraw = 0;
         async.waterfall([
                 function (callback291a) {
                     /**
@@ -163,15 +165,12 @@
                     });
 
                 },
-                function (res, ret, callback291a2) {
+                function (res, ret, callback291a2a) {
                     /**
-                     * KLIINVENTORY fortschreiben aus  opendata.gw_wasserstand.csv
-                     * "sl_nr";"messstelle_id";"datum_messung";"abstich_m";"hinweis";"wasserstd_m";"flurabstd_m";"mph_m";"gok_m";"wwj";"aktual_dat"
-                     * "11958747";"076691895";"19001101";"-1.64";"-";"45.36";"10.46";"43.72";"55.82";"1901";"19961107000000"
+                     * Chunks bilden und vorsortieren, 1 Mio Sätze pro Chunk
+                     * kontrolliert mit iraw
                      */
-                    var counter = 0;
-                    ret.vglstationid = "";
-                    var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    sortdata = [];
                     try {
                         fs.createReadStream(ret.fullname)
                             /*
@@ -186,95 +185,67 @@
                             .on("data", function (data) {
                                 var that = this;
                                 that.pause();
-                                counter++;
-                                ret.counter = counter;
-                                // Daten in Puffer lesen, solange die Gruppe gleich ist - ganz schlicht, dann erst verarbeiten
-                                // der Puffer ist ret.datarecord, ganz schlicht
-
-                                if (data.messstelle_id === "messstelle_id") {
-                                    /**
-                                     * Prüfung auf ungültige Daten und Skip
-                                     */
+                                var messstelle_id = data.messstelle_id;
+                                var datum = data.datum_messung;
+                                var wert = data.wasserstd_m;
+                                if (data.messstelle_id === "data.messstelle_id") {
                                     that.resume();
-                                } else if (data.datum_messung < '19500000') {
-                                    /**
-                                     * zum Testen Skip nach Vorgabe!!!
-                                     * alte Messstelle: 081360034 19570402
-                                     */
-                                    that.resume();
-                                } else if (ret.vglstationid === data.messstelle_id) {
-                                    /**
-                                     * Fortschreiben in Puffer ret.datarecord
-                                     */
-                                    kla1490srv.updatewlvl(mdtable, data, ret);
-                                    if (counter % 500 === 0) console.log(counter + " go next");
-                                    that.resume();
-                                } else {
-                                    /**
-                                     * Ausgabe aus dem Puffer aufrufen und neuen Puffer aufbauen
-                                     */
-                                    ret.data = data;
-                                    kla1490srv.putHYGRIS(db, async, uihelper, sys0000sys, res, ret, function (res, ret1) {
-                                        /**
-                                         * Konsistenzcheck
-                                         */
-                                        if (ret.counter !== counter) {
-                                            throw new Error('Counter-Inkonsistenz:' + ret.counter + " zu " + counter);
-                                            process.exit();
-                                        }
-                                        /**
-                                         * neue Daten vorbereiten, wenn nicht vorhanden
-                                         */
-
-                                        if (Object.keys(ret1.datarecord).length === 0) {
-                                            console.log("neue Messstelle: " + data.messstelle_id + " " + data.datum_messung);
-                                            ret = {};
-                                            ret.vglstationid = data.messstelle_id;
-                                            ret.data = data;
-                                            ret.datarecord = {};
-                                            ret.datarecord.source = "HYGRIS";
-                                            ret.datarecord.stationid = data.messstelle_id;
-
-                                            ret.datarecord.variable = "WLVL";
-                                            ret.datarecord.years = {}; // wird am Schluss stringified
-                                            ret.datarecord.fromyear = null;
-                                            ret.datarecord.toyear = null;
+                                }
+                                sortdata.push({
+                                    messstelle_id: data.messstelle_id,
+                                    datum_messung: data.datum_messung,
+                                    wasserstd_m: data.wasserstd_m
+                                });
+                                iraw++;
+                                if (iraw % 1000000 === 0) {
+                                    sortdata.sort(function (a, b) {
+                                        if (a.messstelle_id < b.messstelle_id) {
+                                            return -1;
+                                        } else if (a.messstelle_id > b.messstelle_id) {
+                                            return 1;
                                         } else {
-                                            console.log("alte Messstelle: " + data.messstelle_id + " " + data.datum_messung);
-                                            ret.datarecord = Object.assign({}, ret1.datarecord, true);
-                                            ret.vglstationid = data.messstelle_id;
+                                            if (a.datum_messung < b.datum_messung) {
+                                                return -1;
+                                            } else if (a.datum_messung > b.datum_messung) {
+                                                return 1;
+                                            }
+                                            return 0;
                                         }
-                                        kla1490srv.updatewlvl(mdtable, data, ret);
-                                        if (counter % 500 === 0) console.log(counter + " go next");
+                                    });
+                                    kla1490srv.putHYGRISchunk(db, async, uihelper, sys0000sys, sortdata, res, ret, function (ret1) {
+                                        sortdata = [];
                                         that.resume();
                                     });
-
+                                } else {
+                                    that.resume();
                                 }
+
                             })
                             .on("end", function () {
-                                // hier muss noch der letzte Satz aus dem Puffer ret.datarecord ausgegeben werden
-                                if (ret.vglstationid.length > 0) {
-                                    ret.data = {}; // Zeit "Dateiende" an
-                                    kla1490srv.putHYGRIS(db, async, uihelper, sys0000sys, res, ret, function (res, ret1) {
-                                        console.log(">>>done Stream<<<");
-                                        ret.error = false;
-                                        ret.message = "Importiert";
-                                        callback291a2(null, res, ret);
-                                        return;
-                                    });
-                                } else {
-                                    console.log(">>>done Stream<<<");
-                                    ret.error = false;
-                                    ret.message = "Importiert";
-                                    callback291a2(null, res, ret);
+                                sortdata.sort(function (a, b) {
+                                    if (a.messstelle_id < b.messstelle_id) {
+                                        return -1;
+                                    } else if (a.messstelle_id > b.messstelle_id) {
+                                        return 1;
+                                    } else {
+                                        if (a.datum_messung < b.datum_messung) {
+                                            return -1;
+                                        } else if (a.datum_messung > b.datum_messung) {
+                                            return 1;
+                                        }
+                                        return 0;
+                                    }
+                                });
+                                kla1490srv.putHYGRISchunk(db, async, uihelper, sys0000sys, sortdata, res, ret, function (ret1) {
+                                    callback291a2a(null, res, ret);
                                     return;
-                                }
+                                });
                             });
                     } catch (err) {
                         ret.error = true;
                         ret.message = err;
                         console.log(counter + " " + err);
-                        callback291a2("Error", res, ret);
+                        callback291a2a("Error", res, ret);
                         return;
                     }
                 }
@@ -285,6 +256,110 @@
                 return;
             });
     };
+
+    /**
+     * putHYGRISchunk - Verarbeiten bis 1 Mio Einträge in sortdata
+     * @param {*} db
+     * @param {*} async
+     * @param {*} uihelper
+     * @param {*} sys0000sys
+     * @param {*} res
+     * @param {*} ret
+     * @param {*} chchunk1
+     */
+    kla1490srv.putHYGRISchunk = function (db, async, uihelper, sys0000sys, sortdata, res, ret, chchunk1) {
+
+        var counter = 0;
+        ret.vglstationid = "";
+        var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+        async.eachSeries(sortdata, function (data, nextdata) {
+                counter++;
+                // Daten in Puffer lesen, solange die Gruppe gleich ist - ganz schlicht, dann erst verarbeiten
+                // der Puffer ist ret.datarecord, ganz schlicht
+                if (data.messstelle_id === "messstelle_id") {
+                    /**
+                     * Prüfung auf ungültige Daten und Skip
+                     */
+                    nextdata();
+                    return;
+                } else if (data.datum_messung < '0') {
+                    /**
+                     * zum Testen Skip nach Vorgabe!!! - an delete o.a. Denken
+                     * alte Messstelle: 081360034 19570402
+                     */
+                    nextdata();
+                    return;
+                } else if (ret.vglstationid === data.messstelle_id) {
+                    /**
+                     * Fortschreiben in Puffer ret.datarecord
+                     */
+                    kla1490srv.updatewlvl(mdtable, data, ret);
+                    nextdata();
+                    return;
+                } else {
+                    /**
+                     * Ausgabe aus dem Puffer aufrufen und neuen Puffer aufbauen
+                     */
+                    ret.data = data;
+                    ret.counter = counter;
+                    kla1490srv.putHYGRIS(db, async, uihelper, sys0000sys, res, ret, function (res, ret1) {
+                        /**
+                         * Konsistenzcheck
+                         */
+                        if (ret.counter !== counter) {
+                            throw new Error('Counter-Inkonsistenz:' + ret.counter + " zu " + counter);
+                            process.exit();
+                        }
+                        /**
+                         * neue Daten vorbereiten, wenn nicht vorhanden
+                         */
+                        if (Object.keys(ret1.datarecord).length === 0) {
+                            console.log("neue Messstelle: " + data.messstelle_id + " " + data.datum_messung);
+                            ret = {};
+                            ret.vglstationid = data.messstelle_id;
+                            ret.data = data;
+                            ret.datarecord = {};
+                            ret.datarecord.source = "HYGRIS";
+                            ret.datarecord.stationid = data.messstelle_id;
+
+                            ret.datarecord.variable = "WLVL";
+                            ret.datarecord.years = {}; // wird am Schluss stringified
+                            ret.datarecord.fromyear = null;
+                            ret.datarecord.toyear = null;
+                        } else {
+                            console.log("alte Messstelle: " + data.messstelle_id + " " + data.datum_messung);
+                            ret.datarecord = Object.assign({}, ret1.datarecord, true);
+                            ret.vglstationid = data.messstelle_id;
+                        }
+                        kla1490srv.updatewlvl(mdtable, data, ret);
+                        nextdata();
+                        return;
+                    });
+                }
+            },
+            function (error) {
+                // hier noch die letzte Gruppe Verarbeiten
+                /**
+                 * Ausgabe aus dem Puffer aufrufen und neuen Puffer aufbauen
+                 */
+                ret.data = {};
+                ret.counter = counter;
+                kla1490srv.putHYGRIS(db, async, uihelper, sys0000sys, res, ret, function (res, ret1) {
+                    /**
+                     * Konsistenzcheck
+                     */
+                    if (ret.counter !== counter) {
+                        throw new Error('Counter-Inkonsistenz:' + ret.counter + " zu " + counter);
+                        process.exit();
+                    }
+                    chchunk1(res, ret);
+                    return;
+                });
+            });
+    };
+
+
 
     /**
      * updatewlvl - Fortschreibung ein Tag in years in datarecord
@@ -340,7 +415,12 @@
     };
 
 
+
+
+
+
     kla1490srv.putHYGRIS = function (db, async, uihelper, sys0000sys, res, ret, callback291b) {
+        console.log("Abschluss zu: " + ret.vglstationid);
         db.serialize(function () {
             async.waterfall([
                 function (callback291b1) {
@@ -355,7 +435,7 @@
                     var reqparm = {
                         sel: {
                             source: "HYGRIS",
-                            stationid: ret.datarecord.stationid
+                            stationid: ret.vglstationid
                         },
                         projection: {},
                         table: "KLISTATIONS"
@@ -401,7 +481,7 @@
                         // Feststellen, ob schon ein alter Datensatz da ist
                         var reqparm = {
                             sel: {
-                                messstelle_id: ret.datarecord.stationid
+                                messstelle_id: ret.vglstationid
                             },
                             projection: {},
                             table: "NRWSTATIONS"
@@ -625,6 +705,9 @@
                                 return;
                             }
                         });
+                    } else {
+                        callback291b3d(null, res, ret);
+                        return;
                     }
                 }
             ], function (error, res, ret) {

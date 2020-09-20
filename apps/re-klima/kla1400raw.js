@@ -2185,6 +2185,8 @@
                                                 html: "Laden Datei",
                                                 click: function (evt) {
                                                     evt.preventDefault();
+                                                    evt.stopPropagation();
+                                                    evt.stopImmediatePropagation();
                                                     document.getElementById("kla1400raw").style.cursor = "progress";
                                                     $(".kla1400rawActionLoad").prop('disabled', true);
                                                     // Ausgabe in Map rechts
