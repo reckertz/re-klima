@@ -1682,44 +1682,39 @@
             console.log(extraParam);
             confrecord = JSON.parse(extraParam).props;
             if (confrecord.allin === false) {
-                if ( confrecord.source === "HYGRIS") {
-                window.parent.sysbase.setCache("onestation", JSON.stringify({
-                    stationid: confrecord.stationid,
-                    source: confrecord.source,
-                    variablename: confrecord.variable,
-                    starecord: starecord,
-                    latitude: $(this).closest("tr").attr("latitude"),
-                    longitude: $(this).closest("tr").attr("longitude"),
-                    config: confrecord
-                }));
-                var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
-                var stationname = stationarray[confrecord.stationid];
-                var tabname = confrecord.stationid + " " + stationname;
-                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
-                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                if (confrecord.source === "HYGRIS") {
+                    window.parent.sysbase.setCache("onestation", JSON.stringify({
+                        stationid: confrecord.stationid,
+                        source: confrecord.source,
+                        variablename: confrecord.variable,
+                        starecord: starecord,
+                        latitude: $(this).closest("tr").attr("latitude"),
+                        longitude: $(this).closest("tr").attr("longitude"),
+                        config: confrecord
+                    }));
+                    var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+                    var stationname = stationarray[confrecord.stationid];
+                    var tabname = confrecord.stationid + " " + stationname;
+                    var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
+                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                } else {
+                    window.parent.sysbase.setCache("onestation", JSON.stringify({
+                        stationid: confrecord.stationid,
+                        source: confrecord.source,
+                        variablename: confrecord.variable,
+                        starecord: starecord,
+                        latitude: $(this).closest("tr").attr("latitude"),
+                        longitude: $(this).closest("tr").attr("longitude"),
+                        config: confrecord
+                    }));
+                    var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+                    var stationname = stationarray[confrecord.stationid];
+                    var tabname = confrecord.stationid + " " + stationname;
+                    var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                }
             } else {
-                window.parent.sysbase.setCache("onestation", JSON.stringify({
-                    stationid: confrecord.stationid,
-                    source: confrecord.source,
-                    variablename: confrecord.variable,
-                    starecord: starecord,
-                    latitude: $(this).closest("tr").attr("latitude"),
-                    longitude: $(this).closest("tr").attr("longitude"),
-                    config: confrecord
-                }));
-                var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
-                var stationname = stationarray[confrecord.stationid];
-                var tabname = confrecord.stationid + " " + stationname;
-                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
-                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-
-
-            }
-
-
-
-
-            } else {
+                // allin === true
                 selstations = [];
                 $(".kla1610staid").each(function (index, item) {
                     selstations.push({
@@ -1743,8 +1738,16 @@
                 if (selstations.length === 1) {
                     tabname = confrecord.stationid + " " + stationname;
                 }
-                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
-                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                var selsource = $("#kla1610stasource").val();
+                if (selsource === "GHCND") {
+                    var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                } else if (selsource === "HYGRIS") {
+                    var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
+                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                }
+
+
             }
         });
         if (Object.keys(confrecord).length === 0) {

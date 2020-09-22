@@ -1112,9 +1112,6 @@ app.post('/getmoredata', function (req, res) {
                 cbmd3("Finish", ret);
                 return;
             });
-
-
-
         }
     ], function (error, result) {
         var smsg = JSON.stringify(result);

@@ -1158,7 +1158,6 @@
         var l = new Vector([1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.5, 1.4, 1.5, 1.5, 1.6, 1.4, 1.1, 1.2, 1.5, 1.3, 1.4, 1.7, 1.5, 1.7, 1.5, 1.0, 1.7, 1.9, 1.6, 1.6, 1.5, 1.4, 1.6, 1.6, 1.5, 1.5, 1.4, 1.5, 1.2, 1.3, 1.4, 1.3, 1.5, 1.3, 1.3, 1.3, 1.6, 1.9, 1.4, 1.6, 1.4, 1.5, 1.4, 4.7, 4.5, 4.9, 4.0, 4.6, 4.5, 4.7, 3.3, 4.6, 3.9, 3.5, 4.2, 4.0, 4.7, 3.6, 4.4, 4.5, 4.1, 4.5, 3.9, 4.8, 4.0, 4.9, 4.7, 4.3, 4.4, 4.8, 5.0, 4.5, 3.5, 3.8, 3.7, 3.9, 5.1, 4.5, 4.5, 4.7, 4.4, 4.1, 4.0, 4.4, 4.6, 4.0, 3.3, 4.2, 4.2, 4.2, 4.3, 3.0, 4.1, 6.0, 5.1, 5.9, 5.6, 5.8, 6.6, 4.5, 6.3, 5.8, 6.1, 5.1, 5.3, 5.5, 5.0, 5.1, 5.3, 5.5, 6.7, 6.9, 5.0, 5.7, 4.9, 6.7, 4.9, 5.7, 6.0, 4.8, 4.9, 5.6, 5.8, 6.1, 6.4, 5.6, 5.1, 5.6, 6.1, 5.6, 5.5, 4.8, 5.4, 5.6, 5.1, 5.1, 5.9, 5.7, 5.2, 5.0, 5.2, 5.4, 5.1]);
         var lm = new Regression.linear(l, w);
         console.log(JSON.stringify(lm, null, 4));
-        debugger;
         */
 
         async.waterfall([
@@ -1631,7 +1630,7 @@
 
                 function (ret, cb1625g7) {
                     /**
-                     * Wasserstandverlauf Graphik und Tabelle
+                     * Wasserstandsverlauf Graphik und Tabelle
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     if (kla1626gwaconfig.tempchart === false) {
@@ -1906,7 +1905,6 @@
                         if (kla1626gwaconfig.heatmaps === true) {
                             var erg = kla9020fun.getHeatmap(cid, kla1626gwaconfig.heatmapsx, matrix1, hmoptions, function (ret) {
                                 sysbase.putMessage("Heatmap ausgegeben", 1);
-                                // if (hmoptions.minmax === true) debugger;
                                 callbackshm2(null, {
                                     error: false,
                                     message: "Heatmap ausgegeben",
@@ -2299,12 +2297,19 @@
                 var config = {
                     type: 'line',
                     data: {
-
                         labels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
                         datasets: [],
                         backgroundColor: "yellow"
                     },
                     options: {
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 50,
+                                top: 10,
+                                bottom: 10
+                            }
+                        },
                         plugins: {
                             colorschemes: {
                                 scheme: 'brewer.Paired12'
@@ -2321,7 +2326,6 @@
                                 var xlabel = myChart.data.labels[firstPoint._index];
                                 var ylabel = myChart.data.datasets[firstPoint._datasetIndex].label;
                                 var value = myChart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-
                                 var syears = ylabel.split("-");
                                 /**
                                  * echte Werte später
@@ -2337,7 +2341,6 @@
                                 var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1627dec", tourl);
                                 window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
                             }
-
                             console.log(ylabel + ":" + value);
                         }
 
@@ -2357,7 +2360,6 @@
                 myCharts[selvariable] = new Chart(ctx, config);
                 /*
                 $('#' + chartid).click(function (e) {
-                    debugger;
                     var activePoints = myChart.getElementsAtEvent(event);
                     var activeDataSet = myChart.getDatasetAtEvent(event);
 
@@ -2672,6 +2674,14 @@
                 },
                 mytype: selvariable,
                 maxcount: 0,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 50,
+                        top: 10,
+                        bottom: 10
+                    }
+                },
                 scales: {
                     xAxes: [{
                         ticks: {
@@ -2713,7 +2723,6 @@
         var ibucket = 0;
         var ebucket = distfromyear + diststep - 1;
         var sunbuckets = [];
-        debugger;
         // Initialisieren und auf Standard-Buckets runden oder vorher setzen!!!
         for (var ibuck = distfromyear; ibuck <= disttoyear; ibuck += diststep) {
             sunbuckets.push({
@@ -2764,7 +2773,7 @@
                     spltoday = splfromday + mdtable[imon];
                     for (var iday = splfromday; iday < spltoday; iday++) {
                         var dval1 = yearvals[iday];
-                        if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
+                        if (dval1 !== null && dval1 !== "" && dval1 !== -9999 && !isNaN(dval1)) {
                             var dval = parseFloat(dval1);
                             var inum = 0;
                             if (selvariablename.indexOf("WLVL") >= 0) {
@@ -2813,7 +2822,7 @@
             }
         }
         sunconfig.options.maxcount = 0;
-        debugger;
+        var maxy = 0;
         for (var ibuck = 0; ibuck < sunbuckets.length; ibuck++) {
             // Transformation in Array und Bestimmung maxcount
             var sigdata = Object.keys(sunbuckets[ibuck].temphisto);
@@ -2838,6 +2847,10 @@
                 var sigval = sunbuckets[ibuck].temphisto[sigindex];
                 if (sigval !== null && sigval !== 0) {
                     newarray[parseInt(sigindex) - minval] += sigval;
+                    var vglval = newarray[parseInt(sigindex) - minval];
+                    if (vglval > maxy) {
+                        maxy = vglval;
+                    }
                 }
             }
             sunbuckets[ibuck].temphisto = Object.assign(newarray);
@@ -2849,23 +2862,29 @@
                 borderWidth: 2
             });
         }
-
         /**
          * Anders rechnen für die effektiven Wasserstandswerte, gerundet
          */
-        debugger;
+        var anzvals = maxval - minval + 1;
         for (var ilabel = minval; ilabel <= maxval; ilabel++) {
             var itemp = ilabel;
             var lab;
-            if (itemp % 10 === 0) {
+            if (anzvals <= 10) {
                 lab = "" + itemp;
             } else {
-                lab = "";
+                if (itemp % 10 === 0) {
+                    lab = "" + itemp;
+                } else {
+                    lab = "";
+                }
             }
             sunconfig.data.labels.push(lab);
         }
-
-
+        var rest = maxy % 10;
+        maxy = maxy - rest + 10;
+        sunconfig.options.scales.yAxes[0].ticks.max = maxy;
+        sunconfig.options.scales.xAxes[0].ticks.min = minval;
+        sunconfig.options.scales.xAxes[0].ticks.max = maxval;
         return {
             sunconfig: sunconfig,
         };
@@ -2977,7 +2996,7 @@
         var tableid = cid.substr(1) + "tbl";
         $(cid)
             .append($("<h3/>", {
-                text: "Wasserstandverlauf " + selvariable + " " + klirecords[0].titel,
+                text: "Wasserstandsverlauf " + selvariable + " " + klirecords[0].titel,
                 class: "doprintthis",
             }))
             .append($("<div/>", {
@@ -3223,6 +3242,14 @@
                 backgroundColor: "yellow"
             },
             options: {
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 50,
+                        top: 10,
+                        bottom: 10
+                    }
+                },
                 plugins: {
                     colorschemes: {
                         scheme: 'tableau.HueCircle19'
@@ -3495,6 +3522,14 @@
                         backgroundColor: "yellow"
                     },
                     options: {
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 50,
+                                top: 10,
+                                bottom: 10
+                            }
+                        },
                         plugins: {
                             colorschemes: {
                                 scheme: 'tableau.HueCircle19'

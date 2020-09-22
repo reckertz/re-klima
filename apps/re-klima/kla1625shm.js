@@ -944,7 +944,6 @@
                     sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid, KLIDATA.variable";
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
-                    debugger;
                     uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
                         if (ret1.error === false && ret1.records !== null) {
                             /*
@@ -954,16 +953,16 @@
                             klirecords = [];
                             // Sortierfolge ist TMAX, TMIN alphabetisch
                             if (typeof ret1.records[0] !== "undefined") {
-                                ret1.records[0].years.replace(/""/g,null);
+                                ret1.records[0].years.replace(/""/g, null);
                                 klirecords.push(ret1.records[0]);
                                 stationrecord = ret1.records[0];
                             }
                             if (typeof ret1.records[1] !== "undefined") {
-                                ret1.records[1].years.replace(/""/g,null);
+                                ret1.records[1].years.replace(/""/g, null);
                                 klirecords.push(ret1.records[1]);
                             } else {
                                 klirecords.push(ret1.records[0]);
-                                ret1.records[1] =  ret1.records[0];
+                                ret1.records[1] = ret1.records[0];
                             }
                             cb1625g1(null, {
                                 error: false,
@@ -1162,6 +1161,9 @@
                     //$("button").hide();
                     $(':button').prop('disabled', true); // Disable all the buttons
                     $("body").css("cursor", "progress");
+                    if (selvariablename === "TMAX" || selvariablename === "TMIN") {
+                        selvariablename = "TMAX,TMIN";
+                    }
                     /**
                      * Aufbau temporary table
                      */
@@ -1203,7 +1205,7 @@
                     sqlStmt += " ON " + ttid + ".source = KLIDATA.source ";
                     sqlStmt += " AND " + ttid + ".stationid = KLIDATA.stationid ";
                     if (selvariablename === "TMAX,TMIN") {
-                    sqlStmt += " WHERE (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
+                        sqlStmt += " WHERE (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
                     } else {
                         sqlStmt += " WHERE KLIDATA.variable ='" + selvariablename + "' ";
                     }
@@ -1227,6 +1229,7 @@
                         sysbase.checkSessionLogin(r1);
                         var ret1 = JSON.parse(r1);
                         sysbase.putMessage(ret1.message, 1);
+                        debugger;
                         if (ret1.error === true) {
                             cb1625n0("Error", {
                                 error: ret1.error,
@@ -2103,12 +2106,17 @@
                         cbuckets: true,
                         hyde: true
                     };
-                    hoptionsL.minmaxhistogram = true;
-                    kla1625shm.klihisto2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
-                        ret.divid = divid;
+                    if (typeof hoptionsL === "undefined") {
                         cb1625g5(null, ret);
                         return;
-                    });
+                    } else {
+                        hoptionsL.minmaxhistogram = true;
+                        kla1625shm.klihisto2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                            ret.divid = divid;
+                            cb1625g5(null, ret);
+                            return;
+                        });
+                    }
                 },
                 function (ret, cb1625g6) {
                     /**
@@ -2121,11 +2129,16 @@
                         hyde: true,
                         divid: ret.divid
                     };
-                    hoptionsR.minmaxhistogram = true;
-                    kla1625shm.klihisto2("#" + ret.divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
+                    if (typeof hoptionsR === "undefined") {
                         cb1625g6(null, ret);
                         return;
-                    });
+                    } else {
+                        hoptionsR.minmaxhistogram = true;
+                        kla1625shm.klihisto2("#" + ret.divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
+                            cb1625g6(null, ret);
+                            return;
+                        });
+                    }
                 },
                 function (ret, cb1625g7) {
                     /**
@@ -2168,12 +2181,17 @@
                         cbuckets: true,
                         hyde: true
                     };
-                    hoptionsL.minmaxhistogram = true;
-                    kla1625shm.klitemp2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
-                        ret.divid = divid;
+                    if (typeof hoptionsL === "undefined") {
                         cb1625g7(null, ret);
                         return;
-                    });
+                    } else {
+                        hoptionsL.minmaxhistogram = true;
+                        kla1625shm.klitemp2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                            ret.divid = divid;
+                            cb1625g7(null, ret);
+                            return;
+                        });
+                    }
                 },
 
                 function (ret, cb1625g8) {
@@ -2189,12 +2207,17 @@
                         hyde: true,
                         divid: ret.divid
                     };
-                    hoptionsR.minmaxhistogram = true;
-                    var divid = ret.divid;
-                    kla1625shm.klitemp2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
+                    if (typeof hoptionsR === "undefined") {
                         cb1625g8(null, ret);
                         return;
-                    });
+                    } else {
+                        hoptionsR.minmaxhistogram = true;
+                        var divid = ret.divid;
+                        kla1625shm.klitemp2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
+                            cb1625g8(null, ret);
+                            return;
+                        });
+                    }
                 },
 
 
@@ -2295,16 +2318,36 @@
                     var hratio;
                     var hmvalstr;
                     try {
-
+                        /*
                         if (selvariablename === "TMAX" && klirecords.length > 0) {
                             ret.record = klirecords[0];
                         } else if (selvariablename === "TMIN" && klirecords.length > 1) {
                             ret.record = klirecords[1];
                         }
-
+                        */
+                        if (selvariablename === "TMAX" && klirecords.length > 0) {
+                            if (klirecords[0].variable === "TMAX") {
+                                ret.record = klirecords[0];
+                            } else if (klirecords.length > 1 && klirecords[1].variable === "TMAX") {
+                                ret.record = klirecords[1];
+                            }
+                        }
+                        if (selvariablename === "TMIN" && klirecords.length > 0) {
+                            if (klirecords[0].variable === "TMIN") {
+                                ret.record = klirecords[0];
+                            } else if (klirecords.length > 1 && klirecords[1].variable === "TMIN") {
+                                ret.record = klirecords[1];
+                            }
+                        }
+                        if (typeof ret.record === "undefined" || typeof ret.record.years === "undefined") {
+                            callbackshm2("No Record:" + selvariablename, {
+                                error: true,
+                                message: "No Record:" + selvariablename
+                            });
+                            return;
+                        }
                         var years = JSON.parse(ret.record.years);
                         var dayyears = JSON.parse(ret.record.years); // ret.record[selvariablename].years;
-
                         var mtitle = "";
                         mtitle += (ret.record.variable || "").length > 0 ? " " + ret.record.variable : "";
                         mtitle += " " + selstationid;
@@ -2549,7 +2592,7 @@
                 if (kla1625shmconfig.temptable === true) {
                     $(cid)
                         .append($("<h3/>", {
-                            text: "Histogramm Temperaturverteilung " + selvariable + " "  + klirecords[0].titel,
+                            text: "Histogramm Temperaturverteilung " + selvariable + " " + klirecords[0].titel,
                             class: "doprintthis"
                         }))
                         .append($("<table/>", {
@@ -2768,6 +2811,7 @@
                             }))
                         );
                     $("#" + sparkid).sparkline(sparkpoints, {
+                        /*
                         type: 'bar',
                         height: 60,
                         barColor: "red",
@@ -2778,7 +2822,15 @@
                         defaultPixelsPerValue: 3,
                         chartRangeMin: mincount,
                         chartRangeMax: maxcount
-
+                        */
+                        type: 'line',
+                        height: 60,
+                        fillColor: "red",
+                        defaultPixelsPerValue: 3,
+                        chartRangeMin: mincount,
+                        chartRangeMax: maxcount,
+                        lineColor: "red",
+                        composite: false
                     });
                 }
             }
@@ -2807,7 +2859,7 @@
                             }
                         })
                         .append($("<h3/>", {
-                            text: "Histogramm 1. Dezimalstelle " + selvariable + " "  + klirecords[0].titel,
+                            text: "Histogramm 1. Dezimalstelle " + selvariable + " " + klirecords[0].titel,
                             class: "doprintthis"
                         }))
                         .append($("<canvas/>", {
@@ -3075,6 +3127,7 @@
                 }))
             );
         $("#" + sparkid).sparkline(sun.temphisto, {
+            /*
             type: 'bar',
             height: 60,
             barColor: "red",
@@ -3086,6 +3139,18 @@
             chartRangeMin: 0,
             chartRangeMax: Math.max(sun.temphisto),
             composite: false
+            */
+            type: 'line',
+            height: 60,
+            fillColor: "red",
+            defaultPixelsPerValue: 3,
+            chartRangeMin: mincount,
+            chartRangeMax: maxcount,
+            lineColor: "red",
+            composite: false
+
+
+
         });
 
         // auf oldsparkid
@@ -3358,7 +3423,7 @@
                         if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
                             var dval = parseFloat(dval1);
                             var inum = 0;
-                            if (selvariablename.indexOf("TMAX") >=0 || selvariablename.indexOf("TMIN") >=0) {
+                            if (selvariablename.indexOf("TMAX") >= 0 || selvariablename.indexOf("TMIN") >= 0) {
                                 var numt = dval1.split(".");
                                 if (numt.length === 2) {
                                     inum = parseInt(numt[1].substr(0, 1));
@@ -3366,7 +3431,7 @@
                                     debugger;
                                 }
                             } else {
-                                inum = parseInt(dval1.substr(dval1.length-1));
+                                inum = parseInt(dval1.substr(dval1.length - 1));
                             }
                             wrk.valsum += dval;
                             wrk.valcount += 1;
@@ -3877,7 +3942,7 @@
                     }
                 })
                 .append($("<h2>", {
-                    text: "Auswertung HYDE-Daten "  + klirecords[0].titel,
+                    text: "Auswertung HYDE-Daten " + klirecords[0].titel,
                     class: "doprintthis"
 
                 }))
