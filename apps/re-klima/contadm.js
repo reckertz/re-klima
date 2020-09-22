@@ -619,7 +619,7 @@
                         width: "100%",
                         filebrowserBrowseUrl: '/ckurlbrowser.html',
                         filebrowserImageBrowseUrl: '/ckbrowser.html',
-                        extraPlugins: 'smiley,font',
+                        extraPlugins: 'smiley,font,tableresize',
                         extraCss: "body{font-family:Calibri, serif;font-size:16px}"
                     });
                     // https://stackoverflow.com/questions/1957156/how-to-add-a-custom-button-to-the-toolbar-that-calls-a-javascript-function
@@ -637,8 +637,6 @@
                         toolbar: 'insert',
                         icon: '/images/icons-png/arrow-d-black.png'
                     });
-
-
 
 
 

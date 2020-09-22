@@ -38,6 +38,7 @@
                 actprjname = parameters[0].prjname;
             }
         }
+
         $(".content").empty();
         $(".headertitle").html("Textanalyse zum Klima");
         $(".headertitle").attr("title", "kla1700txt");
@@ -236,7 +237,7 @@
                         });
                     }
                 }))
-                
+
                 .append($("<button/>", {
                     html: "Text-Tree Refresh",
                     css: {
@@ -420,6 +421,8 @@
                     var treeData = $('#MyTree').jstree(true).get_json('#', {flat:false})
                     // set flat:true to get all nodes in 1-level json
                     var jsonData = JSON.stringify(treeData );
+
+                    https://github.com/favish/ckeditor_responsive_tables/blob/master/tablesaw/dist/tablesaw.js
                 */
                 var filenodes = JSON.parse(ret.record.jsonString);
                 $("#kla1700txt_leftw").remove();

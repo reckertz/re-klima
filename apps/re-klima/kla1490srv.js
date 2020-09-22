@@ -132,37 +132,37 @@
                     /**
                      * KLISTATIONS löschen für HYGRIS
                      */
-                    var delStmt = "DELETE FROM KLISTATIONS ";
-                    delStmt += " WHERE source = 'HYGRIS'";
-                    db.run(delStmt, function (err) {
-                        console.log("KLISTATIONS: deleted:" + this.changes);
+                    // var delStmt = "DELETE FROM KLISTATIONS ";
+                    //delStmt += " WHERE source = 'HYGRIS'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLISTATIONS: deleted:" + this.changes);
                         callback291a1a(null, res, ret);
                         return;
-                    });
+                    //});
                 },
                 function (res, ret, callback291a1b) {
                     /**
                      * KLIINVENTORY löschen für HYGRIS
                      */
-                    var delStmt = "DELETE FROM KLIINVENTORY ";
-                    delStmt += " WHERE source = 'HYGRIS'";
-                    db.run(delStmt, function (err) {
-                        console.log("KLIINVENTORY: deleted:" + this.changes);
+                    //var delStmt = "DELETE FROM KLIINVENTORY ";
+                    //delStmt += " WHERE source = 'HYGRIS'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIINVENTORY: deleted:" + this.changes);
                         callback291a1b(null, res, ret);
                         return;
-                    });
+                    //});
                 },
                 function (res, ret, callback291a1c) {
                     /**
                      * KLIDATA löschen für HYGRIS
                      */
-                    var delStmt = "DELETE FROM KLIDATA ";
-                    delStmt += " WHERE source = 'HYGRIS'";
-                    db.run(delStmt, function (err) {
-                        console.log("KLIDATA: deleted:" + this.changes);
+                    //var delStmt = "DELETE FROM KLIDATA ";
+                    //delStmt += " WHERE source = 'HYGRIS'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIDATA: deleted:" + this.changes);
                         callback291a1c(null, res, ret);
                         return;
-                    });
+                    //});
 
                 },
                 function (res, ret, callback291a2a) {

@@ -931,7 +931,23 @@
         var variablename = starecord.variablename;
         selvariablename = variablename;
         console.log("Station:" + stationid + " from:" + source);
-        if (source !== "ECAD") {
+        if (source === "HYGRIS") {
+            window.parent.sysbase.setCache("onestation", JSON.stringify({
+                stationid: stationid,
+                source: source,
+                variablename: selvariablename,
+                starecord: starecord,
+                latitude: $(this).closest("tr").attr("latitude"),
+                longitude: $(this).closest("tr").attr("longitude"),
+                fromyear: $(this).closest("tr").attr("fromyear"),
+                toyear: $(this).closest("tr").attr("toyear"),
+            }));
+            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
+            var stationname = stationarray[stationid];
+            var tabname = variablename + " " + stationname;
+            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
+            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+        } else if (source !== "ECAD") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
                 source: source,
@@ -947,6 +963,7 @@
             var tabname = variablename + " " + stationname;
             var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
             window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+
         } else if (source === "ECAD") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
@@ -1665,6 +1682,22 @@
             console.log(extraParam);
             confrecord = JSON.parse(extraParam).props;
             if (confrecord.allin === false) {
+                if ( confrecord.source === "HYGRIS") {
+                window.parent.sysbase.setCache("onestation", JSON.stringify({
+                    stationid: confrecord.stationid,
+                    source: confrecord.source,
+                    variablename: confrecord.variable,
+                    starecord: starecord,
+                    latitude: $(this).closest("tr").attr("latitude"),
+                    longitude: $(this).closest("tr").attr("longitude"),
+                    config: confrecord
+                }));
+                var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+                var stationname = stationarray[confrecord.stationid];
+                var tabname = confrecord.stationid + " " + stationname;
+                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+            } else {
                 window.parent.sysbase.setCache("onestation", JSON.stringify({
                     stationid: confrecord.stationid,
                     source: confrecord.source,
@@ -1679,6 +1712,13 @@
                 var tabname = confrecord.stationid + " " + stationname;
                 var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+
+
+            }
+
+
+
+
             } else {
                 selstations = [];
                 $(".kla1610staid").each(function (index, item) {
