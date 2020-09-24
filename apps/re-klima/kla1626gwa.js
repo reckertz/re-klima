@@ -63,7 +63,6 @@
 
     kla1626gwa.show = function (parameters, navigatebucket) {
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
-
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
             selsource = parameters[0].source;
@@ -74,12 +73,14 @@
              * Prüfen, ob allin - Abarbeiten aller stationid aus der Liste
              */
             selparms = window.parent.sysbase.getCache("onestation");
-            selparms = JSON.parse(selparms);
-            selstations = selparms.selstations || [];
-            selstationid = selparms.stationid;
-            starecord = selparms.starecord;
-            selsource = selparms.starecord.source;
-            selvariablename = selparms.starecord.variablename;
+            if (selparms !== null) {
+                selparms = JSON.parse(selparms);
+                selstations = selparms.selstations || [];
+                selstationid = selparms.stationid;
+                starecord = selparms.starecord;
+                selsource = selparms.starecord.source;
+                selvariablename = selparms.starecord.variablename;
+            }
             /*
             config:
             comment: ""
@@ -609,7 +610,6 @@
          * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
          */
         if (kla1626gwaconfig.allin === false) {
-
             kla1626gwa.loadalldata(function (ret) {
                 var wmtit = "Auswertung für Station:";
                 // isMember ? '$2.00' : '$10.00'
@@ -690,8 +690,7 @@
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
                     uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
-
-                        if (ret1.error === false && ret1.records !== null) {
+                        if (ret1.error === false && ret1.records !== null && Object.keys(ret1.records).length > 0) {
                             /*
                             abwärtskompatibel zwei Sätze!
                             */
@@ -706,7 +705,7 @@
                                 message: "Daten gefunden"
                             });
                             return;
-                        } else if (ret1.error === false && ret1.record !== null) {
+                        } else if (ret1.error === false && ret1.record !== null && Object.keys(ret1.record).length > 0) {
                             klirecords = [];
                             ret1.records[0] = Object.assign({}, ret1.record, true);
                             ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
@@ -1902,7 +1901,7 @@
 
                         // hier ist das Layout nochmal zu kontrollieren
                         hmoptions.histo = histo1;
-                        if (kla1626gwaconfig.heatmaps === true) {
+                        if (kla1626gwaconfig.heatmaps === true && matrix1.data.length > 0) {
                             var erg = kla9020fun.getHeatmap(cid, kla1626gwaconfig.heatmapsx, matrix1, hmoptions, function (ret) {
                                 sysbase.putMessage("Heatmap ausgegeben", 1);
                                 callbackshm2(null, {
@@ -2991,275 +2990,285 @@
      * @param {*} cb1625k
      */
     kla1626gwa.klitemp2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb1625k) {
-        var ret = {};
-        var ciddiv = cid.substr(1) + "div";
-        var tableid = cid.substr(1) + "tbl";
-        $(cid)
-            .append($("<h3/>", {
-                text: "Wasserstandsverlauf " + selvariable + " " + klirecords[0].titel,
-                class: "doprintthis",
-            }))
-            .append($("<div/>", {
-                id: ciddiv + "L1",
-                css: {
-                    width: "55%",
-                    margin: "10px",
-                    float: "left",
-                    "background-color": "white",
-                    overflow: "hidden"
-                }
-            }))
-            .append($("<div/>", {
-                    id: ciddiv + "R1",
+        try {
+            var ret = {};
+            var ciddiv = cid.substr(1) + "div";
+            var tableid = cid.substr(1) + "tbl";
+            $(cid)
+                .append($("<h3/>", {
+                    text: "Wasserstandsverlauf " + selvariable + " " + klirecords[0].titel,
+                    class: "doprintthis",
+                }))
+                .append($("<div/>", {
+                    id: ciddiv + "L1",
                     css: {
-                        width: "40%",
-                        float: "right",
+                        width: "55%",
+                        margin: "10px",
+                        float: "left",
+                        "background-color": "white",
                         overflow: "hidden"
                     }
-                })
-                .append($("<table/>", {
-                        id: tableid,
-                        class: "doprintthis tablesorter",
-                        border: "2",
-                        rules: "all",
+                }))
+                .append($("<div/>", {
+                        id: ciddiv + "R1",
                         css: {
-                            width: "95%",
-                            float: "left",
-                            margin: "10px",
-                            "background-color": "white"
+                            width: "40%",
+                            float: "right",
+                            overflow: "hidden"
                         }
                     })
-                    .append($("<thead/>")
-                        .append($("<tr/>")
-                            .append($("<th/>", {
-                                html: "Jahr"
-                            }))
-                            .append($("<th/>", {
-                                html: "min"
-                            }))
-                            .append($("<th/>", {
-                                html: "avg"
-                            }))
-                            .append($("<th/>", {
-                                html: "max"
-                            }))
+                    .append($("<table/>", {
+                            id: tableid,
+                            class: "doprintthis tablesorter",
+                            border: "2",
+                            rules: "all",
+                            css: {
+                                width: "95%",
+                                float: "left",
+                                margin: "10px",
+                                "background-color": "white"
+                            }
+                        })
+                        .append($("<thead/>")
+                            .append($("<tr/>")
+                                .append($("<th/>", {
+                                    html: "Jahr"
+                                }))
+                                .append($("<th/>", {
+                                    html: "min"
+                                }))
+                                .append($("<th/>", {
+                                    html: "avg"
+                                }))
+                                .append($("<th/>", {
+                                    html: "max"
+                                }))
+                            )
                         )
+                        .append($("<tbody/>"))
                     )
-                    .append($("<tbody/>"))
-                )
-            );
-        // Loop über die Jahre
-        // hoptions.cbucketdata[year]
+                );
+            // Loop über die Jahre
+            // hoptions.cbucketdata[year]
 
-        var miny = null;
-        var maxy = null;
-        var minvals = [];
-        var avgvals = [];
-        var maxvals = [];
-        var minregvals = [];
-        var avgregvals = [];
-        var maxregvals = [];
-        var ycount = 0;
-        var baseyear = 0;
-        for (var year in hoptions.cbucketdata) {
-            if (hoptions.cbucketdata.hasOwnProperty(year)) {
-                var nyear = parseInt(year);
-                if (baseyear === 0) {
-                    baseyear = nyear - 1;
-                }
-                ycount = nyear - baseyear;
-                var yeardata = hoptions.cbucketdata[year];
-                ycount++;
-                var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
-                yeardata.avgval = yeardata.valsum / yeardata.valcount;
-                $("#" + tableid)
-                    .find("tbody")
-                    .append($("<tr/>")
-                        .append($("<td/>", {
-                            html: yearlabel
-                        }))
-                        .append($("<td/>", {
-                            html: yeardata.minval.toFixed(1)
-                        }))
-                        .append($("<td/>", {
-                            html: yeardata.avgval.toFixed(1)
-                        }))
-                        .append($("<td/>", {
-                            html: yeardata.maxval.toFixed(1)
-                        }))
-                    );
-                minvals.push(yeardata.minval.toFixed(1));
-                avgvals.push(yeardata.avgval.toFixed(1));
-                maxvals.push(yeardata.maxval.toFixed(1));
-                // Umrechnung auf Kelvin
-                minregvals.push([ycount, yeardata.minval + 273.15]);
-                avgregvals.push([ycount, yeardata.avgval + 273.15]);
-                maxregvals.push([ycount, yeardata.maxval + 273.15]);
+            var miny = null;
+            var maxy = null;
+            var minvals = [];
+            var avgvals = [];
+            var maxvals = [];
+            var minregvals = [];
+            var avgregvals = [];
+            var maxregvals = [];
+            var ycount = 0;
+            var baseyear = 0;
+            for (var year in hoptions.cbucketdata) {
+                if (hoptions.cbucketdata.hasOwnProperty(year)) {
+                    var nyear = parseInt(year);
+                    if (baseyear === 0) {
+                        baseyear = nyear - 1;
+                    }
+                    ycount = nyear - baseyear;
+                    var yeardata = hoptions.cbucketdata[year];
+                    ycount++;
+                    var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
+                    yeardata.avgval = yeardata.valsum / yeardata.valcount;
+                    $("#" + tableid)
+                        .find("tbody")
+                        .append($("<tr/>")
+                            .append($("<td/>", {
+                                html: yearlabel
+                            }))
+                            .append($("<td/>", {
+                                html: yeardata.minval.toFixed(1)
+                            }))
+                            .append($("<td/>", {
+                                html: yeardata.avgval.toFixed(1)
+                            }))
+                            .append($("<td/>", {
+                                html: yeardata.maxval.toFixed(1)
+                            }))
+                        );
+                    minvals.push(yeardata.minval.toFixed(1));
+                    avgvals.push(yeardata.avgval.toFixed(1));
+                    maxvals.push(yeardata.maxval.toFixed(1));
+                    // Umrechnung auf Kelvin
+                    minregvals.push([ycount, yeardata.minval + 273.15]);
+                    avgregvals.push([ycount, yeardata.avgval + 273.15]);
+                    maxregvals.push([ycount, yeardata.maxval + 273.15]);
 
-                if (miny === null) {
-                    miny = yeardata.minval;
-                } else if (miny < yeardata.minval) {
-                    miny = yeardata.minval;
-                }
-                if (maxy === null) {
-                    maxy = yeardata.maxval;
-                } else if (maxy < yeardata.maxval) {
-                    maxy = yeardata.maxval;
+                    if (miny === null) {
+                        miny = yeardata.minval;
+                    } else if (miny < yeardata.minval) {
+                        miny = yeardata.minval;
+                    }
+                    if (maxy === null) {
+                        maxy = yeardata.maxval;
+                    } else if (maxy < yeardata.maxval) {
+                        maxy = yeardata.maxval;
+                    }
                 }
             }
-        }
-        /**
-         * Regressionsanalyse minvals, avgvals und maxvals als Array
-         * https://tom-alexander.github.io/regression-js/
-         */
-        var result = regression.linear(minregvals, {
-            order: 2,
-            precision: 3
-        });
-        var mingradient = result.equation[0].toFixed(3);
-        var minyIntercept = result.equation[1].toFixed(2);
-        var minr2 = Math.round(result.r2 * 100);
+            /**
+             * Regressionsanalyse minvals, avgvals und maxvals als Array
+             * https://tom-alexander.github.io/regression-js/
+             */
+            var result = regression.linear(minregvals, {
+                order: 2,
+                precision: 3
+            });
+            var mingradient = result.equation[0].toFixed(3);
+            var minyIntercept = result.equation[1].toFixed(2);
+            var minr2 = Math.round(result.r2 * 100);
 
-        result = regression.linear(avgregvals, {
-            order: 2,
-            precision: 3
-        });
-        var avggradient = result.equation[0].toFixed(3);
-        var avgyIntercept = result.equation[1].toFixed(2);
-        var avgr2 = Math.round(result.r2 * 100);
+            result = regression.linear(avgregvals, {
+                order: 2,
+                precision: 3
+            });
+            var avggradient = result.equation[0].toFixed(3);
+            var avgyIntercept = result.equation[1].toFixed(2);
+            var avgr2 = Math.round(result.r2 * 100);
 
-        result = regression.linear(maxregvals, {
-            order: 2,
-            precision: 3
-        });
-        var maxgradient = result.equation[0].toFixed(3);
-        var maxyIntercept = result.equation[1].toFixed(2);
-        var maxr2 = Math.round(result.r2 * 100);
+            result = regression.linear(maxregvals, {
+                order: 2,
+                precision: 3
+            });
+            var maxgradient = result.equation[0].toFixed(3);
+            var maxyIntercept = result.equation[1].toFixed(2);
+            var maxr2 = Math.round(result.r2 * 100);
 
-        var mindelta = minregvals[minregvals.length - 1][1] - minregvals[0][1];
-        var avgdelta = avgregvals[avgregvals.length - 1][1] - avgregvals[0][1];
-        var maxdelta = maxregvals[maxregvals.length - 1][1] - maxregvals[0][1];
-        $("#" + tableid)
-            .find("tbody")
-            .append($("<tr/>")
-                .append($("<td/>", {
-                    html: "Delta 1-n"
-                }))
-                .append($("<td/>", {
-                    html: mindelta.toFixed(1)
-                }))
-                .append($("<td/>", {
-                    html: avgdelta.toFixed(1)
-                }))
-                .append($("<td/>", {
-                    html: maxdelta.toFixed(1)
-                }))
-            );
-
+            var mindelta = minregvals[minregvals.length - 1][1] - minregvals[0][1];
+            var avgdelta = avgregvals[avgregvals.length - 1][1] - avgregvals[0][1];
+            var maxdelta = maxregvals[maxregvals.length - 1][1] - maxregvals[0][1];
+            $("#" + tableid)
+                .find("tbody")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: "Delta 1-n"
+                    }))
+                    .append($("<td/>", {
+                        html: mindelta.toFixed(1)
+                    }))
+                    .append($("<td/>", {
+                        html: avgdelta.toFixed(1)
+                    }))
+                    .append($("<td/>", {
+                        html: maxdelta.toFixed(1)
+                    }))
+                );
 
 
-        $("#" + tableid)
-            .find("tbody")
-            .append($("<tr/>")
-                .append($("<td/>", {
-                    html: "Steigung g"
-                }))
-                .append($("<td/>", {
-                    html: mingradient
-                }))
-                .append($("<td/>", {
-                    html: avggradient
-                }))
-                .append($("<td/>", {
-                    html: maxgradient
-                }))
-            );
+
+            $("#" + tableid)
+                .find("tbody")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: "Steigung g"
+                    }))
+                    .append($("<td/>", {
+                        html: mingradient
+                    }))
+                    .append($("<td/>", {
+                        html: avggradient
+                    }))
+                    .append($("<td/>", {
+                        html: maxgradient
+                    }))
+                );
 
 
-        $("#" + tableid)
-            .find("tbody")
-            .append($("<tr/>")
-                .append($("<td/>", {
-                    html: "Bestimmtheit r2 %"
-                }))
-                .append($("<td/>", {
-                    html: minr2
-                }))
-                .append($("<td/>", {
-                    html: avgr2
-                }))
-                .append($("<td/>", {
-                    html: maxr2
-                }))
-            );
+            $("#" + tableid)
+                .find("tbody")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: "Bestimmtheit r2 %"
+                    }))
+                    .append($("<td/>", {
+                        html: minr2
+                    }))
+                    .append($("<td/>", {
+                        html: avgr2
+                    }))
+                    .append($("<td/>", {
+                        html: maxr2
+                    }))
+                );
 
-        var chartid = ciddiv + "chart";
-        $("#" + ciddiv + "L1")
-            .append($("<canvas/>", {
-                id: chartid,
-                class: "doprintthis",
-                css: {
-                    "text-align": "center"
-                }
-            }));
-
-        var ctx = document.getElementById(chartid).getContext('2d');
-        //Chart.defaults.global.plugins.colorschemes.override = true;
-        //Chart.defaults.global.legend.display = true;
-        // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
-
-        var config = {
-            type: 'line',
-            data: {
-                labels: Object.keys(hoptions.cbucketdata),
-                datasets: [{
-                        label: "min",
-                        data: minvals,
-                        backgroundColor: "blue",
-                        borderColor: "blue",
-                        fill: false,
-                        borderWidth: 2
-                    },
-                    {
-                        label: "avg",
-                        data: avgvals,
-                        backgroundColor: "black",
-                        /* window.chartColors.black,*/
-                        borderColor: "black",
-                        /* window.chartColors.black, */
-                        fill: false,
-                        borderWidth: 2
-                    },
-                    {
-                        label: "max",
-                        data: maxvals,
-                        backgroundColor: "red",
-                        borderColor: "red",
-                        fill: false,
-                        borderWidth: 2
+            var chartid = ciddiv + "chart";
+            $("#" + ciddiv + "L1")
+                .append($("<canvas/>", {
+                    id: chartid,
+                    class: "doprintthis",
+                    css: {
+                        "text-align": "center"
                     }
-                ],
-                backgroundColor: "yellow"
-            },
-            options: {
-                layout: {
-                    padding: {
-                        left: 10,
-                        right: 50,
-                        top: 10,
-                        bottom: 10
-                    }
+                }));
+
+            var ctx = document.getElementById(chartid).getContext('2d');
+            //Chart.defaults.global.plugins.colorschemes.override = true;
+            //Chart.defaults.global.legend.display = true;
+            // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+
+            var config = {
+                type: 'line',
+                data: {
+                    labels: Object.keys(hoptions.cbucketdata),
+                    datasets: [{
+                            label: "min",
+                            data: minvals,
+                            backgroundColor: "blue",
+                            borderColor: "blue",
+                            fill: false,
+                            borderWidth: 2
+                        },
+                        {
+                            label: "avg",
+                            data: avgvals,
+                            backgroundColor: "black",
+                            /* window.chartColors.black,*/
+                            borderColor: "black",
+                            /* window.chartColors.black, */
+                            fill: false,
+                            borderWidth: 2
+                        },
+                        {
+                            label: "max",
+                            data: maxvals,
+                            backgroundColor: "red",
+                            borderColor: "red",
+                            fill: false,
+                            borderWidth: 2
+                        }
+                    ],
+                    backgroundColor: "yellow"
                 },
-                plugins: {
-                    colorschemes: {
-                        scheme: 'tableau.HueCircle19'
+                options: {
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 50,
+                            top: 10,
+                            bottom: 10
+                        }
+                    },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.HueCircle19'
+                        }
                     }
                 }
-            }
-        };
-        window.chart1 = new Chart(ctx, config);
-        cb1625k(ret);
-        return;
+            };
+            window.chart1 = new Chart(ctx, config);
+            cb1625k(ret);
+            return;
+        } catch (err) {
+            console.log(err);
+            console.log(err.stack);
+            cb1625k({
+                error: true,
+                message: err
+            });
+            return;
+        }
     };
 
 

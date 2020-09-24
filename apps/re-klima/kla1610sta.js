@@ -521,7 +521,7 @@
                             }
                         }))
 
-
+                        /*
                         .append($("<button/>", {
                             css: {
                                 float: "left",
@@ -564,7 +564,57 @@
                                 }
                             }
                         }))
+                        */
 
+                        .append($("<button/>", {
+                            html: "Leaflet-Pins (Liste)",
+                            id: "kla1626gwapins",
+                            css: {
+                                float: "left",
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                // Iteration Liste für stationid, longitude, latitude
+                                // Übergabe stringified
+                                var stationarray = [];
+                                var test = $("#kla1610sta").find(".col2of2").find("tbody tr:visible");
+                                $("#kla1610sta").find(".col2of2").find("tbody tr:visible").each(function (index, row) {
+                                    var stationid = $(row).attr("rowid");
+                                    var sitename = $(row).find("td:nth-child(2)").text(); //
+                                    var longitude = $(row).attr("longitude"); // .find("td:nth-child(8)").text();
+                                    var latitude = $(row).attr("latitude"); // .find("td:nth-child(9)").text();
+                                    stationarray.push({
+                                        source: $(row).attr("source"),
+                                        variable: $(row).attr("variable"),
+                                        stationid: stationid,
+                                        sitename: sitename,
+                                        longitude: parseFloat(longitude),
+                                        latitude: parseFloat(latitude)
+                                    });
+                                });
+                                if (stationarray.length === 0) {
+                                    sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
+                                    return;
+                                } else {
+                                    window.parent.sysbase.setCache("stationarray", stationarray);
+                                    window.parent.sysbase.setCache("starecord", starecord);
+                                    var idc20 = window.parent.sysbase.tabcreateiframe("Station-Pins", "", "re-klima", "kla1632pins", "klaleafletpins.html");
+                                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                                }
+
+
+                                /*
+                                var gurl = "klaleafpins.html";
+                                gurl += "?";
+                                gurl += "latitude=" + encodeURIComponent(latitude);
+                                gurl += "&";
+                                gurl += "longitude=" + encodeURIComponent(longitude);
+                                var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                                window.open(gurl, wname, 'height=' + screen.height + ', width=' + screen.width);
+                                */
+                            }
+                        }))
 
                         .append($("<button/>", {
                             css: {
@@ -928,14 +978,14 @@
         evt.preventDefault();
         var stationid = $(this).closest("tr").attr("rowid");
         var source = starecord.source;
-        var variablename = starecord.variablename;
+        var variablename = $(this).closest("tr").attr("variable");
         selvariablename = variablename;
         console.log("Station:" + stationid + " from:" + source);
         if (source === "HYGRIS") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
                 source: source,
-                variablename: selvariablename,
+                variablename: $(this).closest("tr").attr("variable"),
                 starecord: starecord,
                 latitude: $(this).closest("tr").attr("latitude"),
                 longitude: $(this).closest("tr").attr("longitude"),
@@ -1275,7 +1325,6 @@
         var skip = 0;
         var limit = 0;
         var api = "getallrecords";
-
         uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
             if (ret.error === true) {
                 // sollte nicht passieren??? oder auch hier anlegen
@@ -1340,19 +1389,26 @@
 
                     };
                     stationrecords = ret.records;
+                    var vglsource = "";
+                    var vglstationid = "";
+                    var vglvariable = "";
                     //stationrecords.source = ret.rsource;
                     var htmltable = "<table class='tablesorter'>";
                     var irow = 0;
                     for (var property in ret.records) {
                         if (ret.records.hasOwnProperty(property)) {
                             var record = ret.records[property];
+                            if (record.source === vglsource && record.stationid === vglstationid) {
+                                // gleiche Gruppe - später Post-Processing für die letzte Zeile!!!
+                                continue;
+                            }
                             delete record._id;
                             var rowid = record.stationid; // "key" + irow;
                             var reprecord = {};
                             // reprecord.source = record.source;
                             reprecord.nr = irow + 1;
                             reprecord.station = record.stationid;
-                            //reprecord.station += " " + record.variable || "" + " ";
+                            reprecord.station += " (" + (record.variable || "") + ") ";
                             reprecord.station += "<br><b>" + record.stationname + "</b>";
                             /*
                             if (typeof record.temperature === "undefined" || record.temperature === null) {
@@ -1427,6 +1483,7 @@
                             var rowprop = {
                                 rowid: rowid,
                                 source: record.source,
+                                variable: record.variable,
                                 longitude: record.longitude,
                                 latitude: record.latitude,
                                 fromyear: record.fromyear,

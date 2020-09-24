@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no">
+    <title>klaleaflet - Weltkarte und Geo-Test</title>
+    <meta name="description" content="Pins für stationids mit Leaflet" />
+    <meta name="cache-control" content="no-cache, no-store">
+    <meta name="keywords" content="Node.js, JavaScript, AWS EC2, MongoDB, PWA, SPA">
+    <meta name="author" content="Rolf W. Eckertz www.eckertz-consult.com">
+    <link href="css/style.min.css" rel="stylesheet">
+    <link href="css/klistyles.css" rel="stylesheet">
+    <link href="css/leaflet.css" rel="stylesheet">
+
+    <script src="lib/async.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.backDetect.js"></script>
+    <script src="lib/jquery.cookie.min.js"></script>
+    <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
+    <script src="lib/leaflet.js" charset="utf-8"></script>
+    <!-- script src="lib/jsts.min.js" charset="utf-8"></script -->
+    <!-- script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script -->
+    <script src="lib/turf.min.js" charset="utf-8"></script>
+
+    <script type="text/javascript" src="apps/re-frame/uihelper.js"></script>
+    <script type="text/javascript" src="apps/re-frame/sysbase.js"></script>
+    <script type="text/javascript" src="apps/re-klima/kla1560wma.js"></script>
+</head>
+
+<body>
+    <div class="header">
+        <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
+        <span class="headertitle" style="color:red;font-weight:bold;">klaleaflet - World-Map und Geo-Test</span>
+        <noscript>
+            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+                <span style="color:blue">
+                    Your browser does not support scripts, you have to enable it to run this page
+                </span>
+            </div>
+        </noscript>
+    </div>
+    <div class="content">
+        <div id="mapid" class="col1of2">
+        </div>
+        <div id="protwrapper" class="col2of2">
+            <div id="buttons">
+
+            </div>
+            <div id="prot">
+
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+    </div>
+    <script>
+        $(window).off("resize");
+        $(window).resize(function () {
+            var hh = $(".header").outerHeight();
+            var fh = $(".footer").outerHeight();
+            var wh = $(window).height();
+            var h = wh - hh - fh - 1;
+            $(".content").height(h);
+            $("#mapid").css({
+                height: h,
+                overflow: "auto"
+            });
+            $("#protwrapper").css({
+                height: h,
+                overflow: "auto"
+            });
+            // $(".content").css("overflow", "auto");
+        });
+        $(document).ready(function () {
+            $('body').backDetect(function () {
+                console.log("The back-button terminates the app (5)");
+            });
+            if (window.location.href.indexOf("localhost") >= 0) {
+                $("body").css({
+                    "background-color": "#5ff80611"
+                });
+            }
+            $(window).resize();
+
+            var stationid = "";
+            var variablename = "popc_";
+            var latitude = 50.941278;
+            var longitude = 6.958281;
+            var fullname = "";
+            var parmobj = {};
+            var queryString = window.location.search;
+            console.log(queryString); // ?product=shirt&color=blue&newuser&size=m
+            queryString = queryString.substr(1);
+            var idis = queryString.lastIndexOf("?");
+            if (idis > 0) {
+                queryString = queryString.substr(0, idis);
+            }
+            if (queryString && queryString.length > 0) {
+                var parms = queryString.split("&");
+                parms.forEach(function (item) {
+                    var subparms = item.split("=");
+                    var key = subparms[0];
+                    parmobj[key] = subparms[1];
+                });
+                console.log(parmobj);
+                stationid = parmobj.stationid || "";
+                variablename = parmobj.variablename || "popc_";
+                latitude = parseFloat(parmobj.latitude) || 50.941278;
+                longitude = parseFloat(parmobj.longitude) || 6.958281;
+            } else {
+              // keine Daten!!!
+
+            }
+
+            var mymap;
+            var msg;
+            var cells = []; // für die HYDE-Daten
+            var metafields = {
+                comment: "",
+                ncols: 4320,
+                nrows: 2160,
+                xllcorner: -180.0,
+                yllcorner: -90.0,
+                cellsize: 0.0833333,
+                NODATA_value: "-9999.0"
+            };
+            var savedmetafields = uihelper.cloneObject(metafields);
+
+
+            /**
+             * Basisberechnungen beim Start
+             */
+            // @50.9412818,6.9560927 LatLon Konvention
+            $("body").css("cursor", "progress");
+            // Kölner Dom
+             latitude = 50.941278;
+             longitude = 6.958281;
+
+            // Elbphilharmonie
+            // latitude = 53.5582446;
+            // longitude = 9.6476395
+
+            // München Marienplatz
+            // latitude = 48.1373932;
+            // longitude = 11.5732598;
+
+            mymap = L.map('mapid').setView([latitude, longitude], 11);
+            // Default public token
+            // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
+            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                id: 'mapbox/streets-v11'
+            }).addTo(mymap);
+
+            // Marker des Zielpunktes, Station, Kölner Dom
+            var marker = L.marker([latitude, longitude]).addTo(mymap);
+        });
+
+    </script>
+</body>
+
+</html>

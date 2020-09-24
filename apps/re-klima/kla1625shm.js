@@ -3144,8 +3144,8 @@
             height: 60,
             fillColor: "red",
             defaultPixelsPerValue: 3,
-            chartRangeMin: mincount,
-            chartRangeMax: maxcount,
+            chartRangeMin: 0,
+            chartRangeMax: Math.max(sun.temphisto),
             lineColor: "red",
             composite: false
 
@@ -3202,6 +3202,7 @@
                 }))
             );
         $("#" + sparkid1).sparkline(win.temphisto, {
+            /*
             type: 'bar',
             height: 60,
             barColor: "red",
@@ -3213,6 +3214,18 @@
             chartRangeMin: 0,
             chartRangeMax: Math.max(win.temphisto),
             composite: false
+            */
+            type: 'line',
+            height: 60,
+            fillColor: "red",
+            defaultPixelsPerValue: 3,
+            chartRangeMin: 0,
+            chartRangeMax: Math.max(sun.temphisto),
+            lineColor: "red",
+            composite: false
+
+
+
         });
 
 

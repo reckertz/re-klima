@@ -33,7 +33,7 @@
 <body>
     <div class="header">
         <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
-        <span class="headertitle" style="color:red;font-weight:bold;">klaleaflet - World-Map und Geo-Test</span>
+        <span class="headertitle" style="color:red;font-weight:bold;">klaleafletpins - Pins für Stationen</span>
         <noscript>
             <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
                 <span style="color:blue">
@@ -43,16 +43,6 @@
         </noscript>
     </div>
     <div class="content">
-        <div id="mapid" class="col1of2">
-        </div>
-        <div id="protwrapper" class="col2of2">
-            <div id="buttons">
-
-            </div>
-            <div id="prot">
-
-            </div>
-        </div>
     </div>
     <div class="footer">
     </div>
@@ -62,106 +52,34 @@
             var hh = $(".header").outerHeight();
             var fh = $(".footer").outerHeight();
             var wh = $(window).height();
-            var h = wh - hh - fh - 1;
-            $(".content").height(h);
-            $("#mapid").css({
-                height: h,
-                overflow: "auto"
-            });
-            $("#protwrapper").css({
-                height: h,
-                overflow: "auto"
-            });
+            $(".content").height(wh - hh - fh - 1);
             // $(".content").css("overflow", "auto");
         });
         $(document).ready(function () {
             $('body').backDetect(function () {
-                console.log("The back-button terminates the app (5)");
+                alert("The back-button terminates the app (2)");
             });
+            var myinfo = uihelper.getSysInfo();
+            myinfo.dbsystem = "sqlite3";
             if (window.location.href.indexOf("localhost") >= 0) {
                 $("body").css({
                     "background-color": "#5ff80611"
                 });
             }
-            $(window).resize();
+            var app =  "";
+            var target = "";
+            try {
+                var urlParams = new URLSearchParams(window.location.search);
+                app = urlParams.get('app');
+                target = urlParams.get('target');
+            } catch (err) {
 
-            var stationid = "";
-            var variablename = "popc_";
-            var latitude = 50.941278;
-            var longitude = 6.958281;
-            var fullname = "";
-            var parmobj = {};
-            var queryString = window.location.search;
-            console.log(queryString); // ?product=shirt&color=blue&newuser&size=m
-            queryString = queryString.substr(1);
-            var idis = queryString.lastIndexOf("?");
-            if (idis > 0) {
-                queryString = queryString.substr(0, idis);
             }
-            if (queryString && queryString.length > 0) {
-                var parms = queryString.split("&");
-                parms.forEach(function (item) {
-                    var subparms = item.split("=");
-                    var key = subparms[0];
-                    parmobj[key] = subparms[1];
-                });
-                console.log(parmobj);
-                stationid = parmobj.stationid || "";
-            } else {
-                variablename = "popc_";
-                latitude = 50.941278;
-                longitude = 6.958281;
-            }
-
-            var mymap;
-            var msg;
-
-
-            // @50.9412818,6.9560927 LatLon Konvention
-            $("body").css("cursor", "progress");
-            // Kölner Dom
-            // latitude = 50.941278;
-            // longitude = 6.958281;
-
-            // Elbphilharmonie
-            // latitude = 53.5582446;
-            // longitude = 9.6476395
-
-            // München Marienplatz
-            // latitude = 48.1373932;
-            // longitude = 11.5732598;
-
-
-            mymap = L.map('mapid').setView([latitude, longitude], 11);
-            // Default public token
-            // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
-            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-                maxZoom: 18,
-                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                id: 'mapbox/streets-v11',
-                style: 'mapbox://styles/mapbox/satellite-v9'
-            }).addTo(mymap);
-
-
-
-
-
-
-            // Marker des Zielpunktes, Station, Kölner Dom
-            var marker = L.marker([latitude, longitude]).addTo(mymap);
-
-            // Elbphilharmonie
-            latitude = 53.5582446;
-            longitude = 9.6476395
-            var marker1 = L.marker([latitude, longitude]).addTo(mymap);
-
-            // München Marienplatz
-            latitude = 48.1373932;
-            longitude = 11.5732598;
-            var marker2 = L.marker([latitude, longitude]).addTo(mymap);
-
+            sysbase.navigateTo(target, [], function (ret) {
+                if (ret.error === true) {
+                    alert(ret.message);
+                }
+            });
         });
     </script>
 </body>
