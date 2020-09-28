@@ -65,6 +65,7 @@
                 enum: [
                     "TMIN,TMAX",
                     "WLVL",
+                    "PRCP",
                     "TMIN",
                     "TMAX",
                     ""
@@ -976,6 +977,9 @@
 
     $(document).on("click", ".kla1610staid", function (evt) {
         evt.preventDefault();
+        evt.stopPropagation();
+        evt.stopImmediatePropagation();
+        debugger;
         var stationid = $(this).closest("tr").attr("rowid");
         var source = starecord.source;
         var variablename = $(this).closest("tr").attr("variable");

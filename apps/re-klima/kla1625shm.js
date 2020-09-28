@@ -63,7 +63,7 @@
 
     kla1625shm.show = function (parameters, navigatebucket) {
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
-
+        debugger;
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
             selsource = parameters[0].source;
@@ -855,6 +855,7 @@
          * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
          */
         if (kla1625shmconfig.allin === false) {
+            debugger;
             kla1625shm.loadalldata(function (ret) {
                 var wmtit = "Auswertung für Station:";
                 // isMember ? '$2.00' : '$10.00'
@@ -886,10 +887,7 @@
                 $(".headertitle").html("Sammelauswertung");
                 kla1625shm.showall(ret);
             });
-
-
         }
-
     }; // Ende show
 
     /**
@@ -973,22 +971,23 @@
                             /**
                              * Abfrage, ob Daten geladen werden sollen
                              */
-                            var qmsg = "Für Station:" + selstationid + " aus " + selsource;
+                            var qmsg = "loadalldata: Für Station:" + selstationid + " aus " + selsource;
                             qmsg += " und " + selvariablename;
-                            qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                            qmsg += "\n gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                            console.log("loadalldata - confirm");
                             var check = window.confirm(qmsg);
                             if (check === false) {
-                                sysbase.putMessage("Keine Daten zur Station gefunden", 3);
+                                sysbase.putMessage("Keine Daten zur Station gefunden und Abbruch", 3);
                                 cb1625g1("Error", {
                                     error: true,
-                                    message: "Keine Temperatur-Daten gefunden"
+                                    message: "Keine " + selvariablename + "-Daten gefunden"
                                 });
                                 return;
                             } else {
                                 cb1625g1(null, {
                                     error: true,
                                     operation: "loadghcn",
-                                    message: "Keine Temperatur-Daten gefunden",
+                                    message: "Keine " + selvariablename + "-Daten gefunden und Laden",
                                     sqlStmt: sqlStmt,
                                     selvariablename: selvariablename,
                                     selsource: selsource,
@@ -1012,8 +1011,6 @@
                         cb1625g2(null, ret);
                         return;
                     }
-
-                    $(that).attr("disabled", true);
                     var jqxhr = $.ajax({
                         method: "GET",
                         crossDomain: false,
@@ -1021,7 +1018,8 @@
                         data: {
                             timeout: 10 * 60 * 1000,
                             source: selsource,
-                            stationid: selstationid
+                            stationid: selstationid,
+                            selvariablename: selvariablename
                         }
                     }).done(function (r1, textStatus, jqXHR) {
                         sysbase.checkSessionLogin(r1);
@@ -1051,12 +1049,11 @@
                         sysbase.putMessage("ghcnddata:" + err, 3);
                         cb1625g2("Error", {
                             error: true,
-                            message: err.message || err
+                            message: err
                         });
                         return;
                     }).always(function () {
                         // nope
-                        $(that).attr("disabled", false);
                     });
                 },
                 function (ret, cb1625g3) {
@@ -1335,9 +1332,11 @@
                         /**
                          * Abfrage, ob Daten geladen werden sollen
                          */
-                        var qmsg = "Für Station:" + selstationid + " aus " + selsource;
+                        debugger;
+                        var qmsg = "execmoredata: Für Station:" + selstationid + " aus " + selsource;
                         qmsg += " und " + selvariablename;
                         qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
+                        console.log("execmoredata - confirm");
                         var check = window.confirm(qmsg);
                         if (check === false) {
                             sysbase.putMessage("Keine Daten zur Station gefunden", 3);
@@ -1677,12 +1676,12 @@
                     cb1625g0a(null, ret);
                     return;
                 },
-                function (ret, cb1625g0) {
+                function (ret, cb1625g0b) {
                     /**
                      * Datenqualität missing/bad data
                      */
                     if (kla1625shmconfig.qonly === false) {
-                        cb1625g0(null, ret);
+                        cb1625g0b(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
@@ -1783,10 +1782,10 @@
                                 }
                             }));
                     }
-                    cb1625g0(null, ret);
+                    cb1625g0b(null, ret);
                     return;
                 },
-                function (ret27, cb1625g1) {
+                function (ret27, cb1625g0c) {
                     /**
                      * Heatmap-1
                      */
@@ -1851,11 +1850,11 @@
                                 overflow: "hidden"
                             });
                         }
-                        cb1625g1(null, ret);
+                        cb1625g0c(null, ret);
                         return;
                     });
                 },
-                function (ret, cb1625g2) {
+                function (ret, cb1625g0d) {
                     /**
                      * Heatmap-2
                      */
@@ -1876,12 +1875,12 @@
                                 overflow: "hidden"
                             });
                         }
-                        cb1625g2(null, ret);
+                        cb1625g0d(null, ret);
                         return;
                     });
                 },
 
-                function (ret, cb1625g3) {
+                function (ret, cb1625g0e) {
                     /**
                      * Heatmap-3
                      */
@@ -1938,11 +1937,11 @@
                         }
                         hmatrixL = ret.matrix;
                         hoptionsL = ret.options;
-                        cb1625g3(null, ret);
+                        cb1625g0e(null, ret);
                         return;
                     });
                 },
-                function (ret, cb1625g4) {
+                function (ret, cb1625g0f) {
                     /**
                      * Heatmap-4
                      */
@@ -1965,7 +1964,7 @@
                         }
                         hmatrixR = ret.matrix;
                         hoptionsR = ret.options;
-                        cb1625g4(null, ret);
+                        cb1625g0f(null, ret);
                         return;
                     });
                 },

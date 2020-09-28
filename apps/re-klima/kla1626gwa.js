@@ -3250,7 +3250,17 @@
                             bottom: 10
                         }
                     },
-                    plugins: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                /* beginAtZero: true, */
+                                reverse: true
+                                /* min: 0,
+                                max: 500 */
+                            }
+                        }]
+                    },
+                        plugins: {
                         colorschemes: {
                             scheme: 'tableau.HueCircle19'
                         }

@@ -136,8 +136,8 @@
                     //delStmt += " WHERE source = 'HYGRIS'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLISTATIONS: deleted:" + this.changes);
-                        callback291a1a(null, res, ret);
-                        return;
+                    callback291a1a(null, res, ret);
+                    return;
                     //});
                 },
                 function (res, ret, callback291a1b) {
@@ -148,8 +148,8 @@
                     //delStmt += " WHERE source = 'HYGRIS'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLIINVENTORY: deleted:" + this.changes);
-                        callback291a1b(null, res, ret);
-                        return;
+                    callback291a1b(null, res, ret);
+                    return;
                     //});
                 },
                 function (res, ret, callback291a1c) {
@@ -160,8 +160,8 @@
                     //delStmt += " WHERE source = 'HYGRIS'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLIDATA: deleted:" + this.changes);
-                        callback291a1c(null, res, ret);
-                        return;
+                    callback291a1c(null, res, ret);
+                    return;
                     //});
 
                 },
@@ -1572,6 +1572,7 @@
     kla1490srv.ghcnddata = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, reqparm, res, callback390) {
         var vglstationid = "";
         stationdata = [];
+
         async.waterfall([
             function (callback390a) {
                 /**
@@ -1582,6 +1583,7 @@
                 var stationid = "";
                 var stationids = "";
                 var selyears = "";
+                var selvariablename = "";
                 if (req !== null) {
                     if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
                         fullname = req.query.fullname;
@@ -1600,18 +1602,24 @@
                     if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
                         selyears = req.query.selyears;
                     }
+                    if (req.query && typeof req.query.selvariablename !== "undefined" && req.query.selvariablename.length > 0) {
+                        selvariablename = req.query.selvariablename;
+                    }
                 } else {
                     fullname = reqparm.fullname || "";
                     source = reqparm.source || "";
                     stationid = reqparm.stationid || "";
                     stationids = reqparm.stationids || [];
                     selyears = reqparm.selyears || "";
+                    selvariablename = reqparm.selvariablename || "";
                 }
                 var ret = {};
                 ret.source = source;
                 ret.selyears = selyears;
                 ret.stationid = stationid;
                 ret.stationids = stationids;
+                ret.selvariablename = selvariablename;
+                console.log(ret.source + " " + ret.stationid + " " + ret.stationids.length + " " + ret.selvariablename);
                 if (typeof stationids === "undefined" ||
                     typeof stationids === "string" && stationids.length === 0 ||
                     Array.isArray(stationids) && stationids.length === 0) {
@@ -1652,6 +1660,7 @@
                  * Start Loop über stationsid's
                  */
                 var stationids = ret.stationids;
+                var selvariablename = ret.selvariablename;
                 var rootpath = datapath;
                 async.eachSeries(stationids, function (station, nextstation) {
                         if (typeof station === "undefined" || station === null || station.trim().length === 0) {
@@ -1754,7 +1763,9 @@
                                                 },
                                                 function (res, ret1, callback392c) {
                                                     vglstationid = dayrecord.stationid;
-                                                    if (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN") {
+                                                    //if (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN" || dayrecord.variable ==="PRCP") {
+                                                    if ((selvariablename === "TMAX" || selvariablename === "TMIN") && (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN") ||
+                                                        dayrecord.variable === selvariablename) {
                                                         // ab 22 kommen 31 Felder für Tageswerte
                                                         var dayarray = [];
                                                         var lastbis = 0;
@@ -1808,7 +1819,7 @@
                                                 var varcount = Object.keys(ret1.outrecs.variables).length;
                                                 if (varcount === 0) {
                                                     ret.error = true;
-                                                    ret.message += " KLISTATION:" + ret1.outrecs.stationid + " hat kein TMIN und TMAX";
+                                                    ret.message += " KLISTATION:" + ret1.outrecs.stationid + " " + selvariablename;
                                                 } else {
                                                     ret.error = false;
                                                     ret.message += " KLISTATION:" + counter;

@@ -164,13 +164,27 @@
                 class: "uiefieldset",
                 width: "90%",
                 properties: {
-                    description: {
+                    comment: {
                         title: "Kommentar",
                         type: "string", // currency, integer, datum, text, key
                         class: "uiearea",
                         default: "",
                         io: "i"
-                    }
+                    },
+                    oldcomments: {
+                        title: "Alte Kommentare",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiearea",
+                        default: "",
+                        io: "o"
+                    },
+                    savecomments: {
+                        title: "Alte Kommentare",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiearea",
+                        default: "",
+                        io: "h"
+                    },
                 }
             },
             metadata: {
@@ -2162,6 +2176,16 @@
                                     klirecord = ret.record;
                                     klirecord.metadata = JSON.parse(klirecord.metadata);
 
+                                    if (typeof klirecord.comments !== "undefined" && Array.isArray(klirecord.comments)) {
+                                        var comments = JSON.parse(klirecord.comments);
+                                        if (comments.length > 0) {
+                                            klirecord.comment = "";
+                                        }
+                                        if (comments.length > 1) {
+                                            klirecord.oldcomments = comments.join("<br>");
+                                            klirecord.savecomments = comments;
+                                        }
+                                    }
                                     uientry.fromRecord2UI("#kla1400rawform", klirecord, klischema);
                                     $("#kla1400rawform")
                                         .append($("<div/>", {
@@ -2336,13 +2360,21 @@
         var api = "setonerecord";
         var table = "KLIRAWFILES";
         var usrrecord = {};
+        var comments = "";
+        debugger;
+        if (klirecord.comment.length > 0) {
+            comments = klirecord.comment + "<br>" + klirecord.savecomments;
+        } else {
+            comments = klirecord.savecomments;
+        }
         try {
             klirecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
             selfields = {
                 fullname: klirecord.fsdata.fullname
             };
             updfields["$set"] = {
-                metadata: klirecord.metadata
+                metadata: klirecord.metadata,
+                comments: comments
             };
             uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
                 if (ret.error === false) {
