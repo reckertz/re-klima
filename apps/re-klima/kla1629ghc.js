@@ -326,7 +326,7 @@
                                 cbuckets: false,
                                 hyde: false
                             };
-                            kla1629ghc.kliheatmap2("kla1629ghcd1", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            kla1629ghc.kliheatmap2("kla1629ghcd1", selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                                 cb1629a(null);
                             });
                         },
@@ -346,7 +346,7 @@
                                 cbuckets: false,
                                 hyde: false
                             };
-                            kla1629ghc.kliheatmap2("kla1629ghcd2", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            kla1629ghc.kliheatmap2("kla1629ghcd2", selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                                 cb1629b(null);
                             });
                         },
@@ -369,7 +369,7 @@
                                 cbuckets: true,
                                 hyde: true
                             };
-                            kla1629ghc.kliheatmap2("kla1629ghcd3", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            kla1629ghc.kliheatmap2("kla1629ghcd3", selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                                 // über ret kommen hier options in ret zurück
                                 /*
                                     error: false,
@@ -737,6 +737,7 @@
                         if (ret1.error === false && ret1.records !== null && Object.keys(ret1.records).length > 0) {
                             /*
                             abwärtskompatibel zwei Sätze!
+                            PROBLEM: wenn kein Satz gefunden, dann ist auch kein stationrecord da - s.u.
                             */
                             klirecords = [];
                             if (typeof ret1.records[0] !== "undefined") {
@@ -761,15 +762,7 @@
                             });
                             return;
                         } else {
-                            /*
-                            sysbase.putMessage("Keine Grundwassser-Daten zur Station gefunden", 3);
-                            cb1629g1("Error", {
-                                error: true,
-                                message: "Keine Grundwasser-Daten gefunden"
-                            });
-                            return;
-                            */
-                           /**
+                            /**
                              * Abfrage, ob Daten geladen werden sollen
                              */
                             debugger;
@@ -871,14 +864,34 @@
                         if (ret1.error === false && ret1.record !== null) {
                             stationrecord = ret1.record;
                             klirecords = [];
-                            // Sortierfolge ist TMAX, TMIN alphabetisch
-                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
-                            if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
-                            cb1629g3(null, {
-                                error: false,
-                                message: "Daten gefunden"
-                            });
-                            return;
+                            if (ret1.error === false && ret1.records !== null && Object.keys(ret1.records).length > 0) {
+                                /*
+                                abwärtskompatibel zwei Sätze!
+                                PROBLEM: wenn kein Satz gefunden, dann ist auch kein stationrecord da - s.u.
+                                */
+                                klirecords = [];
+                                if (typeof ret1.records[0] !== "undefined") {
+                                    ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
+                                    klirecords.push(ret1.records[0]);
+                                    stationrecord = ret1.records[0];
+                                }
+                                cb1629g3(null, {
+                                    error: false,
+                                    message: "Daten gefunden"
+                                });
+                                return;
+                            } else if (ret1.error === false && ret1.record !== null && Object.keys(ret1.record).length > 0) {
+                                klirecords = [];
+                                ret1.records[0] = Object.assign({}, ret1.record, true);
+                                ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
+                                klirecords.push(ret1.records[0]);
+                                stationrecord = ret1.records[0];
+                                cb1629g3(null, {
+                                    error: false,
+                                    message: "Daten gefunden"
+                                });
+                                return;
+                            }
                         } else {
                             cb1629g3(null, {
                                 error: true,
@@ -888,10 +901,6 @@
                         }
                     });
                 },
-
-
-
-
                 function (ret, cb1629g4) {
                     /**
                      * Holen der HYDE-Daten
@@ -946,7 +955,6 @@
                 return;
             });
     };
-
     /**
      * getmoredata - kla1629ghcconfig.allin === true
      * allin === true, dann selstations mit stationid und source als Array abfragen
@@ -1136,7 +1144,7 @@
                             sysbase.putMessage("Keine Daten zur Station gefunden", 3);
                             cb1629p1("Error", {
                                 error: true,
-                                message: "Keine Wasserstand-Daten gefunden"
+                                message: "Keine " + varparms[selvariablename].header + "-Daten gefunden"
                             });
                             return;
                         } else {
@@ -1144,7 +1152,7 @@
                             cb1629p1(null, {
                                 error: true,
                                 operation: "loadghcn",
-                                message: "Keine Wasserstand-Daten gefunden",
+                                message: "Keine " + varparms[selvariablename].header + "-Daten gefunden",
                                 sqlStmt: sqlStmt,
                                 selvariablename: selvariablename,
                                 selsource: selsource,
@@ -1238,7 +1246,7 @@
                         } else {
                             cb1629p3(null, {
                                 error: true,
-                                message: "Endgültig keine Wasserstand-Daten gefunden"
+                                message: "Endgültig keine " + varparms[selvariablename].header + "-Daten gefunden"
                             });
                             return;
                         }
@@ -1612,7 +1620,7 @@
                         cbuckets: false,
                         hyde: true
                     };
-                    kla1629ghc.kliheatmap2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
+                    kla1629ghc.kliheatmap2("#" + divid + "L", selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                         ret.divid = divid;
                         if (kla1629ghcconfig.heatmaps === true) {
                             var nkorr = $("#" + divid + "L").find("canvas").height();
@@ -1672,7 +1680,7 @@
                         cbuckets: true,
                         hyde: true
                     };
-                    kla1629ghc.kliheatmap2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
+                    kla1629ghc.kliheatmap2("#" + divid + "L", selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                         ret.divid = divid;
                         if (kla1629ghcconfig.heatmaps === true) {
                             var nkorr = $("#" + divid + "L").find("canvas").height();
@@ -1702,7 +1710,7 @@
                      */
                     var distrs = {};
                     var maxy = 0;
-                    distrs["WLVL"] = kla1629ghc.klidistr2calc("WLVL", selsource, selstationid, ret);
+                    distrs[selvariablename] = kla1629ghc.klidistr2calc(selvariablename, selsource, selstationid, ret);
                     // Konsolidierung und
                     /*
                     if (distrs["WLVL"].sunconfig.options.maxcount > maxy) {
@@ -1742,7 +1750,7 @@
 
                         );
                     ret.distrs = distrs;
-                    kla1629ghc.klidistr2("#" + divid + "L", "WLVL", selsource, selstationid, ret, function (ret1) {
+                    kla1629ghc.klidistr2("#" + divid + "L", selvariablename, selsource, selstationid, ret, function (ret1) {
                         ret.divid = divid;
                         ret.distrs = distrs;
                         cb1629g5a(null, ret);
@@ -1785,7 +1793,7 @@
                         hyde: true
                     };
                     hoptionsL.minmaxhistogram = true;
-                    kla1629ghc.klihisto2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                    kla1629ghc.klihisto2("#" + divid + "L", selvariablename, selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
                         ret.divid = divid;
                         cb1629g5(null, ret);
                         return;
@@ -1826,7 +1834,7 @@
                         hyde: true
                     };
                     hoptionsL.minmaxhistogram = true;
-                    kla1629ghc.klitemp2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                    kla1629ghc.klitemp2("#" + divid + "L", selvariablename, selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
                         ret.divid = divid;
                         cb1629g7(null, ret);
                         return;
@@ -1932,7 +1940,7 @@
                     var hmvalstr;
                     try {
 
-                        if (selvariablename === "WLVL" && klirecords.length > 0) {
+                        if (selvariablename === selvariablename && klirecords.length > 0) {
                             ret.record = klirecords[0];
                         }
 
@@ -2054,7 +2062,7 @@
                                                 }
                                             } else {
                                                 matrix1.data[irow][icol] = null;
-                                                console.log("Kein formal korrekter Wasserstand:" + rowvalues[icol]);
+                                                console.log("Kein formal korrekter " + varparms[selvariablename].header + ":" + rowvalues[icol]);
                                                 debugger;
                                             }
                                         }
@@ -2182,7 +2190,7 @@
                 if (kla1629ghcconfig.temptable === true) {
                     $(cid)
                         .append($("<h3/>", {
-                            text: "Histogramm Wasserstand-Verteilung " + selvariable + " " + klirecords[0].titel,
+                            text: "Histogramm " + varparms[selvariablename].header + "-Verteilung " + selvariable + " " + klirecords[0].titel,
                             class: "doprintthis"
                         }))
                         .append($("<table/>", {
@@ -2902,7 +2910,7 @@
         }
 
         // years bereitstellen
-        if (selvariable === "WLVL" && klirecords.length > 0) {
+        if (selvariable === selvariablename && klirecords.length > 0) {
             ret1.record = klirecords[0];
         }
 
@@ -2940,16 +2948,16 @@
                         if (dval1 !== null && dval1 !== "" && dval1 !== -9999 && !isNaN(dval1)) {
                             var dval = parseFloat(dval1);
                             var inum = 0;
-                            if (selvariablename.indexOf("WLVL") >= 0) {
+                            //if (selvariablename.indexOf("WLVL") >= 0) {
                                 var numt = dval1.split(".");
                                 if (numt.length === 2) {
                                     inum = parseInt(numt[1].substr(1, 1));
                                 } else {
                                     debugger;
                                 }
-                            } else {
-                                inum = parseInt(dval1.substr(dval1.length - 1));
-                            }
+                            //} else {
+                            //    inum = parseInt(dval1.substr(dval1.length - 1));
+                            //}
                             wrk.valsum += dval;
                             wrk.valcount += 1;
                             if (wrk.minval === null) {
@@ -3161,7 +3169,7 @@
             var tableid = cid.substr(1) + "tbl";
             $(cid)
                 .append($("<h3/>", {
-                    text: "Wasserstandsverlauf " + selvariable + " " + klirecords[0].titel,
+                    text: varparms[selvariablename].header + "verlauf " + selvariable + " " + klirecords[0].titel,
                     class: "doprintthis",
                 }))
                 .append($("<div/>", {
@@ -3425,7 +3433,7 @@
                             }
                         }]
                     },
-                        plugins: {
+                    plugins: {
                         colorschemes: {
                             scheme: 'tableau.HueCircle19'
                         }
