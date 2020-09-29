@@ -363,7 +363,7 @@
                     }));
                     var tourl = "klaheatmap.html" + "?" + "stationid=" + klirecords[0].stationid + "&source=" + klirecords[0].source + "&variablename=" + klirecords[0].variable;
                     var tabname = klirecords[0].stationname;
-                    var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626reg", tourl);
+                    var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1628reg", tourl);
                     window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
                 }
             }))

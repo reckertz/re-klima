@@ -1001,7 +1001,7 @@
             var tabname = variablename + " " + stationname;
             var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
             window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-        } else if (source !== "ECAD") {
+        } else if (source === "GHCND") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
                 source: source,
@@ -1012,12 +1012,19 @@
                 fromyear: $(this).closest("tr").attr("fromyear"),
                 toyear: $(this).closest("tr").attr("toyear"),
             }));
-            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
-            var stationname = stationarray[stationid];
-            var tabname = variablename + " " + stationname;
-            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-
+            if (variablename === "TMAX" || variablename === "TMIN" || variablename === "TMAX,TMIN") {
+                var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
+                var stationname = stationarray[stationid];
+                var tabname = variablename + " " + stationname;
+                var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+            } else {
+                var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
+                var stationname = stationarray[stationid];
+                var tabname = variablename + " " + stationname;
+                var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1629ghc", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+            }
         } else if (source === "ECAD") {
             window.parent.sysbase.setCache("onestation", JSON.stringify({
                 stationid: stationid,
@@ -1029,6 +1036,9 @@
             var stationname = stationarray[stationid];
             var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima", "kli1640eca", tourl);
             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+
+        } else {
+            // falsche Source
 
         }
     });
@@ -1768,11 +1778,21 @@
                         longitude: $(this).closest("tr").attr("longitude"),
                         config: confrecord
                     }));
-                    var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
-                    var stationname = stationarray[confrecord.stationid];
-                    var tabname = confrecord.stationid + " " + stationname;
-                    var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
-                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+
+                    if (confrecord.variable === "TMAX" || confrecord.variable === "TMIN" || confrecord.variable === "TMAX,TMIN") {
+                        var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+                        var stationname = stationarray[confrecord.stationid];
+                        var tabname = confrecord.stationid + " " + stationname;
+                        var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+                        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                    } else {
+                        var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
+                        var stationname = stationarray[confrecord.stationid];
+                        var tabname = confrecord.stationid + " " + stationname;
+                        var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1629ghc", tourl);
+                        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                    }
+
                 }
             } else {
                 // allin === true

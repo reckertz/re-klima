@@ -1,12 +1,12 @@
 /*global $,this,screen,document,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
 (function () {
     'use strict';
-    var kla1626reg = {};
+    var kla1628reg = {};
     var root = typeof self === 'object' && self.self === self && self ||
         typeof global === 'object' && global.global === global && global ||
         this;
     /**
-     * kla1626reg  bekommt über getCache pivotdata oder yearlats(?)
+     * kla1628reg  bekommt über getCache pivotdata oder yearlats(?)
      * Regressionsanalyse über Sommer und Winter oder Jahr
      * mit Sparkline und
      */
@@ -29,7 +29,7 @@
     var selfromyear = null;
     var seltoyear = null;
     var starecord = null; // Selektionsparameter
-    var kla1626regconfig = {};
+    var kla1628regconfig = {};
     var savedwidth = null;
     var heatmapparms = {};
     var stationrecord;
@@ -40,7 +40,7 @@
     var klirecords = [];
 
     var klihyde = {};
-    var kla1626regclock;
+    var kla1628regclock;
 
     var hmatrixR;
     var hmatrixL;
@@ -56,7 +56,7 @@
     poprecord.sunwinter = true;
     poprecord.export = false;
 
-    kla1626reg.show = function (parameters, navigatebucket) {
+    kla1628reg.show = function (parameters, navigatebucket) {
 
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
@@ -123,17 +123,17 @@
 
         $(".content").empty();
         $(".headertitle").html("Regressionsanalyse für Station:" + selstationid + " Quelle:" + selsource);
-        $(".headertitle").attr("title", "kla1626reg");
-        $(".content").attr("pageid", "kla1626reg");
-        $(".content").attr("id", "kla1626reg");
+        $(".headertitle").attr("title", "kla1628reg");
+        $(".content").attr("pageid", "kla1628reg");
+        $(".content").attr("id", "kla1628reg");
         $(".content")
             .css({
                 overflow: "hidden"
             });
-        $("#kla1626reg")
+        $("#kla1628reg")
             .append($("<input/>", {
                 type: "hidden",
-                id: "kla1626reg_isdirty",
+                id: "kla1628reg_isdirty",
                 value: "false"
             }));
         $(".headerright").remove();
@@ -182,10 +182,10 @@
                 )
             );
         sysbase.initFooter();
-        $("#kla1626reg.content").empty();
-        $("#kla1626reg.content")
+        $("#kla1628reg.content").empty();
+        $("#kla1628reg.content")
             .append($("<div/>", {
-                    id: "kla1626regbuttons",
+                    id: "kla1628regbuttons",
                     css: {
                         width: "100%",
                         float: "left"
@@ -195,7 +195,7 @@
 
                 .append($("<button/>", {
                     html: "Super-Sparklines",
-                    id: "kla1626regsup",
+                    id: "kla1628regsup",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -259,13 +259,13 @@
                                 }
                             }
                         };
-                        var anchorHash = "#kla1626regwrapper";
+                        var anchorHash = "#kla1628regwrapper";
                         var title = "Super-Sparklines";
                         var pos = {
-                            left: $("#kla1626regwrapper").offset().left,
+                            left: $("#kla1628regwrapper").offset().left,
                             top: window.screen.height * 0.1,
-                            width: $("#kla1626regwrapper").width() * 0.60,
-                            height: $("#kla1626regwrapper").height() * 0.90
+                            width: $("#kla1628regwrapper").width() * 0.60,
+                            height: $("#kla1628regwrapper").height() * 0.90
                         };
                         $(document).on('popupok', function (evt, extraParam) {
                             evt.preventDefault();
@@ -273,8 +273,8 @@
                             evt.stopImmediatePropagation();
                             console.log(extraParam);
                             var superParam = JSON.parse(extraParam).props;
-                            //kla1626reg.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
-                            kla1626reg.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
+                            //kla1628reg.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
+                            kla1628reg.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
                                 return;
                             });
                             //});
@@ -297,7 +297,7 @@
                         margin: "10px"
                     },
                     click: function (evt) {
-                        // sysbase.printDivAll($("#kla1626regwrapper").html());
+                        // sysbase.printDivAll($("#kla1628regwrapper").html());
                         // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
                         $('canvas').each(function (e) {
                             var image = new Image();
@@ -456,7 +456,7 @@
                 }))
 
                 .append($("<div/>", {
-                    id: "kla1626regclock",
+                    id: "kla1628regclock",
                     float: "left",
                     css: {
                         float: "left",
@@ -466,23 +466,23 @@
 
             );
         /**
-         * Beginn des initialen Aufbaus kla1626regwrapper
+         * Beginn des initialen Aufbaus kla1628regwrapper
          */
-        $("#kla1626reg.content")
+        $("#kla1628reg.content")
             .append($("<div/>", {
-                    id: "kla1626regdiv",
-                    class: "kla1626regdiv"
+                    id: "kla1628regdiv",
+                    class: "kla1628regdiv"
                 })
                 .append($("<div/>", {
-                    id: "kla1626regwrapper",
-                    class: "kla1626regwrapper"
+                    id: "kla1628regwrapper",
+                    class: "kla1628regwrapper"
                 }))
             );
-        var h = $("#kla1626reg").height();
-        h -= $("#kla1626reg.header").height();
-        h -= $("#kla1626regbuttons").height();
-        h -= $("#kla1626reg.footer").height();
-        $("#kla1626regdiv")
+        var h = $("#kla1628reg").height();
+        h -= $("#kla1628reg.header").height();
+        h -= $("#kla1628regbuttons").height();
+        h -= $("#kla1628reg.footer").height();
+        $("#kla1628regdiv")
             .css({
                 "margin": "10px",
                 "background-color": "lime",
@@ -491,7 +491,7 @@
                 overflow: "auto",
                 float: "left"
             });
-        $("#kla1626regwrapper")
+        $("#kla1628regwrapper")
             .css({
                 "background-color": "lime",
                 height: h,
@@ -499,13 +499,13 @@
                 overflow: "auto",
                 float: "left"
             });
-        console.log("kla1626regwrapper initialisiert, leer");
+        console.log("kla1628regwrapper initialisiert, leer");
         $(window).on('resize', function () {
-            var h = $("#kla1626reg").height();
-            h -= $("#kla1626reg.header").height();
-            h -= $("#kla1626regbuttons").height();
-            h -= $("#kla1626reg.footer").height();
-            $("#kla1626regdiv").css({
+            var h = $("#kla1628reg").height();
+            h -= $("#kla1628reg.header").height();
+            h -= $("#kla1628regbuttons").height();
+            h -= $("#kla1628reg.footer").height();
+            $("#kla1628regdiv").css({
                 height: h
             });
         });
@@ -526,15 +526,15 @@
         wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
         $(".headertitle").html(wmtit);
 
-        $("#kla1626regsup").click();
+        $("#kla1628regsup").click();
 
     }; // Ende show
 
     /**
-     * kla1626reg.showall - Aufruf aller Funktionen für die Standardauswertung
+     * kla1628reg.showall - Aufruf aller Funktionen für die Standardauswertung
      * @param {*} ret
      */
-    kla1626reg.showall = function (ret) {
+    kla1628reg.showall = function (ret) {
         return;
     };
 
@@ -546,7 +546,7 @@
      * superParam.sunwinter - das ist schon ein Brocken
      */
     var outrecords = [];
-    kla1626reg.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
+    kla1628reg.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
         try {
             outrecords = [];
             debugger;
@@ -555,20 +555,20 @@
                 return;
             }
             /**
-             * Container kla1626regwrapper aufbereiten
+             * Container kla1628regwrapper aufbereiten
              * in diesen Container gehen sukzessive die Auswertungen
              */
-            $("#kla1626regwrapper").empty();
+            $("#kla1628regwrapper").empty();
             var h = screen.height;
             h -= $(".header").height();
-            h -= $("#kla1626regbuttons").height();
+            h -= $("#kla1628regbuttons").height();
             h -= $(".footer").height();
 
-            var w = $("#kla1626reg.content").width();
+            var w = $("#kla1628reg.content").width();
             w -= 0; // $("#heatmap").position().left;
             w -= 0; // $("#heatmap").width();
             w -= 0; // 40;
-            $("#kla1626regwrapper").css({
+            $("#kla1628regwrapper").css({
                 overflow: "auto",
                 height: h,
                 width: w
@@ -577,7 +577,7 @@
             /**
              * Abschnitt Stammdaten zur Station
              */
-            $("#kla1626regwrapper")
+            $("#kla1628regwrapper")
                 .append($("<div/>", {
                         css: {
                             width: "100%",
@@ -585,7 +585,7 @@
                         }
                     })
                     .append($("<h2/>", {
-                        id: "kla1626regh2",
+                        id: "kla1628regh2",
                         text: stationdata.stationid + " " + stationdata.stationname
                     }))
                 );
@@ -594,7 +594,7 @@
              * Abschnitt sparklines
              * Header zu sparkline-Tabelle
              * */
-            $("#kla1626regwrapper")
+            $("#kla1628regwrapper")
                 .append($("<div/>", {
                         css: {
                             width: "100%",
@@ -605,7 +605,7 @@
                             class: "tablesorter",
                             border: "2",
                             rules: "all",
-                            id: "kla1626regt1",
+                            id: "kla1628regt1",
                             css: {
                                 "max-width": w + "px"
                             }
@@ -751,7 +751,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1626reg.paintXtr("#kla1626regt1", "tot", iyear, pcount, rowdata, superParam);
+                    kla1628reg.paintXtr("#kla1628regt1", "tot", iyear, pcount, rowdata, superParam);
                 }
 
 
@@ -798,7 +798,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1626reg.paintXtr("#kla1626regt1", "som", iyear, pcount, rowdata, superParam);
+                    kla1628reg.paintXtr("#kla1628regt1", "som", iyear, pcount, rowdata, superParam);
 
 
                     /**
@@ -841,7 +841,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1626reg.paintXtr("#kla1626regt1", "win", iyear, pcount, rowdata, superParam);
+                    kla1628reg.paintXtr("#kla1628regt1", "win", iyear, pcount, rowdata, superParam);
                 }
             }
             /**
@@ -913,13 +913,13 @@
     }; // ende paintX
 
     /**
-     * kla1626reg.paintXtr - Ausgabe der Zeilen zu rowdata[0] und rowdata[1]
+     * kla1628reg.paintXtr - Ausgabe der Zeilen zu rowdata[0] und rowdata[1]
      * max drei Zeilen für total, summer-up, winter-dwn
      * @param {*} trcontainer
      * @param {*} rowdata
      * @param {*} superParam
      */
-    kla1626reg.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
+    kla1628reg.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
         /**
          * Vorlauf: regressionsrechnung
          */
@@ -982,7 +982,7 @@
             /**
              * neue eine Variable = eine einfache Zeile
              */
-            $("#kla1626regt1")
+            $("#kla1628regt1")
                 .append($("<tr/>")
                     .append($("<td/>", {
                         html: rowtit
@@ -1194,7 +1194,7 @@
     /**
      * Einblendung Stopuhr wärend langer AJAX-Aufrufe
      */
-    kla1626reg.showclock = function (clockcontainer) {
+    kla1628reg.showclock = function (clockcontainer) {
         // Update the count down every 1 second
         if (typeof clockcontainer === "string") {
             if (!clockcontainer.startsWith("#")) clockcontainer = "#" + clockcontainer;
@@ -1235,14 +1235,14 @@
      */
     if (typeof module === 'object' && module.exports) {
         // Node.js
-        module.exports = kla1626reg;
+        module.exports = kla1628reg;
     } else if (typeof define === 'function' && define.amd) {
         // AMD / RequireJS
         define([], function () {
-            return kla1626reg;
+            return kla1628reg;
         });
     } else {
         // included directly via <script> tag
-        root.kla1626reg = kla1626reg;
+        root.kla1628reg = kla1628reg;
     }
 }());

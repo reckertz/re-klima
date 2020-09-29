@@ -1,18 +1,21 @@
 /*global $,this,screen,document,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
 (function () {
     'use strict';
-    var kla1625shm = {};
+    var kla1629ghc = {};
     var root = typeof self === 'object' && self.self === self && self ||
         typeof global === 'object' && global.global === global && global ||
         this;
     /**
-     * kla1625shm  bekommt über getCache pivotdata oder yearlats(?)
+     * kla1629ghc  Auswertung GHCND außer TMAX und TMIN, also PRCP, SNOW etc.!!!
+     * Aufruf aus kla1610sta
+     * bekommt über getCache pivotdata oder yearlats(?)
      * und erzeugt animierte Gifs mit der Option weiterer Zuordnungen
      * nach latitude und
-     * nach Wert, grundet auf Ganzzahlen
+     * nach wasserstand, grundet auf Ganzzahlen
      * mit Sekundärdaten aus HYDE
      */
-    var kla1625shmparms = {};
+
+    var kla1629ghcparms = {};
     var varparms = {};
     var actprjname;
     var fullname;
@@ -36,18 +39,18 @@
     var selsource = null;
     var selvariablename = null;
     var starecord = null; // Selektionsparameter
-    var kla1625shmconfig = {};
+    var kla1629ghcconfig = {};
     var savedwidth = null;
     var heatmapparms = {};
     var stationrecord;
     var yearindexarray = {};
     var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
-    var histo1 = {}; // Histogramm auf Werte gerundet Ganzzahl
+    var histo1 = {}; // Histogramm auf Wasserstand gerundet Ganzzahl
     var array1 = []; // aktives Array für d3
     var klirecords = [];
 
     var klihyde = {};
-    var kla1625shmclock;
+    var kla1629ghcclock;
 
     var hmatrixR;
     var hmatrixL;
@@ -63,7 +66,7 @@
     poprecord.tempdistribution = true;
     poprecord.export = false;
 
-    kla1625shm.show = function (parameters, navigatebucket) {
+    kla1629ghc.show = function (parameters, navigatebucket) {
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
@@ -75,12 +78,14 @@
              * Prüfen, ob allin - Abarbeiten aller stationid aus der Liste
              */
             selparms = window.parent.sysbase.getCache("onestation");
-            selparms = JSON.parse(selparms);
-            selstations = selparms.selstations || [];
-            selstationid = selparms.stationid;
-            starecord = selparms.starecord;
-            selsource = selparms.starecord.source;
-            selvariablename = selparms.starecord.variablename;
+            if (selparms !== null) {
+                selparms = JSON.parse(selparms);
+                selstations = selparms.selstations || [];
+                selstationid = selparms.stationid;
+                starecord = selparms.starecord;
+                selsource = selparms.starecord.source;
+                selvariablename = selparms.starecord.variablename;
+            }
             /*
             config:
             comment: ""
@@ -93,7 +98,7 @@
             tempchart: false
             temptable: false
             */
-            kla1625shmconfig = $.extend(true, {
+            kla1629ghcconfig = $.extend(true, {
                 comment: "",
                 decimals: true,
                 heatmaps: true,
@@ -107,8 +112,10 @@
                 autoload: false
 
             }, selparms.config);
+
         }
-        kla1625shmparms = {
+
+        kla1629ghcparms = {
             selstations: selstations,
             selstationid: selstationid,
             starecord: starecord,
@@ -137,8 +144,16 @@
                 header: "Niederschlag",
                 reverse: false,
                 cumulate: true
+            },
+            SNOW: {
+                header: "Schnee",
+                reverse: false,
+                cumulate: true
             }
         };
+
+
+
         if (typeof navigatebucket === "object") {
             if (navigatebucket.navigate === "back") {
                 if (typeof navigatebucket.oldparameters === "object") {
@@ -165,17 +180,17 @@
 
         $(".content").empty();
         $(".headertitle").html("Heatmap für Station:" + selstationid + " Quelle:" + selsource);
-        $(".headertitle").attr("title", "kla1625shm");
-        $(".content").attr("pageid", "kla1625shm");
-        $(".content").attr("id", "kla1625shm");
+        $(".headertitle").attr("title", "kla1629ghc");
+        $(".content").attr("pageid", "kla1629ghc");
+        $(".content").attr("id", "kla1629ghc");
         $(".content")
             .css({
                 overflow: "hidden"
             });
-        $("#kla1625shm")
+        $("#kla1629ghc")
             .append($("<input/>", {
                 type: "hidden",
-                id: "kla1625shm_isdirty",
+                id: "kla1629ghc_isdirty",
                 value: "false"
             }));
         $(".headerright").remove();
@@ -224,22 +239,22 @@
                 )
             );
         sysbase.initFooter();
-        $("#kla1625shm.content").empty();
-        $("#kla1625shm.content")
+        $("#kla1629ghc.content").empty();
+        $("#kla1629ghc.content")
             .append($("<div/>", {
-                id: "kla1625shmbuttons",
+                id: "kla1629ghcbuttons",
                 css: {
                     width: "100%",
                     float: "left"
                 }
             }));
 
-        if (kla1625shmconfig.allin === false) {
+        if (kla1629ghcconfig.allin === false) {
 
-            $("#kla1625shmbuttons")
+            $("#kla1629ghcbuttons")
                 .append($("<button/>", {
                     html: "Google-Maps",
-                    id: "kla1625shmgoogle",
+                    id: "kla1629ghcgoogle",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -258,7 +273,7 @@
                 }))
                 .append($("<button/>", {
                     html: "Leaflet-Raster",
-                    id: "kla1625shmleaf",
+                    id: "kla1629ghcleaf",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -277,40 +292,11 @@
                 }));
         }
 
-        // Auswahl selvariablename
-        /*
-        .append($("<button/>", {
-            html: "Sparklines/Periode anzeigen",
-            css: {
-                float: "left",
-                margin: "10px"
-            },
-            click: function (evt) {
-                evt.preventDefault();
-                kla1625shm.paintS(selvariablename, selsource, selstationid, matrix1);
-            }
-        }))
-        */
-        /*
-         .append($("<button/>", {
-             html: "Sparklines/Jahr anzeigen",
-             css: {
-                 float: "left",
-                 margin: "10px"
-             },
-             click: function (evt) {
-                 evt.preventDefault();
-                 // stationrecord - heatworld
-                 kla1625shm.paintT(selvariablename, selsource, selstationid, matrix1);
-             }
-         }))
-         */
-
-        $("#kla1625shmbuttons")
+        $("#kla1629ghcbuttons")
 
             .append($("<button/>", {
                 html: "Super-Heatmaps",
-                id: "kla1625shmsuper",
+                id: "kla1629ghcsuper",
                 css: {
                     float: "left",
                     margin: "10px"
@@ -319,15 +305,15 @@
                     evt.preventDefault();
                     // stationrecord - heatworld
                     async.waterfall([
-                        function (cb1625a) {
+                        function (cb1629a) {
                             // brutal auf die rechte Seite
-                            $("#kla1625shmwrapper").empty();
-                            $("#kla1625shmwrapper").css({
+                            $("#kla1629ghcwrapper").empty();
+                            $("#kla1629ghcwrapper").css({
                                 overflow: "auto"
                             });
-                            $("#kla1625shmwrapper")
+                            $("#kla1629ghcwrapper")
                                 .append($("<div/>", {
-                                    id: "kla1625shmd1",
+                                    id: "kla1629ghcd1",
                                     css: {
                                         width: $("#heatmap").width(),
                                         height: $("#heatmap").height(),
@@ -340,14 +326,14 @@
                                 cbuckets: false,
                                 hyde: false
                             };
-                            kla1625shm.kliheatmap2("kla1625shmd1", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                cb1625a(null);
+                            kla1629ghc.kliheatmap2("kla1629ghcd1", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                cb1629a(null);
                             });
                         },
-                        function (cb1625b) {
-                            $("#kla1625shmwrapper")
+                        function (cb1629b) {
+                            $("#kla1629ghcwrapper")
                                 .append($("<div/>", {
-                                    id: "kla1625shmd2",
+                                    id: "kla1629ghcd2",
                                     css: {
                                         width: $("#heatmap").width(),
                                         height: $("#heatmap").height(),
@@ -360,17 +346,17 @@
                                 cbuckets: false,
                                 hyde: false
                             };
-                            kla1625shm.kliheatmap2("kla1625shmd2", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                cb1625b(null);
+                            kla1629ghc.kliheatmap2("kla1629ghcd2", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
+                                cb1629b(null);
                             });
                         },
-                        function (cb1625c) {
+                        function (cb1629c) {
                             /**
-                             * für TMAX min und max bestimmen, Histogramm als Sparkline
+                             * für WLVL min und max bestimmen, Histogramm als Sparkline
                              */
-                            $("#kla1625shmwrapper")
+                            $("#kla1629ghcwrapper")
                                 .append($("<div/>", {
-                                    id: "kla1625shmd3",
+                                    id: "kla1629ghcd3",
                                     css: {
                                         width: $("#heatmap").width(),
                                         height: $("#heatmap").height(),
@@ -383,7 +369,7 @@
                                 cbuckets: true,
                                 hyde: true
                             };
-                            kla1625shm.kliheatmap2("kla1625shmd3", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                            kla1629ghc.kliheatmap2("kla1629ghcd3", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
                                 // über ret kommen hier options in ret zurück
                                 /*
                                     error: false,
@@ -395,78 +381,13 @@
                                     temparray: ret.temparray,
                                     matrix: hmatrix
                                 */
-                                cb1625c(null);
-                            });
-                        },
-                        function (cb1625d) {
-                            /**
-                             * für TMIN min und max bestimmen, Histogramm als Sparkline
-                             */
-                            $("#kla1625shmwrapper")
-                                .append($("<div/>", {
-                                    id: "kla1625shmd4",
-                                    css: {
-                                        width: $("#heatmap").width(),
-                                        height: $("#heatmap").height(),
-                                        float: "left"
-                                    }
-                                }));
-                            var hmoptions = {
-                                minmax: true,
-                                minmaxhistogram: true,
-                                cbuckets: true,
-                                hyde: false
-                            };
-                            kla1625shm.kliheatmap2("kla1625shmd4", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                                cb1625d(null);
+                                cb1629c(null);
                             });
                         }
 
                     ]);
                 }
             }))
-
-
-            /*
-            .append($("<button/>", {
-                html: "Bucketanalyse (10)",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    // stationrecord - heatworld
-                    kla1625shm.bucketAnalysis(10, selvariablename, selsource, selstationid);
-                }
-            }))
-            */
-
-
-
-            /*
-            .append($("<button/>", {
-                html: "Sparklines-Kelvin",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    var matrix2 = uihelper.cloneObject(matrix1);
-                    for (var i1 = 0; i1 < matrix2.data.length; i1++) {
-                        for (var i2 = 0; i2 < matrix2.data[i1].length; i2++) {
-                            var temp1 = matrix2.data[i1][i2];
-                            if (temp1 !== null) {
-                                var tkelvin = (parseFloat(temp1) + 273).toFixed(1);
-                                matrix2.data[i1][i2] = tkelvin;
-                            }
-                        }
-                    }
-                    kla1625shm.paintT(selvariablename, selsource, selstationid, matrix2);
-                }
-            }))
-            */
 
 
             .append($("<button/>", {
@@ -491,158 +412,6 @@
                 }
             }))
 
-
-            /*
-            .append($("<button/>", {
-                html: "Sparklines-Download",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    // es müssen die canvas modifiziert werden, so dass dataUrl möglich wird
-                    var canliste = $('#kla1625shmt1 tbody tr td span canvas');
-                    $(canliste).each(function (index, element) {
-                        var dataurl = element.toDataURL('image/png');
-                        var par = $(element).parent();
-                        $(par).append($("<img/>", {
-                            src: dataurl
-                        }));
-                        $(element).remove();
-                    });
-                    // Filterzeile clone und löschen
-                    // wenn hasClass u.a. hasFilters
-                    var clonerow;
-                    if ($("#kla1625shmt1").hasClass("hasFilters")) {
-                        clonerow = $("#kla1625shmt1 thead tr").eq(1).clone();
-                        $("#kla1625shmt1 thead tr").eq(1).remove();
-                    }
-                    var elHtml = "";
-                    elHtml += "<html>";
-                    elHtml += "<head>";
-                    elHtml += "<meta charset='UTF-8'>";
-                    elHtml += "<style type='text/css'> @page { size: 29.5cm 21.0cm; margin-left: 1cm; margin-right: 1cm }</style>";
-                    elHtml += "</head>";
-                    elHtml += "<body style='font-family:Calibri,Arial,Helvetica,sans-serif;font-size:11px'>";
-                    elHtml += "<h2>" + $("#kla1625shmh2").text() + "</h2>";
-                    elHtml += "<p style='page-break-before: always'>";
-                    var oldwidth = $("#kla1625shmt1").width();
-                    $("#kla1625shmt1").width("100%");
-                    elHtml += $("#kla1625shmt1").parent().html();
-                    elHtml += "</body>";
-                    elHtml += "<html>";
-                    // Filterzeile clone wieder einfügen
-                    if ($("#kla1625shmt1").hasClass("hasFilters")) {
-                        $("#kla1625shmt1 thead").append(clonerow);
-                    }
-                    var filename = "sparklines.html";
-                    if (elHtml.length > 100) {
-                        var jqxhr = $.ajax({
-                            method: "POST",
-                            crossDomain: false,
-                            url: sysbase.getServer("getbackasfile"),
-                            data: {
-                                timeout: 10 * 60 * 1000,
-                                largestring: elHtml,
-                                filename: filename
-                            }
-                        }).done(function (r1, textStatus, jqXHR) {
-                            sysbase.checkSessionLogin(r1);
-                            console.log("getbackasfile:" + filename + "=>" + r1);
-                            var j1 = JSON.parse(r1);
-                            if (j1.error === false) {
-                                var download_path = j1.path;
-                                // Could also use the link-click method.
-                                // window.location = download_path;
-                                window.open(download_path, '_blank');
-                                sysbase.putMessage(filename + " download erfolgt", 1);
-                            } else {
-                                sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
-                            }
-                            return;
-                        }).fail(function (err) {
-                            sysbase.putMessage("download:" + err, 3);
-                            return;
-                        }).always(function () {
-                            // nope
-                        });
-                    }
-                }
-            }))
-            */
-            /*
-            .append($("<button/>", {
-                html: "Scattergram",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    // stationrecord - heatworld
-                    kla1625shm.scatter(selvariablename, selsource, selstationid, matrix1);
-                }
-            }))
-            */
-
-            /*
-            .append($("<button/>", {
-                html: "Regression testen",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    // stationrecord - heatworld
-                    kla1625shm.paintU(selvariablename, selsource, selstationid, matrix1);
-                }
-            }))
-            .append($("<button/>", {
-                html: "Chart anzeigen",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    // stationrecord - heatworld
-                    kla1625shm.paintChart(30, selvariablename, selsource, selstationid);
-                }
-            }))
-            */
-            /*
-            .append($("<button/>", {
-                html: "Clusteranalyse",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    // stationrecord - heatworld
-                    kla1625shm.clusterAnalysis(selvariablename, selsource, selstationid);
-                }
-            }))
-            */
-            /*
-            .append($("<button/>", {
-                html: "Bucketanalyse (30)",
-                css: {
-                    float: "left",
-                    margin: "10px"
-                },
-                click: function (evt) {
-                    evt.preventDefault();
-                    // stationrecord - heatworld
-                    kla1625shm.bucketAnalysis(30, selvariablename, selsource, selstationid);
-                }
-            }))
-            */
-
-
-
             .append($("<button/>", {
                 html: "Drucken",
                 css: {
@@ -651,7 +420,7 @@
                     margin: "10px"
                 },
                 click: function (evt) {
-                    // sysbase.printDivAll($("#kla1625shmwrapper").html());
+                    // sysbase.printDivAll($("#kla1629ghcwrapper").html());
                     // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
                     $('canvas').each(function (e) {
                         var image = new Image();
@@ -805,15 +574,15 @@
                     if ($("#kliheattable").is(":visible")) {
                         $("#kliheattable").hide();
                     } else {
-                        $("#kla1625shmwrapper").empty();
+                        $("#kla1629ghcwrapper").empty();
                         var h = $("#heatmap").height();
-                        var w = $("#kla1625shm.content").width();
+                        var w = $("#kla1629ghc.content").width();
                         w -= 0; // $("#heatmap").position().left;
                         w -= 0; // $("#heatmap").width();
                         w -= 0; // 40;
-                        $("#kla1625shmwrapper")
+                        $("#kla1629ghcwrapper")
                             .append($("<div/>", {
-                                id: "kla1625shmcolormap",
+                                id: "kla1629ghccolormap",
                                 css: {
                                     "background-color": "yellow",
                                     height: h,
@@ -821,15 +590,15 @@
                                     overflow: "auto"
                                 }
                             }));
-                        $("#kla1625shmcolormap").show();
-                        kla9020fun.getColorPaletteX1("kla1625shmcolormap", 7);
+                        $("#kla1629ghccolormap").show();
+                        kla9020fun.getColorPaletteX1("kla1629ghccolormap", 7);
                     }
                     return false;
                 }
             }))
 
             .append($("<div/>", {
-                id: "kla1625shmclock",
+                id: "kla1629ghcclock",
                 float: "left",
                 css: {
                     float: "left",
@@ -837,23 +606,23 @@
                 }
             }));
         /**
-         * Beginn des initialen Aufbaus kla1625shmwrapper
+         * Beginn des initialen Aufbaus kla1629ghcwrapper
          */
-        $("#kla1625shm.content")
+        $("#kla1629ghc.content")
             .append($("<div/>", {
-                    id: "kla1625shmdiv",
-                    class: "kla1625shmdiv"
+                    id: "kla1629ghcdiv",
+                    class: "kla1629ghcdiv"
                 })
                 .append($("<div/>", {
-                    id: "kla1625shmwrapper",
-                    class: "kla1625shmwrapper"
+                    id: "kla1629ghcwrapper",
+                    class: "kla1629ghcwrapper"
                 }))
             );
-        var h = $("#kla1625shm").height();
-        h -= $("#kla1625shm.header").height();
-        h -= $("#kla1625shmbuttons").height();
-        h -= $("#kla1625shm.footer").height();
-        $("#kla1625shmdiv")
+        var h = $("#kla1629ghc").height();
+        h -= $("#kla1629ghc.header").height();
+        h -= $("#kla1629ghcbuttons").height();
+        h -= $("#kla1629ghc.footer").height();
+        $("#kla1629ghcdiv")
             .css({
                 "margin": "10px",
                 "background-color": "lime",
@@ -862,7 +631,7 @@
                 overflow: "auto",
                 float: "left"
             });
-        $("#kla1625shmwrapper")
+        $("#kla1629ghcwrapper")
             .css({
                 "background-color": "lime",
                 height: h,
@@ -870,13 +639,13 @@
                 overflow: "auto",
                 float: "left"
             });
-        console.log("kla1625shmwrapper initialisiert, leer");
+        console.log("kla1629ghcwrapper initialisiert, leer");
         $(window).on('resize', function () {
-            var h = $("#kla1625shm").height();
-            h -= $("#kla1625shm.header").height();
-            h -= $("#kla1625shmbuttons").height();
-            h -= $("#kla1625shm.footer").height();
-            $("#kla1625shmdiv").css({
+            var h = $("#kla1629ghc").height();
+            h -= $("#kla1629ghc.header").height();
+            h -= $("#kla1629ghcbuttons").height();
+            h -= $("#kla1629ghc.footer").height();
+            $("#kla1629ghcdiv").css({
                 height: h
             });
         });
@@ -884,8 +653,8 @@
         /**
          * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
          */
-        if (kla1625shmconfig.allin === false) {
-            kla1625shm.loadalldata(function (ret) {
+        if (kla1629ghcconfig.allin === false) {
+            kla1629ghc.loadalldata(function (ret) {
                 var wmtit = "Auswertung für Station:";
                 // isMember ? '$2.00' : '$10.00'
                 wmtit += selstationid;
@@ -897,10 +666,10 @@
                 wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
                 wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
                 $(".headertitle").html(wmtit);
-                kla1625shm.showall(ret);
+                kla1629ghc.showall(ret);
             });
         } else {
-            kla1625shm.getmoredata(function (ret) {
+            kla1629ghc.getmoredata(function (ret) {
                 var wmtit = "Auswertung für Station:";
                 // isMember ? '$2.00' : '$10.00'
                 wmtit += "Auswertung aller selektierten Stationen";
@@ -914,28 +683,25 @@
                 wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
                 */
                 $(".headertitle").html("Sammelauswertung");
-                kla1625shm.showall(ret);
+                kla1629ghc.showall(ret);
             });
         }
     }; // Ende show
 
     /**
-     * alle Daten laden - kla1625shmconfig.allin auswerten für Differenzierung
+     * alle Daten laden - kla1629ghcconfig.allin auswerten für Differenzierung
      * allin === false, dann selstationid abfragen
      * allin === true, dann selstationids als Array abfragen
      */
-    kla1625shm.loadalldata = function (cb1625g) {
+    kla1629ghc.loadalldata = function (cb1629g) {
         async.waterfall([
-                function (cb1625g1) {
-                    kla1625shmclock = kla1625shm.showclock("#kla1625shmclock");
+                function (cb1629g1) {
+                    kla1629ghcclock = kla1629ghc.showclock("#kla1629ghcclock");
                     //$("button").hide();
                     $(':button').prop('disabled', true); // Disable all the buttons
                     $("body").css("cursor", "progress");
                     var sqlStmt = "";
                     // das passt nicht mehr
-                    if (selvariablename === "TMAX" || selvariablename === "TMIN") {
-                        selvariablename = "TMAX,TMIN";
-                    }
                     var projection = {};
                     sqlStmt += "SELECT ";
                     sqlStmt += "KLISTATIONS.source, ";
@@ -963,41 +729,47 @@
                     sqlStmt += "AND KLISTATIONS.stationid = KLIDATA.stationid ";
                     sqlStmt += "WHERE KLISTATIONS.source = '" + selsource + "' ";
                     sqlStmt += "AND KLISTATIONS.stationid = '" + selstationid + "' ";
-                    if (selvariablename === "TMAX,TMIN") {
-                        sqlStmt += "AND (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
-                    } else {
-                        sqlStmt += "AND KLIDATA.variable ='" + selvariablename + "' ";
-                    }
+                    sqlStmt += "AND KLIDATA.variable ='" + selvariablename + "' ";
                     sqlStmt += "ORDER BY KLISTATIONS.source, KLISTATIONS.stationid, KLIDATA.variable";
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
                     uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
-                        if (ret1.error === false && ret1.records !== null) {
+                        if (ret1.error === false && ret1.records !== null && Object.keys(ret1.records).length > 0) {
                             /*
-                            intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
-                            wenn die Station komplette Daten geliefert hat
+                            abwärtskompatibel zwei Sätze!
                             */
                             klirecords = [];
-                            // Sortierfolge ist TMAX, TMIN alphabetisch
                             if (typeof ret1.records[0] !== "undefined") {
-                                ret1.records[0].years.replace(/""/g, null);
+                                ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
                                 klirecords.push(ret1.records[0]);
                                 stationrecord = ret1.records[0];
                             }
-                            if (typeof ret1.records[1] !== "undefined") {
-                                ret1.records[1].years.replace(/""/g, null);
-                                klirecords.push(ret1.records[1]);
-                            } else {
-                                klirecords.push(ret1.records[0]);
-                                ret1.records[1] = ret1.records[0];
-                            }
-                            cb1625g1(null, {
+                            cb1629g1(null, {
+                                error: false,
+                                message: "Daten gefunden"
+                            });
+                            return;
+                        } else if (ret1.error === false && ret1.record !== null && Object.keys(ret1.record).length > 0) {
+                            klirecords = [];
+                            ret1.records[0] = Object.assign({}, ret1.record, true);
+                            ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
+                            klirecords.push(ret1.records[0]);
+                            stationrecord = ret1.records[0];
+                            cb1629g1(null, {
                                 error: false,
                                 message: "Daten gefunden"
                             });
                             return;
                         } else {
-                            /**
+                            /*
+                            sysbase.putMessage("Keine Grundwassser-Daten zur Station gefunden", 3);
+                            cb1629g1("Error", {
+                                error: true,
+                                message: "Keine Grundwasser-Daten gefunden"
+                            });
+                            return;
+                            */
+                           /**
                              * Abfrage, ob Daten geladen werden sollen
                              */
                             debugger;
@@ -1008,13 +780,13 @@
                             var check = window.confirm(qmsg);
                             if (check === false) {
                                 sysbase.putMessage("Keine Daten zur Station gefunden und Abbruch", 3);
-                                cb1625g1("Error", {
+                                cb1629g1("Error", {
                                     error: true,
                                     message: "Keine " + selvariablename + "-Daten gefunden"
                                 });
                                 return;
                             } else {
-                                cb1625g1(null, {
+                                cb1629g1(null, {
                                     error: true,
                                     operation: "loadghcn",
                                     message: "Keine " + selvariablename + "-Daten gefunden und Laden",
@@ -1028,17 +800,18 @@
                         }
                     });
                 },
-                function (ret, cb1625g2) {
+
+                function (ret, cb1629g2) {
                     /**
                      * Laden der GHCN-Daily-Daten, falls angefordert
                      * Laden aus den Urdaten (*.dly-Files)
                      */
                     if (ret.error === false) {
-                        cb1625g2(null, ret);
+                        cb1629g2(null, ret);
                         return;
                     }
                     if (ret.error === true && (typeof ret.operation === "undefined" || typeof ret.operation !== "undefined" && ret.operation !== "loadghcn")) {
-                        cb1625g2(null, ret);
+                        cb1629g2(null, ret);
                         return;
                     }
                     var jqxhr = $.ajax({
@@ -1056,13 +829,13 @@
                         var ret1 = JSON.parse(r1);
                         sysbase.putMessage(ret1.message, 1);
                         if (ret1.error === true) {
-                            cb1625g2("Error", {
+                            cb1629g2("Error", {
                                 error: ret1.error,
                                 message: ret1.message
                             });
                             return;
                         } else {
-                            cb1625g2(null, {
+                            cb1629g2(null, {
                                 error: ret1.error,
                                 operation: "repeat",
                                 message: ret1.message,
@@ -1077,7 +850,7 @@
                         //$("#kli1400raw_rightwdata").empty();
                         //document.getElementById("kli1400raw").style.cursor = "default";
                         sysbase.putMessage("ghcnddata:" + err, 3);
-                        cb1625g2("Error", {
+                        cb1629g2("Error", {
                             error: true,
                             message: err
                         });
@@ -1086,12 +859,12 @@
                         // nope
                     });
                 },
-                function (ret, cb1625g3) {
+                function (ret, cb1629g3) {
                     /**
                      * nochmaliges Lesen, falls erforderlich
                      */
                     if (typeof ret.operation === "undefined" || ret.operation !== "repeat") {
-                        cb1625g3(null, ret);
+                        cb1629g3(null, ret);
                         return;
                     }
                     uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, ret.api, ret.table, function (ret1) {
@@ -1101,13 +874,13 @@
                             // Sortierfolge ist TMAX, TMIN alphabetisch
                             if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
                             if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
-                            cb1625g3(null, {
+                            cb1629g3(null, {
                                 error: false,
                                 message: "Daten gefunden"
                             });
                             return;
                         } else {
-                            cb1625g3(null, {
+                            cb1629g3(null, {
                                 error: true,
                                 message: "Endgültig keine " + varparms[selvariablename].header + "-Daten gefunden"
                             });
@@ -1115,12 +888,16 @@
                         }
                     });
                 },
-                function (ret, cb1625g4) {
+
+
+
+
+                function (ret, cb1629g4) {
                     /**
                      * Holen der HYDE-Daten
                      */
-                    if (kla1625shmconfig.hyde === false) {
-                        cb1625g4(null, ret);
+                    if (kla1629ghcconfig.hyde === false) {
+                        cb1629g4(null, ret);
                         return;
                     }
                     var jqxhr = $.ajax({
@@ -1142,17 +919,17 @@
                         var ret = JSON.parse(r1);
                         sysbase.putMessage(ret.message, 1);
                         if (ret.error === true) {
-                            cb1625g4(null, ret);
+                            cb1629g4(null, ret);
                             return;
                         } else {
                             klihyde = ret.klihyde;
                             // klihyde.data muss mit JSON.parse noch entpackt werden
-                            cb1625g4(null, ret);
+                            cb1629g4(null, ret);
                             return;
                         }
                     }).fail(function (err) {
                         sysbase.putMessage(err, 1);
-                        cb1625g4(null, ret);
+                        cb1629g4(null, ret);
                         return;
                     }).always(function () {
                         // nope
@@ -1160,18 +937,18 @@
                 }
             ],
             function (error, result) {
-                clearInterval(kla1625shmclock);
+                clearInterval(kla1629ghcclock);
                 $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
                 //$("button").show();
                 $(':button').prop('disabled', false); // Enable all the buttons
                 $("body").css("cursor", "default");
-                cb1625g(result);
+                cb1629g(result);
                 return;
             });
     };
 
     /**
-     * getmoredata - kla1625shmconfig.allin === true
+     * getmoredata - kla1629ghcconfig.allin === true
      * allin === true, dann selstations mit stationid und source als Array abfragen
      * im server:
      * - create temporary table
@@ -1180,17 +957,14 @@
      * - Rückgabe records - das eigentliche Ziel
      * tricky mit temporary table
      */
-    kla1625shm.getmoredata = function (cb1625n) {
+    kla1629ghc.getmoredata = function (cb1629n) {
         var ttid = "STA" + Math.floor(Math.random() * 100000) + 1;
         async.waterfall([
-                function (cb1625n0) {
-                    kla1625shmclock = kla1625shm.showclock("#kla1625shmclock");
+                function (cb1629n0) {
+                    kla1629ghcclock = kla1629ghc.showclock("#kla1629ghcclock");
                     //$("button").hide();
                     $(':button').prop('disabled', true); // Disable all the buttons
                     $("body").css("cursor", "progress");
-                    if (selvariablename === "TMAX" || selvariablename === "TMIN") {
-                        selvariablename = "TMAX,TMIN";
-                    }
                     /**
                      * Aufbau temporary table
                      */
@@ -1202,7 +976,7 @@
                      * sql SELECT mit temptable
                      */
                     var sqlStmt = "";
-                    // selvariablename = "TMAX,TMIN";
+                    // selvariablename = "WLVL";
                     var projection = {};
                     sqlStmt += "SELECT ";
                     sqlStmt += "KLISTATIONS.source, ";
@@ -1231,11 +1005,7 @@
                     sqlStmt += " LEFT JOIN KLIDATA ";
                     sqlStmt += " ON " + ttid + ".source = KLIDATA.source ";
                     sqlStmt += " AND " + ttid + ".stationid = KLIDATA.stationid ";
-                    if (selvariablename === "TMAX,TMIN") {
-                        sqlStmt += " WHERE (KLIDATA.variable ='TMAX' OR KLIDATA.variable = 'TMIN') ";
-                    } else {
-                        sqlStmt += " WHERE KLIDATA.variable ='" + selvariablename + "' ";
-                    }
+                    sqlStmt += " WHERE KLIDATA.variable ='" + selvariablename + "' ";
                     sqlStmt += " ORDER BY " + ttid + ".source, " + ttid + ".stationid, KLIDATA.variable";
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
@@ -1257,13 +1027,13 @@
                         var ret1 = JSON.parse(r1);
                         sysbase.putMessage(ret1.message, 1);
                         if (ret1.error === true) {
-                            cb1625n0("Error", {
+                            cb1629n0("Error", {
                                 error: ret1.error,
                                 message: ret1.message
                             });
                             return;
                         } else {
-                            cb1625n0(null, {
+                            cb1629n0(null, {
                                 error: ret1.error,
                                 message: ret1.message,
                                 records: ret1.records
@@ -1274,7 +1044,7 @@
                         //$("#kli1400raw_rightwdata").empty();
                         //document.getElementById("kli1400raw").style.cursor = "default";
                         sysbase.putMessage("getmoredata:" + err, 3);
-                        cb1625n0("Error", {
+                        cb1629n0("Error", {
                             error: true,
                             message: err.message || err
                         });
@@ -1284,7 +1054,7 @@
                     });
 
                 },
-                function (ret1, cb1625n1) {
+                function (ret1, cb1629n1) {
                     /**
                      * hier kommt eine async loop-Steuerung, um die Daten sequentiell abzuarbeite
                      * in der bisherigen Logik
@@ -1302,7 +1072,7 @@
                             return;
                         } else if (vglsource !== klirow.source || vglstationid !== klirow.stationid) {
                             // Gruppenwechsel-Verarbeitung, Komplettierung und Ausgabe
-                            kla1625shm.execmoredata(vglsource, vglstationid, function (ret2) {
+                            kla1629ghc.execmoredata(vglsource, vglstationid, function (ret2) {
                                 // neue Gruppe einleiten
                                 vglsource = klirow.source;
                                 vglstationid = klirow.stationid;
@@ -1318,8 +1088,8 @@
                         }
                     }, function (err) {
                         // zum Ablschluss
-                        kla1625shm.execmoredata(vglsource, vglstationid, function (ret2) {
-                            cb1625n1(null, ret2);
+                        kla1629ghc.execmoredata(vglsource, vglstationid, function (ret2) {
+                            cb1629n1(null, ret2);
                             return;
                         });
                     });
@@ -1330,9 +1100,6 @@
             });
 
     };
-
-
-
     /**
      * execmoredata - in Loop die Verarbeitung eines Pair in klirecords
      * durchführen, teilweise von altem loadall und dann showall
@@ -1340,19 +1107,19 @@
      * @param {*} newstationid
      * @param {*} cbexec
      */
-    kla1625shm.execmoredata = function (newsource, newstationid, cb1625p) {
+    kla1629ghc.execmoredata = function (newsource, newstationid, cb1629p) {
         selsource = newsource;
         selstationid = newstationid;
         async.waterfall([
-                function (cb1625p1) {
+                function (cb1629p1) {
                     /*
                     intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
-                    wenn die Station komplette Temperaturdaten geliefert hat
+                    wenn die Station komplette Wasserstanddaten geliefert hat
                     */
                     if (typeof klirecords[0].years !== "undefined" || klirecords[0].years.length > 0) {
-                        // Sortierfolge ist TMAX, TMIN alphabetisch
+                        // Sortierfolge ist WLVL alphabetisch
                         stationrecord = klirecords[0];
-                        cb1625p1(null, {
+                        cb1629p1(null, {
                             error: false,
                             message: "Daten gefunden"
                         });
@@ -1361,25 +1128,23 @@
                         /**
                          * Abfrage, ob Daten geladen werden sollen
                          */
-                        debugger;
-                        var qmsg = "execmoredata: Für Station:" + selstationid + " aus " + selsource;
+                        var qmsg = "Für Station:" + selstationid + " aus " + selsource;
                         qmsg += " und " + selvariablename;
                         qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
-                        console.log("execmoredata - confirm");
                         var check = window.confirm(qmsg);
                         if (check === false) {
                             sysbase.putMessage("Keine Daten zur Station gefunden", 3);
-                            cb1625p1("Error", {
+                            cb1629p1("Error", {
                                 error: true,
-                                message: "Keine " + varparms[selvariablename].header + "-Daten gefunden"
+                                message: "Keine Wasserstand-Daten gefunden"
                             });
                             return;
                         } else {
                             // TODO: neues SQL und beide Variablen bereitstellen
-                            cb1625p1(null, {
+                            cb1629p1(null, {
                                 error: true,
                                 operation: "loadghcn",
-                                message: "Keine  " + varparms[selvariablename].header + "-Daten gefunden",
+                                message: "Keine Wasserstand-Daten gefunden",
                                 sqlStmt: sqlStmt,
                                 selvariablename: selvariablename,
                                 selsource: selsource,
@@ -1389,17 +1154,17 @@
                         }
                     }
                 },
-                function (ret, cb1625p2) {
+                function (ret, cb1629p2) {
                     /**
                      * Laden der GHCN-Daily-Daten, falls angefordert
                      * Laden aus den Urdaten (*.dly-Files)
                      */
                     if (ret.error === false) {
-                        cb1625p2(null, ret);
+                        cb1629p2(null, ret);
                         return;
                     }
                     if (ret.error === true && (typeof ret.operation === "undefined" || typeof ret.operation !== "undefined" && ret.operation !== "loadghcn")) {
-                        cb1625p2(null, ret);
+                        cb1629p2(null, ret);
                         return;
                     }
 
@@ -1418,13 +1183,13 @@
                         var ret1 = JSON.parse(r1);
                         sysbase.putMessage(ret1.message, 1);
                         if (ret1.error === true) {
-                            cb1625p2("Error", {
+                            cb1629p2("Error", {
                                 error: ret1.error,
                                 message: ret1.message
                             });
                             return;
                         } else {
-                            cb1625p2(null, {
+                            cb1629p2(null, {
                                 error: ret1.error,
                                 operation: "repeat",
                                 message: ret1.message,
@@ -1439,7 +1204,7 @@
                         //$("#kli1400raw_rightwdata").empty();
                         //document.getElementById("kli1400raw").style.cursor = "default";
                         sysbase.putMessage("ghcnddata:" + err, 3);
-                        cb1625p2("Error", {
+                        cb1629p2("Error", {
                             error: true,
                             message: err.message || err
                         });
@@ -1449,41 +1214,42 @@
                         $(that).attr("disabled", false);
                     });
                 },
-                function (ret, cb1625p3) {
+                function (ret, cb1629p3) {
                     /**
                      * nochmaliges Lesen, falls erforderlich
                      */
                     if (typeof ret.operation === "undefined" || ret.operation !== "repeat") {
-                        cb1625p3(null, ret);
+                        cb1629p3(null, ret);
                         return;
                     }
                     uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, ret.api, ret.table, function (ret1) {
                         if (ret1.error === false && ret1.record !== null) {
                             stationrecord = ret1.record;
                             klirecords = [];
-                            // Sortierfolge ist TMAX, TMIN alphabetisch
+                            // Sortierfolge ist WLVL
+                            ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
                             if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
-                            if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
-                            cb1625p3(null, {
+
+                            cb1629p3(null, {
                                 error: false,
                                 message: "Daten gefunden"
                             });
                             return;
                         } else {
-                            cb1625p3(null, {
+                            cb1629p3(null, {
                                 error: true,
-                                message: "Endgültig keine " + varparms[selvariablename].header + "-Daten gefunden"
+                                message: "Endgültig keine Wasserstand-Daten gefunden"
                             });
                             return;
                         }
                     });
                 },
-                function (ret, cb1625p4) {
+                function (ret, cb1629p4) {
                     /**
                      * Holen der HYDE-Daten
                      */
-                    if (kla1625shmconfig.hyde === false) {
-                        cb1625p4(null, ret);
+                    if (kla1629ghcconfig.hyde === false) {
+                        cb1629p4(null, ret);
                         return;
                     }
                     var jqxhr = $.ajax({
@@ -1505,57 +1271,50 @@
                         var ret = JSON.parse(r1);
                         sysbase.putMessage(ret.message, 1);
                         if (ret.error === true) {
-                            cb1625p4(null, ret);
+                            cb1629p4(null, ret);
                             return;
                         } else {
                             klihyde = ret.klihyde;
                             // klihyde.data muss mit JSON.parse noch entpackt werden
-                            cb1625p4(null, ret);
+                            cb1629p4(null, ret);
                             return;
                         }
                     }).fail(function (err) {
                         sysbase.putMessage(err, 1);
-                        cb1625p4(null, ret);
+                        cb1629p4(null, ret);
                         return;
                     }).always(function () {
                         // nope
                     });
                 },
-                function (ret, cb1625p5) {
+                function (ret, cb1629p5) {
                     // hier die Ausgabe durchführen
-                    kla1625shm.showall(ret, function (ret1) {
-                        cb1625p5("Finish", ret1);
+                    kla1629ghc.showall(ret, function (ret1) {
+                        cb1629p5("Finish", ret1);
                         return;
                     });
                 }
             ],
             function (error, result) {
-                clearInterval(kla1625shmclock);
+                clearInterval(kla1629ghcclock);
                 $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
                 //$("button").show();
                 $(':button').prop('disabled', false); // Enable all the buttons
                 $("body").css("cursor", "default");
-                cb1625p(result);
+                cb1629p(result);
                 return;
             });
     };
 
-
-
-
-
     /**
-     * kla1625shm.showall - Aufruf aller Funktionen für die Standardauswertung
+     * kla1629ghc.showall - Aufruf aller Funktionen für die Standardauswertung
      * @param {*} ret
      */
-    kla1625shm.showall = function (ret, cball) {
+    kla1629ghc.showall = function (ret, cball) {
         /**
-         * zweibahnige Ausgabe nach kla1625shmwrapper
+         * einbahnige Ausgabe nach kla1629ghcwrapper
          */
-        hmatrixR = {};
         hmatrixL = {};
-
-        hoptionsR = {};
         hoptionsL = {};
 
         /*
@@ -1563,17 +1322,15 @@
         var l = new Vector([1.4, 1.4, 1.3, 1.5, 1.4, 1.7, 1.4, 1.5, 1.4, 1.5, 1.5, 1.6, 1.4, 1.1, 1.2, 1.5, 1.3, 1.4, 1.7, 1.5, 1.7, 1.5, 1.0, 1.7, 1.9, 1.6, 1.6, 1.5, 1.4, 1.6, 1.6, 1.5, 1.5, 1.4, 1.5, 1.2, 1.3, 1.4, 1.3, 1.5, 1.3, 1.3, 1.3, 1.6, 1.9, 1.4, 1.6, 1.4, 1.5, 1.4, 4.7, 4.5, 4.9, 4.0, 4.6, 4.5, 4.7, 3.3, 4.6, 3.9, 3.5, 4.2, 4.0, 4.7, 3.6, 4.4, 4.5, 4.1, 4.5, 3.9, 4.8, 4.0, 4.9, 4.7, 4.3, 4.4, 4.8, 5.0, 4.5, 3.5, 3.8, 3.7, 3.9, 5.1, 4.5, 4.5, 4.7, 4.4, 4.1, 4.0, 4.4, 4.6, 4.0, 3.3, 4.2, 4.2, 4.2, 4.3, 3.0, 4.1, 6.0, 5.1, 5.9, 5.6, 5.8, 6.6, 4.5, 6.3, 5.8, 6.1, 5.1, 5.3, 5.5, 5.0, 5.1, 5.3, 5.5, 6.7, 6.9, 5.0, 5.7, 4.9, 6.7, 4.9, 5.7, 6.0, 4.8, 4.9, 5.6, 5.8, 6.1, 6.4, 5.6, 5.1, 5.6, 6.1, 5.6, 5.5, 4.8, 5.4, 5.6, 5.1, 5.1, 5.9, 5.7, 5.2, 5.0, 5.2, 5.4, 5.1]);
         var lm = new Regression.linear(l, w);
         console.log(JSON.stringify(lm, null, 4));
-        debugger;
         */
 
         async.waterfall([
-                function (cb1625g0a) {
+                function (cb1629g0a) {
                     klirecords[0].titel = klirecords[0].stationid + " " + klirecords[0].stationname + " (" + klirecords[0].source + ")";
-
-                    if (kla1625shmconfig.allin === true) {
+                    if (kla1629ghcconfig.allin === true) {
                         var gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
 
-                        $("#kla1625shmwrapper")
+                        $("#kla1629ghcwrapper")
                             .append($("<div/>", {
                                     class: "doprintthis",
                                     id: gldivid,
@@ -1634,14 +1391,14 @@
                             }));
                     }
                     /**
-                     * Datenqualität missing/bad data
+                     * Stammdaten
                      */
-                    if (kla1625shmconfig.master === false) {
-                        cb1625g0a(null, ret);
+                    if (kla1629ghcconfig.master === false) {
+                        cb1629g0a(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla1625shmwrapper")
+                    $("#kla1629ghcwrapper")
                         .append($("<div/>", {
                             id: divid,
                             class: "doprintthis",
@@ -1702,19 +1459,19 @@
                         .append($("<div/>", {
                             html: html
                         }));
-                    cb1625g0a(null, ret);
+                    cb1629g0a(null, ret);
                     return;
                 },
-                function (ret, cb1625g0b) {
+                function (ret, cb1629g0) {
                     /**
                      * Datenqualität missing/bad data
                      */
-                    if (kla1625shmconfig.qonly === false) {
-                        cb1625g0b(null, ret);
+                    if (kla1629ghcconfig.qonly === false) {
+                        cb1629g0(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla1625shmwrapper")
+                    $("#kla1629ghcwrapper")
                         .append($("<div/>", {
                             id: divid,
                             class: "doprintthis",
@@ -1748,8 +1505,6 @@
                                 html: "Datenqualität, Jahresdaten " + klirecords[0].titel
                             }))
                         );
-
-
                     /**
                      * Prüfung der Datenqualität je Jahr in klirecords.years
                      */
@@ -1810,16 +1565,16 @@
                                 }
                             }));
                     }
-                    cb1625g0b(null, ret);
+                    cb1629g0(null, ret);
                     return;
                 },
-                function (ret27, cb1625g0c) {
+                function (ret27, cb1629g1) {
                     /**
                      * Heatmap-1
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    if (kla1625shmconfig.heatmaps === true || kla1625shmconfig.heatmapsx === true) {
-                        $("#kla1625shmwrapper")
+                    if (kla1629ghcconfig.heatmaps === true || kla1629ghcconfig.heatmapsx === true) {
+                        $("#kla1629ghcwrapper")
                             .append($("<div/>", {
                                     css: {
                                         width: "100%",
@@ -1848,17 +1603,6 @@
                                         id: divid + "L",
                                     }))
                                 )
-                                .append($("<div/>", {
-                                        css: {
-                                            "text-align": "center",
-                                            float: "left",
-                                            width: "49%"
-                                        }
-                                    })
-                                    .append($("<div/>", {
-                                        id: divid + "R",
-                                    }))
-                                )
                             );
                     }
                     // Linke heatmap
@@ -1868,9 +1612,9 @@
                         cbuckets: false,
                         hyde: true
                     };
-                    kla1625shm.kliheatmap2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                    kla1629ghc.kliheatmap2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
                         ret.divid = divid;
-                        if (kla1625shmconfig.heatmaps === true) {
+                        if (kla1629ghcconfig.heatmaps === true) {
                             var nkorr = $("#" + divid + "L").find("canvas").height();
                             $("#" + divid + "L").css({
                                 "max-height": nkorr + 10,
@@ -1878,43 +1622,18 @@
                                 overflow: "hidden"
                             });
                         }
-                        cb1625g0c(null, ret);
-                        return;
-                    });
-                },
-                function (ret, cb1625g0d) {
-                    /**
-                     * Heatmap-2
-                     */
-                    // Rechte heatmap
-                    var hmoptions = {
-                        minmax: false,
-                        minmaxhistogram: false,
-                        cbuckets: false,
-                        hyde: true
-                    };
-                    var divid = ret.divid;
-                    kla1625shm.kliheatmap2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                        if (kla1625shmconfig.heatmaps === true) {
-                            var nkorr = $("#" + divid + "R").find("canvas").height();
-                            $("#" + divid + "R").css({
-                                "max-height": nkorr + 10,
-                                height: nkorr + 10,
-                                overflow: "hidden"
-                            });
-                        }
-                        cb1625g0d(null, ret);
+                        cb1629g1(null, ret);
                         return;
                     });
                 },
 
-                function (ret, cb1625g0e) {
+                function (ret, cb1629g3) {
                     /**
                      * Heatmap-3
                      */
-                    if (kla1625shmconfig.heatmaps === true) {
+                    if (kla1629ghcconfig.heatmaps === true) {
                         var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                        $("#kla1625shmwrapper")
+                        $("#kla1629ghcwrapper")
                             .append($("<div/>", {
                                     css: {
                                         width: "100%",
@@ -1953,9 +1672,9 @@
                         cbuckets: true,
                         hyde: true
                     };
-                    kla1625shm.kliheatmap2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmoptions, function (ret) {
+                    kla1629ghc.kliheatmap2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmoptions, function (ret) {
                         ret.divid = divid;
-                        if (kla1625shmconfig.heatmaps === true) {
+                        if (kla1629ghcconfig.heatmaps === true) {
                             var nkorr = $("#" + divid + "L").find("canvas").height();
                             $("#" + divid + "L").css({
                                 "max-height": nkorr + 10,
@@ -1965,43 +1684,17 @@
                         }
                         hmatrixL = ret.matrix;
                         hoptionsL = ret.options;
-                        cb1625g0e(null, ret);
+                        cb1629g3(null, ret);
                         return;
                     });
                 },
-                function (ret, cb1625g0f) {
+
+                function (ret, cb1629g5a) {
                     /**
-                     * Heatmap-4
+                     * Heat-Distribution mit ChartJS WLVL
                      */
-                    // Rechte heatmap
-                    var hmoptions = {
-                        minmax: true,
-                        minmaxhistogram: true,
-                        cbuckets: true,
-                        hyde: true
-                    };
-                    var divid = ret.divid;
-                    kla1625shm.kliheatmap2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmoptions, function (ret) {
-                        if (kla1625shmconfig.heatmaps === true) {
-                            var nkorr = $("#" + divid + "R").find("canvas").height();
-                            $("#" + divid + "R").css({
-                                "max-height": nkorr + 10,
-                                height: nkorr + 10,
-                                overflow: "hidden"
-                            });
-                        }
-                        hmatrixR = ret.matrix;
-                        hoptionsR = ret.options;
-                        cb1625g0f(null, ret);
-                        return;
-                    });
-                },
-                function (ret, cb1625g5a) {
-                    /**
-                     * Heat-Distribution mit ChartJS TMAX
-                     */
-                    if (kla1625shmconfig.tempdistribution === false) {
-                        cb1625g5a(null, ret);
+                    if (kla1629ghcconfig.tempdistribution === false) {
+                        cb1629g5a(null, ret);
                         return;
                     }
                     /**
@@ -2009,35 +1702,20 @@
                      */
                     var distrs = {};
                     var maxy = 0;
-                    distrs["TMAX"] = kla1625shm.klidistr2calc("TMAX", selsource, selstationid, ret);
-                    distrs["TMIN"] = kla1625shm.klidistr2calc("TMIN", selsource, selstationid, ret);
-
-                    // Konsolidierung
-                    if (distrs["TMAX"].winconfig.options.maxcount > maxy) {
-                        maxy = distrs["TMAX"].winconfig.options.maxcount;
-                    }
-                    if (distrs["TMAX"].sunconfig.options.maxcount > maxy) {
-                        maxy = distrs["TMAX"].sunconfig.options.maxcount;
+                    distrs["WLVL"] = kla1629ghc.klidistr2calc("WLVL", selsource, selstationid, ret);
+                    // Konsolidierung und
+                    /*
+                    if (distrs["WLVL"].sunconfig.options.maxcount > maxy) {
+                        maxy = distrs["WLVL"].sunconfig.options.maxcount;
                     }
 
-                    if (distrs["TMIN"].winconfig.options.maxcount > maxy) {
-                        maxy = distrs["TMIN"].winconfig.options.maxcount;
-                    }
-                    if (distrs["TMIN"].sunconfig.options.maxcount > maxy) {
-                        maxy = distrs["TMIN"].sunconfig.options.maxcount;
-                    }
-                    // Aufrunden auf die nächste 50
                     if (maxy % 50 !== 0) {
                         var yrest = maxy % 50;
                         var maxy = maxy - yrest + 50;
                     }
-                    distrs["TMAX"].winconfig.options.scales.yAxes[0].ticks.max = maxy;
-                    distrs["TMAX"].sunconfig.options.scales.yAxes[0].ticks.max = maxy;
-                    distrs["TMIN"].winconfig.options.scales.yAxes[0].ticks.max = maxy;
-                    distrs["TMIN"].sunconfig.options.scales.yAxes[0].ticks.max = maxy;
-
+                    */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla1625shmwrapper")
+                    $("#kla1629ghcwrapper")
                         .append($("<div/>", {
                                 css: {
                                     width: "100%",
@@ -2064,38 +1742,22 @@
 
                         );
                     ret.distrs = distrs;
-                    kla1625shm.klidistr2("#" + divid + "L", "TMAX", selsource, selstationid, ret, function (ret1) {
+                    kla1629ghc.klidistr2("#" + divid + "L", "WLVL", selsource, selstationid, ret, function (ret1) {
                         ret.divid = divid;
                         ret.distrs = distrs;
-                        cb1625g5a(null, ret);
-                        return;
-                    });
-                },
-
-                function (ret, cb1625g5b) {
-                    /**
-                     * Heat-Distribution mit ChartJS TMIN
-                     */
-                    if (kla1625shmconfig.tempdistribution === false) {
-                        cb1625g5b(null, ret);
-                        return;
-                    }
-                    var divid = ret.divid;
-                    kla1625shm.klidistr2("#" + divid + "R", "TMIN", selsource, selstationid, ret, function (ret) {
-                        cb1625g5b(null, ret);
+                        cb1629g5a(null, ret);
                         return;
                     });
                 },
 
 
-
-                function (ret, cb1625g5) {
+                function (ret, cb1629g5) {
                     /**
-                     * Tabelle mit Histogrammen - links
+                     * Wasserstandtabelle mit Histogrammen - links
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     // hier wird eine Struktur links und rechts bereitgestellt, noch ohne Inhalt
-                    $("#kla1625shmwrapper")
+                    $("#kla1629ghcwrapper")
                         .append($("<div/>", {
                                 css: {
                                     width: "100%",
@@ -2114,17 +1776,6 @@
                                     id: divid + "L",
                                 }))
                             )
-                            .append($("<div/>", {
-                                    css: {
-                                        "text-align": "center",
-                                        float: "left",
-                                        width: "49%"
-                                    }
-                                })
-                                .append($("<div/>", {
-                                    id: divid + "R",
-                                }))
-                            )
                         );
 
                     var hmoptions = {
@@ -2133,50 +1784,24 @@
                         cbuckets: true,
                         hyde: true
                     };
-                    if (typeof hoptionsL === "undefined") {
-                        cb1625g5(null, ret);
+                    hoptionsL.minmaxhistogram = true;
+                    kla1629ghc.klihisto2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                        ret.divid = divid;
+                        cb1629g5(null, ret);
                         return;
-                    } else {
-                        hoptionsL.minmaxhistogram = true;
-                        kla1625shm.klihisto2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
-                            ret.divid = divid;
-                            cb1625g5(null, ret);
-                            return;
-                        });
-                    }
+                    });
                 },
-                function (ret, cb1625g6) {
+
+                function (ret, cb1629g7) {
                     /**
-                     * Tabelle mit Histogrammen - rechts
-                     */
-                    var hmoptions = {
-                        minmax: true,
-                        minmaxhistogram: true,
-                        cbuckets: true,
-                        hyde: true,
-                        divid: ret.divid
-                    };
-                    if (typeof hoptionsR === "undefined") {
-                        cb1625g6(null, ret);
-                        return;
-                    } else {
-                        hoptionsR.minmaxhistogram = true;
-                        kla1625shm.klihisto2("#" + ret.divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
-                            cb1625g6(null, ret);
-                            return;
-                        });
-                    }
-                },
-                function (ret, cb1625g7) {
-                    /**
-                     * Verlauf Graphik und Tabelle
+                     * Wasserstandsverlauf Graphik und Tabelle
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    if (kla1625shmconfig.tempchart === false) {
-                        cb1625g7(null, ret);
+                    if (kla1629ghcconfig.tempchart === false) {
+                        cb1629g7(null, ret);
                         return;
                     }
-                    $("#kla1625shmwrapper")
+                    $("#kla1629ghcwrapper")
                         .append($("<div/>", {
                                 css: {
                                     width: "100%",
@@ -2192,70 +1817,31 @@
                                     width: "49%"
                                 }
                             }))
-                            .append($("<div/>", {
-                                id: divid + "R",
-                                css: {
-                                    "text-align": "center",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
                         );
-                    // Linker Verlauf
+                    // Linker Wasserstand
                     var hmoptions = {
                         minmax: true,
                         minmaxhistogram: true,
                         cbuckets: true,
                         hyde: true
                     };
-                    if (typeof hoptionsL === "undefined") {
-                        cb1625g7(null, ret);
+                    hoptionsL.minmaxhistogram = true;
+                    kla1629ghc.klitemp2("#" + divid + "L", "WLVL", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                        ret.divid = divid;
+                        cb1629g7(null, ret);
                         return;
-                    } else {
-                        hoptionsL.minmaxhistogram = true;
-                        kla1625shm.klitemp2("#" + divid + "L", "TMAX", selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
-                            ret.divid = divid;
-                            cb1625g7(null, ret);
-                            return;
-                        });
-                    }
-                },
-
-                function (ret, cb1625g8) {
-                    // Rechter Verlauf
-                    if (kla1625shmconfig.tempchart === false) {
-                        cb1625g8(null, ret);
-                        return;
-                    }
-                    var hmoptions = {
-                        minmax: true,
-                        minmaxhistogram: true,
-                        cbuckets: true,
-                        hyde: true,
-                        divid: ret.divid
-                    };
-                    if (typeof hoptionsR === "undefined") {
-                        cb1625g8(null, ret);
-                        return;
-                    } else {
-                        hoptionsR.minmaxhistogram = true;
-                        var divid = ret.divid;
-                        kla1625shm.klitemp2("#" + divid + "R", "TMIN", selsource, selstationid, starecord, hmatrixR, hoptionsR, function (ret) {
-                            cb1625g8(null, ret);
-                            return;
-                        });
-                    }
+                    });
                 },
 
 
 
-                function (ret, cb1625g9) {
-                    if (kla1625shmconfig.hyde === false) {
-                        cb1625g9("Finish", ret);
+                function (ret, cb1629g9) {
+                    if (kla1629ghcconfig.hyde === false) {
+                        cb1629g9("Finish", ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla1625shmwrapper")
+                    $("#kla1629ghcwrapper")
                         .append($("<div/>", {
                             id: divid,
                             css: {
@@ -2265,8 +1851,8 @@
                             }
                         }));
                     var hmoptions = {};
-                    kla1625shm.klihyde2("#" + divid, selstationid, starecord, function (ret) {
-                        cb1625g9("Finish", ret);
+                    kla1629ghc.klihyde2("#" + divid, selstationid, starecord, function (ret) {
+                        cb1629g9("Finish", ret);
                         return;
                     });
                 }
@@ -2281,7 +1867,7 @@
                         filter_ignoreCase: true
                     }
                 }); // so funktioniert es
-                $("#kla1625shmwrapper")
+                $("#kla1629ghcwrapper")
                     .append($("<div/>", {
                             css: {
                                 width: "100%",
@@ -2312,13 +1898,13 @@
      * @param {*} selstationid
      * @param {*} starecord
      * @param {*} hmoptions
-     *            minmax: true, - Skala auf echte Min und Max der Werte beziehen, nicht auf die Standardskale
+     *            minmax: true, - Wasserstandskala auf echte Min und Max der Werte beziehen, nicht auf die Standardskale
      *            minmaxhistogram: true - Ausgabe Sparkline über dem Historgramm => histo1
      *            scale: 7 oder 5 - Anzahl der Grundfarben für die Heatmap
      *              minval, maxval, sumval, countval werden berechnet und mit übergeben
      * @param {*} callbackh0
      */
-    kla1625shm.kliheatmap2 = function (cid, selvariablename, selsource, selstationid, starecord, hmoptions, callbackh0) {
+    kla1629ghc.kliheatmap2 = function (cid, selvariablename, selsource, selstationid, starecord, hmoptions, callbackh0) {
 
         async.waterfall([
                 function (callbackshm2) {
@@ -2345,44 +1931,22 @@
                     var hratio;
                     var hmvalstr;
                     try {
-                        /*
-                        if (selvariablename === "TMAX" && klirecords.length > 0) {
+
+                        if (selvariablename === "WLVL" && klirecords.length > 0) {
                             ret.record = klirecords[0];
-                        } else if (selvariablename === "TMIN" && klirecords.length > 1) {
-                            ret.record = klirecords[1];
                         }
-                        */
-                        if (selvariablename === "TMAX" && klirecords.length > 0) {
-                            if (klirecords[0].variable === "TMAX") {
-                                ret.record = klirecords[0];
-                            } else if (klirecords.length > 1 && klirecords[1].variable === "TMAX") {
-                                ret.record = klirecords[1];
-                            }
-                        }
-                        if (selvariablename === "TMIN" && klirecords.length > 0) {
-                            if (klirecords[0].variable === "TMIN") {
-                                ret.record = klirecords[0];
-                            } else if (klirecords.length > 1 && klirecords[1].variable === "TMIN") {
-                                ret.record = klirecords[1];
-                            }
-                        }
-                        if (typeof ret.record === "undefined" || typeof ret.record.years === "undefined") {
-                            callbackshm2("No Record:" + selvariablename, {
-                                error: true,
-                                message: "No Record:" + selvariablename
-                            });
-                            return;
-                        }
+
                         var years = JSON.parse(ret.record.years);
                         var dayyears = JSON.parse(ret.record.years); // ret.record[selvariablename].years;
+
                         var mtitle = "";
                         mtitle += (ret.record.variable || "").length > 0 ? " " + ret.record.variable : "";
                         mtitle += " " + selstationid;
                         mtitle += (ret.record.stationname || "").length > 0 ? " " + ret.record.stationname : "";
                         mtitle += (ret.record.fromyear || "").length > 0 ? " von " + ret.record.fromyear : "";
                         mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
-                        ret.record.fromyear = kla1625shmconfig.fromyear;
-                        ret.record.toyear = kla1625shmconfig.toyear;
+                        ret.record.fromyear = kla1629ghcconfig.fromyear;
+                        ret.record.toyear = kla1629ghcconfig.toyear;
                         mtitle += (ret.record.fromyear || "").length > 0 ? " Filter von " + ret.record.fromyear : "";
                         mtitle += (ret.record.toyear || "").length > 0 ? " bis " + ret.record.toyear : "";
                         // Aufruf Heatmap mit Container und Matrix
@@ -2400,7 +1964,7 @@
                         var numberhisto = new Array(10).fill(0);
                         for (var year in years) {
                             if (years.hasOwnProperty(year)) {
-                                if (parseInt(year) < kla1625shmconfig.fromyear || parseInt(year) > kla1625shmconfig.toyear) {
+                                if (parseInt(year) < kla1629ghcconfig.fromyear || parseInt(year) > kla1629ghcconfig.toyear) {
                                     continue;
                                 }
                                 matrix1.rowheaders.push(year);
@@ -2448,7 +2012,7 @@
                                                     var buck0 = parseInt(year);
                                                     var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
                                                     // oder 1661 als Basisjahr und damit rechnen
-                                                    var steps = parseInt(kla1625shmconfig.step || 30);
+                                                    var steps = parseInt(kla1629ghcconfig.step || 30);
                                                     var buck2 = Math.floor(buck1 / steps);
                                                     var buck3 = 1661 + (buck2) * steps;
                                                     var buckyear = "" + buck3;
@@ -2468,7 +2032,7 @@
                                                     var inum = 0;
                                                     var numt = wert.split(".");
                                                     if (numt.length === 2) {
-                                                        inum = parseInt(numt[1].substr(0, 1));
+                                                        inum = parseInt(numt[1].slice(-1));
                                                     }
                                                     hmoptions.cbucketdata[buckyear].numberhisto[inum] += 1;
                                                     hmoptions.cbucketdata[buckyear].valsum += hmval;
@@ -2490,7 +2054,7 @@
                                                 }
                                             } else {
                                                 matrix1.data[irow][icol] = null;
-                                                console.log("Keine formal korrekte " + varparms[selvariablename].header + ":" + rowvalues[icol]);
+                                                console.log("Kein formal korrekter Wasserstand:" + rowvalues[icol]);
                                                 debugger;
                                             }
                                         }
@@ -2502,10 +2066,9 @@
 
                         // hier ist das Layout nochmal zu kontrollieren
                         hmoptions.histo = histo1;
-                        if (kla1625shmconfig.heatmaps === true) {
-                            var erg = kla9020fun.getHeatmap(cid, kla1625shmconfig.heatmapsx, matrix1, hmoptions, function (ret) {
+                        if (kla1629ghcconfig.heatmaps === true && matrix1.data.length > 0) {
+                            var erg = kla9020fun.getHeatmap(cid, kla1629ghcconfig.heatmapsx, matrix1, hmoptions, function (ret) {
                                 sysbase.putMessage("Heatmap ausgegeben", 1);
-                                // if (hmoptions.minmax === true) debugger;
                                 callbackshm2(null, {
                                     error: false,
                                     message: "Heatmap ausgegeben",
@@ -2544,7 +2107,7 @@
                 },
                 function (ret, callbackshm4) {
                     // hier muss die matrix1-Struktur übergeben werden
-                    // kla1625shm.paintT(selvariablename, selsource, selstationid, ret.matrix);
+                    // kla1629ghc.paintT(selvariablename, selsource, selstationid, ret.matrix);
                     callbackshm4("Finish", ret);
                     return;
                 }
@@ -2556,7 +2119,7 @@
     };
 
 
-    kla1625shm.klihisto2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb1625h) {
+    kla1629ghc.klihisto2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb1629h) {
         var ret = {
             error: false,
             message: ""
@@ -2569,7 +2132,7 @@
         var temparray = [];
         if (hoptions.minmax === true && typeof hoptions.histo === "object" && Object.keys(hoptions.histo).length > 0) {
             temparray = [];
-            // Ergänzen der Werte ohne count
+            // Ergänzen der Wasserstand ohne count
             for (var ival = -50; ival <= 50; ival++) {
                 var valstr = "" + ival;
                 if (typeof hoptions.histo[valstr] === "undefined") {
@@ -2616,11 +2179,10 @@
             if (hoptions.cbuckets === true && typeof hoptions.cbucketdata === "object" && Object.keys(hoptions.cbucketdata).length > 0) {
                 tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
 
-                if (kla1625shmconfig.temptable === true) {
-                    debugger;
+                if (kla1629ghcconfig.temptable === true) {
                     $(cid)
                         .append($("<h3/>", {
-                            text: "Histogramm " + varparms[selvariable].header + "verteilung " + selvariable + " " + klirecords[0].titel,
+                            text: "Histogramm Wasserstand-Verteilung " + selvariable + " " + klirecords[0].titel,
                             class: "doprintthis"
                         }))
                         .append($("<table/>", {
@@ -2679,7 +2241,7 @@
                  * sowie hmatrix.fromyear + "-" + hmatrix.toyear
                  */
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
-                if (kla1625shmconfig.temptable === true) {
+                if (kla1629ghcconfig.temptable === true) {
                     $("#" + tableid + " tbody")
                         .append($("<tr/>")
                             .append($("<td/>", {
@@ -2720,8 +2282,8 @@
                         height: 60,
                         fillColor: "red",
                         defaultPixelsPerValue: 3,
-                        chartRangeMin: mincount,
-                        chartRangeMax: maxcount,
+                        /* chartRangeMin: mincount,
+                        chartRangeMax: maxcount, */
                         lineColor: "red",
                         composite: false
                     });
@@ -2737,7 +2299,7 @@
                 bucknumberprot += " " + JSON.stringify(hoptions.cbucketdata[buckyears[ibuck]].numberhisto);
                 temparray = [];
                 var bucket = hoptions.cbucketdata[buckyears[ibuck]];
-                // Ergänzen der Werte ohne count
+                // Ergänzen der Wasserstand ohne count
                 for (var ival = -50; ival <= 50; ival++) {
                     var valstr = "" + ival;
                     if (typeof bucket.histo[valstr] === "undefined") {
@@ -2794,10 +2356,10 @@
                 // Ausgabe
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
 
-                if (kla1625shmconfig.temptable === true) {
+                if (kla1629ghcconfig.temptable === true) {
                     $("#" + tableid + " tbody")
                         .append($("<tr/>", {
-                                class: "kla1625shmsplit",
+                                class: "kla1629ghcsplit",
                                 fromyear: buckyears[ibuck],
                                 toyear: bucket.toyear,
                                 selvariable: selvariable,
@@ -2839,7 +2401,6 @@
                             }))
                         );
                     $("#" + sparkid).sparkline(sparkpoints, {
-                        /*
                         type: 'bar',
                         height: 60,
                         barColor: "red",
@@ -2847,18 +2408,9 @@
                         barWidth: 3,
                         barSpacing: 0,
                         fillColor: false,
-                        defaultPixelsPerValue: 3,
-                        chartRangeMin: mincount,
-                        chartRangeMax: maxcount
-                        */
-                        type: 'line',
-                        height: 60,
-                        fillColor: "red",
-                        defaultPixelsPerValue: 3,
-                        chartRangeMin: mincount,
-                        chartRangeMax: maxcount,
-                        lineColor: "red",
-                        composite: false
+                        /* chartRangeMin: mincount,
+                        chartRangeMax: maxcount, */
+                        defaultPixelsPerValue: 3
                     });
                 }
             }
@@ -2868,7 +2420,7 @@
                 html: bucknumberprot
             }));
             */
-            if (kla1625shmconfig.decimals === true) {
+            if (kla1629ghcconfig.decimals === true) {
                 var divid = "div" + Math.floor(Math.random() * 100000) + 1;
                 var chartid = divid + "c";
                 /* die tableid hat links oder rechts unterschieden, das muss bei cid nicht so sein?
@@ -2909,12 +2461,19 @@
                 var config = {
                     type: 'line',
                     data: {
-
                         labels: ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"],
                         datasets: [],
                         backgroundColor: "yellow"
                     },
                     options: {
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 50,
+                                top: 10,
+                                bottom: 10
+                            }
+                        },
                         plugins: {
                             colorschemes: {
                                 scheme: 'brewer.Paired12'
@@ -2931,7 +2490,6 @@
                                 var xlabel = myChart.data.labels[firstPoint._index];
                                 var ylabel = myChart.data.datasets[firstPoint._datasetIndex].label;
                                 var value = myChart.data.datasets[firstPoint._datasetIndex].data[firstPoint._index];
-
                                 var syears = ylabel.split("-");
                                 /**
                                  * echte Werte später
@@ -2947,7 +2505,6 @@
                                 var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1627dec", tourl);
                                 window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
                             }
-
                             console.log(ylabel + ":" + value);
                         }
 
@@ -2967,7 +2524,6 @@
                 myCharts[selvariable] = new Chart(ctx, config);
                 /*
                 $('#' + chartid).click(function (e) {
-                    debugger;
                     var activePoints = myChart.getElementsAtEvent(event);
                     var activeDataSet = myChart.getDatasetAtEvent(event);
 
@@ -2980,22 +2536,22 @@
                 });
                 */
             }
-            cb1625h(ret);
+            cb1629h(ret);
             return;
         } else {
-            cb1625h(ret);
+            cb1629h(ret);
             return;
         }
     };
 
 
     /**
-     * kla1625shmsplit - Splitten Sommer/Winter Histogramm
+     * kla1629ghcsplit - Splitten Sommer/Winter Histogramm
      * in neue Zeilen der Zieltabelle
      * starecord hat source, stationid
      * klirecords[0] oder [1] mit variable
      */
-    $(document).on("click", ".kla1625shmsplit", function (evt) {
+    $(document).on("click", ".kla1629ghcsplit", function (evt) {
         evt.preventDefault();
         evt.stopImmediatePropagation();
         evt.stopPropagation();
@@ -3155,7 +2711,6 @@
                 }))
             );
         $("#" + sparkid).sparkline(sun.temphisto, {
-            /*
             type: 'bar',
             height: 60,
             barColor: "red",
@@ -3167,18 +2722,6 @@
             chartRangeMin: 0,
             chartRangeMax: Math.max(sun.temphisto),
             composite: false
-            */
-            type: 'line',
-            height: 60,
-            fillColor: "red",
-            defaultPixelsPerValue: 3,
-            chartRangeMin: 0,
-            chartRangeMax: Math.max(sun.temphisto),
-            lineColor: "red",
-            composite: false
-
-
-
         });
 
         // auf oldsparkid
@@ -3230,7 +2773,6 @@
                 }))
             );
         $("#" + sparkid1).sparkline(win.temphisto, {
-            /*
             type: 'bar',
             height: 60,
             barColor: "red",
@@ -3242,18 +2784,6 @@
             chartRangeMin: 0,
             chartRangeMax: Math.max(win.temphisto),
             composite: false
-            */
-            type: 'line',
-            height: 60,
-            fillColor: "red",
-            defaultPixelsPerValue: 3,
-            chartRangeMin: 0,
-            chartRangeMax: Math.max(sun.temphisto),
-            lineColor: "red",
-            composite: false
-
-
-
         });
 
 
@@ -3284,10 +2814,9 @@
      * @param {*} selsource
      * @param {*} selstationid
      * @param {*} ret1
-     * returns object mit
-     *  - sunconfig und winconfig
+     * returns object mit - sunconfig
      */
-    kla1625shm.klidistr2calc = function (selvariable, selsource, selstationid, ret1) {
+    kla1629ghc.klidistr2calc = function (selvariable, selsource, selstationid, ret1) {
         //Chart.defaults.global.plugins.colorschemes.override = true;
         //Chart.defaults.global.legend.display = true;
         // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
@@ -3309,40 +2838,14 @@
                 },
                 mytype: selvariable,
                 maxcount: 0,
-                scales: {
-                    xAxes: [{
-                        ticks: {
-                            minRotation: 88,
-                            autoskip: true
-                            /* autoSkipPadding: 10 */
-                        },
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            min: 0,
-                            max: 500
-                        }
-                    }]
-                }
-            }
-        };
-
-        var winconfig = {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [],
-                backgroundColor: "yellow"
-            },
-            options: {
-                plugins: {
-                    colorschemes: {
-                        scheme: 'brewer.Paired12'
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 50,
+                        top: 10,
+                        bottom: 10
                     }
                 },
-                mytype: selvariable,
-                maxcount: 0,
                 scales: {
                     xAxes: [{
                         ticks: {
@@ -3362,56 +2865,35 @@
             }
         };
 
-        for (var ilabel = 0; ilabel <= 100; ilabel++) {
-            var itemp = ilabel - 50;
-            var lab;
-            if (itemp % 10 === 0) {
-                lab = "" + itemp;
-            } else {
-                lab = "";
-            }
-            sunconfig.data.labels.push(lab);
-            winconfig.data.labels.push(lab);
-        }
-
         /**
-         * sunconfig und winconfig für die Differenzierung
+         * sunconfig  für die Differenzierung
          */
         var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
         //sun.temphisto = new Array(101).fill(0); // von -50 bis +50
         //win.temphisto = new Array(101).fill(0); // von -50 bis +50
-        if (typeof kla1625shmconfig.fromyear === "undefined") {
+        if (typeof kla1629ghcconfig.fromyear === "undefined") {
             var year1 = uihelper.getwmobucket(selparms.fromyear).fromyear;
             var year2 = uihelper.getwmobucket(selparms.toyear).toyear;
-            kla1625shmconfig.fromyear = year1;
-            kla1625shmconfig.toyear = year2;
-            kla1625shmconfig.step = 30;
+            kla1629ghcconfig.fromyear = year1;
+            kla1629ghcconfig.toyear = year2;
+            kla1629ghcconfig.step = 30;
         }
 
-        var distfromyear = parseInt(kla1625shmconfig.fromyear);
-        var disttoyear = parseInt(kla1625shmconfig.toyear);
-        var diststep = parseInt(kla1625shmconfig.step);
+        var distfromyear = parseInt(kla1629ghcconfig.fromyear);
+        var disttoyear = parseInt(kla1629ghcconfig.toyear);
+        var diststep = parseInt(kla1629ghcconfig.step);
         var sunbucket = {};
         var winbucket = {};
         var ibucket = 0;
         var ebucket = distfromyear + diststep - 1;
         var sunbuckets = [];
-        var winbuckets = [];
         // Initialisieren und auf Standard-Buckets runden oder vorher setzen!!!
         for (var ibuck = distfromyear; ibuck <= disttoyear; ibuck += diststep) {
             sunbuckets.push({
                 fromyear: ibuck,
                 toyear: ibuck + diststep - 1,
-                temphisto: new Array(101).fill(0),
-                valsum: 0,
-                valcount: 0,
-                minval: null,
-                maxval: null
-            });
-            winbuckets.push({
-                fromyear: ibuck,
-                toyear: ibuck + diststep - 1,
-                temphisto: new Array(101).fill(0),
+                temphisto: {},
+                /* von Array zu Object!!! */
                 valsum: 0,
                 valcount: 0,
                 minval: null,
@@ -3420,13 +2902,16 @@
         }
 
         // years bereitstellen
-        if (selvariable === "TMAX" && klirecords.length > 0) {
+        if (selvariable === "WLVL" && klirecords.length > 0) {
             ret1.record = klirecords[0];
-        } else if (selvariable === "TMIN" && klirecords.length > 1) {
-            ret1.record = klirecords[1];
         }
 
         var years = JSON.parse(ret1.record.years);
+        // Loop über die Klimaperioden - Problem: sehr große Spannweite der Werte für Grundwasser und Pegel
+        // daher: kein Array, sondern Loop als Ansatz für Histogramm
+        // Ergebnis in  data: sunbuckets[ibuck].temphisto,
+        var minval = null;
+        var maxval = null;
         for (var iyear = parseInt(distfromyear); iyear <= parseInt(disttoyear); iyear++) {
             if (typeof years[iyear] !== "undefined") {
                 if (uihelper.isleapyear(iyear)) {
@@ -3443,31 +2928,22 @@
                  */
                 var wrk = {};
                 for (var imon = 0; imon < 12; imon++) {
-                    if (imon >= 0 && imon <= 2 || imon >= 9 && imon <= 11) {
-                        for (var ibuck1 = 0; ibuck1 < winbuckets.length; ibuck1++) {
-                            if (iyear >= winbuckets[ibuck1].fromyear && iyear <= winbuckets[ibuck1].toyear) {
-                                wrk = winbuckets[ibuck1];
-                                break;
-                            }
-                        }
-                    } else {
-                        for (var ibuck2 = 0; ibuck2 < sunbuckets.length; ibuck2++) {
-                            if (iyear >= sunbuckets[ibuck2].fromyear && iyear <= sunbuckets[ibuck2].toyear) {
-                                wrk = sunbuckets[ibuck2];
-                                break;
-                            }
+                    for (var ibuck2 = 0; ibuck2 < sunbuckets.length; ibuck2++) {
+                        if (iyear >= sunbuckets[ibuck2].fromyear && iyear <= sunbuckets[ibuck2].toyear) {
+                            wrk = sunbuckets[ibuck2];
+                            break;
                         }
                     }
                     spltoday = splfromday + mdtable[imon];
                     for (var iday = splfromday; iday < spltoday; iday++) {
                         var dval1 = yearvals[iday];
-                        if (dval1 !== null && dval1 !== -9999 && !isNaN(dval1)) {
+                        if (dval1 !== null && dval1 !== "" && dval1 !== -9999 && !isNaN(dval1)) {
                             var dval = parseFloat(dval1);
                             var inum = 0;
-                            if (selvariablename.indexOf("TMAX") >= 0 || selvariablename.indexOf("TMIN") >= 0) {
+                            if (selvariablename.indexOf("WLVL") >= 0) {
                                 var numt = dval1.split(".");
                                 if (numt.length === 2) {
-                                    inum = parseInt(numt[1].substr(0, 1));
+                                    inum = parseInt(numt[1].substr(1, 1));
                                 } else {
                                     debugger;
                                 }
@@ -3487,13 +2963,21 @@
                                 wrk.maxval = dval;
                             }
                             var itemp = Math.round(dval);
-                            itemp += 50;
-                            if (itemp >= 0 && itemp <= 100) {
-                                wrk.temphisto[itemp] += 1;
-                            } else if (itemp < 0) {
-                                wrk.temphisto[0] += 1;
+                            if (minval === null) {
+                                minval = itemp;
+                            } else if (itemp < minval) {
+                                minval = itemp;
+                            }
+                            if (maxval === null) {
+                                maxval = itemp;
+                            } else if (itemp > maxval) {
+                                maxval = itemp;
+                            }
+                            var tempindex = ("00000" + itemp).slice(-5); // führende Nullen
+                            if (typeof wrk.temphisto[tempindex] === "undefined") {
+                                wrk.temphisto[tempindex] = 1;
                             } else {
-                                wrk.temphisto[100] += 1;
+                                wrk.temphisto[tempindex] += 1;
                             }
                         }
                     }
@@ -3502,12 +2986,38 @@
             }
         }
         sunconfig.options.maxcount = 0;
+        var maxy = 0;
         for (var ibuck = 0; ibuck < sunbuckets.length; ibuck++) {
-            for (var imax = 0; imax <= 100; imax++) {
-                if (sunbuckets[ibuck].temphisto[imax] > sunconfig.options.maxcount) {
-                    sunconfig.options.maxcount = sunbuckets[ibuck].temphisto[imax];
+            // Transformation in Array und Bestimmung maxcount
+            var sigdata = Object.keys(sunbuckets[ibuck].temphisto);
+            sigdata.sort(function (a, b) {
+                if (a < b)
+                    return -1;
+                if (a > b)
+                    return 1;
+                return 0;
+            });
+            var minx = null;
+            var maxx = null;
+            var newarray = [];
+            var korrindex = parseInt(sigdata[0]);
+            var fromdata = parseInt(sigdata[0]);
+            var todata = parseInt(sigdata[sigdata.length - 1]);
+            var sigindex = fromdata;
+            var anzarray = maxval - minval + 1;
+            newarray = new Array(anzarray).fill(0);
+            for (var isig = 0; isig < sigdata.length; isig++) {
+                sigindex = sigdata[isig];
+                var sigval = sunbuckets[ibuck].temphisto[sigindex];
+                if (sigval !== null && sigval !== 0) {
+                    newarray[parseInt(sigindex) - minval] += sigval;
+                    var vglval = newarray[parseInt(sigindex) - minval];
+                    if (vglval > maxy) {
+                        maxy = vglval;
+                    }
                 }
             }
+            sunbuckets[ibuck].temphisto = Object.assign(newarray);
             sunconfig.data.datasets.push({
                 label: sunbuckets[ibuck].fromyear + "-" + sunbuckets[ibuck].toyear,
                 data: sunbuckets[ibuck].temphisto,
@@ -3516,38 +3026,41 @@
                 borderWidth: 2
             });
         }
-
-        winconfig.options.maxcount = 0;
-        for (var ibuck = 0; ibuck < winbuckets.length; ibuck++) {
-            for (var imax = 0; imax <= 100; imax++) {
-                if (winbuckets[ibuck].temphisto[imax] > winconfig.options.maxcount) {
-                    winconfig.options.maxcount = winbuckets[ibuck].temphisto[imax];
+        /**
+         * Anders rechnen für die effektiven Wasserstandswerte, gerundet
+         */
+        var anzvals = maxval - minval + 1;
+        for (var ilabel = minval; ilabel <= maxval; ilabel++) {
+            var itemp = ilabel;
+            var lab;
+            if (anzvals <= 10) {
+                lab = "" + itemp;
+            } else {
+                if (itemp % 10 === 0) {
+                    lab = "" + itemp;
+                } else {
+                    lab = "";
                 }
             }
-            winconfig.data.datasets.push({
-                label: winbuckets[ibuck].fromyear + "-" + winbuckets[ibuck].toyear,
-                data: winbuckets[ibuck].temphisto,
-                pointStyle: 'line',
-                fill: false,
-                borderWidth: 2
-            });
+            sunconfig.data.labels.push(lab);
         }
-
-        winconfig.options.scales.yAxes[0].ticks.max = 100;
-
+        var rest = maxy % 10;
+        maxy = maxy - rest + 10;
+        sunconfig.options.scales.yAxes[0].ticks.max = maxy;
+        sunconfig.options.scales.xAxes[0].ticks.min = minval;
+        sunconfig.options.scales.xAxes[0].ticks.max = maxval;
         return {
             sunconfig: sunconfig,
-            winconfig: winconfig
         };
     };
 
     /**
-     * kla1625shm.klidistr2 - tempdistribution
+     * kla1629ghc.klidistr2 - tempdistribution
      * Separate Charts für Sommer und Winter für die Distribution
      * starecord hat source, stationid
      * klirecords[0] oder [1] mit variable
      */
-    kla1625shm.klidistr2 = function (cid, selvariable, selsource, selstationid, ret1, cb1625p) {
+    kla1629ghc.klidistr2 = function (cid, selvariable, selsource, selstationid, ret1, cb1629p) {
         try {
             var divid = "div" + Math.floor(Math.random() * 100000) + 1;
             var chartidsun = divid + "sun";
@@ -3586,22 +3099,6 @@
                         .append($("<br/>"))
                         .append($("<br/>"))
                     )
-
-                    .append($("<h3/>", {
-                        text: "Distribution " + selvariable + " Winter " + klirecords[0].titel,
-                        class: "doprintthis"
-                    }))
-                    .append($("<canvas/>", {
-                        id: chartidwin,
-                        class: "doprintthis",
-                        selvariable: selvariable,
-                        css: {
-                            "text-align": "center",
-                            margin: "10px",
-                            width: "90%"
-                        }
-                    }))
-
                 );
             //Chart.defaults.global.plugins.colorschemes.override = true;
             //Chart.defaults.global.legend.display = true;
@@ -3611,16 +3108,14 @@
             var ctx1 = document.getElementById(chartidsun).getContext('2d');
             myCharts[selvariable + "D1"] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
 
-            var ctx2 = document.getElementById(chartidwin).getContext('2d');
-            myCharts[selvariable + "D2"] = new Chart(ctx2, ret1.distrs[selvariable].winconfig);
-            cb1625p({
+            cb1629p({
                 error: false,
                 message: "Distribution-Chart ausgegeben"
             });
             return;
         } catch (err) {
             console.log(err);
-            cb1625p({
+            cb1629p({
                 error: true,
                 message: "Distribution-Chart:" + err
             });
@@ -3649,7 +3144,7 @@
 
 
     /**
-     * kla1625shm.klitemp2 - Chartjs über Klima-Buckets
+     * kla1629ghc.klitemp2 Wasserstand-Sparkline über Klima-Buckets
      * @param {*} cid
      * @param {*} selvariable
      * @param {*} selsource
@@ -3657,277 +3152,304 @@
      * @param {*} starecord
      * @param {*} hmatrix
      * @param {*} hoptions
-     * @param {*} cb1625k
+     * @param {*} cb1629k
      */
-    kla1625shm.klitemp2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb1625k) {
-        var ret = {};
-        var ciddiv = cid.substr(1) + "div";
-        var tableid = cid.substr(1) + "tbl";
-        debugger;
-        $(cid)
-            .append($("<h3/>", {
-                text: varparms[selvariable].header + "verlauf " + selvariable + " " + klirecords[0].titel,
-                class: "doprintthis",
-            }))
-            .append($("<div/>", {
-                id: ciddiv + "L1",
-                css: {
-                    width: "55%",
-                    margin: "10px",
-                    float: "left",
-                    "background-color": "white",
-                    overflow: "hidden"
-                }
-            }))
-            .append($("<div/>", {
-                    id: ciddiv + "R1",
+    kla1629ghc.klitemp2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb1629k) {
+        try {
+            var ret = {};
+            var ciddiv = cid.substr(1) + "div";
+            var tableid = cid.substr(1) + "tbl";
+            $(cid)
+                .append($("<h3/>", {
+                    text: "Wasserstandsverlauf " + selvariable + " " + klirecords[0].titel,
+                    class: "doprintthis",
+                }))
+                .append($("<div/>", {
+                    id: ciddiv + "L1",
                     css: {
-                        width: "40%",
-                        float: "right",
+                        width: "55%",
+                        margin: "10px",
+                        float: "left",
+                        "background-color": "white",
                         overflow: "hidden"
                     }
-                })
-                .append($("<table/>", {
-                        id: tableid,
-                        class: "doprintthis tablesorter",
-                        border: "2",
-                        rules: "all",
+                }))
+                .append($("<div/>", {
+                        id: ciddiv + "R1",
                         css: {
-                            width: "95%",
-                            float: "left",
-                            margin: "10px",
-                            "background-color": "white"
+                            width: "40%",
+                            float: "right",
+                            overflow: "hidden"
                         }
                     })
-                    .append($("<thead/>")
-                        .append($("<tr/>")
-                            .append($("<th/>", {
-                                html: "Jahr"
-                            }))
-                            .append($("<th/>", {
-                                html: "min"
-                            }))
-                            .append($("<th/>", {
-                                html: "avg"
-                            }))
-                            .append($("<th/>", {
-                                html: "max"
-                            }))
+                    .append($("<table/>", {
+                            id: tableid,
+                            class: "doprintthis tablesorter",
+                            border: "2",
+                            rules: "all",
+                            css: {
+                                width: "95%",
+                                float: "left",
+                                margin: "10px",
+                                "background-color": "white"
+                            }
+                        })
+                        .append($("<thead/>")
+                            .append($("<tr/>")
+                                .append($("<th/>", {
+                                    html: "Jahr"
+                                }))
+                                .append($("<th/>", {
+                                    html: "min"
+                                }))
+                                .append($("<th/>", {
+                                    html: "avg"
+                                }))
+                                .append($("<th/>", {
+                                    html: "max"
+                                }))
+                            )
                         )
+                        .append($("<tbody/>"))
                     )
-                    .append($("<tbody/>"))
-                )
-            );
-        // Loop über die Jahre
-        // hoptions.cbucketdata[year]
+                );
+            // Loop über die Jahre
+            // hoptions.cbucketdata[year]
 
-        var miny = null;
-        var maxy = null;
-        var minvals = [];
-        var avgvals = [];
-        var maxvals = [];
-        var minregvals = [];
-        var avgregvals = [];
-        var maxregvals = [];
-        var ycount = 0;
-        var baseyear = 0;
-        for (var year in hoptions.cbucketdata) {
-            if (hoptions.cbucketdata.hasOwnProperty(year)) {
-                var nyear = parseInt(year);
-                if (baseyear === 0) {
-                    baseyear = nyear - 1;
-                }
-                ycount = nyear - baseyear;
-                var yeardata = hoptions.cbucketdata[year];
-                ycount++;
-                var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
-                yeardata.avgval = yeardata.valsum / yeardata.valcount;
-                $("#" + tableid)
-                    .find("tbody")
-                    .append($("<tr/>")
-                        .append($("<td/>", {
-                            html: yearlabel
-                        }))
-                        .append($("<td/>", {
-                            html: yeardata.minval.toFixed(1)
-                        }))
-                        .append($("<td/>", {
-                            html: yeardata.avgval.toFixed(1)
-                        }))
-                        .append($("<td/>", {
-                            html: yeardata.maxval.toFixed(1)
-                        }))
-                    );
-                minvals.push(yeardata.minval.toFixed(1));
-                avgvals.push(yeardata.avgval.toFixed(1));
-                maxvals.push(yeardata.maxval.toFixed(1));
-                // Umrechnung auf Kelvin
-                minregvals.push([ycount, yeardata.minval + 273.15]);
-                avgregvals.push([ycount, yeardata.avgval + 273.15]);
-                maxregvals.push([ycount, yeardata.maxval + 273.15]);
+            var miny = null;
+            var maxy = null;
+            var minvals = [];
+            var avgvals = [];
+            var maxvals = [];
+            var minregvals = [];
+            var avgregvals = [];
+            var maxregvals = [];
+            var ycount = 0;
+            var baseyear = 0;
+            for (var year in hoptions.cbucketdata) {
+                if (hoptions.cbucketdata.hasOwnProperty(year)) {
+                    var nyear = parseInt(year);
+                    if (baseyear === 0) {
+                        baseyear = nyear - 1;
+                    }
+                    ycount = nyear - baseyear;
+                    var yeardata = hoptions.cbucketdata[year];
+                    ycount++;
+                    var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
+                    yeardata.avgval = yeardata.valsum / yeardata.valcount;
+                    $("#" + tableid)
+                        .find("tbody")
+                        .append($("<tr/>")
+                            .append($("<td/>", {
+                                html: yearlabel
+                            }))
+                            .append($("<td/>", {
+                                html: yeardata.minval.toFixed(1)
+                            }))
+                            .append($("<td/>", {
+                                html: yeardata.avgval.toFixed(1)
+                            }))
+                            .append($("<td/>", {
+                                html: yeardata.maxval.toFixed(1)
+                            }))
+                        );
+                    minvals.push(yeardata.minval.toFixed(1));
+                    avgvals.push(yeardata.avgval.toFixed(1));
+                    maxvals.push(yeardata.maxval.toFixed(1));
+                    // Umrechnung auf Kelvin
+                    minregvals.push([ycount, yeardata.minval + 273.15]);
+                    avgregvals.push([ycount, yeardata.avgval + 273.15]);
+                    maxregvals.push([ycount, yeardata.maxval + 273.15]);
 
-                if (miny === null) {
-                    miny = yeardata.minval;
-                } else if (miny < yeardata.minval) {
-                    miny = yeardata.minval;
-                }
-                if (maxy === null) {
-                    maxy = yeardata.maxval;
-                } else if (maxy < yeardata.maxval) {
-                    maxy = yeardata.maxval;
+                    if (miny === null) {
+                        miny = yeardata.minval;
+                    } else if (miny < yeardata.minval) {
+                        miny = yeardata.minval;
+                    }
+                    if (maxy === null) {
+                        maxy = yeardata.maxval;
+                    } else if (maxy < yeardata.maxval) {
+                        maxy = yeardata.maxval;
+                    }
                 }
             }
+            /**
+             * Regressionsanalyse minvals, avgvals und maxvals als Array
+             * https://tom-alexander.github.io/regression-js/
+             */
+            var result = regression.linear(minregvals, {
+                order: 2,
+                precision: 3
+            });
+            var mingradient = result.equation[0].toFixed(3);
+            var minyIntercept = result.equation[1].toFixed(2);
+            var minr2 = Math.round(result.r2 * 100);
+
+            result = regression.linear(avgregvals, {
+                order: 2,
+                precision: 3
+            });
+            var avggradient = result.equation[0].toFixed(3);
+            var avgyIntercept = result.equation[1].toFixed(2);
+            var avgr2 = Math.round(result.r2 * 100);
+
+            result = regression.linear(maxregvals, {
+                order: 2,
+                precision: 3
+            });
+            var maxgradient = result.equation[0].toFixed(3);
+            var maxyIntercept = result.equation[1].toFixed(2);
+            var maxr2 = Math.round(result.r2 * 100);
+
+            var mindelta = minregvals[minregvals.length - 1][1] - minregvals[0][1];
+            var avgdelta = avgregvals[avgregvals.length - 1][1] - avgregvals[0][1];
+            var maxdelta = maxregvals[maxregvals.length - 1][1] - maxregvals[0][1];
+            $("#" + tableid)
+                .find("tbody")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: "Delta 1-n"
+                    }))
+                    .append($("<td/>", {
+                        html: mindelta.toFixed(1)
+                    }))
+                    .append($("<td/>", {
+                        html: avgdelta.toFixed(1)
+                    }))
+                    .append($("<td/>", {
+                        html: maxdelta.toFixed(1)
+                    }))
+                );
+
+
+
+            $("#" + tableid)
+                .find("tbody")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: "Steigung g"
+                    }))
+                    .append($("<td/>", {
+                        html: mingradient
+                    }))
+                    .append($("<td/>", {
+                        html: avggradient
+                    }))
+                    .append($("<td/>", {
+                        html: maxgradient
+                    }))
+                );
+
+
+            $("#" + tableid)
+                .find("tbody")
+                .append($("<tr/>")
+                    .append($("<td/>", {
+                        html: "Bestimmtheit r2 %"
+                    }))
+                    .append($("<td/>", {
+                        html: minr2
+                    }))
+                    .append($("<td/>", {
+                        html: avgr2
+                    }))
+                    .append($("<td/>", {
+                        html: maxr2
+                    }))
+                );
+
+            var chartid = ciddiv + "chart";
+            $("#" + ciddiv + "L1")
+                .append($("<canvas/>", {
+                    id: chartid,
+                    class: "doprintthis",
+                    css: {
+                        "text-align": "center"
+                    }
+                }));
+
+            var ctx = document.getElementById(chartid).getContext('2d');
+            //Chart.defaults.global.plugins.colorschemes.override = true;
+            //Chart.defaults.global.legend.display = true;
+            // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+
+            var config = {
+                type: 'line',
+                data: {
+                    labels: Object.keys(hoptions.cbucketdata),
+                    datasets: [{
+                            label: "min",
+                            data: minvals,
+                            backgroundColor: "blue",
+                            borderColor: "blue",
+                            fill: false,
+                            borderWidth: 2
+                        },
+                        {
+                            label: "avg",
+                            data: avgvals,
+                            backgroundColor: "black",
+                            /* window.chartColors.black,*/
+                            borderColor: "black",
+                            /* window.chartColors.black, */
+                            fill: false,
+                            borderWidth: 2
+                        },
+                        {
+                            label: "max",
+                            data: maxvals,
+                            backgroundColor: "red",
+                            borderColor: "red",
+                            fill: false,
+                            borderWidth: 2
+                        }
+                    ],
+                    backgroundColor: "yellow"
+                },
+                options: {
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 50,
+                            top: 10,
+                            bottom: 10
+                        }
+                    },
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                /* beginAtZero: true, */
+                                reverse: true
+                                /* min: 0,
+                                max: 500 */
+                            }
+                        }]
+                    },
+                        plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.HueCircle19'
+                        }
+                    }
+                }
+            };
+            window.chart1 = new Chart(ctx, config);
+            cb1629k(ret);
+            return;
+        } catch (err) {
+            console.log(err);
+            console.log(err.stack);
+            cb1629k({
+                error: true,
+                message: err
+            });
+            return;
         }
-        /**
-         * Regressionsanalyse minvals, avgvals und maxvals als Array
-         * https://tom-alexander.github.io/regression-js/
-         */
-        var result = regression.linear(minregvals, {
-            order: 2,
-            precision: 3
-        });
-        var mingradient = result.equation[0].toFixed(3);
-        var minyIntercept = result.equation[1].toFixed(2);
-        var minr2 = Math.round(result.r2 * 100);
-
-        result = regression.linear(avgregvals, {
-            order: 2,
-            precision: 3
-        });
-        var avggradient = result.equation[0].toFixed(3);
-        var avgyIntercept = result.equation[1].toFixed(2);
-        var avgr2 = Math.round(result.r2 * 100);
-
-        result = regression.linear(maxregvals, {
-            order: 2,
-            precision: 3
-        });
-        var maxgradient = result.equation[0].toFixed(3);
-        var maxyIntercept = result.equation[1].toFixed(2);
-        var maxr2 = Math.round(result.r2 * 100);
-
-        var mindelta = minregvals[minregvals.length - 1][1] - minregvals[0][1];
-        var avgdelta = avgregvals[avgregvals.length - 1][1] - avgregvals[0][1];
-        var maxdelta = maxregvals[maxregvals.length - 1][1] - maxregvals[0][1];
-        $("#" + tableid)
-            .find("tbody")
-            .append($("<tr/>")
-                .append($("<td/>", {
-                    html: "Delta 1-n"
-                }))
-                .append($("<td/>", {
-                    html: mindelta.toFixed(1)
-                }))
-                .append($("<td/>", {
-                    html: avgdelta.toFixed(1)
-                }))
-                .append($("<td/>", {
-                    html: maxdelta.toFixed(1)
-                }))
-            );
-
-
-
-        $("#" + tableid)
-            .find("tbody")
-            .append($("<tr/>")
-                .append($("<td/>", {
-                    html: "Steigung g"
-                }))
-                .append($("<td/>", {
-                    html: mingradient
-                }))
-                .append($("<td/>", {
-                    html: avggradient
-                }))
-                .append($("<td/>", {
-                    html: maxgradient
-                }))
-            );
-
-
-        $("#" + tableid)
-            .find("tbody")
-            .append($("<tr/>")
-                .append($("<td/>", {
-                    html: "Bestimmtheit r2 %"
-                }))
-                .append($("<td/>", {
-                    html: minr2
-                }))
-                .append($("<td/>", {
-                    html: avgr2
-                }))
-                .append($("<td/>", {
-                    html: maxr2
-                }))
-            );
-
-        var chartid = ciddiv + "chart";
-        $("#" + ciddiv + "L1")
-            .append($("<canvas/>", {
-                id: chartid,
-                class: "doprintthis",
-                css: {
-                    "text-align": "center"
-                }
-            }));
-
-        var ctx = document.getElementById(chartid).getContext('2d');
-        //Chart.defaults.global.plugins.colorschemes.override = true;
-        //Chart.defaults.global.legend.display = true;
-        // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
-
-        var config = {
-            type: 'line',
-            data: {
-                labels: Object.keys(hoptions.cbucketdata),
-                datasets: [{
-                        label: "min",
-                        data: minvals,
-                        backgroundColor: "blue",
-                        borderColor: "blue",
-                        fill: false,
-                        borderWidth: 2
-                    },
-                    {
-                        label: "avg",
-                        data: avgvals,
-                        backgroundColor: "black",
-                        /* window.chartColors.black,*/
-                        borderColor: "black",
-                        /* window.chartColors.black, */
-                        fill: false,
-                        borderWidth: 2
-                    },
-                    {
-                        label: "max",
-                        data: maxvals,
-                        backgroundColor: "red",
-                        borderColor: "red",
-                        fill: false,
-                        borderWidth: 2
-                    }
-                ],
-                backgroundColor: "yellow"
-            },
-            options: {
-                plugins: {
-                    colorschemes: {
-                        scheme: 'tableau.HueCircle19'
-                    }
-                }
-            }
-        };
-        window.chart1 = new Chart(ctx, config);
-        cb1625k(ret);
-        return;
     };
 
 
 
     /**
-     * kla1625shm.klihyde2 - Ausgabe der HYDE-Daten
+     * kla1629ghc.klihyde2 - Ausgabe der HYDE-Daten
      * Tabelle mit Spalten und Unterteilungen nach Variablen
      * Prüfen: Line-Chart je Variablen, 3 Linien L1, L2, L3 - in %-Egalisierung auf jeweiliges Maximum
      * oder height entsprechend erweitern
@@ -3939,9 +3461,9 @@
      * @param {*} cid - Container-ID, wird vorgegeben, mit #
      * @param {*} selstationid - wird ausgewertet, Daten stehen in klihyde
      * @param {*} starecord - wird ausgewertet für Geo-Koordinaten
-     * @param {*} cb1625j - Callback
+     * @param {*} cb1629j - Callback
      */
-    kla1625shm.klihyde2 = function (cid, selstationid, starecord, cb1625j) {
+    kla1629ghc.klihyde2 = function (cid, selstationid, starecord, cb1629j) {
         // Transformation der Daten nach Variable, year, L1, L2, L3 in Struktur
         // Dasmit Tabelle mit Charts
         var hyderep = {}; // variable - year - level
@@ -4184,6 +3706,14 @@
                         backgroundColor: "yellow"
                     },
                     options: {
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 50,
+                                top: 10,
+                                bottom: 10
+                            }
+                        },
                         plugins: {
                             colorschemes: {
                                 scheme: 'tableau.HueCircle19'
@@ -4200,7 +3730,7 @@
 
             }
         }
-        cb1625j({
+        cb1629j({
             error: false,
             message: "HYDE ausgegeben"
         });
@@ -4212,7 +3742,7 @@
     /**
      * Einblendung Stopuhr wärend langer AJAX-Aufrufe
      */
-    kla1625shm.showclock = function (clockcontainer) {
+    kla1629ghc.showclock = function (clockcontainer) {
         // Update the count down every 1 second
         if (typeof clockcontainer === "string") {
             if (!clockcontainer.startsWith("#")) clockcontainer = "#" + clockcontainer;
@@ -4253,14 +3783,14 @@
      */
     if (typeof module === 'object' && module.exports) {
         // Node.js
-        module.exports = kla1625shm;
+        module.exports = kla1629ghc;
     } else if (typeof define === 'function' && define.amd) {
         // AMD / RequireJS
         define([], function () {
-            return kla1625shm;
+            return kla1629ghc;
         });
     } else {
         // included directly via <script> tag
-        root.kla1625shm = kla1625shm;
+        root.kla1629ghc = kla1629ghc;
     }
 }());
