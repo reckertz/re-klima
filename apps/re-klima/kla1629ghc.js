@@ -2189,10 +2189,28 @@
 
                 if (kla1629ghcconfig.temptable === true) {
                     $(cid)
-                        .append($("<h3/>", {
-                            text: "Histogramm " + varparms[selvariablename].header + "-Verteilung " + selvariable + " " + klirecords[0].titel,
-                            class: "doprintthis"
-                        }))
+                        .append($("<span/>", {
+                                text: "Histogramm " + varparms[selvariablename].header + "-Verteilung " + selvariable + " " + klirecords[0].titel,
+                                class: "doprintthis eckh3"
+                            })
+                            .append($("<span/>", {
+                                text: "x-Range",
+                                css: {
+                                    margin: "5px"
+                                }
+                            }))
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                css: {
+                                    margin: "5px"
+                                },
+                                click: function (evt) {
+                                    // neuer Status der Checkbox
+                                    var state = $(this).prop("checked");
+                                    alert(state);
+                                }
+                            }))
+                        )
                         .append($("<table/>", {
                                 id: tableid,
                                 border: "2",
@@ -2949,12 +2967,12 @@
                             var dval = parseFloat(dval1);
                             var inum = 0;
                             //if (selvariablename.indexOf("WLVL") >= 0) {
-                                var numt = dval1.split(".");
-                                if (numt.length === 2) {
-                                    inum = parseInt(numt[1].substr(1, 1));
-                                } else {
-                                    debugger;
-                                }
+                            var numt = dval1.split(".");
+                            if (numt.length === 2) {
+                                inum = parseInt(numt[1].substr(1, 1));
+                            } else {
+                                debugger;
+                            }
                             //} else {
                             //    inum = parseInt(dval1.substr(dval1.length - 1));
                             //}
@@ -3167,11 +3185,57 @@
             var ret = {};
             var ciddiv = cid.substr(1) + "div";
             var tableid = cid.substr(1) + "tbl";
+            var chartid = ciddiv + "chart";
             $(cid)
-                .append($("<h3/>", {
-                    text: varparms[selvariablename].header + "verlauf " + selvariable + " " + klirecords[0].titel,
-                    class: "doprintthis",
-                }))
+                .append($("<span/>", {
+                        text: varparms[selvariablename].header + "verlauf " + selvariable + " " + klirecords[0].titel,
+                        class: "doprintthis eckh3",
+                    })
+                    .append($("<span/>", {
+                        text: "reverse",
+                        css: {
+                            margin: "5px"
+                        }
+                    }))
+                    .append($("<input/>", {
+                        type: "checkbox",
+                        checked: "checked",
+                        css: {
+                            margin: "5px"
+                        },
+                        click: function (evt) {
+                            // neuer Status der Checkbox
+                            debugger;
+                            var state = $(this).prop("checked");
+                            //var graph = $("#" + ciddiv + "chart").data('graph');
+                            var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                            var graph = window.charts[canvasid];
+                            // var graph = $(canvasref).data('graph');
+                            if (state === true) {
+                                try {
+                                    /*
+                                    var saveminval = graph.options.scales.xAxes[0].ticks.min = minval;
+                                    var savemaxval = graph.options.scales.xAxes[0].ticks.max = maxval;
+                                    delete graph.options.scales.xAxes[0].ticks.min;
+                                    delete graph.options.scales.xAxes[0].ticks.max;
+                                    */
+                                   graph.options.scales.yAxes[0].ticks.reverse = true;
+                                   graph.update();
+                                } catch(err) {
+                                    console.log(err)
+                                }
+                            } else {
+                                try {
+                                   graph.options.scales.yAxes[0].ticks.reverse = false;
+                                   graph.update();
+                                } catch(err) {
+                                    console.log(err)
+                                }
+                            }
+                        }
+                    }))
+
+                )
                 .append($("<div/>", {
                     id: ciddiv + "L1",
                     css: {
@@ -3366,7 +3430,6 @@
                     }))
                 );
 
-            var chartid = ciddiv + "chart";
             $("#" + ciddiv + "L1")
                 .append($("<canvas/>", {
                     id: chartid,
@@ -3440,7 +3503,8 @@
                     }
                 }
             };
-            window.chart1 = new Chart(ctx, config);
+            window.charts = window.charts || {};
+            window.charts[chartid] = new Chart(ctx, config);
             cb1629k(ret);
             return;
         } catch (err) {
