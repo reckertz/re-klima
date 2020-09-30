@@ -1099,7 +1099,10 @@
                             stationrecord = ret1.record;
                             klirecords = [];
                             // Sortierfolge ist TMAX, TMIN alphabetisch
-                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
+                            if (typeof ret1.records[0] !== "undefined") {
+                                klirecords.push(ret1.records[0]);
+                                stationrecord = ret1.record[0];
+                            }
                             if (typeof ret1.records[1] !== "undefined") klirecords.push(ret1.records[1]);
                             cb1625g3(null, {
                                 error: false,

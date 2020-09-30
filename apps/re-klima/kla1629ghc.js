@@ -148,7 +148,17 @@
             SNOW: {
                 header: "Schnee",
                 reverse: false,
-                cumulate: true
+                cumulate: false
+            },
+            TSUN: {
+                header: "Sonne",
+                reverse: false,
+                cumulate: false
+            },
+            PSUN: {
+                header: "mögl. Sonne",
+                reverse: false,
+                cumulate: false
             }
         };
 
@@ -352,7 +362,7 @@
                         },
                         function (cb1629c) {
                             /**
-                             * für WLVL min und max bestimmen, Histogramm als Sparkline
+                             * für min und max bestimmen für Histogramm
                              */
                             $("#kla1629ghcwrapper")
                                 .append($("<div/>", {
@@ -765,7 +775,6 @@
                             /**
                              * Abfrage, ob Daten geladen werden sollen
                              */
-                            debugger;
                             var qmsg = "loadalldata: Für Station:" + selstationid + " aus " + selsource;
                             qmsg += " und " + selvariablename;
                             qmsg += "\n gibt es keine Daten, sollen diese geladen werden (dauert)?";
@@ -860,6 +869,8 @@
                         cb1629g3(null, ret);
                         return;
                     }
+                    ret.api = "getallrecords";
+                    ret.table = "KLIDATA";
                     uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, ret.api, ret.table, function (ret1) {
                         if (ret1.error === false && ret1.record !== null) {
                             stationrecord = ret1.record;
@@ -870,6 +881,7 @@
                                 PROBLEM: wenn kein Satz gefunden, dann ist auch kein stationrecord da - s.u.
                                 */
                                 klirecords = [];
+                                stationrecord = {};
                                 if (typeof ret1.records[0] !== "undefined") {
                                     ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
                                     klirecords.push(ret1.records[0]);
@@ -882,6 +894,7 @@
                                 return;
                             } else if (ret1.error === false && ret1.record !== null && Object.keys(ret1.record).length > 0) {
                                 klirecords = [];
+                                stationrecord = {};
                                 ret1.records[0] = Object.assign({}, ret1.record, true);
                                 ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
                                 klirecords.push(ret1.records[0]);
@@ -2505,10 +2518,11 @@
                                 scheme: 'brewer.Paired12'
                             }
                         },
-                        mytype: selvariable,
+                        chartid: chartid,
+                        /* selvariable, */
                         onClick: function (mouseEvent, chart) {
-                            var mytype = this.options.mytype;
-                            var myChart = myCharts[mytype];
+                            var mytype = this.options.chartid;
+                            var myChart = window.charts[chartid];
                             var firstPoint = myChart.getElementAtEvent(mouseEvent)[0];
                             if (firstPoint) {
                                 var fpIndex = firstPoint._index;
@@ -2547,7 +2561,9 @@
                         borderWidth: 2
                     });
                 }
-                myCharts[selvariable] = new Chart(ctx, config);
+                //myCharts[selvariable] = new Chart(ctx, config);
+                window.charts = window.charts || {};
+                window.charts[chartid] = new Chart(ctx, config);
                 /*
                 $('#' + chartid).click(function (e) {
                     var activePoints = myChart.getElementsAtEvent(event);
@@ -2875,8 +2891,8 @@
                 scales: {
                     xAxes: [{
                         ticks: {
-                            minRotation: 88,
-                            autoskip: true
+                            /* minRotation: 88, */
+                            /* autoskip: true  */
                             /* autoSkipPadding: 10 */
                         },
                     }],
@@ -3102,10 +3118,50 @@
                             width: "100%"
                         }
                     })
-                    .append($("<h3/>", {
-                        text: "Distribution " + selvariable + " Summer " + klirecords[0].titel,
-                        class: "doprintthis"
-                    }))
+                    .append($("<span/>", {
+                            text: "Distribution " + selvariable + " " + klirecords[0].titel,
+                            class: "doprintthis eckh3"
+                        })
+                        .append($("<span/>", {
+                            text: "reverseY",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked");   // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+                                if (state === true) {
+                                    try {
+                                        /*
+                                        var saveminval = graph.options.scales.xAxes[0].ticks.min = minval;
+                                        var savemaxval = graph.options.scales.xAxes[0].ticks.max = maxval;
+                                        delete graph.options.scales.xAxes[0].ticks.min;
+                                        delete graph.options.scales.xAxes[0].ticks.max;
+                                        */
+                                        graph.options.scales.yAxes[0].ticks.reverse = true;
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        graph.options.scales.yAxes[0].ticks.reverse = false;
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+                    )
                     .append($("<canvas/>", {
                         id: chartidsun,
                         class: "doprintthis",
@@ -3133,7 +3189,8 @@
 
             var ctx1 = document.getElementById(chartidsun).getContext('2d');
             myCharts[selvariable + "D1"] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
-
+            window.charts = window.charts || {};
+            window.charts[chartidsun] = myCharts[selvariable + "D1"];
             cb1629p({
                 error: false,
                 message: "Distribution-Chart ausgegeben"
@@ -3205,7 +3262,6 @@
                         },
                         click: function (evt) {
                             // neuer Status der Checkbox
-                            debugger;
                             var state = $(this).prop("checked");
                             //var graph = $("#" + ciddiv + "chart").data('graph');
                             var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
@@ -3219,16 +3275,16 @@
                                     delete graph.options.scales.xAxes[0].ticks.min;
                                     delete graph.options.scales.xAxes[0].ticks.max;
                                     */
-                                   graph.options.scales.yAxes[0].ticks.reverse = true;
-                                   graph.update();
-                                } catch(err) {
+                                    graph.options.scales.yAxes[0].ticks.reverse = true;
+                                    graph.update();
+                                } catch (err) {
                                     console.log(err)
                                 }
                             } else {
                                 try {
-                                   graph.options.scales.yAxes[0].ticks.reverse = false;
-                                   graph.update();
-                                } catch(err) {
+                                    graph.options.scales.yAxes[0].ticks.reverse = false;
+                                    graph.update();
+                                } catch (err) {
                                     console.log(err)
                                 }
                             }
@@ -3793,13 +3849,13 @@
                         }
                     }
                 };
-                window.chart1 = new Chart(ctx, config);
+                window.charts = window.charts || {};
+                window.charts[chartid] = new Chart(ctx, config);
                 /**
                  * Hier Chart-Ausgabe - mit chartJS wird eine Gesamtgraphik ausgegeben
                  */
                 // hmatrixL, hoptionsL,
                 // hmatrixR, hoptionsR,
-
             }
         }
         cb1629j({

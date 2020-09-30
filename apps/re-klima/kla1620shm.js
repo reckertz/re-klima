@@ -169,9 +169,6 @@
                 })
 
                 // Auswahl selvariablename
-
-
-
                 .append($("<button/>", {
                     html: "Sparklines/Periode anzeigen",
                     css: {

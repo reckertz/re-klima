@@ -2315,14 +2315,12 @@
                         } else {
                             // Dubletten entfernen
                             var vglrec = JSON.stringify(ret1.records.length - 1);
-                            debugger;
                             for (var irec = ret1.records.length - 2; irec >= 0; irec++) {
                                 var actrec = JSON.stringify(irec);
                                 if (vglrec === actrec) {
                                     ret1.records.splice((irec + 1), 1);
                                 }
                             }
-                            debugger;
                             callbackba(null, res, {
                                 error: false,
                                 message: "Daten gefunden in KLIDATA",

@@ -1043,7 +1043,7 @@
      */
     uihelper.getAllRecords = function (sel, projection, sort, skip, limit, api, table, callbackgar1) {
         var myInfo = {}; // uihelper.getSysInfo();
-        var url = api; // uisystem.getActiveServer(api);
+        var url = api || "getallrecords"; // uisystem.getActiveServer(api);
         var selparm;
         if (typeof sel === "object") {
             selparm = JSON.stringify(sel);

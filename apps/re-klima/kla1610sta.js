@@ -68,6 +68,9 @@
                     "PRCP",
                     "TMIN",
                     "TMAX",
+                    "TSUN",
+                    "PSUN",
+                    "SNOW",
                     ""
                 ]
             },
@@ -979,7 +982,6 @@
         evt.preventDefault();
         evt.stopPropagation();
         evt.stopImmediatePropagation();
-        debugger;
         var stationid = $(this).closest("tr").attr("rowid");
         var source = starecord.source;
         var variablename = $(this).closest("tr").attr("variable");
