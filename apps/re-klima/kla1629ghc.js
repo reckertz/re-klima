@@ -409,6 +409,7 @@
                 click: function (evt) {
                     evt.preventDefault();
                     var username = uihelper.getUsername();
+                    debugger;
                     window.parent.sysbase.setCache("regstation", JSON.stringify({
                         starecord: starecord,
                         klirecords: klirecords,
@@ -2889,13 +2890,13 @@
                     }
                 },
                 scales: {
+
                     xAxes: [{
                         ticks: {
-                            /* minRotation: 88, */
-                            /* autoskip: true  */
-                            /* autoSkipPadding: 10 */
+
                         },
                     }],
+
                     yAxes: [{
                         ticks: {
                             beginAtZero: true,
@@ -3122,6 +3123,7 @@
                             text: "Distribution " + selvariable + " " + klirecords[0].titel,
                             class: "doprintthis eckh3"
                         })
+
                         .append($("<span/>", {
                             text: "reverseY",
                             css: {
@@ -3135,17 +3137,11 @@
                                 margin: "5px"
                             },
                             click: function (evt) {
-                                var state = $(this).prop("checked");   // neuer Status der Checkbox
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
                                 var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
                                 var graph = window.charts[canvasid];
                                 if (state === true) {
                                     try {
-                                        /*
-                                        var saveminval = graph.options.scales.xAxes[0].ticks.min = minval;
-                                        var savemaxval = graph.options.scales.xAxes[0].ticks.max = maxval;
-                                        delete graph.options.scales.xAxes[0].ticks.min;
-                                        delete graph.options.scales.xAxes[0].ticks.max;
-                                        */
                                         graph.options.scales.yAxes[0].ticks.reverse = true;
                                         graph.update();
                                     } catch (err) {
@@ -3161,6 +3157,93 @@
                                 }
                             }
                         }))
+
+                        .append($("<span/>", {
+                            text: "no x=0",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+
+                                window.chartscache = window.chartscache || {};
+                                window.chartscache[canvasid] = window.chartscache[canvasid] || {};
+                                if (state === true) {
+                                    try {
+                                        debugger;
+                                        var saveminval = graph.options.scales.xAxes[0].ticks.min;
+                                        var savemaxval = graph.options.scales.xAxes[0].ticks.max;
+                                        window.chartscache[canvasid].firstxvalues = [];
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            var firstxvalue = graph.data.datasets[igdata].data[0];
+                                            window.chartscache[canvasid].firstxvalues.push(firstxvalue);
+                                            graph.data.datasets[igdata].data[0] = null;
+                                        }
+                                        delete graph.options.scales.yAxes[0].ticks.min;
+                                        delete graph.options.scales.yAxes[0].ticks.max;
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            var firstxvalue = chartscache[canvasid].firstxvalues[igdata];
+                                            graph.data.datasets[igdata].data[0] = firstxvalue;
+                                        }
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+
+
+                        .append($("<span/>", {
+                            text: "log Y",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+                                if (state === true) {
+                                    try {
+                                        graph.options.scales.yAxes[0].type = "logarithmic";
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        graph.options.scales.yAxes[0].type = "linear";
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+
+
                     )
                     .append($("<canvas/>", {
                         id: chartidsun,
@@ -3188,9 +3271,9 @@
 
 
             var ctx1 = document.getElementById(chartidsun).getContext('2d');
-            myCharts[selvariable + "D1"] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
+            // myCharts[selvariable + "D1"] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
             window.charts = window.charts || {};
-            window.charts[chartidsun] = myCharts[selvariable + "D1"];
+            window.charts[chartidsun] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
             cb1629p({
                 error: false,
                 message: "Distribution-Chart ausgegeben"

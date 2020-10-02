@@ -6,7 +6,8 @@
         typeof global === 'object' && global.global === global && global ||
         this;
     /**
-     * kla1628reg  bekommt über getCache pivotdata oder yearlats(?)
+     * kla1628reg  bekommt über getCache onestation, darin wird
+     * pivotdata oder yearlats(?)
      * Regressionsanalyse über Sommer und Winter oder Jahr
      * mit Sparkline und
      */

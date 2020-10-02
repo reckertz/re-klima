@@ -3272,13 +3272,22 @@
      * deep copy für Objekte, Arrays etc.
      * https://www.codementor.io/avijitgupta/deep-copying-in-js-7x6q8vh5d
      */
-    uihelper.cloneObject = function copy(o) {
+    uihelper.cloneObject = function (o) {
         if (o === null) return null;
         var output, v, key;
         output = Array.isArray(o) ? [] : {};
         for (key in o) {
-            v = o[key];
-            output[key] = (typeof v === "object") ? uihelper.cloneObject(v) : v;
+            if (key.startsWith("_")) {
+                console.log("Problem1:" + key);
+                continue;
+            }
+            if (o.hasOwnProperty(key)) {
+                v = o[key];
+                output[key] = (typeof v === "object") ? uihelper.cloneObject(v) : v;
+            } else {
+                console.log("Problem2:" + key);
+                continue;
+            }
         }
         return output;
     };
