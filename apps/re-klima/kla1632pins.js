@@ -292,10 +292,6 @@
         // longitude = 11.5732598;
         // var marker2 = L.marker([latitude, longitude]).addTo(mymap);
 
-
-
-
-
         for (var isa = 0; isa < stationarray.length; isa++) {
             var station = stationarray[isa];
             if (typeof station.stationid === "undefined" || station.stationid.length === 0) {
@@ -311,12 +307,19 @@
             });
             marker2.on('click', onMarkerClick);
             marker2.addTo(mymap);
+            if (station.variable === "WLVL") {
+                marker2.valueOf()._icon.style.filter = 'hue-rotate(240deg)';
+            } else if (station.variable === "TMAX" || station.variable === "TMIN") {
+                marker2.valueOf()._icon.style.filter = 'hue-rotate(60deg)';
+            } else {
+                marker2.valueOf()._icon.style.filter = 'hue-rotate(120deg)';
+            }
+
         }
     };
 
     var onMarkerClick = function(e){
-        console.log(this);
-        alert("You clicked on marker with customId: " + this.options.stationid);
+        alert("You clicked on marker with customId: " + this.options.stationid + ", variable:" + this.options.variables);
         var stationdata = this.options;
         window.parent.sysbase.setCache("onestation", JSON.stringify({
             stationid: stationdata.stationid,
@@ -336,10 +339,18 @@
 
         var tourl = "klaheatmap.html" + "?" + "stationid=" + stationdata.stationid + "&source=" + stationdata.source + "&variablename=" + stationdata.variable;
         var stationname = stationdata.sitename;
-        debugger;
         var tabname = stationdata.variable + " " + stationname;
-        var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
-        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+        if (stationdata.variable === "WLVL") {
+            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
+            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+        } else if (stationdata.variable === "TMAX" || stationdata.variable === "TMIN") {
+            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+        } else {
+            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1629ghc", tourl);
+            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+        }
+
 
     };
 

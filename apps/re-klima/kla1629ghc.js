@@ -409,7 +409,6 @@
                 click: function (evt) {
                     evt.preventDefault();
                     var username = uihelper.getUsername();
-                    debugger;
                     window.parent.sysbase.setCache("regstation", JSON.stringify({
                         starecord: starecord,
                         klirecords: klirecords,
@@ -3158,56 +3157,6 @@
                             }
                         }))
 
-                        .append($("<span/>", {
-                            text: "no x=0",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-
-                                window.chartscache = window.chartscache || {};
-                                window.chartscache[canvasid] = window.chartscache[canvasid] || {};
-                                if (state === true) {
-                                    try {
-                                        debugger;
-                                        var saveminval = graph.options.scales.xAxes[0].ticks.min;
-                                        var savemaxval = graph.options.scales.xAxes[0].ticks.max;
-                                        window.chartscache[canvasid].firstxvalues = [];
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            var firstxvalue = graph.data.datasets[igdata].data[0];
-                                            window.chartscache[canvasid].firstxvalues.push(firstxvalue);
-                                            graph.data.datasets[igdata].data[0] = null;
-                                        }
-                                        delete graph.options.scales.yAxes[0].ticks.min;
-                                        delete graph.options.scales.yAxes[0].ticks.max;
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            var firstxvalue = chartscache[canvasid].firstxvalues[igdata];
-                                            graph.data.datasets[igdata].data[0] = firstxvalue;
-                                        }
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                }
-                            }
-                        }))
-
 
                         .append($("<span/>", {
                             text: "log Y",
@@ -3242,6 +3191,256 @@
                                 }
                             }
                         }))
+
+
+
+                        .append($("<span/>", {
+                            text: "no x=0",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+
+                                window.chartscache = window.chartscache || {};
+                                window.chartscache[canvasid] = window.chartscache[canvasid] || {};
+                                if (state === true) {
+                                    try {
+                                        var saveminval = graph.options.scales.xAxes[0].ticks.min;
+                                        var savemaxval = graph.options.scales.xAxes[0].ticks.max;
+                                        window.chartscache[canvasid].firstxvalues = [];
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            var firstxvalue = graph.data.datasets[igdata].data[0];
+                                            window.chartscache[canvasid].firstxvalues.push(firstxvalue);
+                                            graph.data.datasets[igdata].data[0] = null;
+                                        }
+                                        delete graph.options.scales.yAxes[0].ticks.min;
+                                        delete graph.options.scales.yAxes[0].ticks.max;
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            var firstxvalue = chartscache[canvasid].firstxvalues[igdata];
+                                            graph.data.datasets[igdata].data[0] = firstxvalue;
+                                        }
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+
+
+
+                        .append($("<span/>", {
+                            text: "x 0=null",
+                            title: "x Konvertieren 0 zu null",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+                                // 10-er Intervalle auf x-Achse zusammenfassen, Aggregation
+                                if (state === true) {
+                                    try {
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            var olddata = graph.data.datasets[igdata].data;
+                                            for (var igx = 0; igx < olddata.length; igx++) {
+                                                if (typeof olddata[igx] === "undefined") {
+                                                    olddata[igx] = "a";
+                                                } else if (olddata[igx] === 0 || olddata[igx].length === 0) {
+                                                    olddata[igx] = "a";
+                                                }
+                                            }
+                                        }
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            var olddata = graph.data.datasets[igdata].data;
+                                            for (var igx = 0; igx < olddata.length; igx++) {
+                                                if (olddata[igx] === "a") {
+                                                    olddata[igx] = 0;
+                                                }
+                                            }
+                                        }
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+
+
+                        .append($("<span/>", {
+                            text: "x/10",
+                            title: "x Aggregation auf 10-er Intervalle",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+                                // 10-er Intervalle auf x-Achse zusammenfassen, Aggregation
+                                // die y-Skalierung .max muss ausgesetzt werden
+                                if (state === true) {
+                                    try {
+                                        window.chartscache = window.chartscache || {};
+                                        window.chartscache[canvasid] = window.chartscache[canvasid] || {};
+                                        window.chartscache[canvasid].originaldata = [];   //uihelper.cloneObject(graph.data.datasets);
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            var olddata = graph.data.datasets[igdata].data;
+                                            window.chartscache[canvasid].originaldata.push(olddata);
+                                            var newdata = new Array(olddata.length).fill(0);
+                                            for (var igx = 0; igx < olddata.length; igx++) {
+                                                // Zielindex berechnen
+                                                var target = Math.floor(igx / 10) * 10 + 5;
+                                                newdata[target] += olddata[igx];
+                                            }
+                                            graph.data.datasets[igdata].data = newdata;
+                                        }
+                                        delete graph.options.scales.yAxes[0].ticks.max;
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        var olddatasets = window.chartscache[canvasid].originaldata;
+                                        for (var igdata = 0; igdata < olddatasets.length; igdata++) {
+                                            graph.data.datasets[igdata].data = olddatasets[igdata];
+                                        }
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+
+                        .append($("<span/>", {
+                            text: "spanGaps",
+                            title: "Line unterbrechen, wenn kein signifikanter y-Wert vorhanden ist",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+                                // spanGaps
+                                if (state === true) {
+                                    try {
+                                        /*
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            graph.data.datasets[igdata].spanGaps = true;
+                                        }
+                                        */
+                                       graph.options.spanGaps = true;
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        /*
+                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                            graph.data.datasets[igdata].spanGaps = false;
+                                        }
+                                        */
+                                       graph.options.spanGaps = false;
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+
+                        // hidden: true,
+
+                        .append($("<span/>", {
+                            text: "hide all",
+                            title: "Alle Datasets ausblenden",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            },
+                            click: function (evt) {
+                                var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                var graph = window.charts[canvasid];
+                                if (state === true) {
+                                    try {
+                                        var olddatasets = graph.data.datasets;
+                                        for (var igdata = 0; igdata < olddatasets.length; igdata++) {
+                                            graph.data.datasets[igdata].hidden = true;
+                                        }
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                } else {
+                                    try {
+                                        var olddatasets = graph.data.datasets;
+                                        for (var igdata = 0; igdata < olddatasets.length; igdata++) {
+                                            graph.data.datasets[igdata].hidden = false;
+                                        }
+                                        graph.update();
+                                    } catch (err) {
+                                        console.log(err)
+                                    }
+                                }
+                            }
+                        }))
+
 
 
                     )
