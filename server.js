@@ -1081,15 +1081,17 @@ app.post('/getmoredata', function (req, res) {
             async.eachSeries(selstations, function (newstation, nextstation) {
                 var newsource = newstation.source;
                 var newstationid = newstation.stationid;
+                var newvariable = newstation.variable;
                 var reqparm = {};
                 reqparm.selfields = {};
                 reqparm.selfields.source = newsource;
                 reqparm.selfields.stationid = newstationid;
-
+                reqparm.selfields.variable = newvariable;
                 reqparm.updfields = {};
                 reqparm.updfields["$setOnInsert"] = {};
                 reqparm.updfields["$setOnInsert"].source = newsource;
                 reqparm.updfields["$setOnInsert"].stationid = newstationid;
+                reqparm.updfields["$setOnInsert"].variable = newvariable;
                 reqparm.updfields["$set"] = {};
                 reqparm.table = temptable;
                 sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret) {

@@ -316,6 +316,29 @@
             }
 
         }
+        // Event-Testung
+        var oneCorner;
+        var TwoCroner;
+
+        mymap.on('mousedown', setOneCorner);
+        mymap.on('mouseup', setTwoCorner);
+
+        function setOneCorner(e) {
+            if (e.originalEvent.ctrlKey) {
+                mymap.dragging.disable();
+                oneCorner = e.latlng;
+            }
+        }
+
+        function setTwoCorner(e) {
+            if (e.originalEvent.ctrlKey) {
+                twoCorner = e.latlng;
+                var bounds = [oneCorner, twoCorner];
+                L.rectangle(bounds, {color:"#ff7800", weight:1}).addTo(mymap);
+            }
+            mymap.dragging.enable();
+        }
+
     };
 
     var onMarkerClick = function(e){

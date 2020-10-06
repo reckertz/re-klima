@@ -58,7 +58,8 @@
         //var idc3 = sysbase.tabcreateiframe("Textanalysis", "", "re-klima", "kla1700txt", "klatext.html");
         //window.parent.$(".tablinks[idhash='#" + idc3 + "']").click();
 
-
+        var idc1 = sysbase.tabcreateiframe("Stationsfilter", "", "re-klima", "kla2000sel");
+        window.parent.$(".tablinks[idhash='#" + idc1 + "']").click();
 
         /* sysbase.initFooter(); */
         // uientry.init();
@@ -109,6 +110,13 @@
             */
             {
                 id: "admin0005",
+                text: "Stationen (NEU)",
+                app: "re-klima",
+                module: "kla2000sel"
+            },
+
+            {
+                id: "admin0006",
                 text: "Stationen",
                 app: "re-klima",
                 module: "kla1610sta"

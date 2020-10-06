@@ -139,7 +139,8 @@
                 class: "col1of2",
                 css: {
                     "background-color": "yellow",
-                    overflow: "auto"
+                    overflow: "auto",
+                    width: "30%"
                 }
             }));
         $("#kla1670piv.content")
@@ -147,7 +148,8 @@
                     class: "col2of2",
                     css: {
                         "background-color": "lightsteelblue",
-                        overflow: "auto"
+                        overflow: "auto",
+                        width: "69%"
                     }
                 })
 
@@ -285,76 +287,21 @@
          */
         var sel = {};
         var table = "KLISTATIONS";
-        var sqlStmt = "";
-        var where = "";
-
-        sqlStmt += "SELECT ";
-        // sqlStmt += " KLISTATIONS.source, KLISTATIONS.stationid, KLISTATIONS.stationname, ";
-        sqlStmt += " KLISTATIONS.climatezone, ";
-        sqlStmt += " KLISTATIONS.continent, ";
-        // sqlStmt += " KLISTATIONS.alpha2, KLISTATIONS.alpha3, ";
-        // sqlStmt += " KLISTATIONS.region, KLISTATIONS.subregion, KLISTATIONS.countryname, ";
-        // sqlStmt += " KLISTATIONS.lats, KLISTATIONS.longitude, KLISTATIONS.latitude, KLISTATIONS.height, ";
-        sqlStmt += " KLIINVENTORY.variable, ";
-        sqlStmt += " KLIINVENTORY.fromyear, KLIINVENTORY.toyear,";
-        sqlStmt += " COUNT(KLIINVENTORY.stationid) AS ANZAHL";
-        sqlStmt += " FROM KLISTATIONS";
-        sqlStmt += " LEFT JOIN KLIINVENTORY";
-        sqlStmt += " ON KLISTATIONS.source = KLIINVENTORY.source";
-        sqlStmt += " AND KLISTATIONS.stationid = KLIINVENTORY.stationid";
-        where += " KLISTATIONS.stationid IN (";
-        where += " SELECT stationid FROM KLIINVENTORY";
-        where += " WHERE KLIINVENTORY.source = '" + starecord.source + "'";
-        where += " AND KLIINVENTORY.variable = '" + starecord.variablename + "'";
-        if (typeof starecord.fromyear !== "undefined" && starecord.fromyear.trim().length > 0) {
-            var fromyear = starecord.fromyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-            if (fromyear !== null && fromyear.length >= 3) {
-                if (where.length > 0) where += " AND ";
-                where += " KLIINVENTORY.toyear " + ">=" + parseInt(fromyear[2]);
-                starecord.fromyear = fromyear[2];
-            } else {
-                callback670("Error", {
-                    error: true,
-                    message: "Parameterfehler"
-                });
-                return;
-            }
-        }
-        if (typeof starecord.toyear !== "undefined" && starecord.toyear.trim().length > 0) {
-            var toyear = starecord.toyear.match(/(<=|>=|<|>|=)?(\d*)(-)?(\d*)?/);
-            if (toyear !== null && toyear.length >= 3) {
-                if (where.length > 0) where += " AND ";
-                where += " KLIINVENTORY.fromyear " + "<=" + parseInt(toyear[2]);
-                starecord.toyear = toyear[2];
-            } else {
-                callback670("Error", {
-                    error: true,
-                    message: "Parameterfehler"
-                });
-                return;
-            }
-        }
-        where += ")";
-        where += " AND KLISTATIONS.source = '" + starecord.source + "'";
-        where += " AND KLIINVENTORY.variable = '" + starecord.variablename + "'";
-        // where += " AND KLIISTATIONS.temperature = 'TMAX,TMIN'";
-        sqlStmt += " WHERE " + where;
-
-        sqlStmt += " GROUP BY KLISTATIONS.continent, KLISTATIONS.climatezone,";
-        sqlStmt += " KLIINVENTORY.variable,",
-            sqlStmt += " KLIINVENTORY.fromyear, KLIINVENTORY.toyear";
-
-
-
-        // sqlStmt += " ORDER BY KLISTATIONS.source, KLISTATIONS.stationid";
-        sqlStmt += " ORDER BY KLISTATIONS.continent, KLISTATIONS.climatezone";
+        var pivotstations = JSON.parse(window.parent.sysbase.getCache("pivotstations"));
+        var sqlStmt = pivotstations.sqlStmt;
+        /**
+         * Wrapper für die Aggregation im Server
+        */
+        var newStmt = "SELECT continent, continentname, climatezone, variable, fromyear, toyear, count(variable) as anzahl";
+        newStmt += " FROM (" + sqlStmt + ") ";
+        newStmt += " GROUP BY continent, continentname, climatezone, variable, fromyear, toyear";
+        console.log(newStmt);
         async.waterfall([
                 function (callback670a) {
                     var skip = 0;
                     var limit = 0;
                     var api = "getallrecords";
-
-                    uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
+                    uihelper.getAllRecords(newStmt, null, null, skip, limit, api, table, function (ret) {
                         if (ret.error === true) {
                             // sollte nicht passieren??? oder auch hier anlegen
                             sysbase.putMessage("Error:" + ret.message, 3);
@@ -378,17 +325,20 @@
                                         var record = ret.records[property];
                                         irow++;
                                         pearls.push({
-                                            continent: record.continent,
+                                            continent: record.continent + " " + record.continentname,
                                             climatezone: record.climatezone,
                                             variable: record.variable,
                                             fromyear: parseInt(record.fromyear) || 0,
                                             toyear: parseInt(record.toyear) || 0,
+                                            anzahl: record.anzahl || 1,
                                             ispainted: false
                                         });
-                                        $("#kla1670pivl1")
+                                        if (irow < 11) {
+                                            $("#kla1670pivl1")
                                             .append($("<li/>", {
                                                 html: JSON.stringify(pearls[pearls.length - 1])
                                             }));
+                                        }
                                     }
                                 }
                                 callback670a(null, {
@@ -416,6 +366,20 @@
                      */
                     gblpearls = ret.pearls;
 
+                    ret.starecord.fromyear = null;
+                    ret.starecord.toyear = null;
+                    for (var ip = 0; ip < gblpearls.length; ip++) {
+                        if (ret.starecord.fromyear === null) {
+                            ret.starecord.fromyear = gblpearls[ip].fromyear;
+                        } else if (ret.starecord.fromyear > gblpearls[ip].fromyear) {
+                            ret.starecord.fromyear = gblpearls[ip].fromyear;
+                        }
+                        if (ret.starecord.toyear === null) {
+                            ret.starecord.toyear = gblpearls[ip].toyear;
+                        } else if (ret.starecord.toyear < gblpearls[ip].toyear) {
+                            ret.starecord.toyear = gblpearls[ip].toyear;
+                        }
+                    }
                     kla1670piv.putpivotyear(gblpearls, ret.starecord.fromyear, {
                         allrowcolheaders: true,
                         fromyear: ret.starecord.fromyear,
@@ -469,19 +433,21 @@
         $("#date670").html(actyear);
         $("#from670").html(config.fromyear);
         $("#to670").html(config.toyear);
-
+        pivotmatrix = [];
         for (var i = 0; i < gblpearls.length; i++) {
             if (gblpearls[i].fromyear <= actyear && gblpearls[i].toyear >= actyear) {
                 pivotmatrix.push({
+                    actyear: actyear,
                     continent: gblpearls[i].continent,
                     climatezone: gblpearls[i].climatezone,
+                    variable: gblpearls[i].variable,
                     anzahl: gblpearls[i].anzahl
                 });
             }
         }
         $("#pivot670").pivotUI(
             pivotmatrix, {
-                rows: ["actyear", "continent"],
+                rows: ["actyear", "continent", "variable"],
                 cols: ["climatezone"]
             }
         );
@@ -506,7 +472,7 @@
 
     $(document).on("click", ".kla1670pivback", function (evt) {
         var oldValue = parseInt($(".slider670").val());
-        var newValue = oldValue - 1;  // Step
+        var newValue = oldValue - 1; // Step
         // Check fromyear
         if (newValue < gblconfig.fromyear) {
             newValue = oldValue;
@@ -519,7 +485,7 @@
 
     $(document).on("click", ".kla1670pivfore", function (evt) {
         var oldValue = parseInt($(".slider670").val());
-        var newValue = oldValue + 1;  // Step
+        var newValue = oldValue + 1; // Step
         // Check fromyear
         if (newValue > gblconfig.toyear) {
             newValue = oldValue;

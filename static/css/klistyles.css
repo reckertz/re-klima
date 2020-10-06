@@ -152,6 +152,8 @@ h1 {
         margin-left: 10px !important;
         height: auto !important;
         min-height: 0px;
+        overflow-y: hidden !important;
+        overflow-x: auto !important;
     }
 }
 

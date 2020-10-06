@@ -472,14 +472,6 @@
                             }))
                         );
                 } else if (epfield.type === "string" && epfield.class === "uietext") {
-                    /**
-                     * text
-                     * .append($('<div/>', {
-                                class: "ui-field-contain",
-                                width: "95%"
-                            })
-
-                     */
                     var uietype = "text";
                     if (epfield.customclasses.indexOf("password") >= 0) {
                         uietype = "password";
