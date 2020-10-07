@@ -1588,11 +1588,11 @@
         var latitude = $(this).closest("tr").attr("latitude");
         var fromyear = $(this).closest("tr").attr("fromyear");
         var toyear = $(this).closest("tr").attr("toyear");
+        var variablename = $(this).closest("tr").attr("variable");
 
         var source = starecord.source;
-        var variablename = starecord.variablename;
         selvariablename = variablename;
-        console.log("Station:" + stationid + " from:" + source);
+        console.log("Station:" + stationid + " from:" + source + " " + variablename);
 
         var username = uihelper.getUsername();
         var confschema = {
@@ -1748,7 +1748,6 @@
             console.log(extraParam);
             confrecord = JSON.parse(extraParam).props;
             if (confrecord.allin === false) {
-
                 selstations = [];
                 selstations.push({
                     source: confrecord.source,

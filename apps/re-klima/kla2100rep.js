@@ -46,8 +46,9 @@
     var histo1 = {}; // Histogramm auf Wasserstand gerundet Ganzzahl
     var array1 = []; // aktives Array für d3
     var klirecords = [];
-
-    var klihyde = {};
+    var klirow = {}; // der aktuelle Datensatz, dynamisch aus klirecords[i] geholt
+    var klihydes = {}; // Struktur für die gesammelten Hyde-Daten: source.stationid => klihyde in der Strukur
+    var klihyde = {}; // Struktur für eine source.stationid Kombination
     var kla2100repclock;
 
     var hmatrixR;
@@ -107,7 +108,7 @@
                 tempchart: true,
                 temptable: true,
                 allin: false,
-                autoload: false
+                autoload: true
 
             }, selparms.config);
 
@@ -546,9 +547,7 @@
                     var crtsql = "CREATE TEMPORARY TABLE " + ttid + " (stationid text, source text, variable text)";
                     /**
                      * Daten zum Laden der temporary table: selstations
-                     */
-                    /**
-                     * sql SELECT mit temptable
+                     * sql SELECT mit temptable über ttid
                      */
                     var sqlStmt = "";
                     // selvariablename = "WLVL";
@@ -605,14 +604,22 @@
                         if (ret1.error === true) {
                             cb2100n0("Error", {
                                 error: ret1.error,
-                                message: ret1.message
+                                message: ret1.message,
+                                crtsql: crtsql,
+                                selstations: selstations,
+                                sqlStmt: sqlStmt,
+                                temptable: ttid
                             });
                             return;
                         } else {
                             cb2100n0(null, {
                                 error: ret1.error,
                                 message: ret1.message,
-                                records: ret1.records
+                                records: ret1.records,
+                                crtsql: crtsql,
+                                selstations: selstations,
+                                sqlStmt: sqlStmt,
+                                temptable: ttid
                             });
                             return;
                         }
@@ -630,14 +637,13 @@
                     });
 
                 },
-                function (ret1, cb2100n1) {
+                function (ret1, cb2100n5) {
                     /**
                      * hier kommt eine async loop-Steuerung, um die Daten sequentiell abzuarbeite
                      * in der bisherigen Logik
                      */
-                    klirecords = [];
-                    debugger;
-                    async.eachSeries(ret1.records, function (klirow, nextklirow) {
+                    klirecords = ret1.records;
+                    async.eachSeries(ret1.records, function (newklirow, nextklirow) {
                         /**
                          * Direkte Ausgabe des reports für die Records in ret1.records => klirow
                          * Wiederholungsvermeidung geschieht dynamisch ohne expliziten Gruppenwechsel
@@ -645,27 +651,153 @@
                          * Achtung: hier kann years  leer sein, genauso anzyears, fromyear, toyear und variable
                          * variable ist der kritische Punkt!!!
                          */
-                        if (klirow.years !== null) {
-                            klirecords[0] = klirow;
-                            klirow.years = JSON.parse(klirow.years);
-                            kla2100rep.showall(klirow, function (ret1) {
+                        klirow = newklirow;
+                        async.waterfall([
+                                function (cb2100n50) {
+                                    /**
+                                     * Laden KLIDATA aus Urdaten, wenn erforderlich
+                                     */
+                                    var ret = {};
+                                    ret.record = klirow;
+                                    if (klirow.years === null) {
+                                        klirow.years = {};
+                                    } else if (typeof klirow.years === "string") {
+                                        if (klirow.years.startsWith("{")) {
+                                            klirow.years = klirow.years.replace(/""/g, null);
+                                            klirow.years = JSON.parse(klirow.years);
+                                        } else {
+                                            klirow.years = {};
+                                        }
+                                    }
+                                    if (typeof klirow.years === "object") {
+                                        var jahre = Object.keys(klirow.years);
+                                        if (jahre === null || jahre.length === 0) {
+                                            if (kla2100repconfig.autoload === true) {
+                                                // hier nachladen!
+                                                kla2100rep.execmoredata(klirow.source, klirow.stationid, klirow.variable, function (ret1) {
+                                                    klirow = ret1.record;
+                                                    ret.record = ret1.record;
+                                                    cb2100n50(null, ret);
+                                                    return;
+                                                });
+                                            } else {
+                                                // raus
+                                                ret.error = true;
+                                                ret.message = "Keine Daten vorhanden, autoload nicht gesetzt";
+                                                cb2100n50("Error", ret);
+                                                return;
+                                            }
+                                        } else {
+                                            // raus
+                                            cb2100n50(null, ret);
+                                            return;
+                                        }
+                                    } else {
+                                        ret.error = true;
+                                        ret.message = "Keine Daten vorhanden, prüfen";
+                                        cb2100n50("Error", ret);
+                                        return;
+                                    }
+                                },
+                                function (ret, cb2100n51) {
+                                    /**
+                                     * Prüfen und Holen der HYDE-Daten
+                                     * HYDE geht in Cache, weil mehrere Variablen den gleichen Bezug haben können
+                                     */
+                                    if (kla2100repconfig.hyde === false) {
+                                        cb2100n51(null, ret);
+                                        return;
+                                    }
+                                    // Prüfen, ob schon vorhanden und holen aus cache
+                                    if (typeof klihydes[klirow.source] !== "undefined" &&
+                                        typeof klihydes[klirow.source][klirow.stationid] !== "undefined") {
+                                        klihyde = klihydes[klirow.source][klirow.stationid];
+                                        cb2100n51(null, ret);
+                                        return;
+                                    }
+                                    var jqxhr = $.ajax({
+                                        method: "GET",
+                                        crossDomain: false,
+                                        url: sysbase.getServer("stationhyde"),
+                                        data: {
+                                            source: klirow.source,
+                                            stationid: klirow.stationid,
+                                            longitude: klirow.longitude,
+                                            latitude: klirow.latitude,
+                                            name: klirow.stationname,
+                                            globals: false,
+                                            selyears: "",
+                                            selvars: "popc,rurc,urbc,uopp,cropland,tot_irri"
+                                        }
+                                    }).done(function (r1, textStatus, jqXHR) {
+                                        sysbase.checkSessionLogin(r1);
+                                        var ret = JSON.parse(r1);
+                                        sysbase.putMessage(ret.message, 1);
+                                        if (ret.error === true) {
+                                            cb2100n51(null, ret);
+                                            return;
+                                        } else {
+                                            klihyde = ret.klihyde;
+                                            klihydes[klirow.source] = klihydes[klirow.source] || {};
+                                            klihydes[klirow.source][klirow.stationid] = klihyde;
+                                            // klihyde.data muss mit JSON.parse noch entpackt werden
+                                            cb2100n51(null, ret);
+                                            return;
+                                        }
+                                    }).fail(function (err) {
+                                        sysbase.putMessage(err, 1);
+                                        cb2100n51(null, ret);
+                                        return;
+                                    }).always(function () {
+                                        // nope
+                                    });
+                                },
+                                function (ret, cb2100n52) {
+                                    /**
+                                     * Auswertung einer source, stationid, variable Kombination aus klirow
+                                     */
+                                    if (klirow.years !== null) {
+                                        if (typeof klirow.years === "string") {
+                                            klirow.years = JSON.parse(klirow.years);
+                                        }
+                                        // Vorbereitung buckets
+                                        kla2100rep.showall(klirow, function (ret1) {
+                                            cb2100n52("Finish", ret);
+                                            return;
+                                        });
+                                    } else {
+                                        cb2100n52("Finish", ret);
+                                        return;
+                                    }
+                                }
+                            ],
+                            function (error, result) {
+                                if (error !== null && error === "Error") {
+                                    var htmlmsg = klirow.source + " " + klirow.stationid + " " + klirow.variable + " " + error + " " + result.message;
+                                    var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                                    $("#kla2100repwrapper")
+                                        .append($("<div/>", {
+                                            id: divid,
+                                            class: "doprintthis",
+                                            css: {
+                                                width: "100%",
+                                                float: "left",
+                                                overflow: "hidden",
+                                                "font-weight": "bold"
+                                            },
+                                            html: htmlmsg
+                                        }));
+                                }
                                 nextklirow();
                                 return;
-                            });
-                        } else {
-                            // später hier nachladen!!! mit kla2100rep.execmoredata
-                            nextklirow();
-                            return;
-                        }
+                            }); // evtl in Schlussfunktion von waterfall erst nextklirow(); aufrufen
                     }, function (err) {
                         // zum Ablschluss TODO:
-                        cb2100n1(null, {
+                        cb2100n5(null, {
                             error: false,
                             message: "finished"
                         });
                         return;
-                        //});
-
                     });
                 }
             ],
@@ -681,69 +813,18 @@
      * @param {*} newsource
      * @param {*} newstationid
      * @param {*} cbexec
+     * returns klirow - years, fromyear, toyear, anzyears gezielt!!!
      */
-    kla2100rep.execmoredata = function (newsource, newstationid, cb2100p) {
+    kla2100rep.execmoredata = function (newsource, newstationid, newvariable, cb2100p) {
         selsource = newsource;
         selstationid = newstationid;
+        selvariablename = newvariable;
         async.waterfall([
-                function (cb2100p1) {
-                    /*
-                    intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
-                    wenn die Station komplette Wasserstanddaten geliefert hat
-                    */
-                    if (typeof klirecords[0].years !== "undefined" || klirecords[0].years.length > 0) {
-                        // Sortierfolge ist WLVL alphabetisch
-                        stationrecord = klirecords[0];
-                        cb2100p1(null, {
-                            error: false,
-                            message: "Daten gefunden"
-                        });
-                        return;
-                    } else {
-                        /**
-                         * Abfrage, ob Daten geladen werden sollen
-                         */
-                        var qmsg = "Für Station:" + selstationid + " aus " + selsource;
-                        qmsg += " und " + selvariablename;
-                        qmsg += " gibt es keine Daten, sollen diese geladen werden (dauert)?";
-                        var check = window.confirm(qmsg);
-                        if (check === false) {
-                            sysbase.putMessage("Keine Daten zur Station gefunden", 3);
-                            cb2100p1("Error", {
-                                error: true,
-                                message: "Keine " + varparms[selvariablename].header + "-Daten gefunden"
-                            });
-                            return;
-                        } else {
-                            // TODO: neues SQL und beide Variablen bereitstellen
-                            cb2100p1(null, {
-                                error: true,
-                                operation: "loadghcn",
-                                message: "Keine " + varparms[selvariablename].header + "-Daten gefunden",
-                                sqlStmt: sqlStmt,
-                                selvariablename: selvariablename,
-                                selsource: selsource,
-                                selstationid: selstationid
-                            });
-                            return;
-                        }
-                    }
-                },
-                function (ret, cb2100p2) {
+                function (cb2100p2) {
                     /**
                      * Laden der GHCN-Daily-Daten, falls angefordert
                      * Laden aus den Urdaten (*.dly-Files)
                      */
-                    if (ret.error === false) {
-                        cb2100p2(null, ret);
-                        return;
-                    }
-                    if (ret.error === true && (typeof ret.operation === "undefined" || typeof ret.operation !== "undefined" && ret.operation !== "loadghcn")) {
-                        cb2100p2(null, ret);
-                        return;
-                    }
-
-                    $(that).attr("disabled", true);
                     var jqxhr = $.ajax({
                         method: "GET",
                         crossDomain: false,
@@ -751,7 +832,8 @@
                         data: {
                             timeout: 10 * 60 * 1000,
                             source: selsource,
-                            stationid: selstationid
+                            stationid: selstationid,
+                            variable: selvariablename
                         }
                     }).done(function (r1, textStatus, jqXHR) {
                         sysbase.checkSessionLogin(r1);
@@ -768,10 +850,9 @@
                                 error: ret1.error,
                                 operation: "repeat",
                                 message: ret1.message,
-                                sqlStmt: ret.sqlStmt,
-                                selvariablename: ret.selvariablename,
-                                selsource: ret.selsource,
-                                selstationid: ret.selstationid
+                                selvariablename: selvariablename,
+                                selsource: selsource,
+                                selstationid: selstationid
                             });
                             return;
                         }
@@ -786,7 +867,6 @@
                         return;
                     }).always(function () {
                         // nope
-                        $(that).attr("disabled", false);
                     });
                 },
                 function (ret, cb2100p3) {
@@ -797,89 +877,154 @@
                         cb2100p3(null, ret);
                         return;
                     }
-                    uihelper.getAllRecords(ret.sqlStmt, {}, [], 0, 2, ret.api, ret.table, function (ret1) {
+                    // gezieltes Lesen years, fromyear, toyear, anzyears
+                    var sqlSelect = "SELECT source, stationid, variable, years, fromyear, toyear, anzyears";
+                    sqlSelect += " FROM KLIDATA";
+                    sqlSelect += " WHERE source ='" + ret.selsource + "'";
+                    sqlSelect += " AND stationid ='" + ret.selstationid + "'";
+                    sqlSelect += " AND variable ='" + ret.selvariablename + "'";
+                    uihelper.getOneRecord(sqlSelect, {}, "getonerecord", "KLIDATA", function (ret1) {
                         if (ret1.error === false && ret1.record !== null) {
-                            stationrecord = ret1.record;
-                            klirecords = [];
-                            // Sortierfolge ist WLVL
-                            ret1.records[0].years = ret1.records[0].years.replace(/""/g, null);
-                            if (typeof ret1.records[0] !== "undefined") klirecords.push(ret1.records[0]);
-
+                            var newdata = ret1.record;
+                            klirow.years = newdata.years;
+                            klirow.fromyear = newdata.fromyear;
+                            klirow.toyear = newdata.toyear;
+                            klirow.anzyears = newdata.anzyears;
+                            klirow.years = klirow.years.replace(/""/g, null);
+                            klirow.years = JSON.parse(klirow.years);
                             cb2100p3(null, {
                                 error: false,
-                                message: "Daten gefunden"
+                                message: ret.selsource + " " + ret.selstationid + " " + ret.selvariablename + " Daten gefunden"
                             });
                             return;
                         } else {
                             cb2100p3(null, {
                                 error: true,
-                                message: "Endgültig keine " + varparms[selvariablename].header + "-Daten gefunden"
+                                message: ret.selsource + " " + ret.selstationid + " " + ret.selvariablename + " Endgültig keine Daten gefunden"
                             });
                             return;
                         }
                     });
-                },
-                function (ret, cb2100p4) {
-                    /**
-                     * Holen der HYDE-Daten
-                     */
-                    if (kla2100repconfig.hyde === false) {
-                        cb2100p4(null, ret);
-                        return;
-                    }
-                    var jqxhr = $.ajax({
-                        method: "GET",
-                        crossDomain: false,
-                        url: sysbase.getServer("stationhyde"),
-                        data: {
-                            source: klirecords[0].source,
-                            stationid: selstationid,
-                            longitude: stationrecord.longitude,
-                            latitude: stationrecord.latitude,
-                            name: stationrecord.stationname,
-                            globals: false,
-                            selyears: "",
-                            selvars: "popc,rurc,urbc,uopp,cropland,tot_irri"
-                        }
-                    }).done(function (r1, textStatus, jqXHR) {
-                        sysbase.checkSessionLogin(r1);
-                        var ret = JSON.parse(r1);
-                        sysbase.putMessage(ret.message, 1);
-                        if (ret.error === true) {
-                            cb2100p4(null, ret);
-                            return;
-                        } else {
-                            klihyde = ret.klihyde;
-                            // klihyde.data muss mit JSON.parse noch entpackt werden
-                            cb2100p4(null, ret);
-                            return;
-                        }
-                    }).fail(function (err) {
-                        sysbase.putMessage(err, 1);
-                        cb2100p4(null, ret);
-                        return;
-                    }).always(function () {
-                        // nope
-                    });
-                },
-                function (ret, cb2100p5) {
-                    // hier die Ausgabe durchführen
-                    kla2100rep.showall(ret, function (ret1) {
-                        cb2100p5("Finish", ret1);
-                        return;
-                    });
                 }
             ],
             function (error, result) {
-                clearInterval(kla2100repclock);
-                $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
-                //$("button").show();
-                $(':button').prop('disabled', false); // Enable all the buttons
-                $("body").css("cursor", "default");
                 cb2100p(result);
                 return;
             });
     };
+
+    /**
+     * kla2100rep.getBucketYear
+     * @param {*} klirow
+     * @param {*} byear
+     * returns bucketyear
+     */
+    kla2100rep.getBucketYear = function (klirow, byear, bstep, method) {
+        var buck0 = parseInt(byear);
+        var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
+        // oder 1661 als Basisjahr und damit rechnen
+        var steps = parseInt(kla2100repconfig.step || 30);
+        var buck2 = Math.floor(buck1 / steps);
+        var buck3 = 1661 + (buck2) * steps;
+        var buckyear = "" + buck3;
+        return {
+            bucketindex: buck3,
+            bucketstring: "" + buck3
+        }
+    };
+
+    /**
+     * kla2100rep.getBuckets
+     * @param {*} klirow - aktueller Datensatz
+     * @param {*} bucketname - Name unter dem die buckets abelegt werden in klirow
+     * @param {*} yearbase - Basisjahr, ab dem Buckets berechnet werden
+     * @param {*} yearstep - Anzahl Jahre in einem Bucket
+     * @param {*} labelmethod - fromto setzt from-to; middle setzt (from + to) / 2
+     * @param {*} endmethod - config setzt kla2100repconfig.fromyear und .toyear; data nimmt klirow.fromyear und toyear
+     *                 toyear wird gerundet
+     *
+     * return - klirow wird direkt fortgeschrieben, return false wenn Probleme aufgetaucht sind
+     */
+    kla2100rep.getBuckets = function (klirow, bucketname, yearbase, yearstep, labelmethod, endmethod) {
+        klirow[bucketname] = {};
+        klirow[bucketname].yearbase = parseInt(yearbase);
+        klirow[bucketname].yearstep = parseInt(yearstep);
+        if (endmethod === "config") {
+            klirow[bucketname].fromyear = parseInt(kla2100repconfig.fromyear);
+            klirow[bucketname].toyear = parseInt(kla2100repconfig.toyear);
+            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+        } else {
+            klirow[bucketname].fromyear = parseInt(klirow.fromyear);
+            klirow[bucketname].toyear = parseInt(klirow.toyear);
+        }
+        klirow[bucketname].data = [];
+        var emptybucket = {
+            label: "",
+            fromyear: null,
+            toyear: null,
+            min: null,
+            max: null,
+            sum: 0,
+            count: 0,
+            avg: null
+        };
+        // Initialisierung aus den Parametern in klirow[bucketname], die bereits aufbereitet sind
+        var anzbuckets = Math.ceil((klirow[bucketname].toyear - klirow[bucketname].fromyear + 1) / klirow[bucketname].yearstep); // aufgerundet
+        for (var ibuck = 0; ibuck < anzbuckets; ibuck++) {
+            klirow[bucketname].data[ibuck] = Object.assign({}, emptybucket);
+            klirow[bucketname].data[ibuck].fromyear = klirow[bucketname].fromyear + ibuck * klirow[bucketname].yearstep;
+            klirow[bucketname].data[ibuck].toyear = klirow[bucketname].data[ibuck].fromyear + klirow[bucketname].yearstep - 1;
+            if (labelmethod === "fromto") {
+                klirow[bucketname].data[ibuck].label = klirow[bucketname].data[ibuck].fromyear + "-" + klirow[bucketname].data[ibuck].toyear;
+            } else {
+                klirow[bucketname].data[ibuck].label = Math.floor((klirow[bucketname].data[ibuck].fromyear + klirow[bucketname].data[ibuck].toyear) / 2);
+            }
+        }
+        /**
+         * hier kommt der eigentliche Berechnungsteil
+         */
+        var workbucket = klirow[bucketname];
+        for (var iyear = workbucket.fromyear; iyear <= workbucket.toyear; iyear++) {
+            var syear = "" + iyear;
+            if (typeof klirow.years[syear] !== "undefined") {
+                // Bestimmung bucket, LOOP, weil später "dedizierte" Perioden kommen
+                var aktbuckindex = null;
+                for (ibuck = 0; ibuck < workbucket.data.length; ibuck++) {
+                    if (iyear >= workbucket.data[ibuck].fromyear && iyear <= workbucket.data[ibuck].toyear) {
+                        aktbuckindex = ibuck;
+                        break;
+                    }
+                }
+                if (aktbuckindex !== null) {
+                    var aktbuck = workbucket.data[aktbuckindex];
+                    for (var iday = 0; iday < klirow.years[syear].length; iday++) {
+                        var valuestring = klirow.years[syear][iday];
+                        if (valuestring === null || valuestring === "-9999" || valuestring === "-999.9") {
+                            continue;
+                        }
+                        var value = parseFloat(valuestring);
+                        if (aktbuck.min === null) {
+                            aktbuck.min = parseFloat(value);
+                        } else if (value < aktbuck.min) {
+                            aktbuck.min = parseFloat(value);
+                        }
+                        if (aktbuck.max === null) {
+                            aktbuck.max = parseFloat(value);
+                        } else if (value > aktbuck.max) {
+                            aktbuck.max = parseFloat(value);
+                        }
+                        aktbuck.count++;
+                        aktbuck.sum += value;
+                        aktbuck.avg = aktbuck.sum / aktbuck.count;
+                    }
+                }
+            }
+        }
+        return true;
+    };
+
+
+
     /**
      * kla2100rep.showall - Aufruf aller Funktionen für die Standardauswertung
      * @param {*} ret
@@ -898,12 +1043,13 @@
         var lm = new Regression.linear(l, w);
         console.log(JSON.stringify(lm, null, 4));
         */
-
+        var gldivid;
         async.waterfall([
                 function (cb2100g0a) {
-                    klirow.titel = klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")";
+                    klirow.titel = klirow.variable + " " + klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")";
+
                     if (kla2100repconfig.allin === true) {
-                        var gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
+                        gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
                         $("#kla2100repwrapper")
                             .append($("<div/>", {
                                     class: "doprintthis",
@@ -911,14 +1057,14 @@
                                     css: {
                                         width: "100%",
                                         float: "left",
+                                        "text-align": "left",
                                         overflow: "hidden"
                                     }
                                 })
                                 .append($("<br/>"))
-                                .append($("<br/>"))
-                                .append($("<h2/>", {
+                                .append($("<span/>", {
                                     html: klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")",
-                                    class: "doprintthis"
+                                    class: "doprintthis eckh3"
                                 }))
                             );
                         // Spezielle Buttons mit Vor-Aufbereitung
@@ -963,6 +1109,25 @@
                                     window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
                                 }
                             }));
+                    } else {
+                        gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
+                        $("#kla2100repwrapper")
+                            .append($("<div/>", {
+                                    class: "doprintthis",
+                                    id: gldivid,
+                                    css: {
+                                        width: "100%",
+                                        float: "left",
+                                        overflow: "hidden"
+                                    }
+                                })
+                                .append($("<br/>"))
+                                .append($("<br/>"))
+                                .append($("<span/>", {
+                                    html: klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")",
+                                    class: "doprintthis eckh3"
+                                }))
+                            );
                     }
                     /**
                      * Stammdaten
@@ -985,7 +1150,7 @@
 
                     $("#" + divid)
                         .append($("<a/>", {
-                                title: "Copy to Clipboard",
+                                title: "HTML-Ausschnitt",
                                 css: {
                                     margin: "10px"
                                 },
@@ -1007,8 +1172,9 @@
                                     });
                                 }
                             })
-                            .append($("<h2/>", {
-                                html: "Stammdaten " + klirow.titel
+                            .append($("<span/>", {
+                                html: "Stammdaten " + klirow.titel,
+                                class: "eckh3"
                             }))
                         );
                     var master = {};
@@ -1056,7 +1222,7 @@
 
                     $("#" + divid)
                         .append($("<a/>", {
-                                title: "Copy to Clipboard",
+                                title: "HTML-Ausschnitt",
                                 css: {
                                     margin: "10px"
                                 },
@@ -1073,8 +1239,9 @@
                                     }
                                 }
                             })
-                            .append($("<h2/>", {
-                                html: "Datenqualität, Jahresdaten " + klirow.titel
+                            .append($("<span/>", {
+                                html: "Datenqualität, Jahresdaten " + klirow.titel,
+                                class: "eckh3"
                             }))
                         );
                     /**
@@ -1142,6 +1309,51 @@
                     cb2100g0(null, ret);
                     return;
                 },
+
+
+                function (ret, cb2100g7) {
+                    /**
+                     * Verlauf Graphik und Tabelle
+                     */
+                    var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                    if (kla2100repconfig.tempchart === false) {
+                        cb2100g7(null, ret);
+                        return;
+                    }
+                    $("#kla2100repwrapper")
+                        .append($("<div/>", {
+                                css: {
+                                    width: "100%",
+                                    float: "left",
+                                    overflow: "hidden"
+                                }
+                            })
+                            .append($("<div/>", {
+                                id: divid + "L",
+                                css: {
+                                    "text-align": "left",
+                                    float: "left",
+                                    width: "49%"
+                                }
+                            }))
+                        );
+
+                    var hmoptions = {
+                        minmax: true,
+                        minmaxhistogram: true,
+                        cbuckets: true,
+                        hyde: true
+                    };
+                    hoptionsL.minmaxhistogram = true;
+                    kla2100rep.klitemp2("#" + divid + "L", klirow, function (ret) {
+                        cb2100g7(null, ret);
+                        return;
+                    });
+                },
+
+
+
+
                 function (ret27, cb2100g1) {
                     /**
                      * Heatmap-1
@@ -1331,7 +1543,7 @@
 
                 function (ret, cb2100g5) {
                     /**
-                     * Wasserstandtabelle mit Histogrammen - links
+                     * Tabelle mit Histogrammen - links
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     // hier wird eine Struktur links und rechts bereitgestellt, noch ohne Inhalt
@@ -1369,48 +1581,6 @@
                         return;
                     });
                 },
-
-                function (ret, cb2100g7) {
-                    /**
-                     * Wasserstandsverlauf Graphik und Tabelle
-                     */
-                    var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    if (kla2100repconfig.tempchart === false) {
-                        cb2100g7(null, ret);
-                        return;
-                    }
-                    $("#kla2100repwrapper")
-                        .append($("<div/>", {
-                                css: {
-                                    width: "100%",
-                                    float: "left",
-                                    overflow: "hidden"
-                                }
-                            })
-                            .append($("<div/>", {
-                                id: divid + "L",
-                                css: {
-                                    "text-align": "center",
-                                    float: "left",
-                                    width: "49%"
-                                }
-                            }))
-                        );
-                    // Linker Wasserstand
-                    var hmoptions = {
-                        minmax: true,
-                        minmaxhistogram: true,
-                        cbuckets: true,
-                        hyde: true
-                    };
-                    hoptionsL.minmaxhistogram = true;
-                    kla2100rep.klitemp2("#" + divid + "L", selvariablename, selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
-                        ret.divid = divid;
-                        cb2100g7(null, ret);
-                        return;
-                    });
-                },
-
 
 
                 function (ret, cb2100g9) {
@@ -2016,7 +2186,6 @@
                 html: bucknumberprot
             }));
             */
-            debugger;
             if (kla2100repconfig.decimals === true) {
                 var divid = "div" + Math.floor(Math.random() * 100000) + 1;
                 var chartid = divid + "c";
@@ -2164,7 +2333,7 @@
         var oldsparkid = $(this).closest("tr").find("span").attr("id");
         // from - to Logik mit den years
         //var years = JSON.parse(ret.record.years);
-        var splrecord = klirecords[0]; // TODO: Der Satz muss geholt werden/gesucht werden in klirecords[i] global
+        var splrecord = klirow; // TODO: Der Satz muss geholt werden/gesucht werden in klirecords[i] global
         var sun = {
             numberhisto: [],
             valsum: 0,
@@ -2494,7 +2663,7 @@
 
         // years bereitstellen
         if (selvariable === selvariablename && klirecords.length > 0) {
-            ret1.record = klirecords[0];
+            ret1.record = klirow;
         }
 
         var years;
@@ -2654,7 +2823,7 @@
      * kla2100rep.klidistr2 - tempdistribution
      * Separate Charts für Sommer und Winter für die Distribution
      * starecord hat source, stationid
-     * klirecords[0] oder [1] mit variable
+     * klirow oder [1] mit variable
      */
     kla2100rep.klidistr2 = function (cid, selvariable, selsource, selstationid, ret1, cb2100p) {
         try {
@@ -2673,328 +2842,163 @@
                         }
                     })
                     .append($("<span/>", {
-                            text: "Distribution " + selvariable + " " + klirecords[0].titel,
+                            text: "Distribution " + selvariable + " " + klirow.titel,
                             class: "doprintthis eckh3"
                         })
-
+                        .append($("<br>"))
                         .append($("<span/>", {
-                            text: "reverseY",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-                                if (state === true) {
-                                    try {
-                                        graph.options.scales.yAxes[0].ticks.reverse = true;
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        graph.options.scales.yAxes[0].ticks.reverse = false;
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
+                                text: "reverseY",
+                                css: {
+                                    margin: "5px",
+                                    "background-color": "lightsteelblue"
                                 }
-                            }
-                        }))
-
-
-                        .append($("<span/>", {
-                            text: "log Y",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-                                if (state === true) {
-                                    try {
-                                        graph.options.scales.yAxes[0].type = "logarithmic";
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        graph.options.scales.yAxes[0].type = "linear";
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
+                            })
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                class: "kla2100repreverse",
+                                css: {
+                                    margin: "5px"
                                 }
-                            }
-                        }))
-
-
+                            }))
+                        )
 
                         .append($("<span/>", {
-                            text: "no x=0",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-
-                                window.chartscache = window.chartscache || {};
-                                window.chartscache[canvasid] = window.chartscache[canvasid] || {};
-                                if (state === true) {
-                                    try {
-                                        var saveminval = graph.options.scales.xAxes[0].ticks.min;
-                                        var savemaxval = graph.options.scales.xAxes[0].ticks.max;
-                                        window.chartscache[canvasid].firstxvalues = [];
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            var firstxvalue = graph.data.datasets[igdata].data[0];
-                                            window.chartscache[canvasid].firstxvalues.push(firstxvalue);
-                                            graph.data.datasets[igdata].data[0] = null;
-                                        }
-                                        delete graph.options.scales.yAxes[0].ticks.min;
-                                        delete graph.options.scales.yAxes[0].ticks.max;
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            var firstxvalue = chartscache[canvasid].firstxvalues[igdata];
-                                            graph.data.datasets[igdata].data[0] = firstxvalue;
-                                        }
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
+                                text: "logY",
+                                css: {
+                                    margin: "5px",
+                                    "background-color": "lightsteelblue"
                                 }
-                            }
-                        }))
+                            })
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                /* checked: "checked", */
+                                class: "kla2100replogy",
+                                css: {
+                                    margin: "5px"
+                                }
+                            }))
+                        )
 
+                        .append($("<span/>", {
+                                text: "no x=0",
+                                css: {
+                                    margin: "5px",
+                                    "background-color": "lightsteelblue"
+                                }
+                            })
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                class: "kla2100repnox0",
+                                /* checked: "checked", */
+                                css: {
+                                    margin: "5px"
+                                }
+                            }))
+                        )
 
 
                         .append($("<span/>", {
-                            text: "x 0=null",
-                            title: "x Konvertieren 0 zu null",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-                                // 10-er Intervalle auf x-Achse zusammenfassen, Aggregation
-                                if (state === true) {
-                                    try {
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            var olddata = graph.data.datasets[igdata].data;
-                                            for (var igx = 0; igx < olddata.length; igx++) {
-                                                if (typeof olddata[igx] === "undefined") {
-                                                    olddata[igx] = "a";
-                                                } else if (olddata[igx] === 0 || olddata[igx].length === 0) {
-                                                    olddata[igx] = "a";
-                                                }
+                                text: "X 0=null",
+                                title: "X Konvertieren 0 zu null",
+                                css: {
+                                    margin: "5px",
+                                    "background-color": "lightsteelblue"
+                                }
+                            })
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                class: "kla2100repx0null",
+                                /* checked: "checked", */
+                                css: {
+                                    margin: "5px"
+                                }
+                            }))
+                        )
+
+                        .append($("<span/>", {
+                                text: "X/10",
+                                title: "x Aggregation auf 10-er Intervalle",
+                                css: {
+                                    margin: "5px",
+                                    "background-color": "lightsteelblue"
+                                }
+                            })
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                class: "kla2100repx10",
+                                /* checked: "checked", */
+                                css: {
+                                    margin: "5px"
+                                }
+                            }))
+                        )
+
+                        .append($("<span/>", {
+                                text: "spanGaps",
+                                title: "Line unterbrechen, wenn kein signifikanter y-Wert vorhanden ist",
+                                css: {
+                                    margin: "5px",
+                                    "background-color": "lightsteelblue"
+                                }
+                            })
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                /* checked: "checked", */
+                                css: {
+                                    margin: "5px"
+                                },
+                                click: function (evt) {
+                                    var state = $(this).prop("checked"); // neuer Status der Checkbox
+                                    var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+                                    var graph = window.charts[canvasid];
+                                    // spanGaps
+                                    if (state === true) {
+                                        try {
+                                            /*
+                                            for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                                graph.data.datasets[igdata].spanGaps = true;
                                             }
+                                            */
+                                            graph.options.spanGaps = true;
+                                            graph.update();
+                                        } catch (err) {
+                                            console.log(err)
                                         }
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            var olddata = graph.data.datasets[igdata].data;
-                                            for (var igx = 0; igx < olddata.length; igx++) {
-                                                if (olddata[igx] === "a") {
-                                                    olddata[igx] = 0;
-                                                }
+                                    } else {
+                                        try {
+                                            /*
+                                            for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                                                graph.data.datasets[igdata].spanGaps = false;
                                             }
+                                            */
+                                            graph.options.spanGaps = false;
+                                            graph.update();
+                                        } catch (err) {
+                                            console.log(err)
                                         }
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
                                     }
                                 }
-                            }
-                        }))
-
-
-                        .append($("<span/>", {
-                            text: "x/10",
-                            title: "x Aggregation auf 10-er Intervalle",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-                                // 10-er Intervalle auf x-Achse zusammenfassen, Aggregation
-                                // die y-Skalierung .max muss ausgesetzt werden
-                                if (state === true) {
-                                    try {
-                                        window.chartscache = window.chartscache || {};
-                                        window.chartscache[canvasid] = window.chartscache[canvasid] || {};
-                                        window.chartscache[canvasid].originaldata = []; //uihelper.cloneObject(graph.data.datasets);
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            var olddata = graph.data.datasets[igdata].data;
-                                            window.chartscache[canvasid].originaldata.push(olddata);
-                                            var newdata = new Array(olddata.length).fill(0);
-                                            for (var igx = 0; igx < olddata.length; igx++) {
-                                                // Zielindex berechnen
-                                                var target = Math.floor(igx / 10) * 10 + 5;
-                                                newdata[target] += olddata[igx];
-                                            }
-                                            graph.data.datasets[igdata].data = newdata;
-                                        }
-                                        delete graph.options.scales.yAxes[0].ticks.max;
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        var olddatasets = window.chartscache[canvasid].originaldata;
-                                        for (var igdata = 0; igdata < olddatasets.length; igdata++) {
-                                            graph.data.datasets[igdata].data = olddatasets[igdata];
-                                        }
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                }
-                            }
-                        }))
-
-                        .append($("<span/>", {
-                            text: "spanGaps",
-                            title: "Line unterbrechen, wenn kein signifikanter y-Wert vorhanden ist",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-                                // spanGaps
-                                if (state === true) {
-                                    try {
-                                        /*
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            graph.data.datasets[igdata].spanGaps = true;
-                                        }
-                                        */
-                                        graph.options.spanGaps = true;
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        /*
-                                        for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                            graph.data.datasets[igdata].spanGaps = false;
-                                        }
-                                        */
-                                        graph.options.spanGaps = false;
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                }
-                            }
-                        }))
-
+                            }))
+                        )
                         // hidden: true,
 
                         .append($("<span/>", {
-                            text: "hide all",
-                            title: "Alle Datasets ausblenden",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            },
-                            click: function (evt) {
-                                var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                var graph = window.charts[canvasid];
-                                if (state === true) {
-                                    try {
-                                        var olddatasets = graph.data.datasets;
-                                        for (var igdata = 0; igdata < olddatasets.length; igdata++) {
-                                            graph.data.datasets[igdata].hidden = true;
-                                        }
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
-                                } else {
-                                    try {
-                                        var olddatasets = graph.data.datasets;
-                                        for (var igdata = 0; igdata < olddatasets.length; igdata++) {
-                                            graph.data.datasets[igdata].hidden = false;
-                                        }
-                                        graph.update();
-                                    } catch (err) {
-                                        console.log(err)
-                                    }
+                                text: "hide all",
+                                title: "Alle Datasets ausblenden",
+                                css: {
+                                    margin: "5px",
+                                    "background-color": "lightsteelblue"
                                 }
-                            }
-                        }))
-
+                            })
+                            .append($("<input/>", {
+                                type: "checkbox",
+                                class: "kla2100rephideall",
+                                /* checked: "checked", */
+                                css: {
+                                    margin: "5px"
+                                }
+                            }))
+                        )
 
 
                     )
@@ -3062,70 +3066,313 @@
     };
 
 
+    $(document).on("change", ".kla2100repreverse", function (evt) {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        evt.stopPropagation();
+        // neuer Status der Checkbox
+        var state;
+        state = $(this).prop("checked");
+        console.log("New Status:" + state);
+        //var graph = $("#" + ciddiv + "chart").data('graph');
+        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+        if (canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (canvasid === null) {
+                canvasid = $(this).parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        // var graph = $(canvasref).data('graph');
+        if (state === true) {
+            try {
+                graph.options.scales.yAxes[0].ticks.reverse = true;
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            try {
+                graph.options.scales.yAxes[0].ticks.reverse = false;
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        }
+        evt.stopImmediatePropagation();
+        evt.stopPropagation();
+    });
+
+    $(document).on("change", ".kla2100replogy", function (evt) {
+        // click: function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+        if (canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (canvasid === null) {
+                canvasid = $(this).parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        if (state === true) {
+            try {
+                graph.options.scales.yAxes[0].type = "logarithmic";
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        } else {
+            try {
+                graph.options.scales.yAxes[0].type = "linear";
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    });
+
+    $(document).on("change", ".kla2100repnox0", function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+        if (canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (canvasid === null) {
+                canvasid = $(this).parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        window.chartscache = window.chartscache || {};
+        window.chartscache[canvasid] = window.chartscache[canvasid] || {};
+        if (state === true) {
+            try {
+                var saveminval = graph.options.scales.xAxes[0].ticks.min;
+                var savemaxval = graph.options.scales.xAxes[0].ticks.max;
+                window.chartscache[canvasid].firstxvalues = [];
+                for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                    var firstxvalue = graph.data.datasets[igdata].data[0];
+                    window.chartscache[canvasid].firstxvalues.push(firstxvalue);
+                    graph.data.datasets[igdata].data[0] = null;
+                }
+                delete graph.options.scales.yAxes[0].ticks.min;
+                delete graph.options.scales.yAxes[0].ticks.max;
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        } else {
+            try {
+                for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                    var firstxvalue = chartscache[canvasid].firstxvalues[igdata];
+                    graph.data.datasets[igdata].data[0] = firstxvalue;
+                }
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    });
+
+
+    $(document).on("change", ".kla2100rephideall", function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+        if (canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (canvasid === null) {
+                canvasid = $(this).parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        if (state === true) {
+            try {
+                var olddatasets = graph.data.datasets;
+                for (var igdata = 0; igdata < olddatasets.length; igdata++) {
+                    graph.config.data.datasets[igdata].hidden = true;
+                    graph.data.datasets[igdata].hidden = true;
+                }
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        } else {
+            try {
+                var olddatasets = graph.data.datasets;
+                for (var igdata = 0; igdata < olddatasets.length; igdata++) {
+                    graph.config.data.datasets[igdata].hidden = false;
+                    graph.data.datasets[igdata].hidden = false;
+                }
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    });
+
+
+
+    $(document).on("change", ".kla2100repx0null", function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+        if (canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (canvasid === null) {
+                canvasid = $(this).parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        // 10-er Intervalle auf x-Achse zusammenfassen, Aggregation
+        if (state === true) {
+            try {
+                for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                    var olddata = graph.data.datasets[igdata].data;
+                    for (var igx = 0; igx < olddata.length; igx++) {
+                        if (typeof olddata[igx] === "undefined") {
+                            olddata[igx] = "a";
+                        } else if (olddata[igx] === 0 || olddata[igx].length === 0) {
+                            olddata[igx] = "a";
+                        }
+                    }
+                }
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        } else {
+            try {
+                for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                    var olddata = graph.data.datasets[igdata].data;
+                    for (var igx = 0; igx < olddata.length; igx++) {
+                        if (olddata[igx] === "a") {
+                            olddata[igx] = 0;
+                        }
+                    }
+                }
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    });
+
+    $(document).on("change", ".kla2100repx10", function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+        if (canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (canvasid === null) {
+                canvasid = $(this).parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        // 10-er Intervalle auf x-Achse zusammenfassen, Aggregation
+        // die y-Skalierung .max muss ausgesetzt werden
+        if (state === true) {
+            try {
+                window.chartscache = window.chartscache || {};
+                window.chartscache[canvasid] = window.chartscache[canvasid] || {};
+                window.chartscache[canvasid].originaldata = []; //uihelper.cloneObject(graph.data.datasets);
+                for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                    var olddata = graph.data.datasets[igdata].data;
+                    window.chartscache[canvasid].originaldata.push(olddata);
+                    var newdata = new Array(olddata.length).fill(0);
+                    for (var igx = 0; igx < olddata.length; igx++) {
+                        // Zielindex berechnen
+                        var target = Math.floor(igx / 10) * 10 + 5;
+                        newdata[target] += olddata[igx];
+                    }
+                    graph.data.datasets[igdata].data = newdata;
+                }
+                delete graph.options.scales.yAxes[0].ticks.max;
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        } else {
+            try {
+                var olddatasets = window.chartscache[canvasid].originaldata;
+                for (var igdata = 0; igdata < olddatasets.length; igdata++) {
+                    graph.data.datasets[igdata].data = olddatasets[igdata];
+                }
+                graph.update();
+            } catch (err) {
+                console.log(err)
+            }
+        }
+    });
+
+
+
     /**
-     * kla2100rep.klitemp2 Wasserstand-Sparkline über Klima-Buckets
+     * kla2100rep.klitemp2 ChartJS mit min, max und avg sowie Tabelle dazu
      * @param {*} cid
-     * @param {*} selvariable
-     * @param {*} selsource
-     * @param {*} selstationid
-     * @param {*} starecord
-     * @param {*} hmatrix
-     * @param {*} hoptions
+     * @param {*} klirow
      * @param {*} cb2100k
      */
-    kla2100rep.klitemp2 = function (cid, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb2100k) {
+    kla2100rep.klitemp2 = function (cid, klirow, cb2100k) {
+        // kla2100repconfig
         try {
             var ret = {};
             var ciddiv = cid.substr(1) + "div";
             var tableid = cid.substr(1) + "tbl";
             var chartid = ciddiv + "chart";
             $(cid)
+                .append($("<br>"))
                 .append($("<span/>", {
-                        text: varparms[selvariablename].header + "verlauf " + selvariable + " " + klirecords[0].titel,
+                        text: "Verlaufsgraphik " + klirow.titel,
                         class: "doprintthis eckh3",
                     })
+                    .append($("<br>"))
                     .append($("<span/>", {
-                        text: "reverse",
-                        css: {
-                            margin: "5px"
-                        }
-                    }))
-                    .append($("<input/>", {
-                        type: "checkbox",
-                        checked: "checked",
-                        css: {
-                            margin: "5px"
-                        },
-                        click: function (evt) {
-                            // neuer Status der Checkbox
-                            var state = $(this).prop("checked");
-                            //var graph = $("#" + ciddiv + "chart").data('graph');
-                            var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                            var graph = window.charts[canvasid];
-                            // var graph = $(canvasref).data('graph');
-                            if (state === true) {
-                                try {
-                                    /*
-                                    var saveminval = graph.options.scales.xAxes[0].ticks.min = minval;
-                                    var savemaxval = graph.options.scales.xAxes[0].ticks.max = maxval;
-                                    delete graph.options.scales.xAxes[0].ticks.min;
-                                    delete graph.options.scales.xAxes[0].ticks.max;
-                                    */
-                                    graph.options.scales.yAxes[0].ticks.reverse = true;
-                                    graph.update();
-                                } catch (err) {
-                                    console.log(err)
-                                }
-                            } else {
-                                try {
-                                    graph.options.scales.yAxes[0].ticks.reverse = false;
-                                    graph.update();
-                                } catch (err) {
-                                    console.log(err)
-                                }
+                            text: "reverseY",
+                            css: {
+                                margin: "5px",
+                                "background-color": "lightsteelblue"
                             }
-                        }
-                    }))
+                        })
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            class: "kla2100repreverse",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                    )
+
+                    .append($("<span/>", {
+                            text: "logY",
+                            css: {
+                                margin: "5px",
+                                "background-color": "lightsteelblue"
+                            }
+                        })
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            /* checked: "checked", */
+                            class: "kla2100replogy",
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                    )
+
+                    .append($("<span/>", {
+                            text: "hide all",
+                            title: "Alle Datasets ausblenden",
+                            css: {
+                                margin: "5px",
+                                "background-color": "lightsteelblue"
+                            }
+                        })
+                        .append($("<input/>", {
+                            type: "checkbox",
+                            class: "kla2100rephideall",
+                            /* checked: "checked", */
+                            css: {
+                                margin: "5px"
+                            }
+                        }))
+                    )
+
 
                 )
                 .append($("<div/>", {
@@ -3177,66 +3424,56 @@
                         .append($("<tbody/>"))
                     )
                 );
+
+            // checked: "checked",
             // Loop über die Jahre
             // hoptions.cbucketdata[year]
-
+            var minvals = [];
+            var maxvals = [];
+            var avgvals = [];
+            var minregvals = [];
+            var maxregvals = [];
+            var avgregvals = [];
             var miny = null;
             var maxy = null;
-            var minvals = [];
-            var avgvals = [];
-            var maxvals = [];
-            var minregvals = [];
-            var avgregvals = [];
-            var maxregvals = [];
-            var ycount = 0;
-            var baseyear = 0;
-            for (var year in hoptions.cbucketdata) {
-                if (hoptions.cbucketdata.hasOwnProperty(year)) {
-                    var nyear = parseInt(year);
-                    if (baseyear === 0) {
-                        baseyear = nyear - 1;
-                    }
-                    ycount = nyear - baseyear;
-                    var yeardata = hoptions.cbucketdata[year];
-                    ycount++;
-                    var yearlabel = year + "-" + hoptions.cbucketdata[year].toyear;
-                    yeardata.avgval = yeardata.valsum / yeardata.valcount;
-                    $("#" + tableid)
-                        .find("tbody")
-                        .append($("<tr/>")
-                            .append($("<td/>", {
-                                html: yearlabel
-                            }))
-                            .append($("<td/>", {
-                                html: yeardata.minval.toFixed(1)
-                            }))
-                            .append($("<td/>", {
-                                html: yeardata.avgval.toFixed(1)
-                            }))
-                            .append($("<td/>", {
-                                html: yeardata.maxval.toFixed(1)
-                            }))
-                        );
-                    minvals.push(yeardata.minval.toFixed(1));
-                    avgvals.push(yeardata.avgval.toFixed(1));
-                    maxvals.push(yeardata.maxval.toFixed(1));
-                    // Umrechnung auf Kelvin
-                    minregvals.push([ycount, yeardata.minval + 273.15]);
-                    avgregvals.push([ycount, yeardata.avgval + 273.15]);
-                    maxregvals.push([ycount, yeardata.maxval + 273.15]);
+            kla2100rep.getBuckets(klirow, "VERLAUF", klirow.fromyear, 30, "fromto", "config");
+            for (var ibucket = 0; ibucket < klirow.VERLAUF.data.length; ibucket++) {
+                $("#" + tableid)
+                    .find("tbody")
+                    .append($("<tr/>")
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.data[ibucket].label
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.data[ibucket].min.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.data[ibucket].avg.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.data[ibucket].max.toFixed(1)
+                        }))
+                    );
+                minvals.push(klirow.VERLAUF.data[ibucket].min.toFixed(1));
+                avgvals.push(klirow.VERLAUF.data[ibucket].avg.toFixed(1));
+                maxvals.push(klirow.VERLAUF.data[ibucket].max.toFixed(1));
+                // Umrechnung auf Kelvin
+                minregvals.push([ibucket, klirow.VERLAUF.data[ibucket].min + 273.15]);
+                avgregvals.push([ibucket, klirow.VERLAUF.data[ibucket].avg + 273.15]);
+                maxregvals.push([ibucket, klirow.VERLAUF.data[ibucket].max + 273.15]);
 
-                    if (miny === null) {
-                        miny = yeardata.minval;
-                    } else if (miny < yeardata.minval) {
-                        miny = yeardata.minval;
-                    }
-                    if (maxy === null) {
-                        maxy = yeardata.maxval;
-                    } else if (maxy < yeardata.maxval) {
-                        maxy = yeardata.maxval;
-                    }
+                if (miny === null) {
+                    miny = klirow.VERLAUF.data[ibucket].min;
+                } else if (miny > klirow.VERLAUF.data[ibucket].min) {
+                    miny = klirow.VERLAUF.data[ibucket].min;
+                }
+                if (maxy === null) {
+                    maxy = klirow.VERLAUF.data[ibucket].max;
+                } else if (maxy < klirow.VERLAUF.data[ibucket].max) {
+                    maxy = klirow.VERLAUF.data[ibucket].max;
                 }
             }
+
             /**
              * Regressionsanalyse minvals, avgvals und maxvals als Array
              * https://tom-alexander.github.io/regression-js/
@@ -3335,11 +3572,14 @@
             //Chart.defaults.global.plugins.colorschemes.override = true;
             //Chart.defaults.global.legend.display = true;
             // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
-
+            var xlabels = [];
+            for (var ibuck = 0; ibuck < klirow.VERLAUF.data.length; ibuck++) {
+                xlabels.push(klirow.VERLAUF.data[ibuck].label);
+            }
             var config = {
                 type: 'line',
                 data: {
-                    labels: Object.keys(hoptions.cbucketdata),
+                    labels: xlabels,
                     datasets: [{
                             label: "min",
                             data: minvals,
@@ -3470,7 +3710,7 @@
                     }
                 })
                 .append($("<h2>", {
-                    text: "Auswertung HYDE-Daten " + klirecords[0].titel,
+                    text: "Auswertung HYDE-Daten " + klirow.titel,
                     class: "doprintthis"
 
                 }))

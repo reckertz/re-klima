@@ -1602,8 +1602,8 @@
                     if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
                         selyears = req.query.selyears;
                     }
-                    if (req.query && typeof req.query.selvariablename !== "undefined" && req.query.selvariablename.length > 0) {
-                        selvariablename = req.query.selvariablename;
+                    if (req.query && typeof req.query.variable !== "undefined" && req.query.variable.length > 0) {
+                        selvariablename = req.query.variable;
                     }
                 } else {
                     fullname = reqparm.fullname || "";
@@ -1831,8 +1831,8 @@
                                             });
                                         } else {
                                             ret.error = true;
-                                            ret.message += " KLISTATION:" + station + " hat kein TMIN und TMAX";
-                                            console.log("KLISTATION:" + station + " hat kein TMIN und TMAX");
+                                            ret.message += " KLISTATION:" + station + " hat kein " + selvariablename;
+                                            console.log("KLISTATION:" + station + " hat kein " + selvariablename);
                                             kla1490srv.markstation(actsource, station, "*NODATA", db, async, sys0000sys, function (ret1) {
                                                 stationdata = [];
                                                 callback361("Error");
