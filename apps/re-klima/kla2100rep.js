@@ -942,7 +942,6 @@
      * @param {*} labelmethod - fromto setzt from-to; middle setzt (from + to) / 2
      * @param {*} endmethod - config setzt kla2100repconfig.fromyear und .toyear; data nimmt klirow.fromyear und toyear
      *                 toyear wird gerundet
-     *
      * return - klirow wird direkt fortgeschrieben, return false wenn Probleme aufgetaucht sind
      */
     kla2100rep.getBuckets = function (klirow, bucketname, yearbase, yearstep, labelmethod, endmethod) {
@@ -968,6 +967,7 @@
             count: 0,
             avg: null
         };
+
         // Initialisierung aus den Parametern in klirow[bucketname], die bereits aufbereitet sind
         var anzbuckets = Math.ceil((klirow[bucketname].toyear - klirow[bucketname].fromyear + 1) / klirow[bucketname].yearstep); // aufgerundet
         for (var ibuck = 0; ibuck < anzbuckets; ibuck++) {
@@ -976,10 +976,14 @@
             klirow[bucketname].data[ibuck].toyear = klirow[bucketname].data[ibuck].fromyear + klirow[bucketname].yearstep - 1;
             if (labelmethod === "fromto") {
                 klirow[bucketname].data[ibuck].label = klirow[bucketname].data[ibuck].fromyear + "-" + klirow[bucketname].data[ibuck].toyear;
-            } else {
+            } else if (labelmethod === "middle") {
                 klirow[bucketname].data[ibuck].label = Math.floor((klirow[bucketname].data[ibuck].fromyear + klirow[bucketname].data[ibuck].toyear) / 2);
             }
         }
+        var sumbucket = Object.assign({}, emptybucket);
+        sumbucket.fromyear = klirow[bucketname].fromyear;
+        sumbucket.toyear = klirow[bucketname].toyear;
+        sumbucket.label = sumbucket.fromyear + "-" + sumbucket.toyear;
         /**
          * hier kommt der eigentliche Berechnungsteil
          */
@@ -1016,12 +1020,159 @@
                         aktbuck.count++;
                         aktbuck.sum += value;
                         aktbuck.avg = aktbuck.sum / aktbuck.count;
+
+                        if (sumbucket.min === null) {
+                            sumbucket.min = parseFloat(value);
+                        } else if (value < sumbucket.min) {
+                            sumbucket.min = parseFloat(value);
+                        }
+                        if (sumbucket.max === null) {
+                            sumbucket.max = parseFloat(value);
+                        } else if (value > sumbucket.max) {
+                            sumbucket.max = parseFloat(value);
+                        }
+                        sumbucket.count++;
+                        sumbucket.sum += value;
+                        sumbucket.avg = aktbuck.sum / aktbuck.count;
                     }
                 }
             }
         }
+        klirow[bucketname].sumbucket = Object.assign({}, sumbucket);
         return true;
     };
+
+
+
+    /**
+     * kla2100rep.getHBuckets
+     * @param {*} klirow - aktueller Datensatz
+     * @param {*} bucketname - Name unter dem die buckets abelegt werden in klirow
+     * @param {*} yearbase - Basisjahr, ab dem Buckets berechnet werden
+     * @param {*} yearstep - Anzahl Jahre in einem Bucket
+     * @param {*} labelmethod - fromto setzt from-to; middle setzt (from + to) / 2
+     * @param {*} endmethod - config setzt kla2100repconfig.fromyear und .toyear; data nimmt klirow.fromyear und toyear
+     *                 toyear wird gerundet
+     * @param {*} histmethod -
+     * return - klirow wird direkt fortgeschrieben, return false wenn Probleme aufgetaucht sind
+     */
+    kla2100rep.getHBuckets = function (klirow, bucketname, yearbase, yearstep, labelmethod, endmethod, histmethod) {
+        klirow[bucketname] = {};
+        klirow[bucketname].yearbase = parseInt(yearbase);
+        klirow[bucketname].yearstep = parseInt(yearstep);
+        if (endmethod === "config") {
+            klirow[bucketname].fromyear = parseInt(kla2100repconfig.fromyear);
+            klirow[bucketname].toyear = parseInt(kla2100repconfig.toyear);
+            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+        } else {
+            klirow[bucketname].fromyear = parseInt(klirow.fromyear);
+            klirow[bucketname].toyear = parseInt(klirow.toyear);
+        }
+        klirow[bucketname].data = [];
+        var emptybucket = {
+            label: "",
+            fromyear: null,
+            toyear: null,
+            min: null,
+            max: null,
+            sum: 0,
+            count: 0,
+            avg: null,
+            hdata: {}
+        };
+        // hdata hat x und y, hdata[x] = y als Prinzip
+        // x wird aus value abgeleitet als Ganzzahl, y ist der Zähler zu x
+
+
+        // Initialisierung aus den Parametern in klirow[bucketname], die bereits aufbereitet sind
+        var anzbuckets = Math.ceil((klirow[bucketname].toyear - klirow[bucketname].fromyear + 1) / klirow[bucketname].yearstep); // aufgerundet
+        for (var ibuck = 0; ibuck < anzbuckets; ibuck++) {
+            klirow[bucketname].data[ibuck] = Object.assign({}, emptybucket);
+            klirow[bucketname].data[ibuck].fromyear = klirow[bucketname].fromyear + ibuck * klirow[bucketname].yearstep;
+            klirow[bucketname].data[ibuck].toyear = klirow[bucketname].data[ibuck].fromyear + klirow[bucketname].yearstep - 1;
+            if (labelmethod === "fromto") {
+                klirow[bucketname].data[ibuck].label = klirow[bucketname].data[ibuck].fromyear + "-" + klirow[bucketname].data[ibuck].toyear;
+            } else if (labelmethod === "middle") {
+                klirow[bucketname].data[ibuck].label = Math.floor((klirow[bucketname].data[ibuck].fromyear + klirow[bucketname].data[ibuck].toyear) / 2);
+            }
+            klirow[bucketname].data[ibuck].hdata = Object.assign({}, {});
+        }
+        var sumbucket = Object.assign({}, emptybucket);
+        sumbucket.fromyear = klirow[bucketname].fromyear;
+        sumbucket.toyear = klirow[bucketname].toyear;
+        sumbucket.label = sumbucket.fromyear + "-" + sumbucket.toyear;
+        /**
+         * hier kommt der eigentliche Berechnungsteil
+         */
+        var workbucket = klirow[bucketname];
+        for (var iyear = workbucket.fromyear; iyear <= workbucket.toyear; iyear++) {
+            var syear = "" + iyear;
+            if (typeof klirow.years[syear] !== "undefined") {
+                // Bestimmung bucket, LOOP, weil später "dedizierte" Perioden kommen
+                var aktbuckindex = null;
+                for (ibuck = 0; ibuck < workbucket.data.length; ibuck++) {
+                    if (iyear >= workbucket.data[ibuck].fromyear && iyear <= workbucket.data[ibuck].toyear) {
+                        aktbuckindex = ibuck;
+                        break;
+                    }
+                }
+                if (aktbuckindex !== null) {
+                    var aktbuck = workbucket.data[aktbuckindex];
+                    for (var iday = 0; iday < klirow.years[syear].length; iday++) {
+                        var valuestring = klirow.years[syear][iday];
+                        if (valuestring === null || valuestring === "-9999" || valuestring === "-999.9") {
+                            continue;
+                        }
+                        /**
+                         * Verlaufsdaten
+                        */
+                        var value = parseFloat(valuestring);
+                        if (aktbuck.min === null) {
+                            aktbuck.min = parseFloat(value);
+                        } else if (value < aktbuck.min) {
+                            aktbuck.min = parseFloat(value);
+                        }
+                        if (aktbuck.max === null) {
+                            aktbuck.max = parseFloat(value);
+                        } else if (value > aktbuck.max) {
+                            aktbuck.max = parseFloat(value);
+                        }
+                        aktbuck.count++;
+                        aktbuck.sum += value;
+                        aktbuck.avg = aktbuck.sum / aktbuck.count;
+
+                        if (sumbucket.min === null) {
+                            sumbucket.min = parseFloat(value);
+                        } else if (value < sumbucket.min) {
+                            sumbucket.min = parseFloat(value);
+                        }
+                        if (sumbucket.max === null) {
+                            sumbucket.max = parseFloat(value);
+                        } else if (value > sumbucket.max) {
+                            sumbucket.max = parseFloat(value);
+                        }
+                        sumbucket.count++;
+                        sumbucket.sum += value;
+                        sumbucket.avg = aktbuck.sum / aktbuck.count;
+                        /**
+                         * Histogrammdaten, in actbuck wird hdata fortgeschrieben: x aus value und y
+                         * hdata[x] = y;
+                        */
+                        var xval = Math.round(value);
+                        if (typeof aktbuck.hdata[xval] === "undefined") {
+                            aktbuck.hdata[xval] = 1;
+                        } else {
+                            aktbuck.hdata[xval] += 1;
+                        }
+                    }
+                }
+            }
+        }
+        debugger;
+        klirow[bucketname].sumbucket = Object.assign({}, sumbucket);
+        return true;
+    };
+
 
 
 
@@ -1333,7 +1484,7 @@
                                 css: {
                                     "text-align": "left",
                                     float: "left",
-                                    width: "49%"
+                                    width: "95%"
                                 }
                             }))
                         );
@@ -1398,7 +1549,6 @@
                         cbuckets: false,
                         hyde: true
                     };
-
                     kla2100rep.kliheatmap2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                         ret.divid = divid;
                         if (kla2100repconfig.heatmaps === true) {
@@ -1488,22 +1638,13 @@
                         return;
                     }
                     /**
-                     * Berechnen aller Werte für die Ausgabeoptimierung
+                     * Berechnen aller Werte für die Histogramm-Ausgabeoptimierung
                      */
+                    kla2100rep.getHBuckets(klirow, "HISTOGRAMM", klirow.fromyear, 30, "fromto", "config");
                     var distrs = {};
                     var maxy = 0;
-                    distrs[selvariablename] = kla2100rep.klidistr2calc(selvariablename, selsource, selstationid, ret);
-                    // Konsolidierung und
-                    /*
-                    if (distrs["WLVL"].sunconfig.options.maxcount > maxy) {
-                        maxy = distrs["WLVL"].sunconfig.options.maxcount;
-                    }
+                    // distrs[selvariablename] = kla2100rep.klidistr2calc(selvariablename, selsource, selstationid, ret);
 
-                    if (maxy % 50 !== 0) {
-                        var yrest = maxy % 50;
-                        var maxy = maxy - yrest + 50;
-                    }
-                    */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     $("#kla2100repwrapper")
                         .append($("<div/>", {
@@ -1532,7 +1673,7 @@
 
                         );
                     ret.distrs = distrs;
-                    kla2100rep.klidistr2("#" + divid + "L", selvariablename, selsource, selstationid, ret, function (ret1) {
+                    kla2100rep.klidistr2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, ret, function (ret1) {
                         ret.divid = divid;
                         ret.distrs = distrs;
                         cb2100g5a(null, ret);
@@ -2825,7 +2966,7 @@
      * starecord hat source, stationid
      * klirow oder [1] mit variable
      */
-    kla2100rep.klidistr2 = function (cid, selvariable, selsource, selstationid, ret1, cb2100p) {
+    kla2100rep.klidistr2 = function (cid, klirow, selvariable, selsource, selstationid, ret1, cb2100p) {
         try {
             var divid = "div" + Math.floor(Math.random() * 100000) + 1;
             var chartidsun = divid + "sun";
@@ -2842,7 +2983,7 @@
                         }
                     })
                     .append($("<span/>", {
-                            text: "Distribution " + selvariable + " " + klirow.titel,
+                            text: "Distribution " + " " + klirow.titel,
                             class: "doprintthis eckh3"
                         })
                         .append($("<br>"))
@@ -2943,44 +3084,13 @@
                             })
                             .append($("<input/>", {
                                 type: "checkbox",
+                                class: "kla2100repspangaps",
                                 /* checked: "checked", */
                                 css: {
                                     margin: "5px"
                                 },
-                                click: function (evt) {
-                                    var state = $(this).prop("checked"); // neuer Status der Checkbox
-                                    var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-                                    var graph = window.charts[canvasid];
-                                    // spanGaps
-                                    if (state === true) {
-                                        try {
-                                            /*
-                                            for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                                graph.data.datasets[igdata].spanGaps = true;
-                                            }
-                                            */
-                                            graph.options.spanGaps = true;
-                                            graph.update();
-                                        } catch (err) {
-                                            console.log(err)
-                                        }
-                                    } else {
-                                        try {
-                                            /*
-                                            for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
-                                                graph.data.datasets[igdata].spanGaps = false;
-                                            }
-                                            */
-                                            graph.options.spanGaps = false;
-                                            graph.update();
-                                        } catch (err) {
-                                            console.log(err)
-                                        }
-                                    }
-                                }
                             }))
                         )
-                        // hidden: true,
 
                         .append($("<span/>", {
                                 text: "hide all",
@@ -3029,8 +3139,84 @@
 
             var ctx1 = document.getElementById(chartidsun).getContext('2d');
             // myCharts[selvariable + "D1"] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
+
+
+            var sunconfig = {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [],
+                    backgroundColor: "yellow"
+                },
+                options: {
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.Paired12'
+                        }
+                    },
+                    mytype: klirow.variable,
+                    maxcount: 0,
+                    layout: {
+                        padding: {
+                            left: 10,
+                            right: 50,
+                            top: 10,
+                            bottom: 10
+                        }
+                    },
+                    scales: {
+                        xAxes: [{
+                            ticks: {},
+                        }],
+                            yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            };
+            debugger;
+            // Die Daten stehen in klirow.HISTOGRAMM
+            var fromx = Math.round(klirow.HISTOGRAMM.sumbucket.min);
+            var tox = Math.round(klirow.HISTOGRAMM.sumbucket.max);
+            var anzx = tox - fromx + 1;
+
+            // Array anlegen und füllen
+            var xarray = new Array(anzx).fill(0);
+            var yarray = new Array(anzx).fill(0);
+            var larray = new Array(anzx).fill("");
+
+            for (var ix = 0; ix < anzx; ix++) {
+                var lx = ix + fromx;
+                if (lx % 5 === 0) {
+                    larray [ix] = lx;
+                }
+                xarray[ix] = lx;
+            }
+            debugger;
+            var hbuckets = klirow.HISTOGRAMM.data;
+            for (var ibucket = 0; ibucket < hbuckets.length; ibucket++) {
+                hbuckets[ibucket].harray = new Array(anzx).fill(0);
+                for (var ix = 0; ix < anzx; ix++) {
+                    var lx = ix + fromx;
+                    if (typeof hbuckets[ibucket].hdata[lx] !== "undefined") {
+                        hbuckets[ibucket].harray[ix] = hbuckets[ibucket].hdata[lx];
+                    }
+                }
+                sunconfig.data.datasets[ibucket] = Object.assign({}, {
+                    label: hbuckets[ibucket].label,
+                    data: hbuckets[ibucket].harray,
+                    pointStyle: 'line',
+                    fill: false,
+                    borderWidth: 2
+                });
+            }
+            sunconfig.data.labels = larray;
+            debugger;
+
             window.charts = window.charts || {};
-            window.charts[chartidsun] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
+            window.charts[chartidsun] = new Chart(ctx1, sunconfig);
             cb2100p({
                 error: false,
                 message: "Distribution-Chart ausgegeben"
@@ -3075,11 +3261,11 @@
         state = $(this).prop("checked");
         console.log("New Status:" + state);
         //var graph = $("#" + ciddiv + "chart").data('graph');
-        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-        if (canvasid === null) {
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
             canvasid = $(this).parent().parent().find("canvas").attr("id");
-            if (canvasid === null) {
-                canvasid = $(this).parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
             }
         }
         var graph = window.charts[canvasid];
@@ -3106,11 +3292,11 @@
     $(document).on("change", ".kla2100replogy", function (evt) {
         // click: function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
-        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-        if (canvasid === null) {
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
             canvasid = $(this).parent().parent().find("canvas").attr("id");
-            if (canvasid === null) {
-                canvasid = $(this).parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
             }
         }
         var graph = window.charts[canvasid];
@@ -3133,11 +3319,11 @@
 
     $(document).on("change", ".kla2100repnox0", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
-        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-        if (canvasid === null) {
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
             canvasid = $(this).parent().parent().find("canvas").attr("id");
-            if (canvasid === null) {
-                canvasid = $(this).parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
             }
         }
         var graph = window.charts[canvasid];
@@ -3175,11 +3361,11 @@
 
     $(document).on("change", ".kla2100rephideall", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
-        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-        if (canvasid === null) {
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
             canvasid = $(this).parent().parent().find("canvas").attr("id");
-            if (canvasid === null) {
-                canvasid = $(this).parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
             }
         }
         var graph = window.charts[canvasid];
@@ -3212,11 +3398,11 @@
 
     $(document).on("change", ".kla2100repx0null", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
-        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-        if (canvasid === null) {
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
             canvasid = $(this).parent().parent().find("canvas").attr("id");
-            if (canvasid === null) {
-                canvasid = $(this).parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
             }
         }
         var graph = window.charts[canvasid];
@@ -3256,11 +3442,11 @@
 
     $(document).on("change", ".kla2100repx10", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
-        var canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
-        if (canvasid === null) {
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
             canvasid = $(this).parent().parent().find("canvas").attr("id");
-            if (canvasid === null) {
-                canvasid = $(this).parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
             }
         }
         var graph = window.charts[canvasid];
@@ -3299,6 +3485,36 @@
             }
         }
     });
+
+
+    $(document).on("change", ".kla2100repspangaps", function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        // spanGaps
+        if (state === true) {
+            try {
+                graph.options.spanGaps = true;
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            try {
+                graph.options.spanGaps = false;
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    });
+
 
 
 
@@ -3419,6 +3635,12 @@
                                 .append($("<th/>", {
                                     html: "max"
                                 }))
+                                .append($("<th/>", {
+                                    html: "kum"
+                                }))
+                                .append($("<th/>", {
+                                    html: "count"
+                                }))
                             )
                         )
                         .append($("<tbody/>"))
@@ -3453,6 +3675,12 @@
                         .append($("<td/>", {
                             html: klirow.VERLAUF.data[ibucket].max.toFixed(1)
                         }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.data[ibucket].sum.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.data[ibucket].count.toFixed(0)
+                        }))
                     );
                 minvals.push(klirow.VERLAUF.data[ibucket].min.toFixed(1));
                 avgvals.push(klirow.VERLAUF.data[ibucket].avg.toFixed(1));
@@ -3473,6 +3701,29 @@
                     maxy = klirow.VERLAUF.data[ibucket].max;
                 }
             }
+
+            $("#" + tableid)
+                    .find("tbody")
+                    .append($("<tr/>")
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.sumbucket.label
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.sumbucket.min.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.sumbucket.avg.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.sumbucket.max.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.sumbucket.sum.toFixed(1)
+                        }))
+                        .append($("<td/>", {
+                            html: klirow.VERLAUF.sumbucket.count.toFixed(0)
+                        }))
+                    );
 
             /**
              * Regressionsanalyse minvals, avgvals und maxvals als Array
