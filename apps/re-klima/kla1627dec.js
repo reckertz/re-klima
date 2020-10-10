@@ -740,7 +740,7 @@
 
             callbackshm9({
                 error: false,
-                message: "keine Daten gechrieben"
+                message: "keine Daten geschrieben"
             });
             return;
         } catch (err) {

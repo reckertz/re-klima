@@ -1589,12 +1589,12 @@
             for (var ikey = 0; ikey < keys.length; ikey++) {
                 var feldname = keys[ikey];
                 var feldtype = typeof obj[feldname];
-                if (feldname === "number") {
+                if (feldtype === "number") {
                     format[feldname] = {
                         title: feldname,
                         align: "right"
                     };
-                } else if (feldname === "boolean") {
+                } else if (feldtype === "boolean") {
                     format[feldname] = {
                         title: feldname,
                         align: "center"
@@ -1635,12 +1635,12 @@
             for (var ikey = 0; ikey < keys.length; ikey++) {
                 var feldname = keys[ikey];
                 var feldtype = typeof obj[feldname];
-                if (feldname === "number") {
+                if (feldtype === "number") {
                     format[feldname] = {
                         title: feldname,
                         align: "right"
                     };
-                } else if (feldname === "boolean") {
+                } else if (feldtype === "boolean") {
                     format[feldname] = {
                         title: feldname,
                         align: "center"
@@ -1653,7 +1653,6 @@
                 }
             }
         }
-
 
 
         var header = "";
@@ -1693,9 +1692,8 @@
                     } else {
                         var typ = typeof obj[property];
                         var wrt = obj[property];
-                        if (typeof wrt === "undefined" ||
-                            wrt === null || wrt === "") {
-                            contentstring = "&nbsp;";
+                        if (typeof wrt === "undefined" || wrt === null || wrt === "") {
+                            cont = "&nbsp;";
                         } else if (format && typeof format[property] !== "undefined") {
                             cont = wrt;
                             if (format[property].pattern && format[property].pattern === "currency") {
@@ -1733,6 +1731,11 @@
                                     cont = wrt;
                                 }
                             }
+                            if (typ === "string" && !isNaN(wrt) && typeof format[property].toFixed !== "undefined") {
+                                cont = parseFloat(wrt).toFixed(format[property].toFixed);
+                            } else if (typ === "number" && !isNaN(wrt) && typeof format[property].toFixed !== "undefined") {
+                                cont = parseFloat(wrt).toFixed(format[property].toFixed);
+                            }
                         }
                         if (format && typeof format[property] !== "undefined" &&
                             format[property].linkclass && format[property].linkclass.length > 0) {
@@ -1767,7 +1770,6 @@
             if (typeof rowid === "string" && rowid !== null && rowid.length > 0) {
                 rowattr += " rowid='" + rowid + "'";
             } else if (typeof rowid === "object" && Object.keys(rowid).length > 0) {
-
                 for (var property in rowid) {
                     if (rowid.hasOwnProperty(property)) {
                         // do stuff
@@ -1776,8 +1778,6 @@
                     }
                 }
             }
-
-
 
             if (typeof rowclass !== "undefined" && rowclass.length > 0) {
                 rowattr += " class='" + rowclass + "'";

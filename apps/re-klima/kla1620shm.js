@@ -2368,14 +2368,14 @@
                 sysbase.putMessage("Daten geschrieben");
                 callbackshm9({
                     error: false,
-                    message: "Daten gechrieben"
+                    message: "Daten geschrieben"
                 });
                 return;
             });
         } else {
             callbackshm9({
                 error: false,
-                message: "keine Daten gechrieben"
+                message: "keine Daten geschrieben"
             });
             return;
         }

@@ -633,6 +633,7 @@ iframe {
 .draggable {
     background-color: mistyrose;
 }
+
 /*
 .doprintthis table {
     border-collapse: collapse  !important;
@@ -651,69 +652,83 @@ td {
 *   2015 mit Modifikationen
 */
 
-  table.kliresponsive {
+table.kliresponsive {
     border: 1px solid #ccc;
     width: 100%;
-    margin:0;
-    padding:0;
+    margin: 0;
+    padding: 0;
     border-collapse: collapse;
     border-spacing: 0;
-  }
+}
 
-  table.kliresponsive tr {
+table.kliresponsive tr {
     border: 1px solid #ddd;
     padding: 5px;
-  }
+}
 
-  table.kliresponsive th, table.kliresponsive td {
+table.kliresponsive th,
+table.kliresponsive td {
     padding: 10px;
     text-align: center;
-  }
+}
 
-  table.kliresponsive th {
+table.kliresponsive th {
     text-transform: uppercase;
     font-size: 14px;
     letter-spacing: 1px;
-  }
+}
 
-  @media screen and (max-width: 600px) {
+@media screen and (max-width: 600px) {
 
     table.kliresponsive {
-      border: 0;
+        border: 0;
     }
 
     table.kliresponsive thead {
-      display: none;
+        display: none;
     }
 
     table.kliresponsive tr {
-      margin-bottom: 10px;
-      display: block;
-      border-bottom: 2px solid #ddd;
+        margin-bottom: 10px;
+        display: block;
+        border-bottom: 2px solid #ddd;
     }
 
     table.kliresponsive td {
-      display: block;
-      text-align: left;
-      font-size: 13px;
-      border-bottom: 1px dotted #ccc;
+        display: block;
+        text-align: left;
+        font-size: 13px;
+        border-bottom: 1px dotted #ccc;
     }
 
     table.kliresponsive td:last-child {
-      border-bottom: 0;
+        border-bottom: 0;
     }
 
     table.kliresponsive td:before {
-      content: attr(data-label);
-      float: left;
-      text-transform: uppercase;
-      font-weight: bold;
+        content: attr(data-label);
+        float: left;
+        text-transform: uppercase;
+        font-weight: bold;
     }
-  }
+}
 
 .eckh3 {
     display: block;
     font-size: 1.17em;
     font-weight: bold;
     margin: 5px;
+}
+
+@media all {
+    .page-break {
+        display: none;
+    }
+}
+
+@media print {
+    .page-break {
+        display: block;
+        page-break-before: always;
+    }
 }

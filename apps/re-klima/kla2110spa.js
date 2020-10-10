@@ -1,12 +1,12 @@
 /*global $,this,screen,document,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
 (function () {
     'use strict';
-    var kla1628reg = {};
+    var kla2110spa = {};
     var root = typeof self === 'object' && self.self === self && self ||
         typeof global === 'object' && global.global === global && global ||
         this;
     /**
-     * kla1628reg  bekommt über getCache onestation, darin wird
+     * kla2110spa  bekommt über getCache onestation, darin wird
      * pivotdata oder yearlats(?)
      * Regressionsanalyse über Sommer und Winter oder Jahr
      * mit Sparkline und
@@ -30,7 +30,7 @@
     var selfromyear = null;
     var seltoyear = null;
     var starecord = null; // Selektionsparameter
-    var kla1628regconfig = {};
+    var kla2110spaconfig = {};
     var savedwidth = null;
     var heatmapparms = {};
     var stationrecord;
@@ -41,7 +41,7 @@
     var klirecords = [];
 
     var klihyde = {};
-    var kla1628regclock;
+    var kla2110spaclock;
 
     var hmatrixR;
     var hmatrixL;
@@ -57,7 +57,7 @@
     poprecord.sunwinter = true;
     poprecord.export = false;
 
-    kla1628reg.show = function (parameters, navigatebucket) {
+    kla2110spa.show = function (parameters, navigatebucket) {
 
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
         if (typeof parameters !== "undefined" && parameters.length > 0) {
@@ -124,17 +124,17 @@
 
         $(".content").empty();
         $(".headertitle").html("Regressionsanalyse für Station:" + selstationid + " Quelle:" + selsource);
-        $(".headertitle").attr("title", "kla1628reg");
-        $(".content").attr("pageid", "kla1628reg");
-        $(".content").attr("id", "kla1628reg");
+        $(".headertitle").attr("title", "kla2110spa");
+        $(".content").attr("pageid", "kla2110spa");
+        $(".content").attr("id", "kla2110spa");
         $(".content")
             .css({
                 overflow: "hidden"
             });
-        $("#kla1628reg")
+        $("#kla2110spa")
             .append($("<input/>", {
                 type: "hidden",
-                id: "kla1628reg_isdirty",
+                id: "kla2110spa_isdirty",
                 value: "false"
             }));
         $(".headerright").remove();
@@ -183,10 +183,10 @@
                 )
             );
         sysbase.initFooter();
-        $("#kla1628reg.content").empty();
-        $("#kla1628reg.content")
+        $("#kla2110spa.content").empty();
+        $("#kla2110spa.content")
             .append($("<div/>", {
-                    id: "kla1628regbuttons",
+                    id: "kla2110spabuttons",
                     css: {
                         width: "100%",
                         float: "left"
@@ -196,7 +196,7 @@
 
                 .append($("<button/>", {
                     html: "Super-Sparklines",
-                    id: "kla1628regsup",
+                    id: "kla2110spasup",
                     css: {
                         float: "left",
                         margin: "10px"
@@ -260,13 +260,13 @@
                                 }
                             }
                         };
-                        var anchorHash = "#kla1628regwrapper";
+                        var anchorHash = "#kla2110spawrapper";
                         var title = "Super-Sparklines";
                         var pos = {
-                            left: $("#kla1628regwrapper").offset().left,
+                            left: $("#kla2110spawrapper").offset().left,
                             top: window.screen.height * 0.1,
-                            width: $("#kla1628regwrapper").width() * 0.60,
-                            height: $("#kla1628regwrapper").height() * 0.90
+                            width: $("#kla2110spawrapper").width() * 0.60,
+                            height: $("#kla2110spawrapper").height() * 0.90
                         };
                         $(document).on('popupok', function (evt, extraParam) {
                             evt.preventDefault();
@@ -274,8 +274,8 @@
                             evt.stopImmediatePropagation();
                             console.log(extraParam);
                             var superParam = JSON.parse(extraParam).props;
-                            //kla1628reg.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
-                            kla1628reg.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
+                            //kla2110spa.loadrecs(selvariablename, selsource, selstationid, superParam, function (ret) {
+                            kla2110spa.paintX(selvariablename, selsource, selstationid, superParam, function (ret) {
                                 return;
                             });
                             //});
@@ -298,7 +298,7 @@
                         margin: "10px"
                     },
                     click: function (evt) {
-                        // sysbase.printDivAll($("#kla1628regwrapper").html());
+                        // sysbase.printDivAll($("#kla2110spawrapper").html());
                         // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
                         $('canvas').each(function (e) {
                             var image = new Image();
@@ -457,7 +457,7 @@
                 }))
 
                 .append($("<div/>", {
-                    id: "kla1628regclock",
+                    id: "kla2110spaclock",
                     float: "left",
                     css: {
                         float: "left",
@@ -467,23 +467,23 @@
 
             );
         /**
-         * Beginn des initialen Aufbaus kla1628regwrapper
+         * Beginn des initialen Aufbaus kla2110spawrapper
          */
-        $("#kla1628reg.content")
+        $("#kla2110spa.content")
             .append($("<div/>", {
-                    id: "kla1628regdiv",
-                    class: "kla1628regdiv"
+                    id: "kla2110spadiv",
+                    class: "kla2110spadiv"
                 })
                 .append($("<div/>", {
-                    id: "kla1628regwrapper",
-                    class: "kla1628regwrapper"
+                    id: "kla2110spawrapper",
+                    class: "kla2110spawrapper"
                 }))
             );
-        var h = $("#kla1628reg").height();
-        h -= $("#kla1628reg.header").height();
-        h -= $("#kla1628regbuttons").height();
-        h -= $("#kla1628reg.footer").height();
-        $("#kla1628regdiv")
+        var h = $("#kla2110spa").height();
+        h -= $("#kla2110spa.header").height();
+        h -= $("#kla2110spabuttons").height();
+        h -= $("#kla2110spa.footer").height();
+        $("#kla2110spadiv")
             .css({
                 "margin": "10px",
                 "background-color": "lime",
@@ -492,7 +492,7 @@
                 overflow: "auto",
                 float: "left"
             });
-        $("#kla1628regwrapper")
+        $("#kla2110spawrapper")
             .css({
                 "background-color": "lime",
                 height: h,
@@ -500,13 +500,13 @@
                 overflow: "auto",
                 float: "left"
             });
-        console.log("kla1628regwrapper initialisiert, leer");
+        console.log("kla2110spawrapper initialisiert, leer");
         $(window).on('resize', function () {
-            var h = $("#kla1628reg").height();
-            h -= $("#kla1628reg.header").height();
-            h -= $("#kla1628regbuttons").height();
-            h -= $("#kla1628reg.footer").height();
-            $("#kla1628regdiv").css({
+            var h = $("#kla2110spa").height();
+            h -= $("#kla2110spa.header").height();
+            h -= $("#kla2110spabuttons").height();
+            h -= $("#kla2110spa.footer").height();
+            $("#kla2110spadiv").css({
                 height: h
             });
         });
@@ -527,15 +527,15 @@
         wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
         $(".headertitle").html(wmtit);
 
-        $("#kla1628regsup").click();
+        $("#kla2110spasup").click();
 
     }; // Ende show
 
     /**
-     * kla1628reg.showall - Aufruf aller Funktionen für die Standardauswertung
+     * kla2110spa.showall - Aufruf aller Funktionen für die Standardauswertung
      * @param {*} ret
      */
-    kla1628reg.showall = function (ret) {
+    kla2110spa.showall = function (ret) {
         return;
     };
 
@@ -547,7 +547,7 @@
      * superParam.sunwinter - das ist schon ein Brocken
      */
     var outrecords = [];
-    kla1628reg.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
+    kla2110spa.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
         try {
             outrecords = [];
             debugger;
@@ -556,20 +556,20 @@
                 return;
             }
             /**
-             * Container kla1628regwrapper aufbereiten
+             * Container kla2110spawrapper aufbereiten
              * in diesen Container gehen sukzessive die Auswertungen
              */
-            $("#kla1628regwrapper").empty();
+            $("#kla2110spawrapper").empty();
             var h = screen.height;
             h -= $(".header").height();
-            h -= $("#kla1628regbuttons").height();
+            h -= $("#kla2110spabuttons").height();
             h -= $(".footer").height();
 
-            var w = $("#kla1628reg.content").width();
+            var w = $("#kla2110spa.content").width();
             w -= 0; // $("#heatmap").position().left;
             w -= 0; // $("#heatmap").width();
             w -= 0; // 40;
-            $("#kla1628regwrapper").css({
+            $("#kla2110spawrapper").css({
                 overflow: "auto",
                 height: h,
                 width: w
@@ -578,7 +578,7 @@
             /**
              * Abschnitt Stammdaten zur Station
              */
-            $("#kla1628regwrapper")
+            $("#kla2110spawrapper")
                 .append($("<div/>", {
                         css: {
                             width: "100%",
@@ -586,7 +586,7 @@
                         }
                     })
                     .append($("<h2/>", {
-                        id: "kla1628regh2",
+                        id: "kla2110spah2",
                         text: stationdata.stationid + " " + stationdata.stationname
                     }))
                 );
@@ -595,7 +595,7 @@
              * Abschnitt sparklines
              * Header zu sparkline-Tabelle
              * */
-            $("#kla1628regwrapper")
+            $("#kla2110spawrapper")
                 .append($("<div/>", {
                         css: {
                             width: "100%",
@@ -606,7 +606,7 @@
                             class: "tablesorter",
                             border: "2",
                             rules: "all",
-                            id: "kla1628regt1",
+                            id: "kla2110spat1",
                             css: {
                                 "max-width": w + "px"
                             }
@@ -752,7 +752,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1628reg.paintXtr("#kla1628regt1", "tot", iyear, pcount, rowdata, superParam);
+                    kla2110spa.paintXtr("#kla2110spat1", "tot", iyear, pcount, rowdata, superParam);
                 }
 
 
@@ -799,7 +799,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1628reg.paintXtr("#kla1628regt1", "som", iyear, pcount, rowdata, superParam);
+                    kla2110spa.paintXtr("#kla2110spat1", "som", iyear, pcount, rowdata, superParam);
 
 
                     /**
@@ -842,7 +842,7 @@
                         }
                         rowdata.push(rowrecord);
                     }
-                    kla1628reg.paintXtr("#kla1628regt1", "win", iyear, pcount, rowdata, superParam);
+                    kla2110spa.paintXtr("#kla2110spat1", "win", iyear, pcount, rowdata, superParam);
                 }
             }
             /**
@@ -909,18 +909,16 @@
             });
             return;
         }
-
-
     }; // ende paintX
 
     /**
-     * kla1628reg.paintXtr - Ausgabe der Zeilen zu rowdata[0] und rowdata[1]
+     * kla2110spa.paintXtr - Ausgabe der Zeilen zu rowdata[0] und rowdata[1]
      * max drei Zeilen für total, summer-up, winter-dwn
      * @param {*} trcontainer
      * @param {*} rowdata
      * @param {*} superParam
      */
-    kla1628reg.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
+    kla2110spa.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
         /**
          * Vorlauf: regressionsrechnung
          */
@@ -983,7 +981,7 @@
             /**
              * neue eine Variable = eine einfache Zeile
              */
-            $("#kla1628regt1")
+            $("#kla2110spat1")
                 .append($("<tr/>")
                     .append($("<td/>", {
                         html: rowtit
@@ -1195,7 +1193,7 @@
     /**
      * Einblendung Stopuhr wärend langer AJAX-Aufrufe
      */
-    kla1628reg.showclock = function (clockcontainer) {
+    kla2110spa.showclock = function (clockcontainer) {
         // Update the count down every 1 second
         if (typeof clockcontainer === "string") {
             if (!clockcontainer.startsWith("#")) clockcontainer = "#" + clockcontainer;
@@ -1236,14 +1234,14 @@
      */
     if (typeof module === 'object' && module.exports) {
         // Node.js
-        module.exports = kla1628reg;
+        module.exports = kla2110spa;
     } else if (typeof define === 'function' && define.amd) {
         // AMD / RequireJS
         define([], function () {
-            return kla1628reg;
+            return kla2110spa;
         });
     } else {
         // included directly via <script> tag
-        root.kla1628reg = kla1628reg;
+        root.kla2110spa = kla2110spa;
     }
 }());
