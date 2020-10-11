@@ -952,6 +952,10 @@
             klirow[bucketname].fromyear = parseInt(kla2100repconfig.fromyear);
             klirow[bucketname].toyear = parseInt(kla2100repconfig.toyear);
             klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+        } else if (endmethod === "ipcc") {
+            klirow[bucketname].fromyear = 1841;
+            klirow[bucketname].toyear = 2020;
+            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
         } else {
             klirow[bucketname].fromyear = parseInt(klirow.fromyear);
             klirow[bucketname].toyear = parseInt(klirow.toyear);
@@ -988,6 +992,10 @@
          * hier kommt der eigentliche Berechnungsteil
          */
         var workbucket = klirow[bucketname];
+        var firstyear = 0; // Jahr mit Daten
+        var firstbucket = 0;
+        var lastyear = 0; // Jahr mit Daten
+        var lastbucket = 0;
         for (var iyear = workbucket.fromyear; iyear <= workbucket.toyear; iyear++) {
             var syear = "" + iyear;
             if (typeof klirow.years[syear] !== "undefined") {
@@ -1003,8 +1011,16 @@
                     var aktbuck = workbucket.data[aktbuckindex];
                     for (var iday = 0; iday < klirow.years[syear].length; iday++) {
                         var valuestring = klirow.years[syear][iday];
-                        if (valuestring === null || valuestring === "-9999" || valuestring === "-999.9") {
+                        if (valuestring === null || valuestring === "" || valuestring === "-9999" || valuestring === "-999.9") {
                             continue;
+                        }
+                        if (firstyear === 0) {
+                            firstyear = iyear;
+                            firstbucket = aktbuckindex;
+                        }
+                        if (iyear > lastyear) {
+                            lastyear = iyear;
+                            lastbucket = aktbuckindex;
                         }
                         var value = parseFloat(valuestring);
                         if (aktbuck.min === null) {
@@ -1036,6 +1052,17 @@
                         sumbucket.avg = aktbuck.sum / aktbuck.count;
                     }
                 }
+            }
+        }
+        // Korrektur label
+        if (firstyear > 0) {
+            if (klirow[bucketname].data[firstbucket].label.indexOf("" + firstyear) < 0) {
+                klirow[bucketname].data[firstbucket].label += " (" + firstyear + ")";
+            }
+        }
+        if (lastyear > 0) {
+            if (klirow[bucketname].data[lastbucket].label.indexOf("" + lastyear) < 0) {
+                klirow[bucketname].data[lastbucket].label += " (" + lastyear + ")";
             }
         }
         klirow[bucketname].sumbucket = Object.assign({}, sumbucket);
@@ -3087,6 +3114,39 @@
         }
     });
 
+
+    $(document).on("change", ".kla2100repybase0", function (evt) {
+        // click: function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        // graph.config.data.datasets[igdata].hidden = true;
+        // graph.data.datasets[igdata].hidden = true;
+
+        if (state === true) {
+            try {
+                graph.options.scales.yAxes[0].ticks.beginAtZero = true;
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            try {
+                graph.options.scales.yAxes[0].ticks.beginAtZero = false;
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    });
+
+
     $(document).on("change", ".kla2100repnox0", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
@@ -3143,8 +3203,9 @@
             try {
                 var olddatasets = graph.data.datasets;
                 for (var igdata = 0; igdata < olddatasets.length; igdata++) {
-                    graph.config.data.datasets[igdata].hidden = true;
-                    graph.data.datasets[igdata].hidden = true;
+                    //graph.config.data.datasets[igdata].hidden = true;
+                    //graph.data.datasets[igdata].hidden = true;
+                    graph.getDatasetMeta(igdata).hidden=true;
                 }
                 graph.update();
             } catch (err) {
@@ -3154,8 +3215,10 @@
             try {
                 var olddatasets = graph.data.datasets;
                 for (var igdata = 0; igdata < olddatasets.length; igdata++) {
-                    graph.config.data.datasets[igdata].hidden = false;
-                    graph.data.datasets[igdata].hidden = false;
+                    //graph.config.data.datasets[igdata].hidden = false;
+                    //graph.data.datasets[igdata].hidden = false;
+                    var grameta = graph.getDatasetMeta(igdata);
+                    graph.getDatasetMeta(igdata).hidden = false;
                 }
                 graph.update();
             } catch (err) {
@@ -3425,6 +3488,13 @@
                     dft: false,
                     init: false
                 },
+                ybase0: {
+                    label: "Y=0 Line",
+                    title: "Wertereihe bei Y=0 ausgeben",
+                    class: "kla2100repybase0",
+                    dft: false,
+                    init: false
+                },
                 nox0: {
                     label: "no x=0",
                     title: "erste Spalte sichern und löschen",
@@ -3507,9 +3577,9 @@
             var checkkeys = Object.keys(defaultActionConfig);
             for (var check of checkkeys) {
                 var newcheck = Object.assign({}, defaultActionConfig[check]);
-                if (typeof chartconfig[check] !== "undefined") {
+                if (typeof actionconfig[check] !== "undefined") {
                     newcheck.dft = true;
-                    newcheck.init = chartconfig[check];
+                    newcheck.init = actionconfig[check];
                 }
                 if (newcheck.dft === true) {
                     $("#" + chartdivid)
@@ -3574,13 +3644,12 @@
             var htmltable = "";
             var line = "";
             for (var irow = 0; irow < klirow[key].data.length; irow++) {
-                line = uihelper.transformJSON2TableTR (klirow[key].data[irow], irow, tableconfig, "" + irow, "");
+                line = uihelper.transformJSON2TableTR(klirow[key].data[irow], irow, tableconfig, "" + irow, "");
                 htmltable += line;
             }
 
             //klirow.VERLAUF.sumbucket
-            debugger;
-            line = uihelper.transformJSON2TableTR (klirow[key].sumbucket, irow, tableconfig, "" + irow, "");
+            line = uihelper.transformJSON2TableTR(klirow[key].sumbucket, irow, tableconfig, "" + irow, "");
             htmltable += line;
 
             htmltable += "</body>";
@@ -3607,15 +3676,15 @@
                         }
                     }))
                 );
-                $(".tablesorter").tablesorter({
-                    theme: "blue",
-                    widgets: ['filter'],
-                    widthFixed: true,
-                    widgetOptions: {
-                        filter_hideFilters: false,
-                        filter_ignoreCase: true
-                    }
-                });
+            $(".tablesorter").tablesorter({
+                theme: "blue",
+                widgets: ['filter'],
+                widthFixed: true,
+                widgetOptions: {
+                    filter_hideFilters: false,
+                    filter_ignoreCase: true
+                }
+            });
 
         } catch (err) {
             console.log(err.stack);
@@ -3641,56 +3710,57 @@
             var ciddiv = cid.substr(1) + "div";
             var tableid = cid.substr(1) + "tbl";
             var chartid = ciddiv + "chart";
-
-            kla2100rep.getBuckets(klirow, "VERLAUF", klirow.fromyear, 30, "fromto", "config");
+            // config, ipcc
+            kla2100rep.getBuckets(klirow, "VERLAUF", klirow.fromyear, 30, "fromto", "ipcc");
             var mychartconfig = {};
             var mytableconfig = {
-                    label: {
-                        title: "Jahre",
-                        name: "label",
-                        width: "15%",
-                        align: "center"
-                    },
-                    min: {
-                        title: "Minimum",
-                        name: "min",
-                        width: "20%",
-                        align: "center",
-                        toFixed: 1
-                    },
-                    avg: {
-                        title: "Durchschnitt",
-                        name: "avg",
-                        width: "20%",
-                        align: "center",
-                        toFixed: 1
-                    },
-                    max: {
-                        title: "Maximum",
-                        name: "max",
-                        width: "20%",
-                        align: "center",
-                        toFixed: 1
-                    },
-                    count: {
-                        title: "Anzahl",
-                        name: "count",
-                        width: "12%",
-                        align: "right",
-                        toFixed: 0
-                    },
-                    sum: {
-                        title: "Summe",
-                        width: "12%",
-                        align: "right",
-                        toFixed: 1
-                    }
+                label: {
+                    title: "Jahre",
+                    name: "label",
+                    width: "15%",
+                    align: "center"
+                },
+                min: {
+                    title: "Minimum",
+                    name: "min",
+                    width: "20%",
+                    align: "center",
+                    toFixed: 1
+                },
+                avg: {
+                    title: "Durchschnitt",
+                    name: "avg",
+                    width: "20%",
+                    align: "center",
+                    toFixed: 1
+                },
+                max: {
+                    title: "Maximum",
+                    name: "max",
+                    width: "20%",
+                    align: "center",
+                    toFixed: 1
+                },
+                count: {
+                    title: "Anzahl",
+                    name: "count",
+                    width: "12%",
+                    align: "right",
+                    toFixed: 0
+                },
+                sum: {
+                    title: "Summe",
+                    width: "12%",
+                    align: "right",
+                    toFixed: 1
+                }
             };
             var myactionconfig = {
                 reverse: false,
                 /*  kla2100repreverse - reverseY - umkehren der y-Werte */
                 logy: false,
                 /*  kla2100replogy - logY - Toggle normale Werte und Log10-Werte, für einige Verteilungen sehr relevant */
+                ybase0: false,
                 nox0: false,
                 /*  kla2100repnox0 - no x=0 - erste x-Spalte wird gesichert und gelöscht */
                 x0null: false,
