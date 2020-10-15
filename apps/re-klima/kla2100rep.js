@@ -3109,7 +3109,7 @@
                 graph.options.scales.yAxes[0].type = "linear";
                 graph.update();
             } catch (err) {
-                console.log(err)
+                console.log(err);
             }
         }
     });
@@ -3139,6 +3139,47 @@
         } else {
             try {
                 graph.options.scales.yAxes[0].ticks.beginAtZero = false;
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        }
+    });
+
+
+
+    $(document).on("change", ".kla2100repykelvin", function (evt) {
+        // click: function (evt) {
+        var state = $(this).prop("checked"); // neuer Status der Checkbox
+        var canvasid = $(this).parent().find("canvas").attr("id");
+        if (typeof canvasid === "undefined" || canvasid === null) {
+            canvasid = $(this).parent().parent().find("canvas").attr("id");
+            if (typeof canvasid === "undefined" || canvasid === null) {
+                canvasid = $(this).parent().parent().parent().find("canvas").attr("id");
+            }
+        }
+        var graph = window.charts[canvasid];
+        window.chartscache = window.chartscache || {};
+        window.chartscache[canvasid] = window.chartscache[canvasid] || {};
+        debugger;
+        if (state === true) {
+            try {
+                window.chartscache[canvasid].original = uihelper.cloneObject(graph.data.datasets);
+                for (var igdata = 0; igdata < graph.data.datasets.length; igdata++) {
+                    for (var iydata = 0; iydata < graph.data.datasets[igdata].data.length; iydata++) {
+                        var value = graph.data.datasets[igdata].data[iydata];
+                        if (value !== null && !isNaN(value)) {
+                            graph.data.datasets[igdata].data[iydata] = value + 273.15;
+                        }
+                    }
+                }
+                graph.update();
+            } catch (err) {
+                console.log(err);
+            }
+        } else {
+            try {
+                graph.data.datasets = window.chartscache[canvasid].original;
                 graph.update();
             } catch (err) {
                 console.log(err);
@@ -3495,6 +3536,13 @@
                     dft: false,
                     init: false
                 },
+                ykelvin: {
+                    label: "Y Kelvin",
+                    title: "Wertereihe in Kelvin umrechnen",
+                    class: "kla2100repykelvin",
+                    dft: false,
+                    init: false
+                },
                 nox0: {
                     label: "no x=0",
                     title: "erste Spalte sichern und löschen",
@@ -3761,6 +3809,7 @@
                 logy: false,
                 /*  kla2100replogy - logY - Toggle normale Werte und Log10-Werte, für einige Verteilungen sehr relevant */
                 ybase0: false,
+                ykelvin: false,
                 nox0: false,
                 /*  kla2100repnox0 - no x=0 - erste x-Spalte wird gesichert und gelöscht */
                 x0null: false,

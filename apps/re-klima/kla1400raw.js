@@ -1278,6 +1278,9 @@
                                 } else if (kla1400raw.checkfragments(fullname, "ECA .zip")) {
                                     aktsource = "ECAD";
                                     actvariablename = "tmax";
+                                } else if (kla1400raw.checkfragments(fullname, "nao dat .txt")) {
+                                    aktsource = "NAO";
+                                    actvariablename = "tmax";
                                 } else {
                                     return;
                                 }
@@ -2284,6 +2287,46 @@
                                                             }).always(function () {
                                                                 // nope
                                                             });
+
+
+                                                        } else if (kla1400raw.checkfragments(fullname, "nao dat \.txt")) {
+                                                            // NAO-Daten North Atlantic Oscillation
+                                                            aktsource = "NAO";
+                                                            var jqxhr = $.ajax({
+                                                                method: "GET",
+                                                                crossDomain: false,
+                                                                url: sysbase.getServer("loadnao"),
+                                                                data: {
+                                                                    fullname: fullname,
+                                                                    targettable: klirecord.metadata.targettable,
+                                                                    primarykey: klirecord.metadata.primarykey,
+                                                                    separator: klirecord.metadata.separator,
+                                                                    timeout: 10 * 60 * 1000
+                                                                }
+                                                            }).done(function (r1, textStatus, jqXHR) {
+                                                                clearInterval(ghcnclock);
+                                                                document.getElementById("kla1400raw").style.cursor = "default";
+                                                                $(".kla1400rawActionLoad").prop('disabled', false);
+                                                                $("#kla1400raw_rightw").empty();
+                                                                sysbase.checkSessionLogin(r1);
+                                                                var ret = JSON.parse(r1);
+                                                                sysbase.putMessage(ret.message, 1);
+                                                                return;
+                                                            }).fail(function (err) {
+                                                                clearInterval(ghcnclock);
+                                                                $("#kla1400raw_rightw").empty();
+                                                                document.getElementById("kla1400raw").style.cursor = "default";
+                                                                $(".kla1400rawActionLoad").prop('disabled', false);
+                                                                sysbase.putMessage(err, 1);
+                                                                return;
+                                                            }).always(function () {
+                                                                // nope
+                                                            });
+
+
+
+
+
                                                     } else {
                                                         $(".kla1400rawActionLoad").prop('disabled', true);
                                                         var jqxhr = $.ajax({
@@ -2360,21 +2403,23 @@
         var api = "setonerecord";
         var table = "KLIRAWFILES";
         var usrrecord = {};
-        var comments = "";
-        debugger;
-        if (klirecord.comment.length > 0) {
-            comments = klirecord.comment + "<br>" + klirecord.savecomments;
-        } else {
-            comments = klirecord.savecomments;
+        var savecomments = "";
+        if (typeof klirecord.comment === "sting" && klirecord.comment.length > 0) {
+            savecomments = klirecord.comment;
         }
         try {
             klirecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
             selfields = {
                 fullname: klirecord.fsdata.fullname
             };
+            var comment = $("#kla1400rawcomment").val();
+            if (comment.length > 0 && savecomments.length > 0) {
+                comment = comment + "<br>" + savecomments;
+            }
+            debugger;
             updfields["$set"] = {
                 metadata: klirecord.metadata,
-                comments: comments
+                comments: comment
             };
             uihelper.setOneRecord(selfields, updfields, api, table, function (ret) {
                 if (ret.error === false) {

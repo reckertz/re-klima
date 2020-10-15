@@ -1,5 +1,10 @@
 /*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
+
+const {
+    isleapyear
+} = require('../re-frame/uihelper');
+
 /*global sysbase,uihelper */
 (function () {
     'use strict';
@@ -29,6 +34,380 @@
     var sql3inserts = 0;
     var sql3errors = 0;
     var stationdata = [];
+
+
+
+    /**
+     * loadnao  - North Atlantic Oscillation
+     * https://crudata.uea.ac.uk/cru/data/nao/
+     *
+     * @param {*} gblInfo
+     * @param {*} db
+     * @param {*} fs
+     * @param {*} path
+     * @param {*} rootname
+     * @param {*} async
+     * @param {*} stream
+     * @param {*} csv
+     * @param {*} readline
+     * @param {*} sys0000sys
+     * @param {*} kla9020fun
+     * @param {*} req
+     * @param {*} res
+     * @param {*} callback291
+     * returns function (res, ret)
+     *
+     */
+    kla1490srv.loadnao = function (gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, callback292) {
+        var sortdata = [];
+        var iraw = 0;
+        async.waterfall([
+                function (callback292a) {
+                    /**
+                     * Dateinamen bereitstellen fullname, source, selyears,
+                     * selyears wird nicht genutzt
+                     */
+                    var fullname = "";
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    var source = "NAO";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    var selyears = "";
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+                    if (!fs.existsSync(fullname)) {
+                        callback292a("Error", res, {
+                            error: false,
+                            message: fullname + " nicht auf dem Server vorhanden"
+                        });
+                        return;
+                    }
+                    var stationfilter = "";
+                    if (req.query && typeof req.query.extraParam !== "undefined" && req.query.extraParam.length > 0) {
+                        stationfilter = JSON.parse(req.query.extraParam).stationfilter;
+                    }
+                    var ret = {};
+                    ret.fullname = fullname;
+                    ret.fullnamestations = fullname;
+                    ret.dirname = path.dirname(fullname);
+                    ret.source = source;
+                    ret.selyears = selyears;
+                    ret.stationfilter = stationfilter;
+                    callback292a(null, res, ret);
+                    return;
+                },
+                function (res, ret, callback292a1) {
+                    /**
+                     * KLICOUNTRYCODES laden nach countries
+                     */
+                    var reqparm = {};
+                    reqparm.table = "KLICOUNTRYCODES";
+                    reqparm.sel = {};
+                    reqparm.projection = {};
+                    sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+                        if (ret1.error === true) {
+                            ret.message += " keine KLICOUNTRYCODES:" + ret1.message;
+                            countries = {};
+                            callback292a1(null, res, ret);
+                            return;
+                        } else {
+                            if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                                countries = {};
+                                for (var recordind in ret1.records) {
+                                    var record = ret1.records[recordind];
+                                    var alpha3 = record.alpha3;
+                                    delete record.history;
+                                    var countryname = record.name;
+                                    delete record.name;
+                                    record.countryname = countryname;
+                                    countries[alpha3] = record;
+                                }
+                                callback292a1(null, res, ret);
+                                return;
+                            } else {
+                                ret.message += " keine KLICOUNTRYCODES";
+                                countries = {};
+                                callback292a1(null, res, ret);
+                                return;
+                            }
+                        }
+                    });
+                },
+                function (res, ret, callback292a1a) {
+                    /**
+                     * KLISTATIONS löschen für NAO
+                     */
+                    // var delStmt = "DELETE FROM KLISTATIONS ";
+                    //delStmt += " WHERE source = 'NAO'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLISTATIONS: deleted:" + this.changes);
+                    callback292a1a(null, res, ret);
+                    return;
+                    //});
+                },
+                function (res, ret, callback292a1b) {
+                    /**
+                     * KLIINVENTORY löschen für ANO
+                     */
+                    //var delStmt = "DELETE FROM KLIINVENTORY ";
+                    //delStmt += " WHERE source = 'NAO'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIINVENTORY: deleted:" + this.changes);
+                    callback292a1b(null, res, ret);
+                    return;
+                    //});
+                },
+                function (res, ret, callback292a1c) {
+                    /**
+                     * KLIDATA löschen für NAO
+                     */
+                    //var delStmt = "DELETE FROM KLIDATA ";
+                    //delStmt += " WHERE source = 'NAO'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIDATA: deleted:" + this.changes);
+                    callback292a1c(null, res, ret);
+                    return;
+                    //});
+                },
+                function (res, ret, callback292a2a) {
+                    /**
+                     * KLISTATIONS und KLIINVENTORY: 1 Datensatz
+                     * KLIDATA: 1 Datensatz, Monatswerte auf Tage des jeweiligen Monats roh verteilt
+                     * "" als missing value in der stringified-Speicherung
+                     */
+                    sortdata = [];
+                    var klistationrec = {
+                        source: "NAO",
+                        stationid: "NAO",
+                        stationname: "NAO-Index",
+                        climatezone: "",
+                        continent: "",
+                        continentname: "North Atlantic",
+                        alpha2: "",
+                        alpha3: "",
+                        countrycode: "",
+                        region: "Acores",
+                        subregion: "Ponte Delgada",
+                        intermediateregion: "",
+                        temperatur: "NAO",
+                        longitude: 25.6960594,
+                        latitude: 37.7448881,
+                        height: 0,
+                        state: "",
+                    };
+                    var kliinventoryrec = {
+                        source: "NAO",
+                        stationid: "NAO",
+                        variable: "NAO",
+                        fromyear: 0,
+                        toyear: 0,
+                        longitude: 25.6960594,
+                        latitude: 37.7448881,
+                    };
+                    var klidatarec = {
+                        source: "NAO",
+                        stationid: "NAO",
+                        variable: "NAO",
+                        fromyear: null,
+                        toyear: null,
+                        anzyears: 0,
+                        realyears: 0,
+                        missing: 0,
+                        years: {}
+                    };
+
+                    var cont = uihelper.getContinent(klistationrec.longitude, klistationrec.latitude);
+                    if (cont.error === false) {
+                        klistationrec.continent = cont.continentcode;
+                        klistationrec.continentname = cont.continentname;
+                    }
+                    var climatezone = uihelper.getClimateZone(klistationrec.latitude);
+                    klistationrec.climatezone = climatezone.value;
+                    if (crg === null) {
+                        crg = require('country-reverse-geocoding').country_reverse_geocoding();
+                    }
+                    /**
+                     * Land aufgrund latitude/longitude bestimmen
+                     */
+                    var country = crg.get_country(klistationrec.latitude, klistationrec.longitude);
+                    if (typeof country !== "undefined" && country !== null) {
+                        klistationrec.alpha3 = country.code;
+                        klistationrec.countryname = country.name;
+                        var countrydata = countries[country.code];
+                        if (typeof countrydata !== "undefined" && countrydata !== null) {
+                            delete countrydata.history;
+                            delete countrydata.tsserverupd;
+                            delete countrydata.iostatus;
+                            delete countrydata._id;
+                            klistationrec = Object.assign(klistationrec, countrydata);
+                        }
+                    }
+                    var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    try {
+                        var readInterface = readline.createInterface({
+                            input: fs.createReadStream(ret.fullname),
+                            console: false
+                        });
+                        readInterface.on('line', function (data) {
+                            // fs.createReadStream(ret.fullname)
+                            /*
+                            .pipe(iconv.decodeStream('iso-8859-15'))
+                            .pipe(iconv.encodeStream('utf8'))
+                            */
+                            // .on("data", function (data) {
+                            var that = this;
+                            that.pause();
+                            iraw++;
+                            // 1825  -0.23   0.21   0.33  -0.28   0.13   0.41  -0.92   1.43  -0.95   1.98   1.06  -1.31    0.16
+                            var darray = data.trim().split(/[\s]+/); // Trenner 1-n Blanks
+                            var year = darray[0];
+                            var monvalues = darray.slice(1, 13);
+                            var yearvalue = darray[13];
+
+                            if (typeof klidatarec.years["" + year] === "undefined") {
+                                if (uihelper.isleapyear(year)) {
+                                    klidatarec.years[year] = new Array(366).fill("");
+                                } else {
+                                    klidatarec.years[year] = new Array(365).fill("");
+                                }
+                                if (klidatarec.fromyear === null) {
+                                    klidatarec.fromyear = year;
+                                } else if (year < klidatarec.fromyear) {
+                                    klidatarec.fromyear = year;
+                                }
+                                if (klidatarec.toyear === null) {
+                                    klidatarec.toyear = year;
+                                } else if (year > klidatarec.toyear) {
+                                    klidatarec.toyear = year;
+                                }
+                            }
+                            if (uihelper.isleapyear(year)) {
+                                mdtable[1] = 29;
+                            } else {
+                                mdtable[1] = 28;
+                            }
+                            var baseday = 0;
+                            for (var imon = 0; imon < 12; imon++) {
+                                for (var day = 1; day < mdtable[imon]; day++) {
+                                    var tind = baseday + parseInt(day) - 1;
+                                    if (monvalues[imon] !== "-99.99") {
+                                        klidatarec.years[year][tind] = monvalues[imon];
+                                    }
+                                }
+                                baseday += mdtable[imon];
+                            }
+                            that.resume();
+                        });
+                        readInterface.on("close", function (err) {
+                            // KLISTATIONS, KLIINVENTORY, KLIDATA: 1 Datensatz
+                            var reqparm = {};
+                            async.waterfall([
+                                function(callback293a) {
+                                    // Ausgabe KLISTATIONS
+                                    reqparm.selfields = {
+                                        source: "NAO",
+                                        stationid: "NAO"
+                                    };
+                                    var updstation = Object.assign({}, klistationrec, true);
+                                    delete updstation.source;
+                                    delete updstation.stationid;
+
+                                    reqparm.updfields = {};
+                                    reqparm.updfields["$setOnInsert"] = {
+                                        source: "NAO",
+                                        stationid: "NAO"
+                                    };
+                                    reqparm.updfields["$set"] = updstation;
+                                    reqparm.table = "KLISTATIONS";
+                                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                        callback293a(null, res, ret);
+                                        return;
+                                    });
+                                },
+                                function(res, ret, callback293b) {
+                                    // Ausgabe KLIINVENTORY
+                                    kliinventoryrec.fromyear = klidatarec.fromyear;
+                                    kliinventoryrec.toyear = klidatarec.toyear;
+                                    kliinventoryrec.anzyears = parseInt(kliinventoryrec.toyear) - parseInt(kliinventoryrec.fromyear) + 1;
+                                    reqparm.selfields = {
+                                        source: "NAO",
+                                        stationid: "NAO",
+                                        variable: "NAO"
+                                    };
+                                    var updstation = Object.assign({}, kliinventoryrec, true);
+                                    delete updstation.source;
+                                    delete updstation.stationid;
+                                    delete updstation.variable;
+
+                                    reqparm.updfields = {};
+                                    reqparm.updfields["$setOnInsert"] = {
+                                        source: "NAO",
+                                        stationid: "NAO",
+                                        variable: "NAO"
+                                    };
+                                    reqparm.updfields["$set"] = updstation;
+                                    reqparm.table = "KLIINVENTORY";
+                                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                        callback293b(null, res, ret);
+                                        return;
+                                    });
+                                },
+                                function(res, ret, callback293c) {
+                                    // Ausgabe KLIDATA
+                                    klidatarec.years = JSON.stringify(klidatarec.years);
+                                    klidatarec.anzyears = parseInt(klidatarec.toyear) - parseInt(klidatarec.fromyear) + 1;
+                                    reqparm.selfields = {
+                                        source: "NAO",
+                                        stationid: "NAO",
+                                        variable: "NAO"
+                                    };
+                                    var updstation = Object.assign({}, klidatarec, true);
+                                    delete updstation.source;
+                                    delete updstation.stationid;
+                                    delete updstation.variable;
+
+                                    reqparm.updfields = {};
+                                    reqparm.updfields["$setOnInsert"] = {
+                                        source: "NAO",
+                                        stationid: "NAO",
+                                        variable: "NAO"
+                                    };
+                                    reqparm.updfields["$set"] = updstation;
+                                    reqparm.table = "KLIDATA";
+                                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                        callback293c("Finish", res, ret);
+                                        return;
+                                    });
+                                }
+                            ],
+                            function(error, res, ret) {
+                                ret.error = true;
+                                ret.message = err;
+                                callback292a2a("Finish", res, ret);
+                                return;
+                            });
+                        });
+                    } catch (err) {
+                        ret.error = true;
+                        ret.message = err;
+                        callback292a2a("Error", res, ret);
+                        return;
+                    }
+                }
+            ],
+            function (error, res, ret) {
+                console.log("FERTIG NAO");
+                callback292(res, ret);
+                return;
+            });
+    };
+
+
+
 
 
     /**
@@ -256,6 +635,7 @@
                 return;
             });
     };
+
 
     /**
      * putHYGRISchunk - Verarbeiten bis 1 Mio Einträge in sortdata

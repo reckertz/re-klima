@@ -208,31 +208,6 @@ span {}
     color: white;
 }
 
-@media print {
-
-    .header,
-    .footer {
-        display: none;
-    }
-
-    a {
-        color: #000;
-        text-decoration: underline;
-    }
-
-    [class*="col"] {
-        width: 100%;
-    }
-
-    body,
-    html,
-    .wrapper,
-    .content {
-        margin-top: 0%;
-        display: block;
-        height: 100%;
-    }
-}
 
 .uieform * {
     font-size: 1em;
@@ -265,8 +240,8 @@ span {}
     padding: 0.01em 0 0 0 !important;
     margin: 0 !important;
     min-width: 0 !important;
-    display: flex;
-    align-items: left
+   /* display: flex; */
+   /* align-items: left */
 }
 
 body:not(:-moz-handler-blocked) fieldset {
@@ -307,7 +282,7 @@ body:not(:-moz-handler-blocked) .ui-field-contain {
 
 .uieform input {
     display: block;
-    /* float: left; */
+     /* float: left; */
     font-size: 1em;
     margin-bottom: 0.4em;
     margin-top: 0.5em;
@@ -651,7 +626,7 @@ td {
 *   Ade Budiman - art.visuadlesigner@gmail.com
 *   2015 mit Modifikationen
 */
-
+/*
 table.kliresponsive {
     border: 1px solid #ccc;
     width: 100%;
@@ -677,9 +652,10 @@ table.kliresponsive th {
     font-size: 14px;
     letter-spacing: 1px;
 }
+*/
 
 @media screen and (max-width: 600px) {
-
+    /*
     table.kliresponsive {
         border: 0;
     }
@@ -711,6 +687,7 @@ table.kliresponsive th {
         text-transform: uppercase;
         font-weight: bold;
     }
+    */
 }
 
 .eckh3 {
@@ -731,4 +708,32 @@ table.kliresponsive th {
         display: block;
         page-break-before: always;
     }
+
+    .header,
+    .footer {
+        display: none;
+    }
+
+    a {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    [class*="col"] {
+        width: 100%;
+    }
+
+    body,
+    html,
+    .wrapper,
+    .content {
+        margin-top: 0%;
+        display: block;
+        height: 100%;
+    }
+
+
+
+
+
 }
