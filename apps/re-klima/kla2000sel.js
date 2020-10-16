@@ -50,6 +50,7 @@
                 enum: [
                     "GHCND",
                     "HYGRIS",
+                    "NAO",
                     "GHCN",
                     "GHCN4",
                     "CRUTEM4",
@@ -71,6 +72,7 @@
                     "TSUN",
                     "PSUN",
                     "SNOW",
+                    "NAO",
                     ""
                 ]
             },
@@ -1734,7 +1736,7 @@
             }
         };
         var anchorHash = "#kla2000sel .col2of2";
-        var title = "GHCN-D Analyse-Konfiguration";
+        var title = "Analyse-Konfiguration";
         var pos = {
             left: $(anchorHash).offset().left,
             top: window.screen.height * 0.1,
@@ -1772,6 +1774,9 @@
                 }
                 var selsource = $("#kla2000selsource").val();
                 if (selsource === "GHCND") {
+                    var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                } else if (selsource === "NAO") {
                     var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
                     window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
                 } else if (selsource === "HYGRIS") {

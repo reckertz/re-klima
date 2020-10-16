@@ -879,6 +879,7 @@
                         if (err) {
                             ret.message += " INSERT-Error:" + err.message;
                             console.log(" INSERT-Error:" + err.message);
+                            console.log(insStmt);
                         } else {
                             ret.message += " " + ret.sorparms.table + " ID:" + this.lastID + " inserted";
                         }

@@ -1280,7 +1280,7 @@
                                     actvariablename = "tmax";
                                 } else if (kla1400raw.checkfragments(fullname, "nao dat .txt")) {
                                     aktsource = "NAO";
-                                    actvariablename = "tmax";
+                                    actvariablename = "NAOIND";
                                 } else {
                                     return;
                                 }
@@ -2412,11 +2412,10 @@
             selfields = {
                 fullname: klirecord.fsdata.fullname
             };
-            var comment = $("#kla1400rawcomment").val();
+            var comment = $("#kla1400rawcomment").val() || 0;
             if (comment.length > 0 && savecomments.length > 0) {
                 comment = comment + "<br>" + savecomments;
             }
-            debugger;
             updfields["$set"] = {
                 metadata: klirecord.metadata,
                 comments: comment

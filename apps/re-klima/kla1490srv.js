@@ -180,10 +180,30 @@ const {
                      * "" als missing value in der stringified-Speicherung
                      */
                     sortdata = [];
+                    var stationid = "";
+                    var stationname = "";
+                    var variable = "";
+                    if (ret.fullname.indexOf("azo") >= 0) {
+                        stationid = "NAO-Azoren";
+                        stationname = "NAO-Azoren";
+                        variable = "NAO";
+                    } else if (ret.fullname.indexOf("gib") >= 0) {
+                        stationid = "NAO-Gibraltar";
+                        stationname = "NAO-Gibraltar";
+                        variable = "NAO";
+                    } else if (ret.fullname.indexOf("ice") >= 0) {
+                        stationid = "NAO-Iceland";
+                        stationname = "NAO-Iceland";
+                        variable = "NAO";
+                    } else {
+                        stationid = "NAO-Index";
+                        stationname = "NAO-Index";
+                        variable = "NAO";
+                    }
                     var klistationrec = {
                         source: "NAO",
-                        stationid: "NAO",
-                        stationname: "NAO-Index",
+                        stationid: stationid,
+                        stationname: stationname,
                         climatezone: "",
                         continent: "",
                         continentname: "North Atlantic",
@@ -201,8 +221,8 @@ const {
                     };
                     var kliinventoryrec = {
                         source: "NAO",
-                        stationid: "NAO",
-                        variable: "NAO",
+                        stationid: stationid,
+                        variable: variable,
                         fromyear: 0,
                         toyear: 0,
                         longitude: 25.6960594,
@@ -210,8 +230,8 @@ const {
                     };
                     var klidatarec = {
                         source: "NAO",
-                        stationid: "NAO",
-                        variable: "NAO",
+                        stationid: stationid,
+                        variable: variable,
                         fromyear: null,
                         toyear: null,
                         anzyears: 0,
@@ -260,45 +280,62 @@ const {
                             */
                             // .on("data", function (data) {
                             var that = this;
+
                             that.pause();
                             iraw++;
                             // 1825  -0.23   0.21   0.33  -0.28   0.13   0.41  -0.92   1.43  -0.95   1.98   1.06  -1.31    0.16
-                            var darray = data.trim().split(/[\s]+/); // Trenner 1-n Blanks
-                            var year = darray[0];
-                            var monvalues = darray.slice(1, 13);
-                            var yearvalue = darray[13];
 
-                            if (typeof klidatarec.years["" + year] === "undefined") {
-                                if (uihelper.isleapyear(year)) {
-                                    klidatarec.years[year] = new Array(366).fill("");
-                                } else {
-                                    klidatarec.years[year] = new Array(365).fill("");
-                                }
-                                if (klidatarec.fromyear === null) {
-                                    klidatarec.fromyear = year;
-                                } else if (year < klidatarec.fromyear) {
-                                    klidatarec.fromyear = year;
-                                }
-                                if (klidatarec.toyear === null) {
-                                    klidatarec.toyear = year;
-                                } else if (year > klidatarec.toyear) {
-                                    klidatarec.toyear = year;
-                                }
+                            var haserror = false;
+                            var darray = data.trim().split(/[\s]+/); // Trenner 1-n Blanks
+                            if (darray.length < 13) {
+                                haserror = true;
                             }
-                            if (uihelper.isleapyear(year)) {
-                                mdtable[1] = 29;
-                            } else {
-                                mdtable[1] = 28;
-                            }
-                            var baseday = 0;
-                            for (var imon = 0; imon < 12; imon++) {
-                                for (var day = 1; day < mdtable[imon]; day++) {
-                                    var tind = baseday + parseInt(day) - 1;
-                                    if (monvalues[imon] !== "-99.99") {
-                                        klidatarec.years[year][tind] = monvalues[imon];
+                            var year = darray[0];
+                            var monvalues = [];
+                            if (haserror === false) {
+                                monvalues = darray.slice(1, 13);
+                                // check if NaN
+                                for (var imon = 0; imon < 12; imon++) {
+                                    if (isNaN(monvalues[imon])) {
+                                        haserror = true;
+                                        break;
                                     }
                                 }
-                                baseday += mdtable[imon];
+                            }
+                            if (haserror === false) {
+                                // var yearvalue = darray[13]; prüfen, ob vorhanden, azoren etc. ohne!!!
+                                if (typeof klidatarec.years["" + year] === "undefined") {
+                                    if (uihelper.isleapyear(year)) {
+                                        klidatarec.years[year] = new Array(366).fill("");
+                                    } else {
+                                        klidatarec.years[year] = new Array(365).fill("");
+                                    }
+                                    if (klidatarec.fromyear === null) {
+                                        klidatarec.fromyear = year;
+                                    } else if (year < klidatarec.fromyear) {
+                                        klidatarec.fromyear = year;
+                                    }
+                                    if (klidatarec.toyear === null) {
+                                        klidatarec.toyear = year;
+                                    } else if (year > klidatarec.toyear) {
+                                        klidatarec.toyear = year;
+                                    }
+                                }
+                                if (uihelper.isleapyear(year)) {
+                                    mdtable[1] = 29;
+                                } else {
+                                    mdtable[1] = 28;
+                                }
+                                var baseday = 0;
+                                for (var imon = 0; imon < 12; imon++) {
+                                    for (var day = 1; day < mdtable[imon]; day++) {
+                                        var tind = baseday + parseInt(day) - 1;
+                                        if (monvalues[imon] !== "-99.99" && monvalues[imon] !== "-10") {
+                                            klidatarec.years[year][tind] = monvalues[imon];
+                                        }
+                                    }
+                                    baseday += mdtable[imon];
+                                }
                             }
                             that.resume();
                         });
@@ -306,92 +343,93 @@ const {
                             // KLISTATIONS, KLIINVENTORY, KLIDATA: 1 Datensatz
                             var reqparm = {};
                             async.waterfall([
-                                function(callback293a) {
-                                    // Ausgabe KLISTATIONS
-                                    reqparm.selfields = {
-                                        source: "NAO",
-                                        stationid: "NAO"
-                                    };
-                                    var updstation = Object.assign({}, klistationrec, true);
-                                    delete updstation.source;
-                                    delete updstation.stationid;
+                                    function (callback293a) {
+                                        // Ausgabe KLISTATIONS
+                                        reqparm.selfields = {
+                                            source: "NAO",
+                                            stationid: stationid
+                                        };
+                                        var updstation = Object.assign({}, klistationrec, true);
+                                        delete updstation.source;
+                                        delete updstation.stationid;
 
-                                    reqparm.updfields = {};
-                                    reqparm.updfields["$setOnInsert"] = {
-                                        source: "NAO",
-                                        stationid: "NAO"
-                                    };
-                                    reqparm.updfields["$set"] = updstation;
-                                    reqparm.table = "KLISTATIONS";
-                                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
-                                        callback293a(null, res, ret);
-                                        return;
-                                    });
-                                },
-                                function(res, ret, callback293b) {
-                                    // Ausgabe KLIINVENTORY
-                                    kliinventoryrec.fromyear = klidatarec.fromyear;
-                                    kliinventoryrec.toyear = klidatarec.toyear;
-                                    kliinventoryrec.anzyears = parseInt(kliinventoryrec.toyear) - parseInt(kliinventoryrec.fromyear) + 1;
-                                    reqparm.selfields = {
-                                        source: "NAO",
-                                        stationid: "NAO",
-                                        variable: "NAO"
-                                    };
-                                    var updstation = Object.assign({}, kliinventoryrec, true);
-                                    delete updstation.source;
-                                    delete updstation.stationid;
-                                    delete updstation.variable;
+                                        reqparm.updfields = {};
+                                        reqparm.updfields["$setOnInsert"] = {
+                                            source: "NAO",
+                                            stationid: stationid
+                                        };
+                                        reqparm.updfields["$set"] = updstation;
+                                        reqparm.table = "KLISTATIONS";
+                                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                            callback293a(null, res, ret);
+                                            return;
+                                        });
+                                    },
+                                    function (res, ret, callback293b) {
+                                        // Ausgabe KLIINVENTORY
+                                        kliinventoryrec.fromyear = klidatarec.fromyear;
+                                        kliinventoryrec.toyear = klidatarec.toyear;
+                                        kliinventoryrec.anzyears = parseInt(kliinventoryrec.toyear) - parseInt(kliinventoryrec.fromyear) + 1;
+                                        reqparm.selfields = {
+                                            source: "NAO",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        var updstation = Object.assign({}, kliinventoryrec, true);
+                                        delete updstation.source;
+                                        delete updstation.stationid;
+                                        delete updstation.variable;
 
-                                    reqparm.updfields = {};
-                                    reqparm.updfields["$setOnInsert"] = {
-                                        source: "NAO",
-                                        stationid: "NAO",
-                                        variable: "NAO"
-                                    };
-                                    reqparm.updfields["$set"] = updstation;
-                                    reqparm.table = "KLIINVENTORY";
-                                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
-                                        callback293b(null, res, ret);
-                                        return;
-                                    });
-                                },
-                                function(res, ret, callback293c) {
-                                    // Ausgabe KLIDATA
-                                    klidatarec.years = JSON.stringify(klidatarec.years);
-                                    klidatarec.anzyears = parseInt(klidatarec.toyear) - parseInt(klidatarec.fromyear) + 1;
-                                    reqparm.selfields = {
-                                        source: "NAO",
-                                        stationid: "NAO",
-                                        variable: "NAO"
-                                    };
-                                    var updstation = Object.assign({}, klidatarec, true);
-                                    delete updstation.source;
-                                    delete updstation.stationid;
-                                    delete updstation.variable;
+                                        reqparm.updfields = {};
+                                        reqparm.updfields["$setOnInsert"] = {
+                                            source: "NAO",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        reqparm.updfields["$set"] = updstation;
+                                        reqparm.table = "KLIINVENTORY";
+                                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                            callback293b(null, res, ret);
+                                            return;
+                                        });
+                                    },
+                                    function (res, ret, callback293c) {
+                                        // Ausgabe KLIDATA
+                                        klidatarec.years = JSON.stringify(klidatarec.years);
+                                        klidatarec.anzyears = parseInt(klidatarec.toyear) - parseInt(klidatarec.fromyear) + 1;
+                                        reqparm.selfields = {
+                                            source: "NAO",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        var updstation = Object.assign({}, klidatarec, true);
+                                        delete updstation.source;
+                                        delete updstation.stationid;
+                                        delete updstation.variable;
 
-                                    reqparm.updfields = {};
-                                    reqparm.updfields["$setOnInsert"] = {
-                                        source: "NAO",
-                                        stationid: "NAO",
-                                        variable: "NAO"
-                                    };
-                                    reqparm.updfields["$set"] = updstation;
-                                    reqparm.table = "KLIDATA";
-                                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
-                                        callback293c("Finish", res, ret);
-                                        return;
-                                    });
-                                }
-                            ],
-                            function(error, res, ret) {
-                                ret.error = true;
-                                ret.message = err;
-                                callback292a2a("Finish", res, ret);
-                                return;
-                            });
+                                        reqparm.updfields = {};
+                                        reqparm.updfields["$setOnInsert"] = {
+                                            source: "NAO",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        reqparm.updfields["$set"] = updstation;
+                                        reqparm.table = "KLIDATA";
+                                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                            callback293c("Finish", res, ret);
+                                            return;
+                                        });
+                                    }
+                                ],
+                                function (error, res, ret) {
+                                    ret.error = true;
+                                    ret.message = err;
+                                    callback292a2a("Finish", res, ret);
+                                    return;
+                                });
                         });
                     } catch (err) {
+                        console.log(err.stack);
                         ret.error = true;
                         ret.message = err;
                         callback292a2a("Error", res, ret);
