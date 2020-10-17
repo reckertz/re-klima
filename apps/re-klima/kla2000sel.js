@@ -1844,8 +1844,29 @@
         confrecord.source = source;
         confrecord.variable = variablename;
         uientry.inputDialogX(anchorHash, pos, title, confschema, confrecord, function (ret) {
-            if (ret.error === false) {} else {
-                sysbase.putMessage("Kein Abruf Super-Sparklines", 1);
+            if (ret.error === false) {
+                // Zufügen Button IPCC-Perioden
+                var auxid = $(anchorHash).find("div.uiepopup").attr("id");
+                //popupD75976fromyear
+                var divname = $("#" + auxid + "fromyear").parent();
+                $(divname)
+                    .append($("<button/>", {
+                        html: "IPCC-Perioden",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            $("#" + auxid + "fromyear").val("1841");
+                            $("#" + auxid + "toyear").val("2020");
+                            $("#" + auxid + "step").val("30");
+                            return;
+                        }
+                    }));
+
+            } else {
+                sysbase.putMessage("Kein Report-Abruf möglich", 1);
                 return;
             }
         });

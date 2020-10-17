@@ -1224,7 +1224,7 @@
         async.waterfall([
                 function (cb2100g0a) {
                     klirow.titel = klirow.variable + " " + klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")";
-
+                    debugger;
                     if (kla2100repconfig.allin === true) {
                         gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
                         $("#kla2100repwrapper")
@@ -1247,71 +1247,6 @@
                                     class: "doprintthis eckh3"
                                 }))
                             );
-                        // Spezielle Buttons mit Vor-Aufbereitung
-                        var gurl = "https://www.google.com/maps/search/?api=1&query=";
-                        gurl += klirow.latitude;
-                        gurl += ",";
-                        gurl += klirow.longitude;
-
-                        var lurl = "klaleaflet.html";
-                        lurl += "?";
-                        lurl += "latitude=" + encodeURIComponent(klirow.latitude);
-                        lurl += "&";
-                        lurl += "longitude=" + encodeURIComponent(klirow.longitude);
-
-                        $("#" + gldivid)
-                            .append($("<button/>", {
-                                html: "Google-Maps",
-                                gurl: gurl,
-                                css: {
-                                    float: "left",
-                                    margin: "10px"
-                                },
-                                click: function (evt) {
-                                    evt.preventDefault();
-                                    //var gurl = "https://www.google.com/maps/dir/";
-                                    var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
-                                    var newurl = $(this).attr("gurl");
-                                    window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
-                                }
-                            }))
-
-                            .append($("<button/>", {
-                                html: "Leaflet-Raster",
-                                lurl: lurl,
-                                css: {
-                                    float: "left",
-                                    margin: "10px"
-                                },
-                                click: function (evt) {
-                                    evt.preventDefault();
-                                    var newurl = $(this).attr("lurl");
-                                    var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
-                                    window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
-                                }
-                            }))
-
-                            .append($("<button/>", {
-                                html: "Alle Sparklines",
-                                css: {
-                                    float: "left",
-                                    margin: "10px"
-                                },
-                                click: function (evt) {
-                                    evt.preventDefault();
-                                    var username = uihelper.getUsername();
-                                    window.parent.sysbase.setCache("regstation", JSON.stringify({
-                                        starecord: starecord,
-                                        klirecords: klirecords,
-                                        fromyear: klirecords[0].fromyear,
-                                        toyear: "" + (parseInt(klirecords[0].fromyear) + 29)
-                                    }));
-                                    var tourl = "klaheatmap.html" + "?" + "stationid=" + klirow.stationid + "&source=" + klirow.source + "&variablename=" + klirow.variable;
-                                    var tabname = klirecords[0].stationname;
-                                    var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1628reg", tourl);
-                                    window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-                                }
-                            }));
                     } else {
                         gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
                         $("#kla2100repwrapper")
@@ -1332,6 +1267,72 @@
                                 }))
                             );
                     }
+
+                    // Spezielle Buttons mit Vor-Aufbereitung
+                    var gurl = "https://www.google.com/maps/search/?api=1&query=";
+                    gurl += klirow.latitude;
+                    gurl += ",";
+                    gurl += klirow.longitude;
+
+                    var lurl = "klaleaflet.html";
+                    lurl += "?";
+                    lurl += "latitude=" + encodeURIComponent(klirow.latitude);
+                    lurl += "&";
+                    lurl += "longitude=" + encodeURIComponent(klirow.longitude);
+
+                    $("#" + gldivid)
+                        .append($("<button/>", {
+                            html: "Google-Maps",
+                            gurl: gurl,
+                            css: {
+                                float: "left",
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                //var gurl = "https://www.google.com/maps/dir/";
+                                var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                                var newurl = $(this).attr("gurl");
+                                window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
+                            }
+                        }))
+
+                        .append($("<button/>", {
+                            html: "Leaflet-Raster",
+                            lurl: lurl,
+                            css: {
+                                float: "left",
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var newurl = $(this).attr("lurl");
+                                var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                                window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
+                            }
+                        }))
+
+                        .append($("<button/>", {
+                            html: "Alle Sparklines",
+                            css: {
+                                float: "left",
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                var username = uihelper.getUsername();
+                                window.parent.sysbase.setCache("regstation", JSON.stringify({
+                                    starecord: starecord,
+                                    klirecords: klirecords,
+                                    fromyear: klirecords[0].fromyear,
+                                    toyear: "" + (parseInt(klirecords[0].fromyear) + 29)
+                                }));
+                                var tourl = "klaheatmap.html" + "?" + "stationid=" + klirow.stationid + "&source=" + klirow.source + "&variablename=" + klirow.variable;
+                                var tabname = klirecords[0].stationname;
+                                var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1628reg", tourl);
+                                window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                            }
+                        }));
                     /**
                      * Stammdaten
                      */
@@ -3246,7 +3247,7 @@
                 for (var igdata = 0; igdata < olddatasets.length; igdata++) {
                     //graph.config.data.datasets[igdata].hidden = true;
                     //graph.data.datasets[igdata].hidden = true;
-                    graph.getDatasetMeta(igdata).hidden=true;
+                    graph.getDatasetMeta(igdata).hidden = true;
                 }
                 graph.update();
             } catch (err) {
@@ -3508,7 +3509,20 @@
                         colorschemes: {
                             scheme: 'brewer.Paired12' /* 'tableau.HueCircle19' */
                         }
+                    },
+                    elements: {
+                        point: {
+                            radius: 0,
+                            hitRadius: 10,
+                            hoverRadius: 8
+                        }
+                    },
+                    /*
+                    ,
+                    tooltips: {
+                        enabled: false
                     }
+                    */
                 }
             };
             /**

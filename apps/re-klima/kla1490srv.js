@@ -183,39 +183,49 @@ const {
                     var stationid = "";
                     var stationname = "";
                     var variable = "";
+                    var latitude = 0;
+                    var longitude = 0;
                     if (ret.fullname.indexOf("azo") >= 0) {
                         stationid = "NAO-Azoren";
-                        stationname = "NAO-Azoren";
+                        stationname = "NAO-Azoren (Ponte Delgada)";
                         variable = "NAO";
+                        latitude = 37.6675097;
+                        longitude = -26.0922538;
                     } else if (ret.fullname.indexOf("gib") >= 0) {
                         stationid = "NAO-Gibraltar";
                         stationname = "NAO-Gibraltar";
                         variable = "NAO";
+                        latitude = 36.1249979;
+                        longitude = -5.3674627;
                     } else if (ret.fullname.indexOf("ice") >= 0) {
                         stationid = "NAO-Iceland";
                         stationname = "NAO-Iceland";
                         variable = "NAO";
+                        latitude = 64.1334735;
+                        longitude = -21.9224816;
                     } else {
                         stationid = "NAO-Index";
                         stationname = "NAO-Index";
                         variable = "NAO";
+                        latitude = 37.6675097;
+                        longitude = -26.0922538;
                     }
                     var klistationrec = {
                         source: "NAO",
                         stationid: stationid,
                         stationname: stationname,
+                        latitude: latitude,
+                        longitude: longitude,
                         climatezone: "",
                         continent: "",
-                        continentname: "North Atlantic",
+                        continentname: "",
                         alpha2: "",
                         alpha3: "",
                         countrycode: "",
-                        region: "Acores",
-                        subregion: "Ponte Delgada",
+                        region: "",
+                        subregion: "",
                         intermediateregion: "",
                         temperatur: "NAO",
-                        longitude: 25.6960594,
-                        latitude: 37.7448881,
                         height: 0,
                         state: "",
                     };
@@ -225,8 +235,8 @@ const {
                         variable: variable,
                         fromyear: 0,
                         toyear: 0,
-                        longitude: 25.6960594,
-                        latitude: 37.7448881,
+                        latitude: latitude,
+                        longitude: longitude,
                     };
                     var klidatarec = {
                         source: "NAO",
@@ -328,8 +338,8 @@ const {
                                 }
                                 var baseday = 0;
                                 for (var imon = 0; imon < 12; imon++) {
-                                    for (var day = 1; day < mdtable[imon]; day++) {
-                                        var tind = baseday + parseInt(day) - 1;
+                                    for (var day = 0; day < mdtable[imon]; day++) {
+                                        var tind = baseday + parseInt(day);
                                         if (monvalues[imon] !== "-99.99" && monvalues[imon] !== "-10") {
                                             klidatarec.years[year][tind] = monvalues[imon];
                                         }
