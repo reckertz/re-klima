@@ -343,6 +343,19 @@ body:not(:-moz-handler-blocked) .ui-field-contain {
 }
 
 
+.uieform input[type="search"] {
+    -webkit-appearance: textfield;
+    box-sizing: content-box;
+    height: 20px;
+    width: 350;
+    /* border: 1px solid #000; */
+    margin-top: 10px;
+    float: left;
+    padding: 0.3em;
+
+}
+
+
 .uieform button {
     float: none;
 }

@@ -682,7 +682,7 @@
                             .append($("<input/>", {
                                 id: pageprefix + epfieldname,
                                 name: epfieldname,
-                                type: "text",
+                                type: "search",
                                 class: "drop uieselectinput" + " " + epfield.customclasses,
                                 list: pageprefix + epfieldname + "_list",
                                 "data-clear-btn": "true",
@@ -1205,7 +1205,7 @@
                                 .append($('<td/>', {})
                                     .append($("<input/>", {
                                         name: epfieldname,
-                                        type: "text",
+                                        type: "search",
                                         /* "data-role": "none", */
                                         class: "drop uieselectinput" + " " + epfield.customclasses,
                                         list: pageprefix + epfieldname + "_list",
