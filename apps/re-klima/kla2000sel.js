@@ -1466,16 +1466,11 @@
                                 record.lastUpdated = (parseInt(record.toyear) - 1) + "-12-31";
                             }
                             if (record.source === "GHCND") {
-                                reprecord.region += " ";
-                                reprecord.region += "<img src='/images/icons-png/arrow-u-black.png'";
-                                reprecord.region += " title='Online-Aktualisierung'";
-                                reprecord.region += " class='kla2000seluplonline'>";
 
                                 reprecord.region += " ";
                                 reprecord.region += "<img src='/images/icons-png/arrow-d-black.png'";
                                 reprecord.region += " title='Online-Aktualisierung'";
-                                reprecord.region += " class='kla2000seluplonline1'>";
-
+                                reprecord.region += " class='kla2000seluplonline'>";
 
                             }
 
@@ -2084,76 +2079,7 @@
     });
 
 
-
-
     $(document).on("click", ".kla2000seluplonline", function (evt) {
-        /**
-         * Online-Aktualisierung GHCND
-         */
-        evt.preventDefault();
-        evt.stopImmediatePropagation();
-        evt.stopPropagation();
-        var source = $(this).closest("tr").attr("source");
-        var stationid = $(this).closest("tr").attr("rowid");
-        var variable = $(this).closest("tr").attr("variable");
-        var lastUpdated = $(this).closest("tr").attr("lastUpdated");
-
-        var longitude = $(this).closest("tr").attr("longitude");
-        var latitude = $(this).closest("tr").attr("latitude");
-        var fromyear = $(this).closest("tr").attr("fromyear");
-        var toyear = $(this).closest("tr").attr("toyear");
-        var ghcnclock = kla2000sel.showclock("#kla2000sellock");
-        var that = this;
-        $(that).attr("disabled", true);
-        var url = "https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&locationid=ZIP:28801&startdate=2010-05-01&enddate=2010-05-01";
-        //var url = "https://www.google.com";
-
-        /*  sysbase.getServer("ghcndonline"), */
-
-        var jqxhr = $.ajax({
-            method: "GET",
-            crossDomain: true,
-            url: url,
-            headers: {
-                token: 'OcsMfeWLPWrSUUpqGPSHOiAHAFdTfGCl'
-            },
-            data: {
-                /*
-                timeout: 10 * 60 * 1000,
-                source: source,
-                stationid: stationid,
-                variable: variable,
-                lastUpdated: lastUpdated,
-                fullname: fullname
-                */
-            }
-        }).done(function (r1, textStatus, jqXHR) {
-            clearInterval(ghcnclock);
-            debugger;
-            sysbase.checkSessionLogin(r1);
-            var ret = JSON.parse(r1);
-            sysbase.putMessage(ret.message, 1);
-
-            $("#kla2000selliste").click();
-
-            return;
-        }).fail(function (err) {
-            clearInterval(ghcnclock);
-            debugger;
-            //$("#kli1400raw_rightwdata").empty();
-            //document.getElementById("kli1400raw").style.cursor = "default";
-            sysbase.putMessage("ghcnddata:" + err, 3);
-            return;
-        }).always(function () {
-            // nope
-            $(that).attr("disabled", false);
-        });
-    });
-
-
-
-
-    $(document).on("click", ".kla2000seluplonline1", function (evt) {
         /**
          * Online-Aktualisierung GHCND
          */
@@ -2189,7 +2115,6 @@
             }
         }).done(function (r1, textStatus, jqXHR) {
             clearInterval(ghcnclock);
-            debugger;
             sysbase.checkSessionLogin(r1);
             var ret = JSON.parse(r1);
             sysbase.putMessage(ret.message, 1);
