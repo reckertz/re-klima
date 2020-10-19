@@ -68,33 +68,45 @@ db.on('profile', function (sql, ms) {
 
 db.serialize(function () {
     async.waterfall([
-        function (callbackdb) {
+        function (callbackdb1) {
             var sqlstmt = "CREATE INDEX KLISTATIONS01";
             sqlstmt += " ON KLISTATIONS(source, stationid)";
             db.run(sqlstmt, function (err) {
                 console.log("Index KLISTATIONS:" + err);
-                callbackdb(null);
+                callbackdb1(null);
                 return;
             });
         },
-        function (callbackdb) {
+        function (callbackdb2) {
             var sqlstmt = "CREATE INDEX KLIDATA01";
             sqlstmt += " ON KLIDATA(source, stationid, fromyear, anzyears)";
             db.run(sqlstmt, function (err) {
                 console.log("Index KLIDATA:" + err);
-                callbackdb(null);
+                callbackdb2(null);
                 return;
             });
         },
-        function (callbackdb) {
+        function (callbackdb3) {
             var sqlstmt = "CREATE INDEX KLIINVENTORY01";
             sqlstmt += " ON KLIINVENTORY(source, stationid, fromyear, toyear)";
             db.run(sqlstmt, function (err) {
                 console.log("Index KLIDATA:" + err);
-                callbackdb(null);
+                callbackdb3(null);
                 return;
             });
         }
+        /*
+        ,
+        function (callbackdb4) {
+            var sqlstmt = "ALTER TABLE KLIDATA ";
+            sqlstmt += " ADD COLUMN lastUpdated TEXT";
+            db.run(sqlstmt, function (err) {
+                console.log("add column KLIDATA:" + err);
+                callbackdb4(null);
+                return;
+            });
+        }
+        */
 
     ], function (error, result) {
         console.log("Fertig mit Indexerstellung");
@@ -1317,6 +1329,32 @@ app.get('/ghcnddata', function (req, res) {
         return;
     });
 });
+
+/**
+ * ghcndonline - Online-Update GHCND mit stationid und variable
+ */
+app.get('/ghcndonline', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.ghcndonline(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
 
 
 /**

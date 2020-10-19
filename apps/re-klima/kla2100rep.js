@@ -571,6 +571,7 @@
                     sqlStmt += "realyears, ";
                     sqlStmt += "fromyear, ";
                     sqlStmt += "toyear, ";
+                    sqlStmt += "lastUpdated, ";
                     sqlStmt += "height, ";
                     sqlStmt += "years ";
                     sqlStmt += " FROM " + ttid;
