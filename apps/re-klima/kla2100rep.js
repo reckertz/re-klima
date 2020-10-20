@@ -1225,7 +1225,6 @@
         async.waterfall([
                 function (cb2100g0a) {
                     klirow.titel = klirow.variable + " " + klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")";
-                    debugger;
                     if (kla2100repconfig.allin === true) {
                         gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
                         $("#kla2100repwrapper")
@@ -1326,7 +1325,9 @@
                                     starecord: starecord,
                                     klirecords: klirecords,
                                     fromyear: klirecords[0].fromyear,
-                                    toyear: "" + (parseInt(klirecords[0].fromyear) + 29)
+                                    toyear: klirecords[0].toyear,
+                                    selfromyear: klirecords[0].fromyear,
+                                    seltoyear: klirecords[0].toyear
                                 }));
                                 var tourl = "klaheatmap.html" + "?" + "stationid=" + klirow.stationid + "&source=" + klirow.source + "&variablename=" + klirow.variable;
                                 var tabname = klirecords[0].stationname;
@@ -1488,8 +1489,9 @@
                     for (var iyear = 1; iyear < yearcontrol.length; iyear++) {
                         var ayear = "" + yearcontrol[iyear];
                         var testyear = years[ayear];
-                        if (uihelper.isqualityyear(testyear) === false) {
-                            badyears.push(ayear);
+                        var qerg = uihelper.isqualityyear(testyear, klirecord.variable);
+                        if (qerg.error === true) {
+                            badyears.push(ayear + " " + qerg.message);
                         }
                     }
                     console.log("Missing:" + JSON.stringify(missingyears));
@@ -3163,7 +3165,6 @@
         var graph = window.charts[canvasid];
         window.chartscache = window.chartscache || {};
         window.chartscache[canvasid] = window.chartscache[canvasid] || {};
-        debugger;
         if (state === true) {
             try {
                 window.chartscache[canvasid].original = uihelper.cloneObject(graph.data.datasets);

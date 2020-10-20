@@ -4,6 +4,7 @@ require('app-module-path/register');
 require('app-module-path').addPath(path.join(__dirname, "apps"));
 var express = require('express');
 var app = express();
+
 var fs = require("fs");
 var async = require("async");
 
@@ -25,45 +26,10 @@ var csv = require("fast-csv");
 
 var csvformat = require('@fast-csv/format');
 
-var regression = require("./static/lib/regression.js");
-var uihelper = require("re-frame/uihelper.js");
-
 // DB expressions
 var sqlite3 = require('sqlite3');
+
 var db = new sqlite3.Database('klidata.db3');
-//var db = new sqlite3.cached.Database('klidata.db3'); // Optimierungsversuch
-db.run("PRAGMA synchronous = OFF", function (err) {
-    console.log("synchronous = OFF:" + err);
-});
-
-db.run("PRAGMA journal_mode = TRUNCATE", function (err) {
-    console.log("journal_mode = TRUNCATE:" + err);
-});
-// PRAGMA temp_store = 0 | DEFAULT | 1 | FILE | 2 | MEMORY;
-db.run("PRAGMA temp_store = 2", function (err) {
-    console.log("temp_store = 2:" + err);
-});
-
-
-/*
-db.run("PRAGMA optimize", function (err) {
-    console.log("optimize:" + err);
-});
-*/
-db.get("PRAGMA page_size", function (err, page) {
-    console.log("page_size:" + JSON.stringify(page) + " " + err);
-});
-
-/*
-db.on('trace', function (sql) {
-    console.log(sql);
-});
-*/
-/*
-db.on('profile', function (sql, ms) {
-    if (ms > 0) console.log(ms);
-});
-*/
 
 
 db.serialize(function () {
@@ -72,29 +38,100 @@ db.serialize(function () {
             var sqlstmt = "CREATE INDEX KLISTATIONS01";
             sqlstmt += " ON KLISTATIONS(source, stationid)";
             db.run(sqlstmt, function (err) {
-                console.log("Index KLISTATIONS:" + err);
+                console.log("Create Index KLISTATIONS:" + err);
                 callbackdb1(null);
                 return;
             });
         },
+        /*
+        function (callbackdb2a) {
+            var sqlstmt = "DROP INDEX KLIDATA01";
+            db.run(sqlstmt, function (err) {
+                console.log("Drop Index KLIDATA01:" + err);
+                callbackdb2a(null);
+                return;
+            });
+        },
+        */
         function (callbackdb2) {
             var sqlstmt = "CREATE INDEX KLIDATA01";
-            sqlstmt += " ON KLIDATA(source, stationid, fromyear, anzyears)";
+            sqlstmt += " ON KLIDATA(source, stationid, variable, fromyear, anzyears)";
             db.run(sqlstmt, function (err) {
-                console.log("Index KLIDATA:" + err);
+                console.log("Create Index KLIDATA:" + err);
                 callbackdb2(null);
                 return;
             });
         },
+        /*
+        function (callbackdb3a) {
+            var sqlstmt = "DROP INDEX KLIINVENTORY01";
+            db.run(sqlstmt, function (err) {
+                console.log("Drop Index KLIDATA:" + err);
+                callbackdb3a(null);
+                return;
+            });
+        },
+        */
         function (callbackdb3) {
             var sqlstmt = "CREATE INDEX KLIINVENTORY01";
-            sqlstmt += " ON KLIINVENTORY(source, stationid, fromyear, toyear)";
+            sqlstmt += " ON KLIINVENTORY(source, stationid, variable, fromyear, toyear)";
             db.run(sqlstmt, function (err) {
-                console.log("Index KLIDATA:" + err);
+                console.log("Create Index KLIINVENTORY01:" + err);
                 callbackdb3(null);
                 return;
             });
-        }
+        },
+        function (callbackdb9) {
+
+            db.get("PRAGMA index_list('KLICONFIG')", function (err, indexlist) {
+                console.log("index_list KLICONFIG:" + JSON.stringify(indexlist) + " " + err);
+                if (typeof indexlist === "object") {
+                    var indexname = indexlist.name;
+                    db.all("PRAGMA index_info('" + indexname + "')", function (err, indexfields) {
+                        console.log("index_info " + indexname + ":" + JSON.stringify(indexfields) + " " + err);
+                    });
+                }
+                callbackdb9(null);
+                return;
+            });
+        },
+        function (callbackdb10) {
+
+            //var db = new sqlite3.cached.Database('klidata.db3'); // Optimierungsversuch
+            db.run("PRAGMA synchronous = OFF", function (err) {
+                console.log("synchronous = OFF:" + err);
+            });
+
+            db.run("PRAGMA journal_mode = TRUNCATE", function (err) {
+                console.log("journal_mode = TRUNCATE:" + err);
+            });
+            // PRAGMA temp_store = 0 | DEFAULT | 1 | FILE | 2 | MEMORY;
+            db.run("PRAGMA temp_store = 2", function (err) {
+                console.log("temp_store = 2:" + err);
+            });
+
+            /*
+            db.run("PRAGMA optimize", function (err) {
+                console.log("optimize:" + err);
+            });
+            */
+            db.get("PRAGMA page_size", function (err, page) {
+                console.log("page_size:" + JSON.stringify(page) + " " + err);
+            });
+
+            /*
+            db.on('trace', function (sql) {
+                console.log(sql);
+            });
+            */
+            /*
+            db.on('profile', function (sql, ms) {
+                if (ms > 0) console.log(ms);
+            });
+            */
+           callbackdb10(null);
+           return;
+        },
         /*
         ,
         function (callbackdb4) {
@@ -113,15 +150,9 @@ db.serialize(function () {
     }); // async.waterfall
 }); // serialize
 
-db.get("PRAGMA index_list('KLICONFIG')", function (err, indexlist) {
-    console.log("index_list KLICONFIG:" + JSON.stringify(indexlist) + " " + err);
-    if (typeof indexlist === "object") {
-        var indexname = indexlist.name;
-        db.all("PRAGMA index_info('" + indexname + "')", function (err, indexfields) {
-            console.log("index_info " + indexname + ":" + JSON.stringify(indexfields) + " " + err);
-        });
-    }
-});
+
+
+
 
 /*
 db.get("PRAGMA index_list('KLISTA1')", function (err, indexlist) {
@@ -245,6 +276,11 @@ process.on('exit', function (code) {
 });
 
 
+var regression = require("./static/lib/regression.js");
+var uihelper = require("re-frame/uihelper.js");
+
+
+
 // bereitstellen countries.json und continents.json
 // "./data/countries.json"
 console.log("*START*");
@@ -272,7 +308,7 @@ var kla1790srv = require("re-klima/kla1790srv.js");
 var gblInfo = sys0000sys.getInfo();
 
 
-var app = express();
+
 app.use(compression({
     threshold: 64000
 }));

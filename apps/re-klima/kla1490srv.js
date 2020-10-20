@@ -2381,8 +2381,8 @@ const {
                 ret.korrUpdated = ret.lastUpdated;
                 if (ret.lastUpdated.length === 4) {
                     ret.korrUpdated = ret.lastUpdated + "-01-01";
-                } else if (ret.lastUpdated.length === 10) {
-                    ret.korrUpdated = ret.lastUpdated;
+                } else if (ret.lastUpdated.length  >= 10) {
+                    ret.korrUpdated = ret.lastUpdated.substr(0, 4) + "-01-01";  // für aktuelle Tests
                 }
                 url += "&startdate=" + ret.korrUpdated;
                 url += "&enddate=" + (new Date().getFullYear()) + '-12-31';
@@ -2399,6 +2399,16 @@ const {
                         result += d;
                     });
                     httpsres.on('end', function (d) {
+                        console.log('statusCode-end:', httpsres.statusCode);
+                        if (httpsres.statusCode !== 200) {
+                            console.log('statusCode-callback:', httpsres.statusCode);
+                            ret.error = true;
+                            ret.message = "ERROR:" + httpsres.statusCode;
+                            ret.message += " " + httpsres.statusMessage;
+                            ret.message += " " + result;
+                            callback391b("Error", res, ret);
+                            return;
+                        }
                         console.log(result);
                         //var len = result.length - 2;
                         //result = result.substr(1, len);
@@ -2425,7 +2435,7 @@ const {
                 }
                 filename = path.join(filename, ret.source + "_" + ret.stationid + "_" + ret.variable + ".log");
                 var rstring = ret.result;
-                fs.writeFile(filename, JSON.stringify(rstring), function(err) {
+                fs.writeFile(filename, JSON.stringify(rstring), function (err) {
                     callback391c(null, res, ret);
                     return;
                 });
@@ -2477,11 +2487,22 @@ const {
                  *       value als string mit implizit 1 Dezimale
                  */
                 var years = JSON.parse(ret.datarecord.years);
+                if (typeof years === "string") {
+                    years = JSON.parse(years);
+                }
                 var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
                 // Iteration
+                var maxyear = 0;
+                var minyear = 9999;
+                var newlastUpdated = "";
                 for (var ival = 0; ival < ret.result.results.length; ival++) {
                     var actdata = ret.result.results[ival];
+                    if (actdata.date > newlastUpdated) {
+                        newlastUpdated = actdata.date;
+                    }
                     var actyear = parseInt(actdata.date.substr(0, 4));
+                    if (actyear < minyear) minyear = actyear;
+                    if (actyear > maxyear) maxyear = actyear;
                     var actmonth = parseInt(actdata.date.substr(5, 2));
                     var actday = parseInt(actdata.date.substr(8, 2));
                     if (typeof years["" + actyear] === "undefined") {
@@ -2526,29 +2547,98 @@ const {
                         var len = value.length;
                         value = value.substr(0, len - 1) + "." + value.substr(len - 1, 1);
                     }
+                    /**
+                     * erst mal nur Protokollausgabe, bevor es zu Problemen kommt
+                     */
                     var msg = "";
                     msg += actdata.date;
                     msg += "=>" + (actindex + actday - 1);
-                    msg += " " +  years["" + actyear][actindex + actday - 1] + "=>" + value;
-                    console.log(msg);
+                    msg += " " + years["" + actyear][actindex + actday - 1] + "=>" + value;
+                    // console.log(msg);
                     years["" + actyear][actindex + actday - 1] = value;
                 }
-                /**
-                 * erst mal nur Protokollausgabe, bevor es zu Problemen kommt
-                */
-               callback390e("Finish", res, ret);
-               return;
+                ret.datarecord.years = years;
+                if (minyear < ret.datarecord.fromyear) {
+                    ret.datarecord.fromyear = minyear;
+                }
+                if (maxyear > ret.datarecord.toyear) {
+                    ret.datarecord.toyear = minyear;
+                }
+                ret.datarecord.lastUpdated = newlastUpdated;
+                callback390e(null, res, ret);
+                return;
             },
+            function (res, ret, callback390f) {
+                /**
+                 * Updates KLIDATA, KLIINVENTORY, zuerst KLIDATA
+                 */
+                var reqparm = {};
+                reqparm.selfields = {
+                    source: ret.datarecord.source,
+                    stationid: ret.datarecord.stationid,
+                    variable: ret.datarecord.variable
+                };
+                reqparm.updfields = {};
+                reqparm.updfields["$setOnInsert"] = {
+                    source: ret.datarecord.source,
+                    stationid: ret.datarecord.stationid,
+                    variable: ret.datarecord.variable
+                };
+                if (typeof ret.datarecord.years !== "string") {
+                    ret.datarecord.years = JSON.stringify(ret.datarecord.years);
+                }
+                reqparm.updfields["$set"] = {
+                    firstyear: ret.datarecord.fromyear,
+                    firstyearok: ret.datarecord.fromyear,
+                    fromyear: ret.datarecord.fromyear,
+                    toyear: ret.datarecord.toyear,
+                    anzyears: ret.datarecord.toyear - ret.datarecord.fromyear + 1,
+                    realyears: ret.datarecord.toyear - ret.datarecord.fromyear + 1,
+                    lastUpdated: ret.datarecord.lastUpdated,
+                    years: ret.datarecord.years
+                };
+                reqparm.table = "KLIDATA";
+                sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                    console.log("KLIDATA-setonerecord:" + ret.datarecord.stationid + " " + ret.datarecord.variable);
+                    callback390f(null, res, ret);
+                    return;
+                });
+            },
+            function (res, ret, callback390f) {
+                /**
+                 * Update KLIINVENTORY
+                 */
+                var reqparm = {};
+                reqparm.selfields = {
+                    source: ret.datarecord.source,
+                    stationid: ret.datarecord.stationid,
+                    variable: ret.datarecord.variable
+                };
+                reqparm.updfields = {};
+                reqparm.updfields["$setOnInsert"] = {
+                    source: ret.datarecord.source,
+                    stationid: ret.datarecord.stationid,
+                    variable: ret.datarecord.variable
+                };
+                reqparm.updfields["$set"] = {
+                    fromyear: ret.datarecord.fromyear,
+                    toyear: ret.datarecord.toyear,
+                    anzyears: ret.datarecord.toyear - ret.datarecord.fromyear + 1,
+                    lastUpdated: ret.datarecord.lastUpdated
+                };
+                reqparm.table = "KLIINVENTORY";
+                sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                    console.log("KLIINVENTORY-setonerecord:" + ret.datarecord.stationid + " " + ret.datarecord.variable);
+                    callback390f(null, res, ret);
+                    return;
+                });
+            }
         ], function (error, res, ret) {
+            ret.message = "kla1490srv.ghcndonline - beendet:" + ret.message;
             callback391(res, ret);
             return;
         });
     };
-
-
-
-
-
 
 
     /**

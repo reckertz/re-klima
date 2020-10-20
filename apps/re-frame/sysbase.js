@@ -13,6 +13,9 @@
 
     var hasiframe = false;
 
+    var userMessages = [];
+    var messageCount = 0;
+
     var sysbaseconfig = {};
     sysbase.getConfig = function () {
         return sysbaseconfig;
@@ -441,14 +444,140 @@
         }
         if (severity > 1) {
             $(".messageline").css({
-                "background-color": "red"
+                "background-color": "magenta",
+                "font-weight": "bold"
             });
         } else {
             $(".messageline").css({
-                "background-color": "yellow"
+                "background-color": "yellow",
+                "font-weight": "normal"
             });
         }
+        messageCount++;
+        var tot = userMessages.unshift({
+            message: message,
+            severity: severity,
+            messageCount: messageCount
+        });
+        if (tot > 100) {
+            userMessages.splice(100, tot);
+        }
     };
+
+    /**
+     * showAllMessages - alle Anzeige in target
+     * target ist ein Container als ul !!!
+     */
+    sysbase.showAllMessages = function (target) {
+        $(target).empty();
+        for (var i = 0; i < userMessages.length; i++) {
+            var eintrag = userMessages[i].message;
+            if (userMessages[i].severity > 2) {
+                $("<li />", {
+                    html: eintrag,
+                    css: {
+                        color: "red"
+                    }
+                }).appendTo(target);
+            } else {
+                $("<li />", {
+                    html: eintrag,
+                    css: {
+                        color: "green"
+                    }
+                }).appendTo(target);
+            }
+        }
+        return true;
+    };
+
+    $(document).on("click", ".messageline", function (evt) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        evt.stopImmediatePropagation();
+        var msgschema = {
+            entryschema: {
+                messages: {
+                    title: "Meldungen",
+                    type: "string", // currency, integer, datum, text, key
+                    class: "uietext",
+                    default: "",
+                    io: "o"
+                }
+            }
+        };
+        var msgrecord = {
+            comment: "hier sind die Meldungen"
+        };
+        var msgcontainer = $("body").find(".content");
+        var msgtargetid = "msg" + Math.floor(Math.random() * 100000) + 1;
+        var oldmsgs = $(".uiepopup").find(".messageprotocol");
+        if (oldmsgs.length > 0) {
+            oldmsgs.closest(".uiepopup").remove();
+        }
+
+        uientry.inputDialogX(msgcontainer, {
+            left: "15%",
+            top: "15%",
+            width: "70%",
+            height: "70%"
+
+        }, "Anzeige Meldungen", msgschema, msgrecord, function (ret) {
+            if (ret.error === false) {
+                // outrec.isactive = "false"; // true oder false wenn gelöscht
+                var hm = $(".uiepopup").height();
+                var wm = $(".uiepopup").width();
+                $(".uiepopup")
+                    .find(".uieform")
+                    .append($("<br>"))
+                    .append($("<div/>", {
+                            class: "messageprotocol doprintthis",
+                            css: {
+                                height: Math.floor(hm * .6),
+                                width: Math.floor(wm * .8),
+                                overflow: "auto"
+                            }
+                        })
+                        .append($("<ul/>", {
+                            id: msgtargetid,
+                            css: {
+                                width: "100%"
+                            }
+                        }))
+                    );
+                    $("button.optionCancel")
+                    .after($("<button/>", {
+                        html: "Drucken",
+                        css: {
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            $('.doprintthis').printThis({
+                                canvas: true,
+                                afterPrint: function () {
+                                    //var lsid = $("iframe").find("[name=printIframe]").attr("id");
+                                    var lsid = $('iframe[name="printIframe"]').attr('id');
+                                    var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+                                    uihelper.downloadfile("station.html", largestring, function (ret) {
+                                        console.log("Downloaded");
+                                    });
+                                }
+                            });
+                        }
+                    }));
+
+
+                sysbase.showAllMessages("#" + msgtargetid);
+            } else {
+                sysbase.putMessage("Keine Anzeige möglich", 3);
+                return;
+            }
+        });
+
+
+
+    });
 
     var klistack = [];
 

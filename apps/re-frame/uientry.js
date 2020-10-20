@@ -1844,8 +1844,11 @@
          */
         var popupid = "popupD" + Math.floor((Math.random() * 90000) + 1);
         var popupHash = "#" + popupid;
-        if (typeof container === "string" && !container.startsWith("#")) container = "#" + container;
+        if (typeof container === "string" && !container.startsWith("#")) {
+            container = "#" + container;
+        }
         var w = $(container).outerWidth();
+
         var l = 0;
         var t = 0;
         var ww = $(window).width();

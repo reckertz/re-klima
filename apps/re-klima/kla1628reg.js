@@ -489,7 +489,7 @@
                 "background-color": "lime",
                 height: h,
                 width: "100%",
-                overflow: "auto",
+                overflow: "hidden",
                 float: "left"
             });
         $("#kla1628regwrapper")
@@ -497,7 +497,8 @@
                 "background-color": "lime",
                 height: h,
                 width: "100%",
-                overflow: "auto",
+                overflow: "hidden",
+                /* auto */
                 float: "left"
             });
         console.log("kla1628regwrapper initialisiert, leer");
@@ -526,7 +527,6 @@
         wmtit += (stationrecord.climatezone || "").length > 0 ? " Klimazone:" + stationrecord.climatezone : "";
         wmtit += (stationrecord.height || "").length > 0 ? " Höhe:" + stationrecord.height : "";
         $(".headertitle").html(wmtit);
-
         $("#kla1628regsup").click();
 
     }; // Ende show
@@ -550,9 +550,12 @@
     kla1628reg.paintX = function (selvariablename, selsource, selstationid, superParam, callbackshm9) {
         try {
             outrecords = [];
-            debugger;
             if (typeof klirecords === "undefined" || klirecords.length < 1) {
                 sysbase.putMessage("Keine Daten vorhanden", 3);
+                callbackshm9({
+                    error: false,
+                    message: "Keine Daten vorhanden"
+                });
                 return;
             }
             /**
@@ -570,7 +573,7 @@
             w -= 0; // $("#heatmap").width();
             w -= 0; // 40;
             $("#kla1628regwrapper").css({
-                overflow: "auto",
+                overflow: "hidden",
                 height: h,
                 width: w
             });
@@ -580,6 +583,7 @@
              */
             $("#kla1628regwrapper")
                 .append($("<div/>", {
+                        id: "kla1628regth1",
                         css: {
                             width: "100%",
                             overflow: "hidden"
@@ -597,6 +601,7 @@
              * */
             $("#kla1628regwrapper")
                 .append($("<div/>", {
+                        id: "kla1628regtb1",
                         css: {
                             width: "100%",
                             overflow: "hidden"
@@ -645,15 +650,27 @@
                     )
                 );
 
+            //  #kla1628regt1
+            $("#kla1628regwrapper").css({
+                overflow: "hidden",
+                height: h,
+                width: w
+            });
             /**
              * jedes Jahr mit allen Tagen für eine Sparkline
              */
             var varyears = [];
             var fromyear = null;
             var toyear = null;
+            var yeardata = {};
+            if (typeof klirecords[0].years === "string") {
+                yeardata = JSON.parse(klirecords[0].years);
+            } else {
+                yeardata = klirecords[0].years;
+            }
             varyears.push({
                 variablename: klirecords[0].variable,
-                years: JSON.parse(klirecords[0].years)
+                years: yeardata
             });
             fromyear = parseInt(klirecords[0].fromyear);
             toyear = parseInt(klirecords[0].toyear);
@@ -724,9 +741,11 @@
                             console.log("***ivar:" + ivar + " iyear:" + iyear + " undefiniert");
                             continue;
                         }
-                        if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
-                            console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
-                            continue;
+                        if (iyear < toyear && iyear > fromyear) {
+                            if (superParam.qonly === true && !uihelper.isqualityyear(varyears[ivar].years[iyear])) {
+                                console.log("***ivar:" + ivar + " iyear:" + iyear + " bad data");
+                                continue;
+                            }
                         }
                         /**
                          * reine Vorbereitung und Initialisierung rowrecord für rowdata
@@ -857,6 +876,23 @@
                     filter_ignoreCase: true
                 }
             }); // so funktioniert es
+            debugger;
+            var hc = $("#kla1628reg").height();
+            var hb = $("#kla1628regbuttons").height();
+            $("#kla1628regdiv").height(hc - hb);
+            $("#kla1628regwrapper").height(hc - hb);
+            var hh = $("#kla1628regth1").height();
+            var ht = hc - hb - hh;
+            $("#kla1628regtb1").css({
+                overflow: "auto",
+                height: ht,
+                width: "95%" /* w */
+            });
+
+            $('#kla1628regt1').fixedHeaderTable('show');
+
+
+
         } catch (err) {
             console.log(err);
             console.log(err.stack);

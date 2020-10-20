@@ -3082,13 +3082,19 @@
      * 2. verteilte Lücken > 20%
      * Vorgabe array für das Jahr mit Temperaturdaten, return true/false
      */
-    uihelper.isqualityyear = function (yeararray) {
+    uihelper.isqualityyear = function (yeararray, qvariable) {
         var igood = 0;
         var ibad = 0;
         var istarter = 0;
         var iender = 0;
         var iges = yeararray.length;
         var igesx = iges - 30 - 1;
+        var docheck = false;
+        var qmsg = "";
+        var qerr = 0;
+        if (typeof qvariable === "string" && (qvariable === "TMIN" || qvariable === "TMAX" || qvariable === TAVG)) {
+            docheck = true;
+        }
         for (var iqual = 0; iqual < iges; iqual++) {
             var qvalue = yeararray[iqual];
             var qtype = typeof qvalue;
@@ -3102,17 +3108,47 @@
                 }
                 continue;
             } else {
+                if (docheck === true) {
+                    var qf = parseFloat(qvalue);
+                    if (qf < -100 || qf > 80) {
+                        qmsg += qvalue;
+                        qmsg += " (" + iqual + ") ";
+                        qerr++;
+                        console.log(qmsg)
+                    }
+                }
                 igood++;
                 continue;
             }
         }
-        if (ibad / iges * 100 >= 20) {
-            return false;
+        if (ibad / iges * 100 >= 20 || qerr > 0) {
+           if (docheck === true) {
+                return {
+                    error: true,
+                    message: qmsg
+                };
+           } else {
+                return false;
+           }
         }
         if (istarter > 30 || iender > 30) {
-            return false;
+            if (docheck === true) {
+                return {
+                    error: true,
+                    message: qmsg
+                };
+           } else {
+                return false;
+           }
         }
-        return true;
+        if (docheck === true) {
+            return {
+                error: false,
+                message: "OK"
+            };
+       } else {
+            return true;
+       }
     };
 
     /**
