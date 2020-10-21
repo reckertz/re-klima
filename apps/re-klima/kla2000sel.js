@@ -462,6 +462,7 @@
                             id: "kla2000selliste",
                             css: {
                                 float: "left",
+                                clear: "both",
                                 "margin": "10px"
                             },
                             html: "Liste",
@@ -1626,11 +1627,12 @@
             var username = uihelper.getUsername();
             var confschema = {
                 entryschema: {
-                    props: {
+                    props1: {
                         title: "Abrufparameter " + stationid,
                         description: "",
                         type: "object", // currency, integer, datum, text, key, object
                         class: "uiefieldset",
+                        width: "55%",
                         properties: {
                             stationid: {
                                 title: "Stations-ID",
@@ -1660,6 +1662,7 @@
                                 title: "gute Daten",
                                 type: "string", // currency, integer, datum, text, key
                                 class: "uiecheckbox",
+                                clear: "none",
                                 io: "i"
                             },
                             heatmaps: {
@@ -1704,6 +1707,16 @@
                                 default: "",
                                 io: "i"
                             },
+                        }
+                    },
+                    props2: {
+                        title: "Abrufparameter " + stationid,
+                        description: "",
+                        type: "object", // currency, integer, datum, text, key, object
+                        class: "uiefieldset",
+                        width: "40%",
+                        properties: {
+
                             decimals: {
                                 title: "Dezimalstelle",
                                 type: "string", // currency, integer, datum, text, key
@@ -1775,7 +1788,8 @@
                 evt.stopPropagation();
                 evt.stopImmediatePropagation();
                 console.log(extraParam);
-                confrecord = JSON.parse(extraParam).props;
+                confrecord = JSON.parse(extraParam).props1;
+                Object.assign(confrecord, JSON.parse(extraParam).props2);
                 if (confrecord.allin === false) {
                     selstations = [];
                     selstations.push({

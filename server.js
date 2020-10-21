@@ -35,7 +35,7 @@ var db = new sqlite3.Database('klidata.db3');
 db.serialize(function () {
     async.waterfall([
         function (callbackdb1) {
-            var sqlstmt = "CREATE INDEX KLISTATIONS01";
+            var sqlstmt = "CREATE INDEX IF NOT EXISTS KLISTATIONS01";
             sqlstmt += " ON KLISTATIONS(source, stationid)";
             db.run(sqlstmt, function (err) {
                 console.log("Create Index KLISTATIONS:" + err);
@@ -54,7 +54,7 @@ db.serialize(function () {
         },
         */
         function (callbackdb2) {
-            var sqlstmt = "CREATE INDEX KLIDATA01";
+            var sqlstmt = "CREATE INDEX IF NOT EXISTS KLIDATA01";
             sqlstmt += " ON KLIDATA(source, stationid, variable, fromyear, anzyears)";
             db.run(sqlstmt, function (err) {
                 console.log("Create Index KLIDATA:" + err);
@@ -73,7 +73,7 @@ db.serialize(function () {
         },
         */
         function (callbackdb3) {
-            var sqlstmt = "CREATE INDEX KLIINVENTORY01";
+            var sqlstmt = "CREATE INDEX IF NOT EXISTS KLIINVENTORY01";
             sqlstmt += " ON KLIINVENTORY(source, stationid, variable, fromyear, toyear)";
             db.run(sqlstmt, function (err) {
                 console.log("Create Index KLIINVENTORY01:" + err);
@@ -132,8 +132,8 @@ db.serialize(function () {
            callbackdb10(null);
            return;
         },
+        
         /*
-        ,
         function (callbackdb4) {
             var sqlstmt = "ALTER TABLE KLIDATA ";
             sqlstmt += " ADD COLUMN lastUpdated TEXT";
@@ -142,8 +142,22 @@ db.serialize(function () {
                 callbackdb4(null);
                 return;
             });
+        },
+        */    
+       /*
+        function (callbackdb5) {
+            var sqlstmt = "ALTER TABLE KLIINVENTORY ";
+            sqlstmt += " ADD COLUMN lastUpdated TEXT";
+            db.run(sqlstmt, function (err) {
+                console.log("add column KLIINVENTORY:" + err);
+                callbackdb5(null);
+                return;
+            });
         }
         */
+        
+
+        
 
     ], function (error, result) {
         console.log("Fertig mit Indexerstellung");

@@ -454,7 +454,8 @@
                     $(containerHash)
                         .append($('<div/>', {
                                 class: "ui-field-contain",
-                                width: "95%"
+                                width: "95%",
+                                clear: epfield.clear || "both"
                             })
                             .append($('<label/>', {
                                 for: pageprefix + epfieldname,
@@ -480,7 +481,8 @@
                         $(containerHash)
                             .append($('<div/>', {
                                     class: "ui-field-contain",
-                                    width: "95%"
+                                    width: "95%",
+                                    clear: epfield.clear || "both"
                                 })
                                 .append($('<label/>', {
                                     for: pageprefix + epfieldname,
@@ -499,6 +501,7 @@
                         $(containerHash)
                             .append($('<div/>', {
                                     class: "ui-field-contain",
+                                    clear: epfield.clear || "both",
                                     width: "95%"
                                 })
                                 .append($("<input/>", {
@@ -527,6 +530,7 @@
                         $(containerHash)
                             .append($('<div/>', {
                                     class: "ui-field-contain",
+                                    clear: epfield.clear || "both",
                                     width: "95%"
                                 })
                                 .append($('<label/>', {
@@ -548,6 +552,7 @@
                         $(containerHash)
                             .append($('<div/>', {
                                     class: "ui-field-contain",
+                                    clear: epfield.clear || "both",
                                     width: "95%"
                                 })
                                 .append($("<textarea/>", {
@@ -572,6 +577,7 @@
                     $(containerHash)
                         .append($('<div/>', {
                                 class: "ui-field-contain",
+                                clear: epfield.clear || "both",
                                 width: "95%"
                             })
                             .append($('<label/>', {
@@ -593,6 +599,7 @@
                     $(containerHash)
                         .append($('<div/>', {
                                 class: "ui-field-contain",
+                                clear: epfield.clear || "both",
                                 width: "95%"
                             })
                             .append($('<label/>', {
@@ -615,6 +622,7 @@
                     $(containerHash)
                         .append($('<div/>', {
                                 class: "ui-field-contain",
+                                clear: epfield.clear || "both",
                                 width: "95%"
                             })
                             .append($('<label/>', {
@@ -635,7 +643,8 @@
                     $(containerHash)
                         .append($('<fieldset/>', {
                                 id: pageprefix + epfieldname,
-                                class: "ui-field-contain"
+                                class: "ui-field-contain",
+                                clear: epfield.clear || "both"
                             })
                             .append($("<legend/>", {
                                 text: epfield.title
@@ -673,6 +682,7 @@
                     $(containerHash)
                         .append($("<div/>", {
                                 class: "ui-field-contain",
+                                clear: epfield.clear || "both",
                                 width: "95%"
                             })
                             .append($('<label/>', {
@@ -878,6 +888,7 @@
                     $(containerHash)
                         .append($('<div/>', {
                                 class: "ui-field-contain",
+                                clear: epfield.clear || "both",
                                 width: "95%"
                             })
                             .append($('<label/>', {
@@ -1902,7 +1913,10 @@
                 }))
                 .append($('<div/>', {
                     id: popupid + "form",
-                    class: "uieform"
+                    class: "uieform",
+                    css: {
+                        width: "inherit"
+                    }
                 }))
                 .append($('<div/>', {
                         css: {
