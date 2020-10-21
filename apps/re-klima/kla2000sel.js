@@ -1780,7 +1780,7 @@
             var pos = {
                 left: $(anchorHash).offset().left,
                 top: window.screen.height * 0.1,
-                width: $(anchorHash).width() * 0.60,
+                width: $(anchorHash).width() * 0.75,
                 height: $(anchorHash).height() * 0.90
             };
             $(document).on('popupok', function (evt, extraParam) {

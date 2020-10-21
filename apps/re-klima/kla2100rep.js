@@ -276,6 +276,8 @@
                 click: function (evt) {
                     // sysbase.printDivAll($("#kla2100repwrapper").html());
                     // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
+                    // $("div.")  // leaflet-spezialbehandlung
+
                     $('canvas').each(function (e) {
                         var image = new Image();
                         var that = this;
@@ -1405,6 +1407,38 @@
                     ret.leftdivid = divid;
                     cb2100g0a(null, ret);
                     return;
+                },
+
+                function (ret, cb2100g01) {
+                    var divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
+                    $("#kla2100repwrapper")
+                        .append($("<div/>", {
+                            id: divid1,
+                            class: "col2of2 doprintthis",
+                            css: {
+                                float: "left",
+                                height: $("#" + ret.leftdivid).height(),
+                                overflow: "auto"
+                            }
+                        }));
+
+                        var  mymap = L.map(divid1).setView([klirow.latitude, klirow.longitude], 15);
+                        // Default public token
+                        // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
+                        L.tileLayer(
+                            'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                                maxZoom: 13,
+                                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                                id: 'mapbox/streets-v11'
+                            }).addTo(mymap);
+
+                        // Marker des Zielpunktes, Station, Kölner Dom
+                        var marker = L.marker([klirow.latitude, klirow.longitude]).addTo(mymap);
+                        cb2100g01(null, ret);
+                        return;
+
                 },
                 function (ret, cb2100g0) {
                     /**
