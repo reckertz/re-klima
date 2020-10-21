@@ -1269,7 +1269,7 @@
                     }
 
                     // Spezielle Buttons mit Vor-Aufbereitung
-                    var gurl = "https://www.google.com/maps/search/?api=1&query=";
+                    var gurl = "https://www.google.com/maps/search/?api=1&map-action=map&zoom=10&query=";
                     gurl += klirow.latitude;
                     gurl += ",";
                     gurl += klirow.longitude;
@@ -1346,9 +1346,8 @@
                     $("#kla2100repwrapper")
                         .append($("<div/>", {
                             id: divid,
-                            class: "doprintthis",
+                            class: "col1of2 doprintthis",
                             css: {
-                                width: "100%",
                                 float: "left",
                                 overflow: "hidden"
                             }
@@ -1403,6 +1402,7 @@
                         .append($("<div/>", {
                             html: html
                         }));
+                    ret.leftdivid = divid;
                     cb2100g0a(null, ret);
                     return;
                 },
@@ -1782,7 +1782,7 @@
 
                 function (ret, cb2100g9) {
                     if (kla2100repconfig.hyde === false) {
-                        cb2100g9("Finish", ret);
+                        cb2100g9(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
@@ -1797,7 +1797,7 @@
                         }));
                     var hmoptions = {};
                     kla2100rep.klihyde2("#" + divid, selstationid, starecord, function (ret) {
-                        cb2100g9("Finish", ret);
+                        cb2100g9(null, ret);
                         return;
                     });
                 }

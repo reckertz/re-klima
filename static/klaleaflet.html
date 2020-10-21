@@ -22,6 +22,7 @@
     <script src="lib/jquery.cookie.min.js"></script>
     <script src="lib/jquery.mousewheel.min.js" charset="utf-8"></script>
     <script src="lib/leaflet.js" charset="utf-8"></script>
+    <script src="lib/leaflet-image.js" charset="utf-8"></script>
     <!-- script src="lib/jsts.min.js" charset="utf-8"></script -->
     <!-- script src="https://cdn.jsdelivr.net/npm/@turf/turf@5/turf.min.js"></script -->
     <script src="lib/turf.min.js" charset="utf-8"></script>
@@ -36,7 +37,8 @@
         <!-- img src="img/icons/klilogo_schrift.png" alt="headerpic not work" class="headerPic" / -->
         <span class="headertitle" style="color:red;font-weight:bold;">klaleaflet - World-Map und Geo-Test</span>
         <noscript>
-            <div style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
+            <div
+                style='position:fixed;z-index:1;left:30%;top:25%;width:50%;min-width:150px;min-height:20%;overflow:auto;background-color:mistyrose;text-align:center;'>
                 <span style="color:blue">
                     Your browser does not support scripts, you have to enable it to run this page
                 </span>
@@ -53,6 +55,10 @@
             <div id="prot">
 
             </div>
+            <div id="images">
+
+            </div>
+
         </div>
     </div>
     <div class="footer">
@@ -150,7 +156,8 @@
                         metafields.latitude = "-90.0";
                         metafields.longitude = "-180.0";
                         mymap.setView([metafields.latitude, metafields.longitude], 13);
-                        var marker = L.marker([metafields.latitude, metafields.longitude]).addTo(mymap);
+                        var marker = L.marker([metafields.latitude, metafields.longitude]).addTo(
+                            mymap);
                         var y = lat2y(metafields, metafields.latitude);
                         var x = lon2x(metafields, metafields.longitude);
                         metafields.rawy = y;
@@ -177,7 +184,8 @@
                         metafields.latitude = "90.0";
                         metafields.longitude = "180.0";
                         mymap.setView([metafields.latitude, metafields.longitude], 13);
-                        var marker = L.marker([metafields.latitude, metafields.longitude]).addTo(mymap);
+                        var marker = L.marker([metafields.latitude, metafields.longitude]).addTo(
+                            mymap);
                         var y = lat2y(metafields, metafields.latitude);
                         var x = lon2x(metafields, metafields.longitude);
                         metafields.rawy = y;
@@ -224,19 +232,37 @@
 
             metafields.latitude = latitude;
             metafields.longitude = longitude;
-            mymap = L.map('mapid').setView([latitude, longitude], 11);
+            mymap = L.map('mapid').setView([latitude, longitude], 15);
             // Default public token
             // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
-            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-                maxZoom: 18,
-                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                id: 'mapbox/streets-v11'
-            }).addTo(mymap);
+            L.tileLayer(
+                'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                    maxZoom: 18,
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                        '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                        'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    id: 'mapbox/streets-v11'
+                }).addTo(mymap);
 
             // Marker des Zielpunktes, Station, Kölner Dom
             var marker = L.marker([latitude, longitude]).addTo(mymap);
+
+            //var map = L.mapbox.map('map', 'YOUR.MAPID').setView([38.9, -77.03], 14);
+            https://github.com/mapbox/leaflet-image
+            leafletImage(mymap, function (err, canvas) {
+                // now you have canvas
+                // example thing to do with that canvas:
+                var img = document.createElement('img');
+                var dimensions = mymap.getSize();
+                img.width = dimensions.x;
+                img.height = dimensions.y;
+                img.src = canvas.toDataURL();
+                document.getElementById('images').innerHTML = '';
+                document.getElementById('images').appendChild(img);
+            });
+
+
+
 
 
             // Berechnung der center-Zelle LatLon-Sicht
@@ -303,10 +329,10 @@
                     function (callback) {
                         /**
                          * Holen Hyde-Daten neuer API stationhyde
-                        */
-                       var ret = {};
-                       callback (null, ret);
-                       return;
+                         */
+                        var ret = {};
+                        callback(null, ret);
+                        return;
                     },
                     function (ret, callback) {
                         /**
@@ -333,7 +359,8 @@
                             var fromline = ret.fromline;
                             var frombyte = ret.aktbyte;
                             console.log(ret.message + " Textlänge:" + nextchunk.length);
-                            sysbase.putMessage("HYDE-Matrix geladen, Textlänge:" + nextchunk.length, 1);
+                            sysbase.putMessage("HYDE-Matrix geladen, Textlänge:" + nextchunk.length,
+                                1);
                             callback(null, ret);
                         });
                     },
