@@ -182,7 +182,7 @@
                                 for (var icon = 0; icon < ipcczones.length; icon++) {
                                     var ipcczone = ipcczones[icon];
                                     if (ipcczone.label !== "8") {
-                                       // continue;
+                                        // continue;
                                     }
                                     for (var iko = 0; iko < (ipcczone.lat.length - 1); iko++) {
                                         ilink++;
@@ -626,11 +626,27 @@
                                 variablename: starecord.variablename,
                                 starecord: starecord
                             }));
+                            /*
                             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
                                 source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
                             var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima",
                                 "kla1620shm", tourl);
                             window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                            */
+
+                            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
+                                source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
+                            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima",
+                                "kla2100rep", tourl);
+                            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+
+
+                            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + selvariablename;
+                            var stationname = stationarray[stationid];
+                            var tabname = selvariablename + " " + stationname;
+                            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+
 
                         },
                         /*
