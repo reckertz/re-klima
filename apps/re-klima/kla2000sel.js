@@ -1658,6 +1658,18 @@
                                 class: "uiecheckbox",
                                 io: "i"
                             },
+                            worldmap: {
+                                title: "Position in Worldmap",
+                                type: "string", // currency, integer, datum, text, key
+                                class: "uiecheckbox",
+                                io: "i"
+                            },
+                            leaflet: {
+                                title: "Position in Leaflet-zoomed",
+                                type: "string", // currency, integer, datum, text, key
+                                class: "uiecheckbox",
+                                io: "i"
+                            },
                             qonly: {
                                 title: "gute Daten",
                                 type: "string", // currency, integer, datum, text, key
@@ -1866,8 +1878,9 @@
                     decimals: true,
                     heatmaps: true,
                     heatmapsx: true,
-                    hyde: true,
                     master: true,
+                    worldmap: true,
+                    leaflet: false,
                     qonly: true,
                     tempdistribution: true,
                     tempchart: true,
@@ -1877,7 +1890,8 @@
                     comment: "",
                     fromyear: fromyear,
                     toyear: toyear,
-                    step: 30
+                    step: 30,
+                    hyde: true
                 };
             }
             // Hidden der aktuellen variablen Daten

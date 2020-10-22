@@ -103,6 +103,8 @@
                 heatmaps: true,
                 hyde: true,
                 master: true,
+                worldmao: true,
+                leaflet: false,
                 qonly: true,
                 tempdistribution: true,
                 tempchart: true,
@@ -1410,7 +1412,15 @@
                 },
 
                 function (ret, cb2100g01) {
+                    /**
+                     * Worldmap und leaflet
+                     */
+                    if (kla2100repconfig.worldmap === false) {
+                        cb2100g01(null, ret);
+                        return;
+                    }
                     var divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
+                    ret.rightdivid = divid1;
                     $("#kla2100repwrapper")
                         .append($("<div/>", {
                             id: divid1,
@@ -1421,23 +1431,128 @@
                                 overflow: "auto"
                             }
                         }));
+                    $("#" + divid1)
+                        .append($("<div/>", {
+                                class: "mapcontainer",
+                                css: {
+                                    width: "100%"
+                                }
+                            })
+                            .append($("<div/>", {
+                                class: "map"
+                            }))
+                        );
+                    $("#" + divid1 + ".mapcontainer").css({
+                        height: $("#" + ret.leftdivid).height() * .8,
+                        overflow: "hidden"
+                    });
+                    // Attay, ein Element
+                    var plots = [{
+                        stationid: klirow.stationid,
+                        sitename: klirow.stationname,
+                        longitude: klirow.longitude,
+                        latitude: klirow.latitude
+                    }];
 
-                        var  mymap = L.map(divid1).setView([klirow.latitude, klirow.longitude], 15);
-                        // Default public token
-                        // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
-                        L.tileLayer(
-                            'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
-                                maxZoom: 13,
-                                attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
-                                    '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
-                                    'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
-                                id: 'mapbox/streets-v11'
-                            }).addTo(mymap);
+                    var worldmaplinks = kla2100rep.getClimatezonelinks();
 
-                        // Marker des Zielpunktes, Station, Kölner Dom
-                        var marker = L.marker([klirow.latitude, klirow.longitude]).addTo(mymap);
-                        cb2100g01(null, ret);
+                    var worldmap = {
+                        map: {
+                            // Set the name of the map to display
+                            name: "world",
+                            zoom: {
+                                "enabled": true
+                            },
+                            defaultArea: {
+                                eventHandlers: {}
+                            },
+                            defaultPlot: {
+                                eventHandlers: {}
+
+                            },
+                            afterInit: function ($self, paper, areas, plots, options) {
+                                //$('.mapcontainer .map').unbind("resizeEnd");
+                                /*
+                                debugger;
+                                var mapi = $(".mapcontainer").data("mapael");
+                                var mapW = paper._viewBox[2];
+                                var mapH = paper._viewBox[3];
+                                var mapRatio = mapW / mapH;
+                                // TODO - height berechnen - eigentlich muss aus der Weite die Höhe berechnet werden!!!
+                                var availableH = $(".content").height() - 100; // für content - Bereich für
+                                var availableW = availableH * mapRatio;
+                                var maxW = $(".col1of2").width();
+                                if (availableW > maxW) {
+                                    availableH = maxW / mapRatio; // für content - Bereich für
+                                    availableW = maxW;
+                                }
+                                var msg = "";
+                                msg += " avH:" + availableH;
+                                msg += " ratio:" + mapRatio;
+                                msg += " avW:" + availableW;
+                                console.log(msg);
+                                paper.setSize(availableW, availableH);
+                                $(window).on('resize', function () {
+                                    // kla1630map.fitMap(".content", "world", paper);
+                                });
+                                */
+                            }
+                        },
+                        plots: plots,
+                        links: worldmaplinks
+                    };
+                    //$(".mapcontainer").trigger('update', [options]); 
+
+                    $("#" + divid1).find(".mapcontainer").mapael(worldmap);
+                    cb2100g01(null, ret);
+                    return;
+
+                },
+
+                function (ret, cb2100g02) {
+                    /**
+                     * Worldmap und leaflet
+                     */
+                    if (kla2100repconfig.leaflet === false) {
+                        cb2100g02(null, ret);
                         return;
+                    }
+                    var divid1 = "";
+                    if (typeof ret.rightdivid !== "undefined") {
+                        divid1 = ret.rightdivid;
+                    } else {
+                        divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
+                        ret.rightdivid = divid1;
+                        $("#kla2100repwrapper")
+                            .append($("<div/>", {
+                                id: divid1,
+                                class: "col2of2 doprintthis",
+                                css: {
+                                    float: "left",
+                                    height: $("#" + ret.leftdivid).height(),
+                                    overflow: "auto"
+                                }
+                            }));
+                    }
+
+
+
+                    var mymap = L.map(divid1).setView([klirow.latitude, klirow.longitude], 15);
+                    // Default public token
+                    // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
+                    L.tileLayer(
+                        'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                            maxZoom: 13,
+                            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                            id: 'mapbox/streets-v11'
+                        }).addTo(mymap);
+
+                    // Marker des Zielpunktes, Station, Kölner Dom
+                    var marker = L.marker([klirow.latitude, klirow.longitude]).addTo(mymap);
+                    cb2100g02(null, ret);
+                    return;
 
                 },
                 function (ret, cb2100g0) {
@@ -4626,6 +4741,153 @@
         }, 1000);
         return xclock;
     };
+
+
+    /**
+     * getClimatezonelinks - für worldmap-Einblendung
+     */
+    kla2100rep.getClimatezonelinks = function () {
+        // 23,5 - 40 - 60
+        var wl = {
+            'link0': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 0.1,
+                    longitude: -179.0
+                }, {
+                    latitude: 0.2,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Tropic"
+                }
+            },
+            'link1': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 23.50,
+                    longitude: -179.0
+                }, {
+                    latitude: 23.51,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Subtropic"
+                }
+            },
+            'link2': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 40.0,
+                    longitude: -179.0
+                }, {
+                    latitude: 40.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Gemäßigt"
+                }
+            },
+            'link3': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: 60.0,
+                    longitude: -179.0
+                }, {
+                    latitude: 60.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Kalt"
+                }
+            },
+
+            'link1s': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: -23.50,
+                    longitude: -179.0
+                }, {
+                    latitude: -23.51,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Subtropic"
+                }
+            },
+            'link2s': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: -40.0,
+                    longitude: -179.0
+                }, {
+                    latitude: -40.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Gemäßigt"
+                }
+            },
+            'link3s': {
+                factor: 0.01,
+                // The source and the destination of the link can be set with a latitude and a longitude or a x and a y ...
+                between: [{
+                    latitude: -60.0,
+                    longitude: -179.0
+                }, {
+                    latitude: -60.1,
+                    longitude: 179.0
+                }],
+                attrs: {
+                    "stroke-width": 2,
+                    stroke: "#a4e100",
+                    opacity: 0.6
+                },
+                tooltip: {
+                    content: "Kalt"
+                }
+            }
+        };
+        return wl;
+    };
+
+
 
     /**
      * standardisierte Mimik zur Integration mit App, Browser und node.js
