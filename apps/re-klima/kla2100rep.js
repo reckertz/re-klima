@@ -14,23 +14,12 @@
      * nach wasserstand, grundet auf Ganzzahlen
      * mit Sekundärdaten aus HYDE
      */
-
-    var kla2100repparms = {};
     var varparms = {};
     var actprjname;
-    var fullname;
-    var fulldatafilename;
-    var datafilename;
-    var selyears;
-    var yearlats;
-    var tarray = [];
     var cid;
     var cidw;
-    var sgif;
-    var aktyear;
-    var aktvariablename;
 
-    var myCharts = {};
+
 
     var selparms;
     var selstations = []; // die Massenabfrage kann je station unterschiedliche source haben!!!,
@@ -41,88 +30,294 @@
     var starecord = null; // Selektionsparameter
     var kla2100repconfig = {};
     var stationrecord;
-    var yearindexarray = {};
     var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
     var histo1 = {}; // Histogramm auf Wasserstand gerundet Ganzzahl
-    var array1 = []; // aktives Array für d3
     var klirecords = [];
     var klirow = {}; // der aktuelle Datensatz, dynamisch aus klirecords[i] geholt
     var klihydes = {}; // Struktur für die gesammelten Hyde-Daten: source.stationid => klihyde in der Strukur
     var klihyde = {}; // Struktur für eine source.stationid Kombination
     var kla2100repclock;
 
-    var hmatrixR;
     var hmatrixL;
-
-    var hoptionsR;
     var hoptionsL;
+    var stationarray = [];
+    var parmobj = {};
 
-    var poprecord = {}; // Konfigurationsparameter mit Default-Zuweisung
-    poprecord.qonly = true;
-    poprecord.total = false;
-    poprecord.mixed = true;
-    poprecord.moon = false;
-    poprecord.tempdistribution = true;
-    poprecord.export = false;
+    var confschema = {
+        entryschema: {
+            props1: {
+                title: "Abrufparameter ",
+                description: "",
+                type: "object", // currency, integer, datum, text, key, object
+                class: "uiefieldset",
+                width: "33%",
+                properties: {
+                    stationid: {
+                        title: "Stations-ID",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        io: "h"
+                    },
+                    source: {
+                        title: "Source",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        io: "h"
+                    },
+                    variable: {
+                        title: "Variable",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        io: "h"
+                    },
+                    master: {
+                        title: "Stammdaten",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        io: "i"
+                    },
+                    worldmap: {
+                        title: "Position in Worldmap",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        io: "i"
+                    },
+                    leaflet: {
+                        title: "Position in Leaflet-zoomed",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        io: "i"
+                    },
+                    qonly: {
+                        title: "gute Daten",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        clear: "none",
+                        io: "i"
+                    },
+                    heatmaps: {
+                        title: "Heatmaps",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        io: "i"
+                    },
+                    heatmapsx: {
+                        title: "Heatmaps+",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        io: "i"
+                    },
+                    fromyear: {
+                        title: "Von Jahr",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        maxlength: 4,
+                        size: 4,
+                        width: "70px",
+                        default: "",
+                        io: "i"
+                    },
+                    toyear: {
+                        title: "Bis Jahr",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        maxlength: 4,
+                        size: 4,
+                        width: "70px",
+                        default: "",
+                        io: "i"
+                    },
+                    step: {
+                        title: "Bucket",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        maxlength: 4,
+                        size: 4,
+                        width: "70px",
+                        default: "",
+                        io: "i"
+                    },
+                }
+            },
+            props2: {
+                title: "Abrufparameter ",
+                description: "",
+                type: "object", // currency, integer, datum, text, key, object
+                class: "uiefieldset",
+                width: "30%",
+                properties: {
+                    decimals: {
+                        title: "Dezimalstelle",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    },
+                    tempchart: {
+                        title: "Temperaturverlauf",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        io: "i"
+                    },
+                    temptable: {
+                        title: "Temperaturtabelle",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        io: "i"
+                    },
+                    tempdistribution: {
+                        title: "Distribution",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    },
+                    allin: {
+                        title: "Alle in der Liste",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: false,
+                        io: "i"
+                    },
+                    autoload: {
+                        title: "Automatisch Laden",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: false,
+                        io: "i"
+                    },
+                    comment: {
+                        title: "Kommentar",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uietext",
+                        default: "",
+                        io: "i"
+                    }
+                }
+            },
+            props3: {
+                title: "Hyde-Abruf",
+                description: "",
+                type: "object", // currency, integer, datum, text, key, object
+                class: "uiefieldset",
+                width: "25%",
+                properties: {
+                    hyde: {
+                        title: "HYDE-Daten",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: false,
+                        io: "i"
+                    },
+                    // popc,rurc,urbc,uopp,cropland,tot_irri
+                    popc: {
+                        title: "Bevölkerung",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    },
+                    urbc: {
+                        title: "Stadtbevölkerung",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    },
+                    rurc: {
+                        title: "Landbevölkerung",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    },
+                    uopp: {
+                        title: "Städt. Bebauung",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    },
+                    cropland: {
+                        title: "Landwirtschaft",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    },
+                    tot_irri: {
+                        title: "Bewässert",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: true,
+                        io: "i"
+                    }
+                }
+            }
+        }
+    };
+    var confrecord = {};
 
+    /**
+     * kla2100rep.show - Initialisierung der Anwendung
+     * Gerüst anzeigen und erste Funktionsaufrufe
+     * @param {*} parameters
+     * @param {*} navigatebucket
+     */
     kla2100rep.show = function (parameters, navigatebucket) {
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
+
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
             selsource = parameters[0].source;
             selvariablename = parameters[0].variablename;
             starecord = JSON.parse(parameters[0].starecord);
-        } else {
-            /**
-             * Prüfen, ob allin - Abarbeiten aller stationid aus der Liste
-             */
-            selparms = window.parent.sysbase.getCache("onestation");
-            if (selparms !== null) {
-                selparms = JSON.parse(selparms);
-                selstations = selparms.selstations || [];
-                selstationid = selparms.stationid;
-                starecord = selparms.starecord;
-                selsource = selparms.starecord.source;
-                selvariablename = selparms.starecord.variablename;
-            }
-            /*
-            config:
-            comment: ""
-            decimals: false
-            heatmaps: false
-            hyde: false
-            master: true
-            qonly: false
-            tempdistribution: false
-            tempchart: false
-            temptable: false
-            */
-            kla2100repconfig = $.extend(true, {
-                comment: "",
-                decimals: true,
-                heatmaps: true,
-                hyde: true,
-                master: true,
-                worldmao: true,
-                leaflet: false,
-                qonly: true,
-                tempdistribution: true,
-                tempchart: true,
-                temptable: true,
-                allin: false,
-                autoload: true
-
-            }, selparms.config);
-
+        }
+        /**
+         * Prüfen, getCache onestation Parameter hat
+         */
+        selparms = window.parent.sysbase.getCache("onestation");
+        if (typeof selparms === "string" && selparms.length > 0) {
+            selparms = JSON.parse(selparms);
+        }
+        /**
+         * Prüfen, ob es URL-Parameter gab, diese überschreiben onestation
+         */
+        var queryString = window.location.search;
+        console.log(queryString); // ?product=shirt&color=blue&newuser&size=m
+        queryString = queryString.substr(1);
+        var idis = queryString.lastIndexOf("?");
+        if (idis > 0) {
+            queryString = queryString.substr(0, idis);
+        }
+        if (queryString && queryString.length > 0) {
+            var parms = queryString.split("&");
+            var parmobj = {};
+            parms.forEach(function (item) {
+                var subparms = item.split("=");
+                var key = subparms[0];
+                parmobj[key] = subparms[1];
+            });
+            console.log(parmobj);
+            selparms = $.extend(true, selparms, parmobj);
         }
 
-        kla2100repparms = {
-            selstations: selstations,
-            selstationid: selstationid,
-            starecord: starecord,
-            selsource: selsource,
-            selvariablename: selvariablename
-        };
+        if (typeof selparms === "object" && Object.keys(selparms).length > 0) {
+            selstations = selparms.selstations || [];
+            selstationid = selparms.stationid;
+            starecord = selparms.starecord;
+            if (typeof selparms.source === "undefined") {
+                selsource = selparms.starecord.source;
+            } else {
+                selsource = selparms.source;
+            }
+            if (typeof selparms.variablename === "undefined") {
+                selvariablename = selparms.starecord.variablename;
+            } else {
+                selvariablename = selparms.variablename;
+            }
+        }
+        stationarray = selparms.stationarray || [];
         varparms = {
             TMAX: {
                 header: "Temperatur",
@@ -336,7 +531,6 @@
                     var idc21 = window.parent.sysbase.tabcreateiframe(selstationid, "", "re-klima", "kla1990htm", tourl);
                     window.parent.$(".tablinks[idhash='#" + idc21 + "']").click(); // das legt erst den iFrame an
                     setTimeout(function () {
-
                         var actdiv = window.parent.$("#" + idc21);
                         var actiFrame = $(actdiv).find("iframe").get(0);
                         var actiFrameBody = $(actiFrame).contents();
@@ -356,8 +550,176 @@
                                 }));
                         });
                         /**
-                         * Konvertieren canvas zu image
+                         * Konvertieren leaflet zu Image
+                         * vorgezogen weil etwas kritisch
                          */
+                        debugger;
+                        $(actiFrameBody).find('.leaflet-container').each(function (index, maincontainer) {
+                            // maincanvas ist die oberste Ebene der Leaflet-Map
+                            // canvas anlegen
+                            // neuen Canvas anlegen
+                            var canvasid = "C" + Math.floor(Math.random() * 100000) + 1;
+                            $(maincontainer)
+                                .parent()
+                                .append($("<canvas/>", {
+                                    id: canvasid,
+                                    css: {
+                                        border: "1px solid",
+                                        width: $(maincontainer).width(),
+                                        height: $(maincontainer).height()
+                                    }
+                                }));
+
+
+
+
+                            var imgarray = [];
+                            var targetW = $(maincontainer).width();
+                            var targetH = $(maincontainer).height();
+                            var w
+                            $(maincontainer).find('img').each(function (imgindex, imgelement) {
+                                var sourceW = $(imgelement).width();
+                                var sourceH = $(imgelement).height();
+                                var sourceT = $(imgelement).css("transform");
+                                // matrix(1, 0, 0, 1, 207, 230) 207 = tx und 230 = ty
+                                var ex1 = sourceT.substr(7);
+                                var ex2 = ex1.substr(0, ex1.length - 1);
+                                var exparms = ex2.split(",");
+                                var tx = parseFloat(exparms[4]);
+                                var ty = parseFloat(exparms[5]);
+                                imgarray.push({
+                                    img: imgelement,
+                                    w: sourceW,
+                                    h: sourceH,
+                                    tx: tx,
+                                    ty: ty
+                                });
+                            });
+                            imgarray.sort(function (a, b) {
+                                if (Math.round(a.tx) < Math.round(b.tx))
+                                    return -1;
+                                if (Math.round(a.tx) > Math.round(b.tx))
+                                    return 1;
+                                if (Math.round(a.ty) < Math.round(b.ty))
+                                    return -1;
+                                if (Math.round(a.ty) > Math.round(b.ty))
+                                    return 1;
+                                return 0;
+                            });
+
+                            // kalkulieren der x-Positionierungen
+                            var relx = 0;
+                            var vglx = 0;
+                            var rely = 0;
+                            var vgly = 0;
+                            var superx = {};
+                            var supery = {};
+                            var minx = null;
+                            var miny = null;
+                            for (var iimg = 0; iimg < imgarray.length; iimg++) {
+                                var actimg = imgarray[iimg].img;
+                                var actx = Math.round(imgarray[iimg].tx);
+                                var acty = Math.round(imgarray[iimg].ty);
+                                if (minx === null) {
+                                    minx = actx;
+                                } else if (actx < minx) {
+                                    minx = actx;
+                                }
+                                if (miny === null) {
+                                    miny = acty;
+                                } else if (acty < miny) {
+                                    miny = acty;
+                                }
+                            }
+
+                            if (minx < 0) minx = minx * -1;
+                            if (miny < 0) miny = miny * -1;
+
+                            var canvas0 = $("#" + canvasid).get(0);
+                            if (typeof canvas0 !== "undefined") {
+                                var ctx0 = canvas0.getContext("2d");
+                            }
+
+
+                            var p1 = $(maincontainer).parent();
+                            var p1can = $(p1).find("canvas[id=" + canvasid + "]");
+                            var ctx =  $(p1can).get(0).getContext('2d');
+                            //var ctx1 = canvas.getContext("2d");
+                            var ctx1 = $(maincontainer).parent().find("canvas").get(0).getContext('2d');
+
+
+                            for (var iimg = 0; iimg < imgarray.length; iimg++) {
+                                // Ausgabe
+
+                                var actimg = imgarray[iimg];
+                                var tx = actimg.tx;
+                                var ty = actimg.ty;
+                                var w = actimg.w;
+                                var h = actimg.h;
+
+                                var sourceX = 0;
+                                var sourceY = 0;
+                                var sourceWidth = 0;
+                                var sourceHeight = 0;
+                                var destX = 0;
+                                var destY = 0;
+                                var destWidth = 0;
+                                var destHeight = 0;
+                                // links
+
+                                sourceWidth = actimg.w;
+                                if (tx < 0) {
+                                    sourceX = minx;
+                                    sourceWidth = w - minx;
+                                    destX = 0;
+                                    destWidth = sourceWidth;
+                                } else {
+
+
+                                }
+                                if (ty < 0) {
+                                    sourceY = miny;
+                                    sourceHeight = h - miny;
+                                    destY = 0;
+                                    destHeight = sourceHeight;
+                                } else {
+
+
+                                }
+
+                                ctx.drawImage(actimg.img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
+                            }
+
+
+                            debugger;
+
+
+                            //var map = L.mapbox.map('map', 'YOUR.MAPID').setView([38.9, -77.03], 14);
+                            // https: //github.com/mapbox/leaflet-image
+                            /*
+                            leafletImage(mymap, function (err, canvas) {
+                                    // now you have canvas
+                                    // example thing to do with that canvas:
+                                    var img = document.createElement('img');
+                                    var dimensions = mymap.getSize();
+                                    img.width = dimensions.x;
+                                    img.height = dimensions.y;
+                                    img.src = canvas.toDataURL();
+                                    document.getElementById('images').innerHTML = '';
+                                    document.getElementById('images').appendChild(img);
+                                });
+                            */
+
+
+                        });
+
+
+
+
+                        /**
+                         * Konvertieren canvas zu image setview
+                         */
+
                         $(actiFrameBody).find('canvas').each(function (index, printcanvas) {
                             var image = new Image();
                             image.src = printcanvas.toDataURL("image/jpg"); // png
@@ -379,9 +741,12 @@
                             $(printcanvas).replaceWith(image);
                         });
 
+
                         /**
                          * Konvertieren svg zu Image
                          */
+                        /*
+                        debugger;
                         $(actiFrame).find('svg').each(function (index, svgelement) {
                             var svgString = new XMLSerializer().serializeToString(svgelement);
                             //var canvas = document.getElementById("canvas");
@@ -411,6 +776,7 @@
                             }
                             $(svgelement).replaceWith(image);
                         });
+                        */
 
                     }, 2000);
                     if (1 === 1) return;
@@ -507,18 +873,173 @@
                 height: h
             });
         });
-
         /**
-         * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
+         * hier werden die Konfigurationsparameter inital aufgerufen
          */
-        kla2100rep.getmoredata(function (ret) {
-            clearInterval(kla2100repclock);
-            $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
-            $(':button').prop('disabled', false); // Enable all the buttons
-            $("body").css("cursor", "default");
-            return;
+        kla2100rep.getConfigparameters(function (ret) {
+            if (ret.error === false) {
+
+            }
         });
     }; // Ende show
+
+
+
+    /**
+     * getConfigparameters - Popup für die Konfiguration der Auswertung
+     * Defaults aus parmobj und aus getCache onerecord
+     * confrecord und confschema
+     * selparms kann Parameter überschreiben beim ersten Aufruf
+     */
+    kla2100rep.getConfigparameters = function () {
+        if (Object.keys(confrecord).length === 0) {
+            kla2100repconfig = $.extend(true, {
+                comment: "",
+                decimals: true,
+                heatmaps: true,
+                hyde: true,
+                master: true,
+                worldmap: true,
+                leaflet: false,
+                qonly: true,
+                tempdistribution: true,
+                tempchart: true,
+                temptable: true,
+                allin: false,
+                autoload: true,
+                fromyear: 1841,
+                toyear: 2020,
+                step: 30,
+                popc: true,
+                rurc: true,
+                urbc: true,
+                uopp: true,
+                cropland: true,
+                tot_irri: true
+            }, selparms.config);
+            confrecord = uihelper.cloneObject(kla2100repconfig);
+        }
+
+        var anchorHash = "#kla2100rep";
+        var title = "Studien-Konfiguration";
+        var pos = {
+            left: $(anchorHash).width() * 0.15,
+            top: window.screen.height * 0.1,
+            width: $(anchorHash).width() * 0.70,
+            height: $(anchorHash).height() * 0.90
+        };
+        /**
+         * OK nach dem Click auf den Button
+         */
+        $(document).on('popupok', function (evt, extraParam) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            evt.stopImmediatePropagation();
+            console.log(extraParam);
+            confrecord = JSON.parse(extraParam).props1;
+            Object.assign(confrecord, JSON.parse(extraParam).props2);
+            Object.assign(confrecord, JSON.parse(extraParam).props3);
+
+            kla2100repconfig = $.extend(true, kla2100repconfig, confrecord);
+
+            var selvars = "";
+            var selarray = [];
+            if (kla2100repconfig.popc === true) {
+                selarray.push("popc");
+            }
+            if (kla2100repconfig.rurc === true) {
+                selarray.push("rurc");
+            }
+            if (kla2100repconfig.urbc === true) {
+                selarray.push("urbc");
+            }
+            if (kla2100repconfig.uopp === true) {
+                selarray.push("uopp");
+            }
+            if (kla2100repconfig.cropland === true) {
+                selarray.push("cropland");
+            }
+            if (kla2100repconfig.tot_irri === true) {
+                selarray.push("tot_irri");
+            }
+            selvars = selarray.join(",");
+            kla2100repconfig.selvars = selvars;
+            if (confrecord.allin === false) {
+                /**
+                 * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
+                 */
+                kla2100rep.getmoredata(function (ret) {
+                    clearInterval(kla2100repclock);
+                    $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
+                    $(':button').prop('disabled', false); // Enable all the buttons
+                    $("body").css("cursor", "default");
+                    return;
+                });
+            } else {
+                /**
+                 * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
+                 */
+                kla2100rep.getmoredata(function (ret) {
+                    clearInterval(kla2100repclock);
+                    $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
+                    $(':button').prop('disabled', false); // Enable all the buttons
+                    $("body").css("cursor", "default");
+                    return;
+                });
+            }
+        });
+
+        // Hidden der aktuellen variablen Daten
+        confrecord.stationid = selstationid;
+        confrecord.source = selsource;
+        confrecord.variable = selvariablename;
+
+        uientry.inputDialogX(anchorHash, pos, title, confschema, confrecord, function (ret) {
+            if (ret.error === false) {
+                // Zufügen Button IPCC-Perioden
+
+                var auxid = $(anchorHash).find("div.uiepopup").attr("id");
+                //popupD75976fromyear
+                // var divname = $("#" + auxid + "fromyear").parent();
+                var divobj = $(anchorHash).find("div.uiepopup").find("button.optionCancel").parent();
+
+                $(divobj)
+                    .append($("<button/>", {
+                        html: "IPCC-Perioden",
+                        css: {
+                            float: "left",
+                            margin: "10px"
+                        },
+                        click: function (evt) {
+                            evt.preventDefault();
+                            $("#" + auxid + "fromyear").val("1841");
+                            $("#" + auxid + "toyear").val("2020");
+                            $("#" + auxid + "step").val("30");
+                            return;
+                        }
+                    }));
+
+            } else {
+                sysbase.putMessage("Kein Report-Abruf möglich", 1);
+                return;
+            }
+        });
+
+
+
+
+
+
+
+        return {
+            error: false,
+            message: "Parameter bereitgestellt"
+        };
+
+    };
+
+
+
 
     /**
      * getmoredata - kla2100repconfig.allin === true
@@ -720,6 +1241,8 @@
                                         cb2100n51(null, ret);
                                         return;
                                     }
+                                    // TODO selyears füllen
+                                    // selvars popc,rurc,urbc,uopp,cropland,tot_irri
                                     var jqxhr = $.ajax({
                                         method: "GET",
                                         crossDomain: false,
@@ -732,7 +1255,7 @@
                                             name: klirow.stationname,
                                             globals: false,
                                             selyears: "",
-                                            selvars: "popc,rurc,urbc,uopp,cropland,tot_irri"
+                                            selvars: kla2100rep.selvars
                                         }
                                     }).done(function (r1, textStatus, jqXHR) {
                                         sysbase.checkSessionLogin(r1);
@@ -953,6 +1476,7 @@
         klirow[bucketname] = {};
         klirow[bucketname].yearbase = parseInt(yearbase);
         klirow[bucketname].yearstep = parseInt(yearstep);
+
         if (endmethod === "config") {
             klirow[bucketname].fromyear = parseInt(kla2100repconfig.fromyear);
             klirow[bucketname].toyear = parseInt(kla2100repconfig.toyear);
@@ -960,10 +1484,15 @@
         } else if (endmethod === "ipcc") {
             klirow[bucketname].fromyear = 1841;
             klirow[bucketname].toyear = 2020;
-            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+            klirow[bucketname].yearstep = 30; //parseInt(kla2100repconfig.step);
         } else {
             klirow[bucketname].fromyear = parseInt(klirow.fromyear);
             klirow[bucketname].toyear = parseInt(klirow.toyear);
+            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+
+        }
+        if (isNaN(klirow[bucketname].yearstep) || klirow[bucketname].yearstep === 0) {
+            klirow[bucketname].yearstep = 30;
         }
         klirow[bucketname].data = [];
         var emptybucket = {
@@ -1096,10 +1625,19 @@
             klirow[bucketname].fromyear = parseInt(kla2100repconfig.fromyear);
             klirow[bucketname].toyear = parseInt(kla2100repconfig.toyear);
             klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+        } else if (endmethod === "ipcc") {
+            klirow[bucketname].fromyear = 1841;
+            klirow[bucketname].toyear = 2020;
+            klirow[bucketname].yearstep = 30; // parseInt(kla2100repconfig.step);
         } else {
             klirow[bucketname].fromyear = parseInt(klirow.fromyear);
             klirow[bucketname].toyear = parseInt(klirow.toyear);
+            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
         }
+        if (isNaN(klirow[bucketname].yearstep) || klirow[bucketname].yearstep === 0) {
+            klirow[bucketname].yearstep = 30;
+        }
+
         klirow[bucketname].data = [];
         var emptybucket = {
             label: "",
@@ -1350,7 +1888,7 @@
                     $("#kla2100repwrapper")
                         .append($("<div/>", {
                             id: divid,
-                            class: "col1of2 doprintthis",
+                            class: "doprintthis",
                             css: {
                                 float: "left",
                                 overflow: "hidden"
@@ -1413,21 +1951,21 @@
 
                 function (ret, cb2100g01) {
                     /**
-                     * Worldmap und leaflet
+                     * Worldmap
                      */
                     if (kla2100repconfig.worldmap === false) {
                         cb2100g01(null, ret);
                         return;
                     }
                     var divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
-                    ret.rightdivid = divid1;
                     $("#kla2100repwrapper")
                         .append($("<div/>", {
                             id: divid1,
-                            class: "col2of2 doprintthis",
+                            class: "doprintthis",
                             css: {
                                 float: "left",
-                                height: $("#" + ret.leftdivid).height(),
+                                width: $("#kla2100rep").width() * .4,
+                                clear: "both",
                                 overflow: "auto"
                             }
                         }));
@@ -1435,7 +1973,7 @@
                         .append($("<div/>", {
                                 class: "mapcontainer",
                                 css: {
-                                    width: "100%"
+                                    width: $("#kla2100rep").width() * .4
                                 }
                             })
                             .append($("<div/>", {
@@ -1501,7 +2039,7 @@
                         plots: plots,
                         links: worldmaplinks
                     };
-                    //$(".mapcontainer").trigger('update', [options]); 
+                    //$(".mapcontainer").trigger('update', [options]);
 
                     $("#" + divid1).find(".mapcontainer").mapael(worldmap);
                     cb2100g01(null, ret);
@@ -1511,31 +2049,34 @@
 
                 function (ret, cb2100g02) {
                     /**
-                     * Worldmap und leaflet
+                     * leaflet
                      */
                     if (kla2100repconfig.leaflet === false) {
                         cb2100g02(null, ret);
                         return;
                     }
-                    var divid1 = "";
-                    if (typeof ret.rightdivid !== "undefined") {
-                        divid1 = ret.rightdivid;
-                    } else {
-                        divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
-                        ret.rightdivid = divid1;
-                        $("#kla2100repwrapper")
-                            .append($("<div/>", {
-                                id: divid1,
-                                class: "col2of2 doprintthis",
-                                css: {
-                                    float: "left",
-                                    height: $("#" + ret.leftdivid).height(),
-                                    overflow: "auto"
-                                }
-                            }));
+                    var divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
+                    var hh = $("#kla2100rep").height() * .5;
+                    // angleichen an worldmap, wenn diese vorhanden ist
+                    if ($("#kla2100rep").find(".mapcontainer").height() > 0) {
+                        hh = $("#kla2100rep").find(".mapcontainer").height();
+                        $("#kla2100rep").find(".mapcontainer").parent().css({
+                            "margin-right": "20px"
+                        });
                     }
+                    var ww = $("#kla2100rep").width() * .5;
 
-
+                    $("#kla2100repwrapper")
+                        .append($("<div/>", {
+                            id: divid1,
+                            class: "doprintthis",
+                            css: {
+                                height: hh,
+                                width: ww,
+                                float: "left",
+                                overflow: "auto"
+                            }
+                        }));
 
                     var mymap = L.map(divid1).setView([klirow.latitude, klirow.longitude], 15);
                     // Default public token
@@ -1596,7 +2137,7 @@
                             })
                             .append($("<span/>", {
                                 html: "Datenqualität, Jahresdaten " + klirow.titel,
-                                class: "eckh3"
+                                class: "doprintthis eckh3"
                             }))
                         );
                     /**
@@ -1731,8 +2272,9 @@
                                             "text-align": "center"
                                         }
                                     })
-                                    .append($("<h2>", {
-                                        text: "Heatmaps " + klirow.titel
+                                    .append($("<span/>", {
+                                        text: "Heatmaps " + klirow.titel,
+                                        class: "doprintthis eckh3"
                                     }))
                                 )
                                 .append($("<div/>", {
@@ -2039,8 +2581,8 @@
                         mtitle += (klirow.stationname || "").length > 0 ? " " + klirow.stationname : "";
                         mtitle += (klirow.fromyear || "").length > 0 ? " von " + klirow.fromyear : "";
                         mtitle += (klirow.toyear || "").length > 0 ? " bis " + klirow.toyear : "";
-                        klirow.fromyear = kla2100repconfig.fromyear;
-                        klirow.toyear = kla2100repconfig.toyear;
+                        // klirow.fromyear = kla2100repconfig.fromyear;
+                        // klirow.toyear = kla2100repconfig.toyear;
                         mtitle += (klirow.fromyear || "").length > 0 ? " Filter von " + klirow.fromyear : "";
                         mtitle += (klirow.toyear || "").length > 0 ? " bis " + klirow.toyear : "";
                         // Aufruf Heatmap mit Container und Matrix
@@ -2550,9 +3092,9 @@
                                 width: "90%"
                             }
                         })
-                        .append($("<h3/>", {
+                        .append($("<span/>", {
                             text: "Histogramm 1. Dezimalstelle " + klirow.titel,
-                            class: "doprintthis"
+                            class: "doprintthis eckh3"
                         }))
                         .append($("<canvas/>", {
                             id: chartid,
@@ -2634,7 +3176,7 @@
                         borderWidth: 2
                     });
                 }
-                //myCharts[selvariable] = new Chart(ctx, config);
+
                 window.charts = window.charts || {};
                 window.charts[chartid] = new Chart(ctx, config);
                 /*
@@ -3091,8 +3633,6 @@
 
 
             var ctx1 = document.getElementById(chartidsun).getContext('2d');
-            // myCharts[selvariable + "D1"] = new Chart(ctx1, ret1.distrs[selvariable].sunconfig);
-
 
             var sunconfig = {
                 type: 'line',
@@ -4434,6 +4974,7 @@
         if (typeof klihyde.data === "string" && klihyde.data.length > 0) {
             klihyde.data = JSON.parse(klihyde.data);
         }
+        // kla2100repconfig.selvars
         for (var year in klihyde.data) {
             if (klihyde.data.hasOwnProperty(year)) {
                 var yeardata = klihyde.data[year];
@@ -4442,18 +4983,20 @@
                         var leveldata = yeardata[level];
                         for (var variablename in leveldata) {
                             if (leveldata.hasOwnProperty(variablename)) {
-                                var wert = leveldata[variablename];
-                                // hier ist die finale Werteebene
-                                if (typeof hyderep[variablename] === "undefined") {
-                                    hyderep[variablename] = {};
+                                if (kla2100repconfig.selvars.indexOf(variablename.replace("_", "")) >= 0) {
+                                    var wert = leveldata[variablename];
+                                    // hier ist die finale Werteebene
+                                    if (typeof hyderep[variablename] === "undefined") {
+                                        hyderep[variablename] = {};
+                                    }
+                                    if (typeof hyderep[variablename][year] === "undefined") {
+                                        hyderep[variablename][year] = {};
+                                    }
+                                    if (typeof hyderep[variablename][year][level] === "undefined") {
+                                        hyderep[variablename][year][level] = 0;
+                                    }
+                                    hyderep[variablename][year][level] += wert;
                                 }
-                                if (typeof hyderep[variablename][year] === "undefined") {
-                                    hyderep[variablename][year] = {};
-                                }
-                                if (typeof hyderep[variablename][year][level] === "undefined") {
-                                    hyderep[variablename][year][level] = 0;
-                                }
-                                hyderep[variablename][year][level] += wert;
                             }
                         }
                     }
@@ -4691,7 +5234,7 @@
                  * Hier Chart-Ausgabe - mit chartJS wird eine Gesamtgraphik ausgegeben
                  */
                 // hmatrixL, hoptionsL,
-                // hmatrixR, hoptionsR,
+
             }
         }
         cb2100j({

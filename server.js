@@ -132,7 +132,7 @@ db.serialize(function () {
            callbackdb10(null);
            return;
         },
-        
+
         /*
         function (callbackdb4) {
             var sqlstmt = "ALTER TABLE KLIDATA ";
@@ -143,7 +143,7 @@ db.serialize(function () {
                 return;
             });
         },
-        */    
+        */
        /*
         function (callbackdb5) {
             var sqlstmt = "ALTER TABLE KLIINVENTORY ";
@@ -155,9 +155,9 @@ db.serialize(function () {
             });
         }
         */
-        
 
-        
+
+
 
     ], function (error, result) {
         console.log("Fertig mit Indexerstellung");
@@ -1450,6 +1450,10 @@ app.get('/stationhyde', function (req, res) {
     var stationid = "";
     if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
         stationid = req.query.stationid;
+    }
+    var selvars = "";
+    if (req.query && typeof req.query.selvars !== "undefined" && req.query.selvars.length > 0) {
+        selvars = req.query.selvars;
     }
     if (source.length === 0) {
         source = "HYDE";

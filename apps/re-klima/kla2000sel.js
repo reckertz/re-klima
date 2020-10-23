@@ -475,23 +475,45 @@
                             }
                         }))
 
+
                         .append($("<button/>", {
-                            id: "kla2000seldwn",
+                            id: "kla2000selall",
                             css: {
                                 float: "left",
                                 "margin": "10px"
                             },
-                            html: "HTML-Tabelle download",
+                            html: "Liste auswerten",
                             click: function (evt) {
                                 evt.preventDefault();
-                                uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt", true);
+                                selstations = [];
+                                $(".kla2000selid").each(function (index, item) {
+                                    selstations.push({
+                                        source: $(this).attr("source"),
+                                        stationid: $(this).attr("rowid"),
+                                        variable: $(this).attr("variable")
+                                    });
+                                });
+                                window.parent.sysbase.setCache("onestation", JSON.stringify({
+                                    selstations: selstations,
+                                    stationid: "",
+                                    source: starecord.source,
+                                    variablename: starecord.variable,
+                                    starecord: starecord,
+                                }));
+                                var tourl = "klaheatmap.html" + "?";
+                                var stationname = stationarray[confrecord.stationid];
+                                var tabname = "Sammelauswertung"; // confrecord.stationid + " " + stationname;
+                                var selsource = starecord.source;  // $("#kla2000selsource").val();
+                                if (selsource === "GHCND") {
+                                    var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                                    window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                                } else if (selsource === "HYGRIS") {
+                                    var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                                    window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                                }
                                 return;
                             }
                         }))
-
-
-
-
 
                         .append($("<button/>", {
                             css: {
@@ -527,6 +549,22 @@
                                 }
                             }
                         }))
+
+
+                        .append($("<button/>", {
+                            id: "kla2000seldwn",
+                            css: {
+                                float: "left",
+                                "margin": "10px"
+                            },
+                            html: "HTML-Tabelle download",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt", true);
+                                return;
+                            }
+                        }))
+
 
                         /*
                         .append($("<button/>", {
@@ -934,73 +972,6 @@
         });
 
     }; // Ende show
-
-    $(document).on("click", ".kla2000selid", function (evt) {
-        evt.preventDefault();
-        evt.stopPropagation();
-        evt.stopImmediatePropagation();
-        var stationid = $(this).closest("tr").attr("rowid");
-        var source = starecord.source;
-        var variablename = $(this).closest("tr").attr("variable");
-        selvariablename = variablename;
-        console.log("Station:" + stationid + " from:" + source);
-        if (source === "HYGRIS") {
-            window.parent.sysbase.setCache("onestation", JSON.stringify({
-                stationid: stationid,
-                source: source,
-                variablename: $(this).closest("tr").attr("variable"),
-                starecord: starecord,
-                latitude: $(this).closest("tr").attr("latitude"),
-                longitude: $(this).closest("tr").attr("longitude"),
-                fromyear: $(this).closest("tr").attr("fromyear"),
-                toyear: $(this).closest("tr").attr("toyear"),
-            }));
-            var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
-            var stationname = stationarray[stationid];
-            var tabname = variablename + " " + stationname;
-            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-        } else if (source === "GHCND") {
-            window.parent.sysbase.setCache("onestation", JSON.stringify({
-                stationid: stationid,
-                source: source,
-                variablename: selvariablename,
-                starecord: starecord,
-                latitude: $(this).closest("tr").attr("latitude"),
-                longitude: $(this).closest("tr").attr("longitude"),
-                fromyear: $(this).closest("tr").attr("fromyear"),
-                toyear: $(this).closest("tr").attr("toyear"),
-            }));
-            if (variablename === "TMAX" || variablename === "TMIN" || variablename === "TMAX,TMIN") {
-                var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
-                var stationname = stationarray[stationid];
-                var tabname = variablename + " " + stationname;
-                var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
-                window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-            } else {
-                var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + variablename;
-                var stationname = stationarray[stationid];
-                var tabname = variablename + " " + stationname;
-                var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1629ghc", tourl);
-                window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-            }
-        } else if (source === "ECAD") {
-            window.parent.sysbase.setCache("onestation", JSON.stringify({
-                stationid: stationid,
-                source: source,
-                variablename: selvariablename,
-                starecord: starecord
-            }));
-            var tourl = "kliheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
-            var stationname = stationarray[stationid];
-            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima", "kli1640eca", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-
-        } else {
-            // falsche Source
-
-        }
-    });
 
 
     /**
@@ -1607,324 +1578,52 @@
 
 
         /**
-         * kla2000selconf - Konfigurierte Analyse
+         * kla2000selconf - neue Analyse
          */
         $(document).on("click", ".kla2000selconf", function (evt) {
             evt.preventDefault();
             evt.stopImmediatePropagation();
             evt.stopPropagation();
+            var source = $(this).closest("tr").attr("source");
             var stationid = $(this).closest("tr").attr("rowid");
+            var variablename = $(this).closest("tr").attr("variable");
+
             var longitude = $(this).closest("tr").attr("longitude");
             var latitude = $(this).closest("tr").attr("latitude");
             var fromyear = $(this).closest("tr").attr("fromyear");
             var toyear = $(this).closest("tr").attr("toyear");
-            var variablename = $(this).closest("tr").attr("variable");
 
-            var source = starecord.source;
+            window.parent.sysbase.setCache("onestation", JSON.stringify({
+                selstations: [],
+                stationid: stationid,
+                source: source,
+                variablename: variablename,
+                longitude: longitude,
+                latitude: latitude,
+                fromyear: fromyear,
+                toyear: toyear,
+                starecord: starecord,
+                stationsarray: stationarray
+            }));
+
+            var tourl = "klaheatmap.html";
+            var stationname = stationarray[stationid];
+            var tabname = stationname; // confrecord.stationid + " " + stationname;
+            if (source === "GHCND") {
+                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+            } else if (source === "HYGRIS") {
+                var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+            } else {
+                sysbase.putMessage("keine Einzelauswertung vorgesehen", 3);
+            }
+            if (1 === 1) {
+                return;
+            }
             selvariablename = variablename;
             console.log("Station:" + stationid + " from:" + source + " " + variablename);
-
             var username = uihelper.getUsername();
-            var confschema = {
-                entryschema: {
-                    props1: {
-                        title: "Abrufparameter " + stationid,
-                        description: "",
-                        type: "object", // currency, integer, datum, text, key, object
-                        class: "uiefieldset",
-                        width: "55%",
-                        properties: {
-                            stationid: {
-                                title: "Stations-ID",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uietext",
-                                io: "h"
-                            },
-                            source: {
-                                title: "Source",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uietext",
-                                io: "h"
-                            },
-                            variable: {
-                                title: "Variable",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uietext",
-                                io: "h"
-                            },
-                            master: {
-                                title: "Stammdaten",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                io: "i"
-                            },
-                            worldmap: {
-                                title: "Position in Worldmap",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                io: "i"
-                            },
-                            leaflet: {
-                                title: "Position in Leaflet-zoomed",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                io: "i"
-                            },
-                            qonly: {
-                                title: "gute Daten",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                clear: "none",
-                                io: "i"
-                            },
-                            heatmaps: {
-                                title: "Heatmaps",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                io: "i"
-                            },
-                            heatmapsx: {
-                                title: "Heatmaps+",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                io: "i"
-                            },
-                            fromyear: {
-                                title: "Von Jahr",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uietext",
-                                maxlength: 4,
-                                size: 4,
-                                width: "70px",
-                                default: "",
-                                io: "i"
-                            },
-                            toyear: {
-                                title: "Bis Jahr",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uietext",
-                                maxlength: 4,
-                                size: 4,
-                                width: "70px",
-                                default: "",
-                                io: "i"
-                            },
-                            step: {
-                                title: "Bucket",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uietext",
-                                maxlength: 4,
-                                size: 4,
-                                width: "70px",
-                                default: "",
-                                io: "i"
-                            },
-                        }
-                    },
-                    props2: {
-                        title: "Abrufparameter " + stationid,
-                        description: "",
-                        type: "object", // currency, integer, datum, text, key, object
-                        class: "uiefieldset",
-                        width: "40%",
-                        properties: {
-
-                            decimals: {
-                                title: "Dezimalstelle",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                default: true,
-                                io: "i"
-                            },
-                            tempchart: {
-                                title: "Temperaturverlauf",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                io: "i"
-                            },
-                            temptable: {
-                                title: "Temperaturtabelle",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                io: "i"
-                            },
-                            tempdistribution: {
-                                title: "Distribution",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                default: true,
-                                io: "i"
-                            },
-                            hyde: {
-                                title: "HYDE-Daten",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                default: false,
-                                io: "i"
-                            },
-                            allin: {
-                                title: "Alle in der Liste",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                default: false,
-                                io: "i"
-                            },
-                            autoload: {
-                                title: "Automatisch Laden",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uiecheckbox",
-                                default: false,
-                                io: "i"
-                            },
-                            comment: {
-                                title: "Kommentar",
-                                type: "string", // currency, integer, datum, text, key
-                                class: "uietext",
-                                default: "",
-                                io: "i"
-                            }
-                        }
-                    }
-                }
-            };
-            var anchorHash = "#kla2000sel .col2of2";
-            var title = "Analyse-Konfiguration";
-            var pos = {
-                left: $(anchorHash).offset().left,
-                top: window.screen.height * 0.1,
-                width: $(anchorHash).width() * 0.75,
-                height: $(anchorHash).height() * 0.90
-            };
-            $(document).on('popupok', function (evt, extraParam) {
-                evt.preventDefault();
-                evt.stopPropagation();
-                evt.stopImmediatePropagation();
-                console.log(extraParam);
-                confrecord = JSON.parse(extraParam).props1;
-                Object.assign(confrecord, JSON.parse(extraParam).props2);
-                if (confrecord.allin === false) {
-                    selstations = [];
-                    selstations.push({
-                        source: confrecord.source,
-                        stationid: confrecord.stationid,
-                        variable: confrecord.variable
-                    });
-                    window.parent.sysbase.setCache("onestation", JSON.stringify({
-                        selstations: selstations,
-                        stationid: confrecord.stationid,
-                        source: confrecord.source,
-                        variablename: confrecord.variable,
-                        starecord: starecord,
-                        latitude: $(this).closest("tr").attr("latitude"),
-                        longitude: $(this).closest("tr").attr("longitude"),
-                        config: confrecord
-                    }));
-                    var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
-                    var stationname = stationarray[confrecord.stationid];
-                    var tabname = "Sammelauswertung"; // confrecord.stationid + " " + stationname;
-                    if (selstations.length === 1) {
-                        tabname = confrecord.stationid + " " + stationname;
-                    }
-                    var selsource = $("#kla2000selsource").val();
-                    if (selsource === "GHCND") {
-                        var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
-                        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                    } else if (selsource === "NAO") {
-                        var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
-                        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                    } else if (selsource === "HYGRIS") {
-                        var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
-                        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                    }
-                } else {
-                    // allin === true
-                    selstations = [];
-                    $(".kla2000selid").each(function (index, item) {
-                        selstations.push({
-                            source: $(this).attr("source"),
-                            stationid: $(this).attr("rowid"),
-                            variable: $(this).attr("variable")
-                        });
-                    });
-                    window.parent.sysbase.setCache("onestation", JSON.stringify({
-                        selstations: selstations,
-                        stationid: confrecord.stationid,
-                        source: confrecord.source,
-                        variablename: confrecord.variable,
-                        starecord: starecord,
-                        latitude: $(this).closest("tr").attr("latitude"),
-                        longitude: $(this).closest("tr").attr("longitude"),
-                        config: confrecord
-                    }));
-                    var tourl = "klaheatmap.html" + "?" + "stationid=" + confrecord.stationid + "&source=" + confrecord.source + "&variablename=" + confrecord.variable;
-                    var stationname = stationarray[confrecord.stationid];
-                    var tabname = "Sammelauswertung"; // confrecord.stationid + " " + stationname;
-                    if (selstations.length === 1) {
-                        tabname = confrecord.stationid + " " + stationname;
-                    }
-                    var selsource = $("#kla2000selsource").val();
-                    if (selsource === "GHCND") {
-                        var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
-                        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                    } else if (selsource === "HYGRIS") {
-                        var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
-                        window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
-                    }
-                }
-            });
-            if (typeof confrecord === "undefined" || confrecord === null || Object.keys(confrecord).length === 0) {
-                // Default-Setzungen
-                confrecord = {
-                    decimals: true,
-                    heatmaps: true,
-                    heatmapsx: true,
-                    master: true,
-                    worldmap: true,
-                    leaflet: false,
-                    qonly: true,
-                    tempdistribution: true,
-                    tempchart: true,
-                    temptable: true,
-                    allin: false,
-                    autoload: false,
-                    comment: "",
-                    fromyear: fromyear,
-                    toyear: toyear,
-                    step: 30,
-                    hyde: true
-                };
-            }
-            // Hidden der aktuellen variablen Daten
-            confrecord.stationid = stationid;
-            confrecord.source = source;
-            confrecord.variable = variablename;
-            uientry.inputDialogX(anchorHash, pos, title, confschema, confrecord, function (ret) {
-                if (ret.error === false) {
-                    // Zufügen Button IPCC-Perioden
-                    var auxid = $(anchorHash).find("div.uiepopup").attr("id");
-                    //popupD75976fromyear
-                    var divname = $("#" + auxid + "fromyear").parent();
-                    $(divname)
-                        .append($("<button/>", {
-                            html: "IPCC-Perioden",
-                            css: {
-                                float: "left",
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                $("#" + auxid + "fromyear").val("1841");
-                                $("#" + auxid + "toyear").val("2020");
-                                $("#" + auxid + "step").val("30");
-                                return;
-                            }
-                        }));
-
-                } else {
-                    sysbase.putMessage("Kein Report-Abruf möglich", 1);
-                    return;
-                }
-            });
         });
 
 
