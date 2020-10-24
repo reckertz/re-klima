@@ -531,6 +531,7 @@
                     var idc21 = window.parent.sysbase.tabcreateiframe(selstationid, "", "re-klima", "kla1990htm", tourl);
                     window.parent.$(".tablinks[idhash='#" + idc21 + "']").click(); // das legt erst den iFrame an
                     setTimeout(function () {
+                        var old2newids = {};
                         var actdiv = window.parent.$("#" + idc21);
                         var actiFrame = $(actdiv).find("iframe").get(0);
                         var actiFrameBody = $(actiFrame).contents();
@@ -538,210 +539,231 @@
                          * Loop über alle doprintthis-Elemente
                          */
                         var aktwrapper = $(actiFrameBody).find(".kla1990htmwrapper");
-                        $('.doprintthis').each(function (index, printelement) {
+
+                        $('.doprintthis').each(function (index, printelement1) {
+                            // hier ist printelement1 noch im alten Kontext
+                            var found = false;
+                            // Container für den neuen Inhalt bereitstellen
+                            var newcontainerid = "NCID" + Math.floor(Math.random() * 100000) + 1;
+                            var newcontainerhash = "#" + newcontainerid;
                             $(aktwrapper)
-                                .append($(printelement));
+                                .append($("<div/>", {
+                                    id: newcontainerid,
+                                }));
+                            /*
+                            $(aktwrapper).find(newcontainerhash)
+                                .append($("<span/>", {
+                                    text: newcontainerid
+                                }));
+                            */
+                            /**
+                             * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                             * hier svg
+                             */
+                            if ($(printelement1).is('svg')) {
+                                found = true;
+                                var svgString = new XMLSerializer().serializeToString(printelement1);
+                                var canvas = document.createElement("canvas");
+                                var ctx = canvas.getContext("2d");
+                                var DOMURL = self.URL || self.webkitURL || self;
+                                var svg = new Blob([svgString], {
+                                    type: "image/svg+xml;charset=utf-8"
+                                });
+                                var url = DOMURL.createObjectURL(svg);
+                                var image = new Image();
+                                image.src = url;
+                                /*
+                                var w = $(printelement1).width();
+                                var h = $(printelement1).height();
+                                $(image).width(w);
+                                $(image).height(h);
+                                */
+                                $(aktwrapper).find(newcontainerhash)
+                                    .empty();
+                                $(aktwrapper).find(newcontainerhash)
+                                    .append(image);
+                                $(aktwrapper).find(newcontainerhash)
+                                    .append($("<div/>", {
+                                        html: "&nbsp;",
+                                        css: {
+                                            clear: "both"
+                                        }
+                                    }));
+                            }
+                            if (found === true) return; // continue für jQuery
+                            /**
+                             * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                             * hier leaflet
+                             */
+                            if ($(printelement1).hasClass("leaflet-container")) {
+                                var mydivid = $(printelement1).attr("id");
+                                window.mymaps = window.mymaps || {};
+                                var mymap = window.mymaps[mydivid];
+                                if (typeof window.mymaps[mydivid] !== "undefined") {
+                                    found = true;
+                                    leafletImage(mymap, function (err, canvas) {
+                                        var img = document.createElement('img');
+                                        img.src = canvas.toDataURL();
+                                        var dimensions = mymap.getSize();
+                                        $(img).width(dimensions.x);
+                                        $(img).height(dimensions.y);
+                                        $(aktwrapper).find(newcontainerhash).append(img);
+                                        $(aktwrapper).find(newcontainerhash)
+                                            .append($("<div/>", {
+                                                html: "&nbsp;",
+                                                css: {
+                                                    clear: "both"
+                                                }
+                                            }));
+                                    });
+                                }
+                            }
+                            if (found === true) return; // continue für jQuery
+                            /**
+                             * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                             * hier canvas
+                             */
+                            if ($(printelement1).is("canvas")) {
+                                found = true;
+                                console.log("CANVAS:" + $(printelement1).attr("id"));
+                                var img = document.createElement('img');
+                                img.src = printelement1.toDataURL(); // png "image/jpg"
+                                $(aktwrapper).find(newcontainerhash).append(img);
+                                $(aktwrapper).find(newcontainerhash)
+                                    .append($("<div/>", {
+                                        html: "&nbsp;",
+                                        css: {
+                                            clear: "both"
+                                        }
+                                    }));
+                            }
+                            if (found === true) return; // continue für jQuery
+
+                            /**
+                             * hier wird es schwieriger, weil die Sonderelemente eingebettet sind
+                             * es muss also erst ein CLONE erzeugt werden und dann kann darin gearbeitet werden
+                             */
+                            // Vorbereiten für untergeordnete Sonderfälle
+
+                            $(printelement1).find('canvas').each(function (index, printcanvas) {
+                                if (typeof $(printcanvas).attr("id") === "undefined") {
+                                    var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                                    $(printcanvas).attr("id", newid);
+                                }
+                            });
+                            $(printelement1).find('svg').each(function (index, printsvg) {
+                                if (typeof $(printsvg).attr("id") === "undefined") {
+                                    var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                                    $(printsvg).attr("id", newid);
+                                }
+                            });
+                            $(printelement1).find('.leaflet-container').each(function (index, printleaf) {
+                                if (typeof $(printleaf).attr("id") === "undefined") {
+                                    var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                                    $(printleaf).attr("id", newid);
+                                }
+                            });
+
+                            var printelement = $(printelement1).clone(true, true);
+                            /**
+                             * erst mal die id's austauschen, id' haben Nebeneffekte
+                             */
+                            $(printelement).find("[id]").each(function () {
+                                var actid = this.id;
+                                if (typeof old2newids[actid] === "undefined") {
+                                    old2newids[actid] = "NID" + Math.floor(Math.random() * 100000) + 1;
+                                    this.id = old2newids[actid];
+                                } else {
+                                    this.id = old2newids[actid];
+                                }
+                            });
+                            console.log("printelementid:" + $(printelement).attr("id"));
+                            console.log("printelementtag:" + $(printelement).prop("tagName"));
                             $(aktwrapper)
+                                .find(newcontainerhash)
+                                .append($("<span/>", {
+                                    html: "&nbsp;",   // $(printelement).prop("tagName") + "=>" + $(printelement).attr("id"),
+                                    css: {
+                                        clear: "both"
+                                    }
+                                }));
+
+                            // Löschen Suchzeilen in Tabellen
+                            $(printelement).find("tr[role=search]").remove();
+
+                            // HIER WIRD ES INTERESSANT - es müssen die Sonderfälle im Original gesucht werden
+                            // und vom Original verarbeitet werden!!!
+
+                            /**
+                             * Konvertieren canvas-Unterelemente zu image setview
+                             * im loop - in das jeweilige Parent einbetten
+                             */
+                            $(printelement1).find('canvas').each(function (index, printcanvas) {
+                                // gesucht und gefunden im Original
+                                var img = document.createElement('img');
+                                img.src = printcanvas.toDataURL(); // png "image/jpg"
+                                // das Image kommt in den Clone!!!
+                                var oldid = $(printcanvas).attr("id");
+                                var newid = old2newids[oldid];
+                                $(printelement).find("#" + newid).replaceWith(img);
+                            });
+
+                            $(printelement1).find('svg').each(function (index, svgelement) {
+                                var svgString = new XMLSerializer().serializeToString(svgelement);
+                                var canvas = document.createElement("canvas");
+                                var ctx = canvas.getContext("2d");
+                                var DOMURL = self.URL || self.webkitURL || self;
+                                var svg = new Blob([svgString], {
+                                    type: "image/svg+xml;charset=utf-8"
+                                });
+                                var url = DOMURL.createObjectURL(svg);
+                                var img = new Image();
+                                img.src = url;
+                                var w = $(svgelement).width();
+                                var h = $(svgelement).height();
+                                $(img).width(w);
+                                $(img).height(h);
+                                var oldid = $(svgelement).attr("id");
+                                var newid = old2newids[oldid];
+                                $(printelement).find("#" + newid).replaceWith(img);
+                            });
+
+
+
+                            /**
+                             * Finale AUSABE der komplexen Konstrukte
+                             */
+                            $(aktwrapper)
+                                .find(newcontainerhash)
+                                .append(printelement);
+                            $(aktwrapper)
+                                .find(newcontainerhash)
                                 .append($("<div/>", {
                                     html: "&nbsp;",
                                     css: {
                                         clear: "both"
                                     }
                                 }));
-                        });
-                        /**
-                         * Konvertieren leaflet zu Image
-                         * vorgezogen weil etwas kritisch
-                         */
-                        debugger;
-                        $(actiFrameBody).find('.leaflet-container').each(function (index, maincontainer) {
-                            // maincanvas ist die oberste Ebene der Leaflet-Map
-                            // canvas anlegen
-                            // neuen Canvas anlegen
-                            var canvasid = "C" + Math.floor(Math.random() * 100000) + 1;
-                            $(maincontainer)
-                                .parent()
-                                .append($("<canvas/>", {
-                                    id: canvasid,
+
+                            if (1 === 1) return;
+
+                            /**
+                             * SVG - untergeordnet
+                             */
+
+                            /*
+                            $(aktwrapper).find(newcontainerhash)
+                                .append($(printelement));
+                            $(aktwrapper).find(newcontainerhash)
+                                .append($("<div/>", {
+                                    html: "&nbsp;",
                                     css: {
-                                        border: "1px solid",
-                                        width: $(maincontainer).width(),
-                                        height: $(maincontainer).height()
+                                        clear: "both"
                                     }
                                 }));
-
-
-
-
-                            var imgarray = [];
-                            var targetW = $(maincontainer).width();
-                            var targetH = $(maincontainer).height();
-                            var w
-                            $(maincontainer).find('img').each(function (imgindex, imgelement) {
-                                var sourceW = $(imgelement).width();
-                                var sourceH = $(imgelement).height();
-                                var sourceT = $(imgelement).css("transform");
-                                // matrix(1, 0, 0, 1, 207, 230) 207 = tx und 230 = ty
-                                var ex1 = sourceT.substr(7);
-                                var ex2 = ex1.substr(0, ex1.length - 1);
-                                var exparms = ex2.split(",");
-                                var tx = parseFloat(exparms[4]);
-                                var ty = parseFloat(exparms[5]);
-                                imgarray.push({
-                                    img: imgelement,
-                                    w: sourceW,
-                                    h: sourceH,
-                                    tx: tx,
-                                    ty: ty
-                                });
-                            });
-                            imgarray.sort(function (a, b) {
-                                if (Math.round(a.tx) < Math.round(b.tx))
-                                    return -1;
-                                if (Math.round(a.tx) > Math.round(b.tx))
-                                    return 1;
-                                if (Math.round(a.ty) < Math.round(b.ty))
-                                    return -1;
-                                if (Math.round(a.ty) > Math.round(b.ty))
-                                    return 1;
-                                return 0;
-                            });
-
-                            // kalkulieren der x-Positionierungen
-                            var relx = 0;
-                            var vglx = 0;
-                            var rely = 0;
-                            var vgly = 0;
-                            var superx = {};
-                            var supery = {};
-                            var minx = null;
-                            var miny = null;
-                            for (var iimg = 0; iimg < imgarray.length; iimg++) {
-                                var actimg = imgarray[iimg].img;
-                                var actx = Math.round(imgarray[iimg].tx);
-                                var acty = Math.round(imgarray[iimg].ty);
-                                if (minx === null) {
-                                    minx = actx;
-                                } else if (actx < minx) {
-                                    minx = actx;
-                                }
-                                if (miny === null) {
-                                    miny = acty;
-                                } else if (acty < miny) {
-                                    miny = acty;
-                                }
-                            }
-
-                            if (minx < 0) minx = minx * -1;
-                            if (miny < 0) miny = miny * -1;
-
-                            var canvas0 = $("#" + canvasid).get(0);
-                            if (typeof canvas0 !== "undefined") {
-                                var ctx0 = canvas0.getContext("2d");
-                            }
-
-
-                            var p1 = $(maincontainer).parent();
-                            var p1can = $(p1).find("canvas[id=" + canvasid + "]");
-                            var ctx =  $(p1can).get(0).getContext('2d');
-                            //var ctx1 = canvas.getContext("2d");
-                            var ctx1 = $(maincontainer).parent().find("canvas").get(0).getContext('2d');
-
-
-                            for (var iimg = 0; iimg < imgarray.length; iimg++) {
-                                // Ausgabe
-
-                                var actimg = imgarray[iimg];
-                                var tx = actimg.tx;
-                                var ty = actimg.ty;
-                                var w = actimg.w;
-                                var h = actimg.h;
-
-                                var sourceX = 0;
-                                var sourceY = 0;
-                                var sourceWidth = 0;
-                                var sourceHeight = 0;
-                                var destX = 0;
-                                var destY = 0;
-                                var destWidth = 0;
-                                var destHeight = 0;
-                                // links
-
-                                sourceWidth = actimg.w;
-                                if (tx < 0) {
-                                    sourceX = minx;
-                                    sourceWidth = w - minx;
-                                    destX = 0;
-                                    destWidth = sourceWidth;
-                                } else {
-
-
-                                }
-                                if (ty < 0) {
-                                    sourceY = miny;
-                                    sourceHeight = h - miny;
-                                    destY = 0;
-                                    destHeight = sourceHeight;
-                                } else {
-
-
-                                }
-
-                                ctx.drawImage(actimg.img, sourceX, sourceY, sourceWidth, sourceHeight, destX, destY, destWidth, destHeight);
-                            }
-
-
-                            debugger;
-
-
-                            //var map = L.mapbox.map('map', 'YOUR.MAPID').setView([38.9, -77.03], 14);
-                            // https: //github.com/mapbox/leaflet-image
-                            /*
-                            leafletImage(mymap, function (err, canvas) {
-                                    // now you have canvas
-                                    // example thing to do with that canvas:
-                                    var img = document.createElement('img');
-                                    var dimensions = mymap.getSize();
-                                    img.width = dimensions.x;
-                                    img.height = dimensions.y;
-                                    img.src = canvas.toDataURL();
-                                    document.getElementById('images').innerHTML = '';
-                                    document.getElementById('images').appendChild(img);
-                                });
                             */
 
-
                         });
-
-
-
-
-                        /**
-                         * Konvertieren canvas zu image setview
-                         */
-
-                        $(actiFrameBody).find('canvas').each(function (index, printcanvas) {
-                            var image = new Image();
-                            image.src = printcanvas.toDataURL("image/jpg"); // png
-                            var w = $(printcanvas).width();
-                            var h = $(printcanvas).height();
-                            $(image).width(w);
-                            $(image).height(h);
-                            // doprintthis, wenn die Klasse schon da war
-                            if ($(printcanvas).hasClass("doprintthis")) {
-                                $(image).addClass("doprintthis");
-                            }
-                            var parspan = $(printcanvas).parent();
-                            if ($(parspan).prop("tagName") === "SPAN") {
-                                $(parspan).css({
-                                    width: w + "px",
-                                    height: h + "px"
-                                });
-                            }
-                            $(printcanvas).replaceWith(image);
-                        });
-
-
                         /**
                          * Konvertieren svg zu Image
                          */
@@ -1786,15 +1808,15 @@
                                 .append($("<br/>"))
                                 .append($("<span/>", {
                                     html: klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")",
-                                    class: "doprintthis eckh3"
+                                    class: "eckh3"
                                 }))
                             );
                     } else {
                         gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
                         $("#kla2100repwrapper")
                             .append($("<div/>", {
-                                    class: "doprintthis",
                                     id: gldivid,
+                                    class: "doprintthis",
                                     css: {
                                         width: "100%",
                                         float: "left",
@@ -1805,7 +1827,7 @@
                                 .append($("<br/>"))
                                 .append($("<span/>", {
                                     html: klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")",
-                                    class: "doprintthis eckh3"
+                                    class: "eckh3"
                                 }))
                             );
                     }
@@ -2078,7 +2100,13 @@
                             }
                         }));
 
-                    var mymap = L.map(divid1).setView([klirow.latitude, klirow.longitude], 15);
+                    var mymap = L.map(divid1, {
+                        preferCanvas: true
+                    }).setView([klirow.latitude, klirow.longitude], 15);
+
+                    window.mymaps = window.mymaps || {};
+                    window.mymaps[divid1] = mymap;
+
                     // Default public token
                     // pk.eyJ1IjoiZWNraTIwMDAiLCJhIjoiY2s0d3pzZTh1MDNtMzNrbnJjaHN3amJ5YyJ9.P7wr6VrNtLPHMvW_O14d7Q
                     L.tileLayer(
@@ -2117,29 +2145,10 @@
                         }));
 
                     $("#" + divid)
-                        .append($("<a/>", {
-                                title: "HTML-Ausschnitt",
-                                css: {
-                                    margin: "10px"
-                                },
-                                click: function (evt) {
-                                    evt.preventDefault();
-                                    var cHtml = $(this).closest("div");
-                                    if ($(cHtml).attr("id") !== null) {
-                                        cHtml = $(cHtml).attr("id");
-                                        uihelper.copyHtml2clipboard(cHtml);
-                                    } else {
-                                        var newid = "I" + Math.floor(Math.random() * 100000) + 1;
-                                        $(cHtml).attr("id", newid);
-                                        uihelper.copyHtml2clipboard(newid);
-                                    }
-                                }
-                            })
-                            .append($("<span/>", {
-                                html: "Datenqualität, Jahresdaten " + klirow.titel,
-                                class: "doprintthis eckh3"
-                            }))
-                        );
+                        .append($("<span/>", {
+                            html: "Datenqualität, Jahresdaten " + klirow.titel,
+                            class: "eckh3"
+                        }));
                     /**
                      * Prüfung der Datenqualität je Jahr in klirow.years
                      */
@@ -2259,7 +2268,7 @@
                     if (kla2100repconfig.heatmaps === true || kla2100repconfig.heatmapsx === true) {
                         $("#kla2100repwrapper")
                             .append($("<div/>", {
-                                    class: "doprintthis",
+                                    class: "",
                                     css: {
                                         width: "100%",
                                         float: "left",
@@ -2286,6 +2295,7 @@
                                     })
                                     .append($("<div/>", {
                                         id: divid + "L",
+                                        class: "doprintthis"
                                     }))
                                 )
                             );
@@ -2347,6 +2357,7 @@
                                     })
                                     .append($("<div/>", {
                                         id: divid + "R",
+                                        class: "doprintthis"
                                     }))
                                 ));
                         // Linke heatmap
@@ -3704,7 +3715,6 @@
                 });
             }
             sunconfig.data.labels = larray;
-
             window.charts = window.charts || {};
             window.charts[chartidsun] = new Chart(ctx1, sunconfig);
             cb2100p({

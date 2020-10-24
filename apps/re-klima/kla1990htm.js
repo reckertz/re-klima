@@ -178,7 +178,8 @@
                         evt.preventDefault();
                         // https://github.com/jasonday/printThis
                         $('.doprintthis').printThis({
-                            canvas: true,
+                            canvas: false,
+                            importCSS: false
                         });
                     }
                 }))
@@ -220,7 +221,7 @@
                 .append($("<div/>", {
                     id: "kla1990htmwrapper",
                     class: "kla1990htmwrapper",
-                    html: "Dies ist die Initialisierung"
+                    html: "&nbsp;"
                 }))
             );
         var h = $("#kla1990htm").height();
