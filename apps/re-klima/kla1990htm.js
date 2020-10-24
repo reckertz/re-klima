@@ -179,6 +179,7 @@
                         // https://github.com/jasonday/printThis
                         $('.doprintthis').printThis({
                             canvas: false,
+                            removeScripts: true,
                             importCSS: false
                         });
                     }
@@ -199,6 +200,33 @@
                         });
                     }
                 }))
+
+
+                .append($("<button/>", {
+                    html: "Download kompakt",
+                    css: {
+                        "text-align": "center",
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        var newid = "N" + Math.floor(Math.random() * 100000) + 1;
+                        var newhash = "#" + newid;
+                        $(".content")
+                            .append($("<div/>", {
+                                id: newid
+                            }));
+                        debugger;
+                        // rekursiv durch die alte Struktur
+                        kla1990htm.recurse($(".content"), newhash);
+                        var largestring = $(newhash).html();
+                        uihelper.downloadfile("station.html", largestring, function (ret) {
+                            console.log("Downloaded");
+                        });
+                    }
+                }))
+
 
                 .append($("<div/>", {
                     id: "kla1990htmclock",
@@ -259,7 +287,108 @@
     }; // Ende show
 
 
+    kla1990htm.recurse = function (obj, newhash) {
+        var actid = $(obj).attr("id");
+        if (typeof actid !== "undefined") {
+            if (actid === newhash.substr(1)) {
+                console.log("Return home");
+                return;
+            }
+        }
+        var acttag = $(obj).prop("tagName");
+        console.log(actid + "=>" + acttag);
+        console.log(acttag);
+        if (acttag === "IMG") {
+            $(newhash)
+                .append($("<span/>", {
+                    html: "&nbsp;",
+                    clear: "both"
+                }));
+            $(newhash)
+                .append($(obj).clone());
+            return;
+        }
+        if (acttag === "TABLE") {
+            $(newhash)
+                .append($("<span/>", {
+                    html: "&nbsp;",
+                    clear: "both"
+                }));
+            $(newhash)
+                .append($(obj).clone());
+            return;
+        }
+        if (acttag === "BUTTON") {
+            return;
+        }
 
+        var ch = $(obj).children();
+        if (acttag !== "PRE" && typeof ch !== "undefined" && ch.length > 0) {
+            $(ch).each(function (ind, el) {
+                console.log("***recurse:" + ch.length + " " + acttag);
+                // alert(this.value); // "this" is the current element in the loop
+                var that = this;
+                kla1990htm.recurse(that, newhash);
+            });
+        } else {
+            if (acttag === "SPAN") {
+                var html = $(obj).html();
+                $(newhash)
+                    .append($("<span/>", {
+                        html: "&nbsp;",
+                        clear: "both"
+                    }));
+                $(newhash)
+                    .append($("<span/>", {
+                        html: html
+                    }));
+                return;
+            }
+
+            if (acttag === "DIV") {
+                var html = $(obj).html();
+                debugger;
+                $(newhash)
+                    .append($("<span/>", {
+                        html: "&nbsp;",
+                        clear: "both"
+                    }));
+                $(newhash)
+                    .append($("<span/>", {
+                        html: html
+                    }));
+                return;
+            }
+
+            if (acttag === "PRE") {
+                var html = $(obj).html();
+                debugger;
+                $(newhash)
+                    .append($("<span/>", {
+                        html: "&nbsp;",
+                        clear: "both"
+                    }));
+                $(newhash)
+                    .append($("<pre/>", {
+                        html: html
+                    }));
+                return;
+            }
+
+            var text = $(obj).text();
+            if (typeof text !== "undefined" && text.length > 0) {
+                $(newhash)
+                    .append($("<span/>", {
+                        html: "&nbsp;",
+                        clear: "both"
+                    }));
+                $(newhash)
+                    .append($("<span/>", {
+                        text: text
+                    }));
+            }
+        }
+    };
 
 
 

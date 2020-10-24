@@ -572,6 +572,15 @@
                                 var url = DOMURL.createObjectURL(svg);
                                 var image = new Image();
                                 image.src = url;
+                                // noch weiter
+                                var image1 = document.createElement("img");
+                                var canvas1 = document.createElement("canvas");
+                                canvas1.width = image.width;
+                                canvas1.height = image.height;
+                                var ctx1 = canvas.getContext("2d");
+                                ctx1.drawImage(image, 0, 0);
+                                var base64 = canvas1.toDataURL("image/png");
+                                debugger;
                                 /*
                                 var w = $(printelement1).width();
                                 var h = $(printelement1).height();
@@ -682,7 +691,7 @@
                             $(aktwrapper)
                                 .find(newcontainerhash)
                                 .append($("<span/>", {
-                                    html: "&nbsp;",   // $(printelement).prop("tagName") + "=>" + $(printelement).attr("id"),
+                                    html: "&nbsp;", // $(printelement).prop("tagName") + "=>" + $(printelement).attr("id"),
                                     css: {
                                         clear: "both"
                                     }
@@ -717,15 +726,46 @@
                                     type: "image/svg+xml;charset=utf-8"
                                 });
                                 var url = DOMURL.createObjectURL(svg);
-                                var img = new Image();
-                                img.src = url;
+                                var img = document.createElement("img"); // new Image();
+
                                 var w = $(svgelement).width();
                                 var h = $(svgelement).height();
                                 $(img).width(w);
                                 $(img).height(h);
-                                var oldid = $(svgelement).attr("id");
-                                var newid = old2newids[oldid];
-                                $(printelement).find("#" + newid).replaceWith(img);
+                                $(img).attr('crossorigin', 'anonymous');
+                                img.src = url;
+                                debugger;
+
+                                blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
+                                    // success
+                                    var oldid = $(svgelement).attr("id");
+                                    var newid = old2newids[oldid];
+                                    img.src = dataURL;
+                                    // $(printelement).find("#" + newid).replaceWith(img);
+                                    $(printelement).find("#" + newid).replaceWith(img);
+                                    //debugger;
+                                }).catch(function (err) {
+                                    // error
+                                    debugger;
+                                });
+
+                                debugger;
+                                // noch weiter
+                                /*
+                                var canvas1 = document.createElement("canvas");
+                                canvas1.width = w;  // img.width;
+                                canvas1.height = h;   // img.height;
+                                var ctx1 = canvas.getContext("2d");
+                                ctx1.drawImage(img, 0, 0);
+                                var base64 = canvas1.toDataURL();   // ("image/png");
+                                var newimage = document.createElement("img");
+                                newimage.src = base64;
+                                var len = base64.length;
+                                // img.src = base64;
+                                $(newimage).width(w);
+                                $(newimage).height(h);
+                                */
+
                             });
 
 
