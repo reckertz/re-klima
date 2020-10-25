@@ -48,6 +48,8 @@
     var hoptionsR;
     var hoptionsL;
 
+    var lastobj = null;
+
     var poprecord = {}; // Konfigurationsparameter mit Default-Zuweisung
     poprecord.qonly = true;
     poprecord.total = false;
@@ -217,7 +219,6 @@
                             .append($("<div/>", {
                                 id: newid
                             }));
-                        debugger;
                         // rekursiv durch die alte Struktur
                         kla1990htm.recurse($(".content"), newhash);
                         var largestring = $(newhash).html();
@@ -227,6 +228,95 @@
                     }
                 }))
 
+
+                .append($("<button/>", {
+                    html: "Download kompakt-2",
+                    css: {
+                        "text-align": "center",
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        var newid = "N" + Math.floor(Math.random() * 100000) + 1;
+                        var newhash = "#" + newid;
+                        $(".content")
+                            .append($("<div/>", {
+                                    id: newid,
+                                    css: {
+                                        position: "relative"
+                                    }
+                                })
+                                .append($("<h3/>", {
+                                    id: "H" + newid,
+                                    text: "Aufbereitung für Textverarbeitung",
+                                    css: {
+                                        position: "absolute",
+                                        top: "15px",
+                                        left: "15px"
+                                    }
+                                }))
+                            );
+                        // rekursiv durch die alte Struktur
+                        lastobj = $("#H" + newid);
+                        kla1990htm.recurse2($(".content"), newhash);
+                        var largestring = $(newhash).html();
+                        uihelper.downloadfile("station.html", largestring, function (ret) {
+                            console.log("Downloaded");
+                        });
+                    }
+                }))
+
+
+                .append($("<button/>", {
+                    html: "Download kompakt-3",
+                    css: {
+                        "text-align": "center",
+                        float: "left",
+                        margin: "10px"
+                    },
+                    click: function (evt) {
+                        evt.preventDefault();
+                        var newid = "N" + Math.floor(Math.random() * 100000) + 1;
+                        var newhash = "#" + newid;
+                        $(".content")
+                            .append($("<div/>", {
+                                    id: newid
+                                })
+                                .append($("<table/>", {
+                                        border: "2",
+                                        rules: "all",
+                                        width: "95%",
+                                        layout: "fixed",
+                                        "background-color": "white"
+                                    })
+                                    .append($("<thead/>")
+                                        .append($("<th/>", {
+                                            html: "Ergebnis",
+                                            width: "70%"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "Kommentar",
+                                            width: "30%"
+                                        }))
+                                    )
+                                    .append($("<tbody/>", {
+                                        id: newid + "T"
+                                    }))
+                                )
+                            );
+                        // rekursiv durch die alte Struktur
+                        debugger;
+
+
+                        kla1990htm.recurse3($(".content"), "#" + newid + "T", newhash);
+                        debugger;
+                        var largestring = $(newhash).html();
+                        uihelper.downloadfile("station.html", largestring, function (ret) {
+                            console.log("Downloaded");
+                        });
+                    }
+                }))
 
                 .append($("<div/>", {
                     id: "kla1990htmclock",
@@ -283,14 +373,18 @@
                 height: h
             });
         });
-
     }; // Ende show
 
-
+    /**
+     *
+     * @param {*} obj
+     * @param {*} newhash
+     */
     kla1990htm.recurse = function (obj, newhash) {
         var actid = $(obj).attr("id");
         if (typeof actid !== "undefined") {
             if (actid === newhash.substr(1)) {
+                debugger;
                 console.log("Return home");
                 return;
             }
@@ -299,23 +393,25 @@
         console.log(actid + "=>" + acttag);
         console.log(acttag);
         if (acttag === "IMG") {
+            debugger;
             $(newhash)
-                .append($("<span/>", {
-                    html: "&nbsp;",
-                    clear: "both"
-                }));
-            $(newhash)
-                .append($(obj).clone());
+                .append($("<div/>", {
+                        html: "&nbsp;",
+                        clear: "left"
+                    })
+                    .append($(obj).clone())
+                );
             return;
         }
         if (acttag === "TABLE") {
             $(newhash)
-                .append($("<span/>", {
-                    html: "&nbsp;",
-                    clear: "both"
-                }));
-            $(newhash)
-                .append($(obj).clone());
+                .append($("<div/>", {
+                        html: "&nbsp;",
+                        width: "100%",
+                        clear: "left"
+                    })
+                    .append($(obj).clone())
+                );
             return;
         }
         if (acttag === "BUTTON") {
@@ -334,62 +430,334 @@
             if (acttag === "SPAN") {
                 var html = $(obj).html();
                 $(newhash)
-                    .append($("<span/>", {
-                        html: "&nbsp;",
-                        clear: "both"
-                    }));
-                $(newhash)
-                    .append($("<span/>", {
-                        html: html
-                    }));
+                    .append($("<div/>", {
+                            html: "&nbsp;",
+                            width: "100%",
+                            clear: "left"
+                        })
+                        .append($("<span/>", {
+                            html: html,
+                            css: {
+                                float: "left"
+                            }
+                        }))
+                    );
                 return;
             }
 
             if (acttag === "DIV") {
                 var html = $(obj).html();
-                debugger;
                 $(newhash)
-                    .append($("<span/>", {
-                        html: "&nbsp;",
-                        clear: "both"
-                    }));
-                $(newhash)
-                    .append($("<span/>", {
-                        html: html
-                    }));
+                    .append($("<div/>", {
+                            html: "&nbsp;",
+                            width: "100%",
+                            clear: "left"
+                        })
+                        .append($("<div/>", {
+                            html: html,
+                            css: {
+                                float: "left"
+                            }
+                        }))
+                    );
                 return;
             }
 
             if (acttag === "PRE") {
                 var html = $(obj).html();
-                debugger;
                 $(newhash)
-                    .append($("<span/>", {
-                        html: "&nbsp;",
-                        clear: "both"
-                    }));
-                $(newhash)
-                    .append($("<pre/>", {
-                        html: html
-                    }));
+                    .append($("<div/>", {
+                            html: "&nbsp;",
+                            width: "100%",
+                            clear: "left"
+                        })
+                        .append($("<pre/>", {
+                            html: html,
+                            css: {
+                                float: "left"
+                            }
+                        }))
+                    );
                 return;
             }
 
             var text = $(obj).text();
             if (typeof text !== "undefined" && text.length > 0) {
                 $(newhash)
-                    .append($("<span/>", {
-                        html: "&nbsp;",
-                        clear: "both"
-                    }));
-                $(newhash)
-                    .append($("<span/>", {
-                        text: text
-                    }));
+                    .append($("<div/>", {
+                            html: "&nbsp;",
+                            width: "100%",
+                            clear: "left"
+                        })
+                        .append($("<div/>", {
+                            text: text,
+                            css: {
+                                float: "left"
+                            }
+                        }))
+                    );
             }
         }
     };
 
+
+    /**
+     * recurse2 - Aufbereiten mit left und top "stripped"
+     * lastobj ist der Anker für die Positionierung
+     * newhash steht für den Container (könnte auch body sein)
+     * @param {*} obj
+     * @param {*} newhash
+     */
+    kla1990htm.recurse2 = function (obj, newhash) {
+        var doposition = "absolute";
+        var actid = $(obj).attr("id");
+        if (typeof actid !== "undefined") {
+            if (actid === newhash.substr(1)) {
+                console.log("Return home");
+                return;
+            }
+        }
+        var acttag = $(obj).prop("tagName");
+        console.log(actid + "=>" + acttag);
+        console.log(acttag);
+        if (acttag === "IMG") {
+            var newimg = $(obj).clone();
+            $(newimg).css({
+                position: doposition,
+                top: $(lastobj).position().top + $(lastobj).height() + 15,
+                left: "15px"
+            });
+            $(newhash).append($(newimg));
+            lastobj = $(newimg);
+            return;
+        }
+        if (acttag === "TABLE") {
+            var newtable = $(obj).clone();
+            $(newtable).css({
+                position: doposition,
+                top: $(lastobj).position().top + $(lastobj).height() + 15,
+                left: "15px"
+            });
+            $(newhash).append($(newtable));
+            lastobj = $(newtable);
+            return;
+        }
+        if (acttag === "BUTTON") {
+            return;
+        }
+
+        var ch = $(obj).children();
+        if (acttag !== "PRE" && typeof ch !== "undefined" && ch.length > 0) {
+            $(ch).each(function (ind, el) {
+                console.log("***recurse:" + ch.length + " " + acttag);
+                // alert(this.value); // "this" is the current element in the loop
+                var that = this;
+                kla1990htm.recurse2(that, newhash);
+            });
+        } else {
+            if (acttag === "SPAN") {
+                var html = $(obj).html();
+                if (html.length === 0 || html === "&nbsp;") return;
+                var newspan = $(obj).clone();
+                $(newspan).css({
+                    position: doposition,
+                    top: $(lastobj).position().top + $(lastobj).height() + 15,
+                    left: "15px"
+                });
+                $(newhash).append($(newspan));
+                lastobj = $(newspan);
+                return;
+            }
+
+            if (acttag === "DIV") {
+                var html = $(obj).html();
+                if (html.trim().length > 0 && html !== "&nbsp;") {
+                    var newdiv = document.createElement("span");
+                    $(newdiv).html(html);
+                    $(newdiv).css({
+                        position: doposition,
+                        top: $(lastobj).position().top + $(lastobj).height() + 15,
+                        left: "15px"
+                    });
+                    $(newhash).append($(newdiv));
+                    lastobj = $(newdiv);
+                }
+                return;
+            }
+
+            if (acttag === "PRE") {
+                var newpre = document.createElement("span");
+                $(newpre).html($(obj).html());
+                $(newpre).css({
+                    position: doposition,
+                    top: $(lastobj).position().top + $(lastobj).height() + 15,
+                    left: "15px"
+                });
+                $(newhash).append($(newpre));
+                lastobj = $(newpre);
+                return;
+            }
+
+            var text = $(obj).text();
+            if (typeof text !== "undefined" && text.length > 0) {
+                var newtext = document.createElement("span");
+                $(newtext).html($(obj).html());
+                $(newtext).css({
+                    position: doposition,
+                    top: $(lastobj).position().top + $(lastobj).height() + 15,
+                    left: "15px"
+                });
+                $(newhash).append($(newtext));
+                lastobj = $(newtext);
+            }
+            return;
+        }
+    };
+
+
+
+    /**
+     * recurse3 - Aufbereiten Table
+     * newhash steht für den Container (könnte auch body sein)
+     * @param {*} obj
+     * @param {*} newhash
+     */
+    kla1990htm.recurse3 = function (obj, newhash, newtophash) {
+        var doposition = "absolute";
+        var actid = $(obj).attr("id");
+        if (typeof actid !== "undefined") {
+            if (actid === newtophash.substr(1)) {
+                debugger;
+                console.log("Return home");
+                return;
+            }
+        }
+        var acttag = $(obj).prop("tagName");
+        console.log(actid + "=>" + acttag);
+        console.log(acttag);
+        if (acttag === "IMG") {
+            var newimg = $(obj).clone();
+            $(newimg).css({
+                margin: "10px"
+            });
+            $(newhash)
+                .append($("<tr/>")
+                    .append($("<td/>")
+                        .append($(newimg))
+                    )
+                    .append($("<td/>", {
+                        html: "Raum für Kommentare"
+                    }))
+                );
+            return;
+        }
+        if (acttag === "TABLE") {
+            var newtable = $(obj).clone();
+            $(newtable).css({
+                margin: "10px"
+            });
+            $(newhash)
+                .append($("<tr/>")
+                    .append($("<td/>")
+                        .append($(newtable))
+                    )
+                    .append($("<td/>", {
+                        html: "Raum für Kommentare"
+                    }))
+                );
+            return;
+        }
+        if (acttag === "BUTTON") {
+            return;
+        }
+
+        var ch = $(obj).children();
+        if (acttag !== "PRE" && typeof ch !== "undefined" && ch.length > 0) {
+            $(ch).each(function (ind, el) {
+                console.log("***recurse:" + ch.length + " " + acttag);
+                // alert(this.value); // "this" is the current element in the loop
+                var that = this;
+                kla1990htm.recurse3(that, newhash, newtophash);
+            });
+        } else {
+            if (acttag === "SPAN") {
+                var html = $(obj).html();
+                if (html.length === 0 || html === "&nbsp;") return;
+                var newspan = $(obj).clone();
+                $(newspan).css({
+                    margin: "10px"
+                });
+                $(newhash)
+                    .append($("<tr/>")
+                        .append($("<td/>")
+                            .append($(newspan))
+                        )
+                        .append($("<td/>", {
+                            html: "Raum für Kommentare"
+                        }))
+                    );
+                return;
+            }
+
+            if (acttag === "DIV") {
+                var html = $(obj).html();
+                if (html.trim().length > 0 && html !== "&nbsp;") {
+                    var newdiv = document.createElement("span");
+                    $(newdiv).html(html);
+                    $(newdiv).css({
+                        margin: "10px"
+                    });
+                    $(newhash)
+                        .append($("<tr/>")
+                            .append($("<td/>")
+                                .append($(newdiv))
+                            )
+                            .append($("<td/>", {
+                                html: "Raum für Kommentare"
+                            }))
+                        );
+                }
+                return;
+            }
+
+            if (acttag === "PRE") {
+                var newpre = document.createElement("span");
+                $(newpre).html($(obj).html());
+                $(newpre).css({
+                    margin: "10px"
+                });
+                $(newhash)
+                    .append($("<tr/>")
+                        .append($("<td/>")
+                            .append($(newpre))
+                        )
+                        .append($("<td/>", {
+                            html: "Raum für Kommentare"
+                        }))
+                    );
+                return;
+            }
+
+            var text = $(obj).text();
+            if (typeof text !== "undefined" && text.length > 0) {
+                var newtext = document.createElement("span");
+                $(newtext).html($(obj).html());
+                $(newtext).css({
+                    margin: "10px"
+                });
+                $(newhash)
+                    .append($("<tr/>")
+                        .append($("<td/>")
+                            .append($(newtext))
+                        )
+                        .append($("<td/>", {
+                            html: "Raum für Kommentare"
+                        }))
+                    );
+            }
+            return;
+        }
+    };
 
 
     /**
