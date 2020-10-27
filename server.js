@@ -415,9 +415,6 @@ app.get('/createtemptable', function (req, res) {
     }
 });
 
-
-
-
 /**
  * getsql3tables - API - Sammlung der Tabellen einer Datenbank,
  * gleiche Rückgabestruktur - wird spannend
@@ -462,7 +459,6 @@ app.get('/getsql3tables', function (req, res) {
         }));
         return;
     }
-
 });
 
 
