@@ -2086,6 +2086,40 @@
                                                     html: "Speichern",
                                                 }))
                                             );
+                                        if (kla1400raw.checkfragments(fullname, "rojekte  klimadaten  NOAA pages2k paleo")) {
+                                            $("#kla1400rawform")
+                                                .append($("<div/>", {
+                                                        css: {
+                                                            "text-align": "center",
+                                                            width: "100%"
+                                                        }
+                                                    })
+                                                    .append($("<button/>", {
+                                                        class: "kla1400rawActionp2k",
+                                                        css: {
+                                                            "margin-left": "10px"
+                                                        },
+                                                        html: "Download pages2k-Verzeichnis",
+                                                    }))
+                                                );
+
+                                                $("#kla1400rawform")
+                                                .append($("<div/>", {
+                                                        css: {
+                                                            "text-align": "center",
+                                                            width: "100%"
+                                                        }
+                                                    })
+                                                    .append($("<button/>", {
+                                                        class: "kla1400rawActiongetp2k",
+                                                        css: {
+                                                            "margin-left": "10px"
+                                                        },
+                                                        html: "Download pages2k-Dateien",
+                                                    }))
+                                                );
+
+                                        }
                                     }
                                     $("#kla1400rawselections").attr("rules", "all");
                                     $("#kla1400rawselections").css({
@@ -2111,6 +2145,7 @@
                         });
                     },
                     function (ret, callbackc) {
+                        debugger;
                         if (kla1400raw.checkfragments(fullname, "G:  Projekte  klimadaten  HYDE_lu_pop_proxy  baseline  asc")) {
                             // Ausgabe Mittelbereich für die dedizierte Verarbeitung
                             kla1400raw.puthydeform(fullname, function (ret) {
@@ -2255,73 +2290,73 @@
                                                         });
 
                                                     } else if (kla1400raw.checkfragments(fullname, "opendata gw_wasserstand \.csv")) {
-                                                            aktsource = "HYGRIS";
-                                                            debugger;
-                                                            var jqxhr = $.ajax({
-                                                                method: "GET",
-                                                                crossDomain: false,
-                                                                url: sysbase.getServer("loadwasserstand"),
-                                                                data: {
-                                                                    fullname: fullname,
-                                                                    targettable: klirecord.metadata.targettable,
-                                                                    primarykey: klirecord.metadata.primarykey,
-                                                                    separator: klirecord.metadata.separator,
-                                                                    timeout: 10 * 60 * 1000
-                                                                }
-                                                            }).done(function (r1, textStatus, jqXHR) {
-                                                                clearInterval(ghcnclock);
-                                                                document.getElementById("kla1400raw").style.cursor = "default";
-                                                                $(".kla1400rawActionLoad").prop('disabled', false);
-                                                                $("#kla1400raw_rightw").empty();
-                                                                sysbase.checkSessionLogin(r1);
-                                                                var ret = JSON.parse(r1);
-                                                                sysbase.putMessage(ret.message, 1);
-                                                                return;
-                                                            }).fail(function (err) {
-                                                                clearInterval(ghcnclock);
-                                                                $("#kla1400raw_rightw").empty();
-                                                                document.getElementById("kla1400raw").style.cursor = "default";
-                                                                $(".kla1400rawActionLoad").prop('disabled', false);
-                                                                sysbase.putMessage(err, 1);
-                                                                return;
-                                                            }).always(function () {
-                                                                // nope
-                                                            });
+                                                        aktsource = "HYGRIS";
+                                                        debugger;
+                                                        var jqxhr = $.ajax({
+                                                            method: "GET",
+                                                            crossDomain: false,
+                                                            url: sysbase.getServer("loadwasserstand"),
+                                                            data: {
+                                                                fullname: fullname,
+                                                                targettable: klirecord.metadata.targettable,
+                                                                primarykey: klirecord.metadata.primarykey,
+                                                                separator: klirecord.metadata.separator,
+                                                                timeout: 10 * 60 * 1000
+                                                            }
+                                                        }).done(function (r1, textStatus, jqXHR) {
+                                                            clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            sysbase.checkSessionLogin(r1);
+                                                            var ret = JSON.parse(r1);
+                                                            sysbase.putMessage(ret.message, 1);
+                                                            return;
+                                                        }).fail(function (err) {
+                                                            clearInterval(ghcnclock);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            sysbase.putMessage(err, 1);
+                                                            return;
+                                                        }).always(function () {
+                                                            // nope
+                                                        });
 
 
-                                                        } else if (kla1400raw.checkfragments(fullname, "nao dat \.txt")) {
-                                                            // NAO-Daten North Atlantic Oscillation
-                                                            aktsource = "NAO";
-                                                            var jqxhr = $.ajax({
-                                                                method: "GET",
-                                                                crossDomain: false,
-                                                                url: sysbase.getServer("loadnao"),
-                                                                data: {
-                                                                    fullname: fullname,
-                                                                    targettable: klirecord.metadata.targettable,
-                                                                    primarykey: klirecord.metadata.primarykey,
-                                                                    separator: klirecord.metadata.separator,
-                                                                    timeout: 10 * 60 * 1000
-                                                                }
-                                                            }).done(function (r1, textStatus, jqXHR) {
-                                                                clearInterval(ghcnclock);
-                                                                document.getElementById("kla1400raw").style.cursor = "default";
-                                                                $(".kla1400rawActionLoad").prop('disabled', false);
-                                                                $("#kla1400raw_rightw").empty();
-                                                                sysbase.checkSessionLogin(r1);
-                                                                var ret = JSON.parse(r1);
-                                                                sysbase.putMessage(ret.message, 1);
-                                                                return;
-                                                            }).fail(function (err) {
-                                                                clearInterval(ghcnclock);
-                                                                $("#kla1400raw_rightw").empty();
-                                                                document.getElementById("kla1400raw").style.cursor = "default";
-                                                                $(".kla1400rawActionLoad").prop('disabled', false);
-                                                                sysbase.putMessage(err, 1);
-                                                                return;
-                                                            }).always(function () {
-                                                                // nope
-                                                            });
+                                                    } else if (kla1400raw.checkfragments(fullname, "nao dat \.txt")) {
+                                                        // NAO-Daten North Atlantic Oscillation
+                                                        aktsource = "NAO";
+                                                        var jqxhr = $.ajax({
+                                                            method: "GET",
+                                                            crossDomain: false,
+                                                            url: sysbase.getServer("loadnao"),
+                                                            data: {
+                                                                fullname: fullname,
+                                                                targettable: klirecord.metadata.targettable,
+                                                                primarykey: klirecord.metadata.primarykey,
+                                                                separator: klirecord.metadata.separator,
+                                                                timeout: 10 * 60 * 1000
+                                                            }
+                                                        }).done(function (r1, textStatus, jqXHR) {
+                                                            clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            sysbase.checkSessionLogin(r1);
+                                                            var ret = JSON.parse(r1);
+                                                            sysbase.putMessage(ret.message, 1);
+                                                            return;
+                                                        }).fail(function (err) {
+                                                            clearInterval(ghcnclock);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            sysbase.putMessage(err, 1);
+                                                            return;
+                                                        }).always(function () {
+                                                            // nope
+                                                        });
 
 
 
@@ -2435,6 +2470,122 @@
             console.log(err.stack);
         }
     });
+
+
+    /**
+     * click on actionp2k, Download vom Server
+     * https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/ 
+     * in das Zielverzeichnis ?:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy
+     * nur .txt-Dateien
+     */
+    $(document).on("click", ".kla1400rawActionp2k", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        debugger;
+        var url = "https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/";
+        var directory = "g:\\Projekte\\klimadaten\\NOAA_pages2k_paleo_proxy";
+        var jqxhr = $.ajax({
+            method: "GET",
+            crossDomain: false,
+            url: sysbase.getServer("gethtmllinks"),
+            data: {
+                url: url,
+                directory: directory
+            }
+        }).done(function (r1, textStatus, jqXHR) {
+            sysbase.checkSessionLogin(r1);
+            sysbase.putMessage(r1, 1);
+            var ret = JSON.parse(r1);
+            // Ausgabe in Treeview oder Refresh aus KLIRAWFILES
+            // in ret.linkliste steht ein Array von Dateinamen, sonst nichts.
+            var node = $("#kla1400rawt0").jstree().get_selected(true)[0];
+            debugger;
+            for (var ilist = 0; ilist < ret.linkliste.length; ilist++) {
+
+                var filenode = {
+                    text: ret.linkliste[ilist],
+                };
+                filenode.li_attr = {
+                    fullname: directory + ret.linkliste[ilist]
+                };
+                filenode.icon = "jstree-file";
+                filenode.li_attr.what = "file";
+                try {
+                    $('#kla1400rawt0').jstree().create_node(node, filenode, 'last', function (newnode) {
+                        console.log("zugefügt:" + newnode.text);
+                    }, true);
+                } catch (err) {
+                    console.log("Error:" + err);
+                    console.log(err.stack);
+                }
+            }
+        }).fail(function (err) {
+            sysbase.putMessage(err, 1);
+            return;
+        }).always(function () {
+            // nope
+        });
+    });
+
+
+    /**
+     * click on actionp2k, Download vom Server
+     * https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/ 
+     * in das Zielverzeichnis ?:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy
+     * nur .txt-Dateien
+     */
+    $(document).on("click", ".kla1400rawActionp2k", function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        debugger;
+        var url = "https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/";
+        var directory = "g:\\Projekte\\klimadaten\\NOAA_pages2k_paleo_proxy";
+        var jqxhr = $.ajax({
+            method: "GET",
+            crossDomain: false,
+            url: sysbase.getServer("gethtmllinks"),
+            data: {
+                url: url,
+                directory: directory
+            }
+        }).done(function (r1, textStatus, jqXHR) {
+            sysbase.checkSessionLogin(r1);
+            sysbase.putMessage(r1, 1);
+            var ret = JSON.parse(r1);
+            // Ausgabe in Treeview oder Refresh aus KLIRAWFILES
+            // in ret.linkliste steht ein Array von Dateinamen, sonst nichts.
+            var node = $("#kla1400rawt0").jstree().get_selected(true)[0];
+            debugger;
+            for (var ilist = 0; ilist < ret.linkliste.length; ilist++) {
+
+                var filenode = {
+                    text: ret.linkliste[ilist],
+                };
+                filenode.li_attr = {
+                    fullname: directory + ret.linkliste[ilist]
+                };
+                filenode.icon = "jstree-file";
+                filenode.li_attr.what = "file";
+                try {
+                    $('#kla1400rawt0').jstree().create_node(node, filenode, 'last', function (newnode) {
+                        console.log("zugefügt:" + newnode.text);
+                    }, true);
+                } catch (err) {
+                    console.log("Error:" + err);
+                    console.log(err.stack);
+                }
+            }
+        }).fail(function (err) {
+            sysbase.putMessage(err, 1);
+            return;
+        }).always(function () {
+            // nope
+        });
+    });
+
+
+
+
 
     kla1400raw.setResizeObserver = function () {
 

@@ -1237,6 +1237,69 @@
     };
 
 
+    /**
+     * getPhysicalDirectory - hierarchische Prüfung der physischen Verfügbarkeit von Dateien oder Verzeichnissen
+     * Extraktion der Directory-
+     * g:\Projekte\klimadaten\<Quell-Verzeichnis>\[optional: Unterverzeichnisse]\<Dateiname> // PC Desktop
+     * e:\Projekte\klimadaten\<Quell-Verzeichnis>\[optional: Unterverzeichnisse]\<Dateiname> // Laptop
+     * c:\Projekte\klimadaten\<Quell-Verzeichnis>\[optional: Unterverzeichnisse]\<Dateiname>  // Notverzeichnis, wenn sonst nichts funktioniert, SSD ist Engpass
+     * @param {*} pfullname 
+     * return ret mit error, message, fullname - korrigierter Name oder ""
+     */
+    sys0000sys.getPhysicalDirectory = function (pfullname) {
+        var newfullname = "";
+        if (fs.existsSync(pfullname)) {
+            console.log("vorhanden:" + pfullname);
+            return {
+                error: false,
+                message: "Gefunden",
+                fullname: pfullname
+            };
+        }
+        // Suche G:
+        if (!pfullname.startsWith("g:")) {
+            newfullname = "g" + pfullname.substr(1);
+            if (fs.existsSync(newfullname)) {
+                console.log("vorhanden:" + newfullname);
+                return {
+                    error: false,
+                    message: "Gefunden",
+                    fullname: newfullname
+                };
+            }
+        }
+        // Suche E:
+        if (!pfullname.startsWith("e:")) {
+            newfullname = "e" + pfullname.substr(1);
+            if (fs.existsSync(newfullname)) {
+                console.log("vorhanden:" + newfullname);
+                return {
+                    error: false,
+                    message: "Gefunden",
+                    fullname: newfullname
+                };
+            }
+        }
+        // Suche C:
+        if (!pfullname.startsWith("c:")) {
+            newfullname = "c" + pfullname.substr(1);
+            if (fs.existsSync(newfullname)) {
+                console.log("vorhanden:" + newfullname);
+                return {
+                    error: false,
+                    message: "Gefunden",
+                    fullname: newfullname
+                };
+            }
+        }
+        // nichts gefunden
+        return {
+            error: true,
+            message: "nicht gefunden",
+            fullname: ""
+        };
+    };
+
 
     /**
      * line = Zeile; search: Suchbegriff inkl. :; variablename und metadata für das Ergebnis
@@ -1406,6 +1469,12 @@
                 tablename = "KLIRAWFILES";
             }
         }
+        var check = sys0000sys.getPhysicalDirectory(rootdir);
+        if (check.error === false) {
+            rootdir = check.fullname;
+        }
+
+        /*
         if (typeof rootdir !== "undefined" && rootdir.length > 0 && !fs.existsSync(rootdir)) {
             rootdir = path.join("C:", "projekte");
             rootdir = path.join(rootdir, "klima1001");
@@ -1413,6 +1482,7 @@
                 fs.mkdirSync(rootdir);
             }
         }
+        */
 
         var files = [];
         var predirectory = "";
@@ -1429,10 +1499,22 @@
                 predirectory = startdir;
             }
         }
+
+        check = sys0000sys.getPhysicalDirectory(predirectory);
+        if (check.error === false) {
+            predirectory = check.fullname;
+        }
+
         var directory = "";
         if (req.query && typeof req.query.directory !== "undefined" && req.query.directory.length > 0) {
             directory = req.query.directory;
         }
+        check = sys0000sys.getPhysicalDirectory(directory);
+        if (check.error === false) {
+            directory = check.fullname;
+        }
+
+
         if (predirectory.startsWith(rootdir)) predirectory = predirectory.substr(rootdir.length);
         if (directory.startsWith(rootdir)) directory = directory.substr(rootdir.length);
 
@@ -1912,7 +1994,7 @@
      * gethtmllinks url aufrufen und links extrahieren
      * Übergabe in ret.linkliste als array
      */
-    sys0000sys.gethtmllinks = function (gbldb, async, ObjectID, uihelper, req, res, supercallback1) {
+    sys0000sys.gethtmllinks = function (gbldb, async, uihelper, req, res, supercallback1) {
 
         var url = "";
         var directory = "";
@@ -1922,6 +2004,10 @@
         if (req.query && typeof req.query.directory !== "undefined" && req.query.directory.length > 0) {
             directory = req.query.directory;
         }
+        var check = sys0000sys.getPhysicalDirectory(directory);
+        if (check.error === false) {
+            directory = check.fullname;
+        }
         console.log(url);
         async.waterfall([
                 function (callback) {
@@ -1930,6 +2016,7 @@
                      */
                     var ret = {};
                     ret.linkliste = [];
+                    ret.directory = directory;
                     request(url, {
                         json: true
                     }, function (err, res1, body) {
@@ -1941,11 +2028,15 @@
                                 onopentag(tagname, attribs) {
                                     if (tagname === "a" && typeof attribs.href !== "undefined") {
                                         console.log(attribs.href);
-                                        ret.linkliste.push(attribs.href);
+                                        if (attribs.href.startsWith("?") || attribs.href.startsWith("/")) {
+                                            // nope
+                                        } else {
+                                            ret.linkliste.push(attribs.href);
+                                        }
                                     }
                                 },
                                 ontext(text) {
-                                    // console.log("-->", text);
+                                    //console.log("-->", text);
                                 },
                                 onclosetag(tagname) {
                                     if (tagname === "script") {
@@ -1977,7 +2068,7 @@
      * geturllinksfiles - Dateien aus url mit link holen
      * und in Zielverzeichnis schreiben
      */
-    sys0000sys.geturllinksfiles = function (gblInfo, gbldb, async, ObjectID, uihelper, req, res, supercallback1) {
+    sys0000sys.geturllinksfiles = function (gblInfo, gbldb, async, uihelper, req, res, supercallback1) {
 
         var url = "";
         var linkarray = [];
@@ -1993,11 +2084,13 @@
         }
         console.log(url);
         var dir = path.join(gblInfo.rootDirectory, "/../klima1001/");
+       
         var targetdir = path.join(dir, directory);
         if (!fs.existsSync(targetdir)) {
             fs.mkdirSync(targetdir);
             console.log("ANGELEGT:" + targetdir);
         }
+
         var ret = {};
         async.eachSeries(linkarray, function (linkname, nextlink) {
             /**
@@ -3161,6 +3254,172 @@
             });
         // G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2008AD_pop\rurc_2008AD.asc
     };
+
+
+
+
+    /**
+     * getp2kfile - Datei lesen und Daten als Array bereitstellen
+     * Aufruf aus kla1400raw!
+     * Parameter sind url, predirectory, directory, filename
+     * trule: 1000=ingnorieren, first5= die ersten 5 Sätze mit Daten als html aufbereiten
+     * oder das Array darauf beschränken
+     * Rückgabe ret.data ret.metadata, ret.metafields jeweisl als Array
+     */
+    sys0000sys.getp2kfile = function (rootdir, fs, async, req, reqparm, res, supercallback3) {
+        var files = [];
+        var predirectory = "";
+        var directory = "";
+        var filename = "";
+        var trule = "";
+        var ret = {};
+        ret.data = [];
+
+
+        if (typeof req !== "undefined" && req !== null) {
+            if (req.query && typeof req.query.predirectory !== "undefined" && req.query.predirectory.length > 0) {
+                predirectory = req.query.predirectory;
+            }
+            if (req.query && typeof req.query.directory !== "undefined" && req.query.directory.length > 0) {
+                directory = req.query.directory;
+            }
+            if (predirectory.length > 0) {
+                ret.directory = path.join(rootdir, predirectory);
+                ret.directory = path.join(ret.directory, directory);
+            } else {
+                ret.directory = path.join(rootdir, directory);
+            }
+            if (req.query && typeof req.query.filename !== "undefined" && req.query.filename.length > 0) {
+                filename = req.query.filename;
+            }
+            if (req.query && typeof req.query.trule !== "undefined" && req.query.trule.length > 0) {
+                trule = req.query.trule;
+            }
+        } else if (typeof reqparm !== "undefined" && reqparm !== null) {
+            if (reqparm && typeof reqparm.predirectory !== "undefined" && reqparm.predirectory.length > 0) {
+                predirectory = reqparm.predirectory;
+            }
+            if (reqparm && typeof reqparm.directory !== "undefined" && reqparm.directory.length > 0) {
+                directory = reqparm.directory;
+            }
+            if (predirectory.length > 0) {
+                ret.directory = path.join(rootdir, predirectory);
+                ret.directory = path.join(ret.directory, directory);
+            } else {
+                ret.directory = path.join(rootdir, directory);
+            }
+            if (reqparm && typeof reqparm.filename !== "undefined" && reqparm.filename.length > 0) {
+                filename = reqparm.filename;
+            }
+            if (reqparm && typeof reqparm.trule !== "undefined" && reqparm.trule.length > 0) {
+                trule = reqparm.trule;
+            }
+
+        }
+
+        var linecount = 0;
+        var metadata = {};
+        var metafields = [];
+        var headfields = [];
+        var datafields = [];
+        var datalinecounter = 0;
+
+        ret.filepath = path.join(ret.directory, filename);
+        var readInterface = readline.createInterface({
+            input: fs.createReadStream(ret.filepath),
+            console: false
+        });
+        readInterface.on('line', function (line) {
+            //console.log(line);
+            if (line.startsWith("##") === true && line.trim().length > 0) {
+                var metainfo = line.split("\t");
+                metafields.push({
+                    fieldname: metainfo[0].substr(2),
+                    fielddescr: metainfo[1]
+                });
+            } else if (line.startsWith("#") === true && line.trim().length > 0) {
+                /*
+                    Metadaten zu der Datei
+                    # Archive: tree
+                    # Site_Information
+                    #     Site_Name: Lake Tanganyika
+                    #     Location: 
+                    #     Country: 
+                    #     Northernmost_Latitude: -6.03
+                    #     Southernmost_Latitude: -6.03
+                    #     Easternmost_Longitude: 28.53
+                    #     Westernmost_Longitude: 28.53
+                    #     Elevation: 905
+                    #------------------
+                    # Data_Collection
+                    #     Collection_Name: 
+                    #     Earliest_Year: 504.0
+                    #     Most_Recent_Year: 1986.0
+                    #     Time_Unit: AD
+                    #     Core_Length: 
+                */
+                sys0000sys.getlineparameter(line, "Archive:", "archive", metadata);
+                sys0000sys.getlineparameter(line, "Northernmost_Latitude:", "latitude", metadata);
+                sys0000sys.getlineparameter(line, "Easternmost_Longitude:", "longitude", metadata);
+                sys0000sys.getlineparameter(line, "Elevation:", "HGHT", metadata);
+                sys0000sys.getlineparameter(line, "Site_Name:", "sitename", metadata);
+                sys0000sys.getlineparameter(line, "Earliest_Year:", "firstyear", metadata);
+                sys0000sys.getlineparameter(line, "Most_Recent_Year:", "lastyear", metadata);
+            } else if (line.startsWith("#") === false && line.trim().length > 0) {
+                linecount++;
+                if (linecount === 1) {
+                    // head-line
+                    headfields = line.split("\t");
+                } else {
+                    // data-line
+                    datalinecounter++;
+                    if (trule === "first5" && datalinecounter > 5) {
+                        readInterface.close();
+                        return;
+                    }
+                    datafields = line.split("\t");
+                    var datarow = {};
+                    for (var ifield = 0; ifield < metafields.length; ifield++) {
+                        var fname = metafields[ifield].fieldname;
+                        var fvalue = datafields[ifield];
+                        datarow[fname] = fvalue;
+                    }
+                    ret.data.push(datarow);
+                }
+            }
+
+        });
+        readInterface.on('close', function () {
+            // do something on finish here
+            supercallback3(res, {
+                error: false,
+                message: "OK",
+                metadata: metadata,
+                data: ret.data,
+                metafields: metafields
+            });
+            return;
+        });
+    };
+
+
+    /**
+     * line = Zeile; search: Suchbegriff inkl. :; variablename und metadata für das Ergebnis
+     */
+    sys0000sys.getlineparameter = function (line, search, variablename, metadata) {
+        var sline = line.substring(1).trim(); // ohne # und trim
+        if (sline.indexOf(search) >= 0) {
+            var idis = sline.indexOf(search) + search.length;
+            var value = sline.substring(idis);
+            metadata[variablename] = value;
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+
+
 
 
 

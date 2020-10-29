@@ -155,10 +155,6 @@ db.serialize(function () {
             });
         }
         */
-
-
-
-
     ], function (error, result) {
         console.log("Fertig mit Indexerstellung");
     }); // async.waterfall
@@ -1590,6 +1586,45 @@ app.get('/stationhyde', function (req, res) {
         }
     );
 });
+
+
+/**
+ * gethtmllinks url aufrufen und links extrahieren 
+ * Übergabe in ret.linkliste als array
+ */
+app.get('/gethtmllinks', function (req, res) {
+    if (checkSession(req, res)) return;
+    sys0000sys.gethtmllinks(db, async, uihelper, req, res, function (res, ret) {
+        // in ret liegen error, message und linkliste
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+/**
+ * geturllinksfiles - Dateien aus url mit link holen
+ * und in Zielverzeichnis schreiben
+ */
+app.post('/geturllinksfiles', function (req, res) {
+    if (checkSession(req, res)) return;
+    sys0000sys.geturllinksfiles(gblInfo, db, async, uihelper, req, res, function (res, ret) {
+        // in ret liegen error, message und linkliste
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
 
 
 /**
