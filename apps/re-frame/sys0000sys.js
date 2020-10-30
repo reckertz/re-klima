@@ -1243,7 +1243,7 @@
      * g:\Projekte\klimadaten\<Quell-Verzeichnis>\[optional: Unterverzeichnisse]\<Dateiname> // PC Desktop
      * e:\Projekte\klimadaten\<Quell-Verzeichnis>\[optional: Unterverzeichnisse]\<Dateiname> // Laptop
      * c:\Projekte\klimadaten\<Quell-Verzeichnis>\[optional: Unterverzeichnisse]\<Dateiname>  // Notverzeichnis, wenn sonst nichts funktioniert, SSD ist Engpass
-     * @param {*} pfullname 
+     * @param {*} pfullname
      * return ret mit error, message, fullname - korrigierter Name oder ""
      */
     sys0000sys.getPhysicalDirectory = function (pfullname) {
@@ -2084,7 +2084,7 @@
         }
         console.log(url);
         var dir = path.join(gblInfo.rootDirectory, "/../klima1001/");
-       
+
         var targetdir = path.join(dir, directory);
         if (!fs.existsSync(targetdir)) {
             fs.mkdirSync(targetdir);
@@ -3256,8 +3256,6 @@
     };
 
 
-
-
     /**
      * getp2kfile - Datei lesen und Daten als Array bereitstellen
      * Aufruf aus kla1400raw!
@@ -3268,53 +3266,29 @@
      */
     sys0000sys.getp2kfile = function (rootdir, fs, async, req, reqparm, res, supercallback3) {
         var files = [];
-        var predirectory = "";
-        var directory = "";
-        var filename = "";
+        var fullname = "";
         var trule = "";
         var ret = {};
         ret.data = [];
-
-
         if (typeof req !== "undefined" && req !== null) {
-            if (req.query && typeof req.query.predirectory !== "undefined" && req.query.predirectory.length > 0) {
-                predirectory = req.query.predirectory;
-            }
-            if (req.query && typeof req.query.directory !== "undefined" && req.query.directory.length > 0) {
-                directory = req.query.directory;
-            }
-            if (predirectory.length > 0) {
-                ret.directory = path.join(rootdir, predirectory);
-                ret.directory = path.join(ret.directory, directory);
-            } else {
-                ret.directory = path.join(rootdir, directory);
-            }
-            if (req.query && typeof req.query.filename !== "undefined" && req.query.filename.length > 0) {
-                filename = req.query.filename;
+            if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                fullname = req.query.fullname;
             }
             if (req.query && typeof req.query.trule !== "undefined" && req.query.trule.length > 0) {
                 trule = req.query.trule;
             }
         } else if (typeof reqparm !== "undefined" && reqparm !== null) {
-            if (reqparm && typeof reqparm.predirectory !== "undefined" && reqparm.predirectory.length > 0) {
-                predirectory = reqparm.predirectory;
-            }
-            if (reqparm && typeof reqparm.directory !== "undefined" && reqparm.directory.length > 0) {
-                directory = reqparm.directory;
-            }
-            if (predirectory.length > 0) {
-                ret.directory = path.join(rootdir, predirectory);
-                ret.directory = path.join(ret.directory, directory);
-            } else {
-                ret.directory = path.join(rootdir, directory);
-            }
-            if (reqparm && typeof reqparm.filename !== "undefined" && reqparm.filename.length > 0) {
-                filename = reqparm.filename;
+            if (reqparm && typeof reqparm.fullname !== "undefined" && reqparm.fullname.length > 0) {
+                fullname = reqparm.fullname;
             }
             if (reqparm && typeof reqparm.trule !== "undefined" && reqparm.trule.length > 0) {
                 trule = reqparm.trule;
             }
+        }
 
+        var check = sys0000sys.getPhysicalDirectory(fullname);
+        if (check.error === false) {
+            fullname = ret.fullname;
         }
 
         var linecount = 0;
@@ -3324,7 +3298,13 @@
         var datafields = [];
         var datalinecounter = 0;
 
-        ret.filepath = path.join(ret.directory, filename);
+        var klistation = {
+
+        };
+
+
+
+        ret.filepath = fullname;
         var readInterface = readline.createInterface({
             input: fs.createReadStream(ret.filepath),
             console: false
@@ -3343,8 +3323,8 @@
                     # Archive: tree
                     # Site_Information
                     #     Site_Name: Lake Tanganyika
-                    #     Location: 
-                    #     Country: 
+                    #     Location:
+                    #     Country:
                     #     Northernmost_Latitude: -6.03
                     #     Southernmost_Latitude: -6.03
                     #     Easternmost_Longitude: 28.53
@@ -3352,11 +3332,11 @@
                     #     Elevation: 905
                     #------------------
                     # Data_Collection
-                    #     Collection_Name: 
+                    #     Collection_Name:
                     #     Earliest_Year: 504.0
                     #     Most_Recent_Year: 1986.0
                     #     Time_Unit: AD
-                    #     Core_Length: 
+                    #     Core_Length:
                 */
                 sys0000sys.getlineparameter(line, "Archive:", "archive", metadata);
                 sys0000sys.getlineparameter(line, "Northernmost_Latitude:", "latitude", metadata);

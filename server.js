@@ -1588,8 +1588,31 @@ app.get('/stationhyde', function (req, res) {
 });
 
 
+
 /**
- * gethtmllinks url aufrufen und links extrahieren 
+ * getp2kfile - Datei lesen und Daten als Array bereitstellen
+ * Parameter sind url, predirectory, directory, filename
+ * Rückgabe ret.data als Array
+ */
+app.get('/getp2kfile', function (req, res) {
+    if (checkSession(req, res)) return;
+    var rootdir = path.dirname(require.main.filename);
+    sys0000sys.getp2kfile(rootdir, fs, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
+/**
+ * gethtmllinks url aufrufen und links extrahieren
  * Übergabe in ret.linkliste als array
  */
 app.get('/gethtmllinks', function (req, res) {

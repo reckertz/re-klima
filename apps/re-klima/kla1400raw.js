@@ -2103,7 +2103,7 @@
                                                     }))
                                                 );
 
-                                                $("#kla1400rawform")
+                                            $("#kla1400rawform")
                                                 .append($("<div/>", {
                                                         css: {
                                                             "text-align": "center",
@@ -2118,9 +2118,10 @@
                                                         html: "Download pages2k-Dateien",
                                                     }))
                                                 );
-
                                         }
                                     }
+
+
                                     $("#kla1400rawselections").attr("rules", "all");
                                     $("#kla1400rawselections").css({
                                         border: "1px solid black",
@@ -2145,7 +2146,6 @@
                         });
                     },
                     function (ret, callbackc) {
-                        debugger;
                         if (kla1400raw.checkfragments(fullname, "G:  Projekte  klimadaten  HYDE_lu_pop_proxy  baseline  asc")) {
                             // Ausgabe Mittelbereich für die dedizierte Verarbeitung
                             kla1400raw.puthydeform(fullname, function (ret) {
@@ -2256,6 +2256,9 @@
                                                     $("#kla1400raw_rightw").height($("#kla1400raw_left").height());
                                                     var ghcnclock = kla1400raw.showclock("#kla1400raw_rightw");
                                                     var klirecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
+                                                    /**
+                                                     * IPCC GHCN-Daily
+                                                     */
                                                     if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily inventory \.txt")) {
                                                         aktsource = "GHCND";
                                                         var jqxhr = $.ajax({
@@ -2288,7 +2291,41 @@
                                                         }).always(function () {
                                                             // nope
                                                         });
-
+                                                        /**
+                                                         * NOAA Pages2k
+                                                         */
+                                                    } else if (kla1400raw.checkfragments(fullname, "NOAA pages2k \.txt")) {
+                                                        aktsource = "PAGES2K";
+                                                        var jqxhr = $.ajax({
+                                                            method: "GET",
+                                                            crossDomain: false,
+                                                            url: sysbase.getServer("getp2kfile"),
+                                                            data: {
+                                                                fullname: fullname,
+                                                                timeout: 10 * 60 * 1000
+                                                            }
+                                                        }).done(function (r1, textStatus, jqXHR) {
+                                                            clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            sysbase.checkSessionLogin(r1);
+                                                            var ret = JSON.parse(r1);
+                                                            sysbase.putMessage(ret.message, 1);
+                                                            return;
+                                                        }).fail(function (err) {
+                                                            clearInterval(ghcnclock);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            sysbase.putMessage(err, 1);
+                                                            return;
+                                                        }).always(function () {
+                                                            // nope
+                                                        });
+                                                        /**
+                                                         * HYGRIS Grundwasserstand
+                                                        */
                                                     } else if (kla1400raw.checkfragments(fullname, "opendata gw_wasserstand \.csv")) {
                                                         aktsource = "HYGRIS";
                                                         debugger;
@@ -2357,11 +2394,6 @@
                                                         }).always(function () {
                                                             // nope
                                                         });
-
-
-
-
-
                                                     } else {
                                                         $(".kla1400rawActionLoad").prop('disabled', true);
                                                         var jqxhr = $.ajax({
@@ -2474,7 +2506,7 @@
 
     /**
      * click on actionp2k, Download vom Server
-     * https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/ 
+     * https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/
      * in das Zielverzeichnis ?:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy
      * nur .txt-Dateien
      */
@@ -2530,7 +2562,7 @@
 
     /**
      * click on actionp2k, Download vom Server
-     * https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/ 
+     * https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/
      * in das Zielverzeichnis ?:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy
      * nur .txt-Dateien
      */
@@ -2582,6 +2614,7 @@
             // nope
         });
     });
+
 
 
 
