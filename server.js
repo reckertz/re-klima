@@ -1597,7 +1597,7 @@ app.get('/stationhyde', function (req, res) {
 app.get('/getp2kfile', function (req, res) {
     if (checkSession(req, res)) return;
     var rootdir = path.dirname(require.main.filename);
-    sys0000sys.getp2kfile(rootdir, fs, async, req, null, res, function (res, ret) {
+    kla1490srv.getp2kfile(db, rootdir, fs, async, req, null, res, function (res, ret) {
         // in ret liegen error, message und record
         var smsg = JSON.stringify(ret);
         res.writeHead(200, {

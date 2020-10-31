@@ -526,6 +526,26 @@
         //console.log("SEL:" + JSON.stringify(selfields, null, " "));
         //console.log("UPD:" + JSON.stringify(updfields, null, " "));
         /**
+         * Absichern - Object stringify zu string
+         */
+        for (var property in updfields["$set"]) {
+            if (updfields["$set"].hasOwnProperty(property)) {
+                if (typeof updfields["$set"][property] === "object") {
+                    var fstring = JSON.stringify(updfields["$set"][property]);
+                    updfields["$set"][property] = fstring;
+                }
+            }
+        }
+        for (var property in updfields["$setOnInsert"]) {
+            if (updfields["$setOnInsert"].hasOwnProperty(property)) {
+                if (typeof updfields["$setOnInsert"][property] === "object") {
+                    var fstring1 = JSON.stringify(updfields["$setOnInsert"][property]);
+                    updfields["$setOnInsert"][property] = fstring1;
+                }
+            }
+        }
+
+        /**
          * Erzeugen Update-Statement - upsert = true ist default und wird beachtet
          */
         var allfields = {};
@@ -3264,7 +3284,7 @@
      * oder das Array darauf beschränken
      * Rückgabe ret.data ret.metadata, ret.metafields jeweisl als Array
      */
-    sys0000sys.getp2kfile = function (rootdir, fs, async, req, reqparm, res, supercallback3) {
+    sys0000sys.getp2kfileOLD = function (rootdir, fs, async, req, reqparm, res, supercallback3) {
         var files = [];
         var fullname = "";
         var trule = "";

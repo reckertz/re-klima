@@ -2256,9 +2256,11 @@
                                                     $("#kla1400raw_rightw").height($("#kla1400raw_left").height());
                                                     var ghcnclock = kla1400raw.showclock("#kla1400raw_rightw");
                                                     var klirecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
+                                                    fullname = klirecord.fsdata.fullname;
                                                     /**
                                                      * IPCC GHCN-Daily
                                                      */
+                                                    debugger;
                                                     if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily inventory \.txt")) {
                                                         aktsource = "GHCND";
                                                         var jqxhr = $.ajax({
@@ -2328,7 +2330,6 @@
                                                         */
                                                     } else if (kla1400raw.checkfragments(fullname, "opendata gw_wasserstand \.csv")) {
                                                         aktsource = "HYGRIS";
-                                                        debugger;
                                                         var jqxhr = $.ajax({
                                                             method: "GET",
                                                             crossDomain: false,

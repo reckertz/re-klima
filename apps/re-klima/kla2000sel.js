@@ -1294,6 +1294,7 @@
         var skip = 0;
         var limit = 0;
         var api = "getallrecords";
+        debugger;
         uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
             if (ret.error === true) {
                 // sollte nicht passieren??? oder auch hier anlegen
