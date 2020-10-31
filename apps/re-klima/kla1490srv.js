@@ -140,25 +140,37 @@ const {
                     /**
                      * KLISTATIONS löschen für pages2k
                      */
-                    // var delStmt = "DELETE FROM KLISTATIONS ";
-                    //delStmt += " WHERE source = 'PAGES2K'";
-                    //db.run(delStmt, function (err) {
-                    //    console.log("KLISTATIONS: deleted:" + this.changes);
-                    callback294a1a(null, res, ret);
+                    var delStmt = "DELETE FROM KLISTATIONS ";
+                    delStmt += " WHERE source = 'PAGES2K'";
+                    db.run(delStmt, function (err) {
+                        console.log("KLISTATIONS-PAGES2K: deleted:" + this.changes);
+                        callback294a1a(null, res, ret);
                     return;
-                    //});
+                    });
+                },
+                function (res, ret, callback291a1b) {
+                    /**
+                     * KLIINVENTORY löschen für PAGES2K
+                     */
+                    var delStmt = "DELETE FROM KLIINVENTORY ";
+                    delStmt += " WHERE source = 'PAGES2K'";
+                    db.run(delStmt, function (err) {
+                        console.log("KLIINVENTORY-PAGES2K: deleted:" + this.changes);
+                        callback291a1b(null, res, ret);
+                    return;
+                    });
                 },
                 function (res, ret, callback294a1c) {
                     /**
                      * KLIHYDE löschen für pages2k
                      */
-                    //var delStmt = "DELETE FROM KLIHYDE ";
-                    //delStmt += " WHERE source = 'PAGES2K'";
-                    //db.run(delStmt, function (err) {
-                    //    console.log("KLIHYDE: deleted:" + this.changes);
-                    callback294a1c(null, res, ret);
+                    var delStmt = "DELETE FROM KLIHYDE ";
+                    delStmt += " WHERE source = 'PAGES2K'";
+                    db.run(delStmt, function (err) {
+                        console.log("KLIHYDE-PAGES2K: deleted:" + this.changes);
+                        callback294a1c(null, res, ret);
                     return;
-                    //});
+                    });
                 },
 
                 function (res, ret, callback294a1d) {
@@ -231,6 +243,16 @@ const {
                         height: 0,
                         state: "",
                     };
+                    var kliinventoryrec = {
+                        source: "PAGES2K",
+                        stationid: stationid,
+                        variable: "PAGES2K",
+                        latitude: latitude,
+                        longitude: longitude,
+                        fromyear: null,
+                        toyear: null,
+                        anzyears: 0,
+                    };
                     var klihyderec = {
                         source: "PAGES2K",
                         stationid: stationid,
@@ -242,6 +264,7 @@ const {
                         data: {}
                     };
                     ret.klistation = klistationrec;
+                    ret.kliinventory = kliinventoryrec;
                     ret.klihyde = klihyderec;
                     callback294a2a(null, res, ret);
                     return;
@@ -380,6 +403,9 @@ const {
                             ret.klistation.latitude = metadata.latitude;
                         }
 
+                        ret.kliinventory.longitude = ret.klistation.longitude;
+                        ret.kliinventory.latitude = ret.klistation.latitude;
+
                         var cont = uihelper.getContinent(ret.klistation.longitude, ret.klistation.latitude);
                         if (cont.error === false) {
                             ret.klistation.continent = cont.continentcode;
@@ -413,13 +439,54 @@ const {
                         var newstationid = ret.klistation.continent + (parseFloat(ret.klistation.longitude).toFixed(3)) + (parseFloat(ret.klistation.latitude).toFixed(3)) + ret.klistation.height;
                         newstationid = newstationid.replace(/-/g, "");
                         newstationid = newstationid.replace(/\./g, "");
+
                         ret.klistation.stationid = newstationid;
+                        ret.kliinventory.stationid = newstationid;
                         ret.klihyde.stationid = newstationid;
 
                         ret.klistation.metafields = metafields;
                         ret.klistation.metadata = metadata;
-
                         ret.klihyde.metafields = metafields;
+                        /**
+                         * Aufbereitung Jahresdaten in klihyde
+                         */
+                        ret.klihyde.data = {};
+                        ret.klihyde.fromyear = null;
+                        ret.klihyde.toyear = null;
+                        ret.klihyde.anzyears = 0;
+                        for (var idata = 0; idata < ret.data.length; idata++) {
+                            var year = ret.data[idata].year;
+                            year = year.replace(".0", "");
+                            if (typeof ret.klihyde.data[year] === "undefined") {
+                                ret.klihyde.data[year] = {};
+                                if (ret.klihyde.fromyear === null) {
+                                    ret.klihyde.fromyear = year;
+                                } else if (ret.klihyde.fromyear > year) {
+                                    ret.klihyde.fromyear = year;
+                                }
+                                if (ret.klihyde.toyear === null) {
+                                    ret.klihyde.toyear = year;
+                                } else if (ret.klihyde.toyear < year) {
+                                    ret.klihyde.toyear = year;
+                                }
+                            }
+                            if (typeof ret.klihyde.data[year].L1 === "undefined") {
+                                ret.klihyde.data[year].L1 = {};
+                            }
+                            var names = Object.keys(ret.data[idata]);
+                            for (var iname = 0; iname < names.length; iname++) {
+                                if (names[iname] !== "year") {
+                                    ret.klihyde.data[year].L1[names[iname]] = ret.data[idata][names[iname]];
+                                }
+                            }
+                        }
+                        ret.klihyde.anzyears = parseInt(ret.klihyde.toyear) - parseInt(ret.klihyde.fromyear) + 1;
+                        /**
+                         * Vererben auf KLIINVENTORY
+                        */
+                        ret.kliinventory.fromyear = ret.klihyde.fromyear;
+                        ret.kliinventory.toyear = ret.klihyde.toyear;
+                        ret.kliinventory.anzyears = ret.klihyde.anzyears;
 
                         var reqparm = {};
                         async.waterfall([
@@ -445,26 +512,42 @@ const {
                                         return;
                                     });
                                 },
+                                function (res, ret, callback294b1) {
+                                    // Ausgabe KLIINVENTORY
+                                    var reqparm = {};
+                                    reqparm.selfields = {
+                                        source: "PAGES2K",
+                                        stationid: ret.klistation.stationid,
+                                        variable: "PAGES2K"
+                                    };
+                                    reqparm.updfields = {};
+                                    reqparm.updfields["$setOnInsert"] = reqparm.selfields;
+                                    var updrecord = {
+                                        fromyear: ret.klihyde.fromyear,
+                                        toyear: ret.klihyde.toyear,
+                                        anzyears: ret.klihyde.anzyears,
+                                        longitude: ret.klistation.longitude,
+                                        latitude: ret.klistation.latitude
+                                    };
+                                    reqparm.updfields["$set"] = updrecord;
+                                    reqparm.table = "KLIINVENTORY";
+                                    sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                        if (ret1.error === true) {
+                                            console.log(ret.klihyde.stationid + " ERROR " + ret1.message);
+                                            ret.error = false;
+                                            ret.message = "ERROR:" + ret1.message;
+                                            callback294b1(null, res, ret);
+                                            return;
+                                        } else {
+                                            ret.error = false;
+                                            ret.message = "process";
+                                            callback294b1(null, res, ret);
+                                            return;
+                                        }
+                                    });
+                                },
                                 function (res, ret, callback294c) {
                                     // Ausgabe KLIHYDE
-                                    ret.klihyde.data = {};
-                                    for (var idata = 0; idata < ret.data.length; idata++) {
-                                        var year = ret.data[idata].year;
-                                        year = year.replace(".0", "");
-                                        if (typeof ret.klihyde.data[year] === "undefined") {
-                                            ret.klihyde.data[year] = {};
-                                        }
-                                        if (typeof ret.klihyde.data[year].L1 === "undefined") {
-                                            ret.klihyde.data[year].L1 = {};
-                                        }
-                                        var names = Object.keys(ret.data[idata]);
-                                        for (var iname = 0; iname < names.length; iname++) {
-                                            if (names[iname] !== "year") {
-                                                ret.klihyde.data[year].L1[names[iname]] = ret.data[idata][names[iname]];
-                                            }
-                                        }
-                                    }
-
                                     reqparm.selfields = {
                                         source: "PAGES2K",
                                         stationid: ret.klihyde.stationid,

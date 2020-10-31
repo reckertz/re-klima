@@ -49,6 +49,7 @@
                 io: "i",
                 enum: [
                     "GHCND",
+                    "PAGES2K",
                     "HYGRIS",
                     "NAO",
                     "GHCN",
@@ -73,6 +74,7 @@
                     "PSUN",
                     "SNOW",
                     "NAO",
+                    "PAGES2K",
                     ""
                 ]
             },
@@ -503,7 +505,7 @@
                                 var tourl = "klaheatmap.html" + "?";
                                 var stationname = stationarray[confrecord.stationid];
                                 var tabname = "Sammelauswertung"; // confrecord.stationid + " " + stationname;
-                                var selsource = starecord.source;  // $("#kla2000selsource").val();
+                                var selsource = starecord.source; // $("#kla2000selsource").val();
                                 if (selsource === "GHCND") {
                                     var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
                                     window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
@@ -1294,7 +1296,6 @@
         var skip = 0;
         var limit = 0;
         var api = "getallrecords";
-        debugger;
         uihelper.getAllRecords(sqlStmt, null, null, skip, limit, api, table, function (ret) {
             if (ret.error === true) {
                 // sollte nicht passieren??? oder auch hier anlegen
@@ -1616,6 +1617,9 @@
             } else if (source === "HYGRIS") {
                 var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+            } else if (source === "PAGES2K") {
+                var idc22 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc22 + "']").click();
             } else {
                 sysbase.putMessage("keine Einzelauswertung vorgesehen", 3);
             }

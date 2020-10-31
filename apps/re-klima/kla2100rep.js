@@ -36,6 +36,7 @@
     var klirow = {}; // der aktuelle Datensatz, dynamisch aus klirecords[i] geholt
     var klihydes = {}; // Struktur für die gesammelten Hyde-Daten: source.stationid => klihyde in der Strukur
     var klihyde = {}; // Struktur für eine source.stationid Kombination
+    var klipages2k = {}; // struktur für pages2k aus KLIHYDE für stationid
     var kla2100repclock;
 
     var hmatrixL;
@@ -251,7 +252,14 @@
                         class: "uiecheckbox",
                         default: true,
                         io: "i"
-                    }
+                    },
+                    pages2k: {
+                        title: "Pages2K (alle)",
+                        type: "string", // currency, integer, datum, text, key
+                        class: "uiecheckbox",
+                        default: false,
+                        io: "i"
+                    },
                 }
             }
         }
@@ -1015,6 +1023,7 @@
                 decimals: true,
                 heatmaps: true,
                 hyde: true,
+                pages2k: false,
                 master: true,
                 worldmap: true,
                 leaflet: false,
@@ -1327,8 +1336,14 @@
                                                 // raus
                                                 ret.error = true;
                                                 ret.message = "Keine Daten vorhanden, autoload nicht gesetzt";
-                                                cb2100n50("Error", ret);
-                                                return;
+                                                // wenn HYDE gesetzt, dann geht es weiter
+                                                if (kla2100repconfig.pages2k === true) {
+                                                    cb2100n50(null, ret);
+                                                    return;
+                                                } else {
+                                                    cb2100n50("Error", ret);
+                                                    return;
+                                                }
                                             }
                                         } else {
                                             // raus
@@ -1342,6 +1357,7 @@
                                         return;
                                     }
                                 },
+
                                 function (ret, cb2100n51) {
                                     /**
                                      * Prüfen und Holen der HYDE-Daten
@@ -1397,6 +1413,43 @@
                                         // nope
                                     });
                                 },
+
+
+                                function (ret, cb2100n51a) {
+                                    /**
+                                     * Prüfen und Holen der PAGES2K-Daten
+                                     * PAGES2K geht in Cache, weil mehrere Variablen den gleichen Bezug haben können
+                                     */
+                                    if (kla2100repconfig.pages2k === false) {
+                                        cb2100n51a(null, ret);
+                                        return;
+                                    }
+                                    // PAGES2K mit stationid
+                                    // metafields: [{"fieldname":"year","fielddescr":"Year AD, ,,AD, , speleothem, ,,N, "},{"fieldname":"d18O","fielddescr":"inferred temperature, ,,permil, 1 2 3 4 5 6 7 8 9 10 11 12, speleothem, top of sample; signal believed to primarily reflect temperature; but influence of other factors cannot be excluded., Linear regression, C, "},{"fieldname":"SE","fielddescr":"error on temp reconstruction, ,,degC, , speleothem, ,,, "}]
+                                    var sqlSelect = "SELECT source, stationid, fromyear, toyear, anzyears, metafields, data";
+                                    sqlSelect += " FROM KLIHYDE";
+                                    sqlSelect += " WHERE source ='PAGES2K'";
+                                    sqlSelect += " AND stationid ='" + klirow.stationid + "'";
+                                    uihelper.getOneRecord(sqlSelect, {}, "getonerecord", "KLIHYDE", function (ret1) {
+                                        debugger;
+                                        if (ret1.error === false && ret1.record !== null) {
+                                            var newdata = ret1.record;
+                                            klipages2k = uihelper.cloneObject(newdata);
+                                            cb2100n51a(null, {
+                                                error: false,
+                                                message: ret.selsource + " " + ret.selstationid + " " + ret.selvariablename + " Daten gefunden"
+                                            });
+                                            return;
+                                        } else {
+                                            cb2100n51a(null, {
+                                                error: true,
+                                                message: ret.selsource + " " + ret.selstationid + " " + ret.selvariablename + " Endgültig keine Daten gefunden"
+                                            });
+                                            return;
+                                        }
+                                    });
+                                },
+
                                 function (ret, cb2100n52) {
                                     /**
                                      * Auswertung einer source, stationid, variable Kombination aus klirow
@@ -1405,7 +1458,7 @@
                                         if (typeof klirow.years === "string") {
                                             klirow.years = JSON.parse(klirow.years);
                                         }
-                                        // Vorbereitung buckets
+                                        // Auswertung "alles"
                                         kla2100rep.showall(klirow, function (ret1) {
                                             cb2100n52("Finish", ret);
                                             return;
@@ -1468,7 +1521,7 @@
                 function (cb2100p2) {
                     /**
                      * Laden der GHCN-Daily-Daten, falls angefordert
-                     * Laden aus den Urdaten (*.dly-Files)
+                     * Laden aus den Urdaten (*.dly-Files) - aber erst prüfen
                      */
                     var jqxhr = $.ajax({
                         method: "GET",
@@ -2576,7 +2629,6 @@
                     });
                 },
 
-
                 function (ret, cb2100g9) {
                     if (kla2100repconfig.hyde === false) {
                         cb2100g9(null, ret);
@@ -2593,11 +2645,36 @@
                             }
                         }));
                     var hmoptions = {};
-                    kla2100rep.klihyde2("#" + divid, selstationid, starecord, function (ret) {
+                    kla2100rep.klihyde2("#" + divid, selstationid, starecord, "hyde", function (ret) {
                         cb2100g9(null, ret);
                         return;
                     });
+                },
+
+                function (ret, cb2100g91) {
+                    if (kla2100repconfig.pages2k === false) {
+                        cb2100g91(null, ret);
+                        return;
+                    }
+                    var divid = "D" + Math.floor(Math.random() * 100000) + 1;
+                    $("#kla2100repwrapper")
+                        .append($("<div/>", {
+                            id: divid,
+                            css: {
+                                width: "100%",
+                                float: "left",
+                                overflow: "hidden"
+                            }
+                        }));
+                    var hmoptions = {};
+                    kla2100rep.klipages2k2("#" + divid, selstationid, starecord, "pages2k", function (ret) {
+                        cb2100g91(null, ret);
+                        return;
+                    });
                 }
+
+
+
             ],
             function (error, result) {
                 $(".tablesorter").tablesorter({
@@ -5070,12 +5147,15 @@
      * @param {*} cid - Container-ID, wird vorgegeben, mit #
      * @param {*} selstationid - wird ausgewertet, Daten stehen in klihyde
      * @param {*} starecord - wird ausgewertet für Geo-Koordinaten
+     * @param {*} open - hyde oder pages2k als Auswertungsdirektive
      * @param {*} cb2100j - Callback
      */
-    kla2100rep.klihyde2 = function (cid, selstationid, starecord, cb2100j) {
+    kla2100rep.klihyde2 = function (cid, selstationid, starecord, oper, cb2100j) {
         // Transformation der Daten nach Variable, year, L1, L2, L3 in Struktur
         // Dasmit Tabelle mit Charts
         var hyderep = {}; // variable - year - level
+        var maintitle = " HYDE ";
+
         if (typeof klihyde.data === "string" && klihyde.data.length > 0) {
             klihyde.data = JSON.parse(klihyde.data);
         }
@@ -5088,7 +5168,23 @@
                         var leveldata = yeardata[level];
                         for (var variablename in leveldata) {
                             if (leveldata.hasOwnProperty(variablename)) {
-                                if (kla2100repconfig.selvars.indexOf(variablename.replace("_", "")) >= 0) {
+                                if (oper === "hyde") {
+                                    if (kla2100repconfig.selvars.indexOf(variablename.replace("_", "")) >= 0) {
+                                        var wert = leveldata[variablename];
+                                        // hier ist die finale Werteebene
+                                        if (typeof hyderep[variablename] === "undefined") {
+                                            hyderep[variablename] = {};
+                                        }
+                                        if (typeof hyderep[variablename][year] === "undefined") {
+                                            hyderep[variablename][year] = {};
+                                        }
+                                        if (typeof hyderep[variablename][year][level] === "undefined") {
+                                            hyderep[variablename][year][level] = 0;
+                                        }
+                                        hyderep[variablename][year][level] += wert;
+                                    }
+                                } else {
+                                    // bei pages2k immer alle Variablen bis auf weiteres
                                     var wert = leveldata[variablename];
                                     // hier ist die finale Werteebene
                                     if (typeof hyderep[variablename] === "undefined") {
@@ -5118,11 +5214,13 @@
                     }
                 })
                 .append($("<h2>", {
-                    text: "Auswertung HYDE-Daten " + klirow.titel,
+                    text: "Auswertung " + maintitle + " " + klirow.titel,
                     class: "doprintthis"
-
                 }))
             );
+
+
+
         for (var variablename in hyderep) {
             if (hyderep.hasOwnProperty(variablename)) {
                 hcount++;
@@ -5344,7 +5442,280 @@
         }
         cb2100j({
             error: false,
-            message: "HYDE ausgegeben"
+            message: maintitle + " ausgegeben"
+        });
+    };
+
+
+
+    /**
+     * kla2100rep.klipages2k2 - Ausgabe der PAGES2K-Daten
+     * Tabelle mit Spalten und Unterteilungen nach Variablen
+     * Prüfen: Line-Chart je Variablen, 1 Linie L1,  - in %-Egalisierung auf jeweiliges Maximum
+     * oder height entsprechend erweitern
+     * {"1750": {
+        "L1":{"popc_":175.11806088,"rurc_":0,"uopp_":0},
+        "L2":{"popc_":1281.765752112,"rurc_":246.622361287,"uopp_":0},
+        "L3":{"popc_":1275.5785712538,"rurc_":611.3757526348,"uopp_":0}
+       },
+     * @param {*} cid - Container-ID, wird vorgegeben, mit #
+     * @param {*} selstationid - wird ausgewertet, Daten stehen in klihyde
+     * @param {*} starecord - wird ausgewertet für Geo-Koordinaten
+     * @param {*} open - hyde oder pages2k als Auswertungsdirektive
+     * @param {*} cb2100j - Callback
+     */
+    kla2100rep.klipages2k2 = function (cid, selstationid, starecord, oper, cb2100j) {
+        // Transformation der Daten nach Variable, year, L1, L2, L3 in Struktur
+        // Dasmit Tabelle mit Charts
+        var hyderep = {}; // variable - year - level
+        debugger;
+        var maintitle = " PAGES2K ";
+
+        if (typeof klipages2k.data === "string" && klipages2k.data.length > 0) {
+            klipages2k.data = JSON.parse(klipages2k.data);
+        }
+
+        // kla2100repconfig.selvars
+        for (var year in klipages2k.data) {
+            if (klipages2k.data.hasOwnProperty(year)) {
+                var yeardata = klipages2k.data[year];
+                for (var level in yeardata) {
+                    if (yeardata.hasOwnProperty(level)) {
+                        var leveldata = yeardata[level];
+                        for (var variablename in leveldata) {
+                            if (leveldata.hasOwnProperty(variablename) && variablename !== "year") {
+                                // bei pages2k immer alle Variablen bis auf weiteres
+                                var wert = leveldata[variablename];
+                                if (typeof wert === "string" && !isNaN(wert)) {
+                                    wert = parseFloat(wert);
+                                } else if (typeof wert !== "number") {
+                                    wert = null;
+                                }
+                                // hier ist die finale Werteebene
+                                if (typeof hyderep[variablename] === "undefined") {
+                                    hyderep[variablename] = {};
+                                }
+                                if (typeof hyderep[variablename][year] === "undefined") {
+                                    hyderep[variablename][year] = {};
+                                }
+                                if (typeof hyderep[variablename][year][level] === "undefined") {
+                                    hyderep[variablename][year][level] = 0;
+                                }
+                                hyderep[variablename][year][level] = wert;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        var hcount = 0;
+        $(cid)
+            .append($("<div/>", {
+                    css: {
+                        width: "100%",
+                        "text-align": "center"
+                    }
+                })
+                .append($("<h2>", {
+                    text: "Auswertung " + maintitle + " " + klirow.titel,
+                    class: "doprintthis"
+                }))
+            );
+
+
+
+        for (var variablename in hyderep) {
+            if (hyderep.hasOwnProperty(variablename)) {
+                hcount++;
+                var ciddiv = cid + variablename;
+                var chartdiv = ciddiv + "c";
+                var tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
+                var gravec = []; // Vektor für Sparkline-Graphik
+                var floatdirection = "right";
+                if (hcount % 2 === 1) {
+                    floatdirection = "left";
+                }
+                $(cid)
+                    .append($("<div/>", {
+                            css: {
+                                width: "49%",
+                                float: floatdirection,
+                                overflow: "hidden"
+                            }
+                        })
+                        .append($("<h2/>", {
+                            html: variablename + " " + cfeCodes.getTitleKey("hydevariable", variablename),
+                            class: "doprintthis",
+                            css: {
+                                width: "100%"
+                            }
+                        }))
+                        .append($("<div/>", {
+                            id: chartdiv.substr(1),
+                            css: {
+                                width: "50%",
+                                float: "left",
+                                overflow: "hidden"
+                            }
+                        }))
+                        .append($("<div/>", {
+                                id: ciddiv.substr(1),
+                                css: {
+                                    width: "40%",
+                                    float: "right",
+                                    overflow: "hidden"
+                                }
+                            })
+                            .append($("<table/>", {
+                                    id: tableid,
+                                    class: "doprintthis tablesorter",
+                                    border: "2",
+                                    rules: "all",
+                                    css: {
+                                        width: "49%",
+                                        float: "left"
+                                    }
+                                })
+                                .append($("<thead/>")
+                                    .append($("<tr/>")
+                                        .append($("<th/>", {
+                                            html: "Variable"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "Jahr"
+                                        }))
+                                        .append($("<th/>", {
+                                            html: "L1"
+                                        }))
+                                    )
+                                )
+                                .append($("<tbody/>"))
+                            )
+                        )
+                    );
+                // Loop über die Jahre
+                // hyderep[variablename][year][level] += wert;
+                var miny = null;
+                var maxy = null;
+                var L1vals = [];
+                debugger;
+                for (var year in hyderep[variablename]) {
+                    if (hyderep[variablename].hasOwnProperty(year)) {
+                        var yeardata = hyderep[variablename][year];
+                        var l1wert = yeardata.L1;
+                        if (isNaN(l1wert)) {
+                            l1wert = null;
+                        } else {
+                            l1wert = l1wert.toFixed(6);  // TODO Differenzieren nach Variablenname
+                        }
+                        $("#" + tableid)
+                            .find("tbody")
+                            .append($("<tr/>")
+                                .append($("<td/>", {
+                                    html: variablename
+                                }))
+                                .append($("<td/>", {
+                                    html: year
+                                }))
+                                .append($("<td/>", {
+                                    html: l1wert
+                                }))
+                            );
+                        gravec.push({
+                            year: year,
+                            L1: yeardata.L1.toFixed(6),
+                        });
+                        L1vals.push(yeardata.L1.toFixed(6));
+                        if (miny === null) {
+                            miny = yeardata.L1;
+                        } else if (miny < yeardata.L1) {
+                            miny = yeardata.L1;
+                        }
+                        if (maxy === null) {
+                            maxy = yeardata.L1;
+                        } else if (maxy < yeardata.L1) {
+                            maxy = yeardata.L1;
+                        }
+                    }
+                }
+                var chartid = ciddiv + "chart";
+                // $(cid)
+                /*
+                $(ciddiv)
+                    .parent()
+                    .append($("<div/>", {
+                            css: {
+                                width: "49%",
+                                align: "right",
+                                overflow: "auto",
+                                "background-color": "white"
+                            }
+                        })
+                        */
+                // hier Canvas für Chartjs
+                $(chartdiv)
+                    .append($("<canvas/>", {
+                        id: chartid,
+                        class: "doprintthis",
+                        css: {
+                            "text-align": "center",
+                            "background-color": "white"
+                        }
+                    }));
+                //);
+
+                var ctx = document.getElementById(chartid).getContext('2d');
+                //Chart.defaults.global.plugins.colorschemes.override = true;
+                //Chart.defaults.global.legend.display = true;
+                // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
+                var config = {
+                    type: 'line',
+                    data: {
+                        labels: gravec.map(function (a) {
+                            return a.year;
+                        }),
+                        datasets: [{
+                                label: "L1",
+                                data: gravec.map(function (a) {
+                                    return a.L1;
+                                }),
+                                backgroundColor: "blue",
+                                borderColor: "blue",
+                                fill: false,
+                                borderWidth: 2
+                            }
+                        ],
+                        backgroundColor: "yellow"
+                    },
+                    options: {
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 50,
+                                top: 10,
+                                bottom: 10
+                            }
+                        },
+                        plugins: {
+                            colorschemes: {
+                                scheme: 'tableau.HueCircle19'
+                            }
+                        }
+                    }
+                };
+                window.charts = window.charts || {};
+                window.charts[chartid] = new Chart(ctx, config);
+                /**
+                 * Hier Chart-Ausgabe - mit chartJS wird eine Gesamtgraphik ausgegeben
+                 */
+                // hmatrixL, hoptionsL,
+
+            }
+        }
+        cb2100j({
+            error: false,
+            message: maintitle + " ausgegeben"
         });
     };
 
