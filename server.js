@@ -1589,6 +1589,29 @@ app.get('/stationhyde', function (req, res) {
 
 
 
+
+/**
+ * getp2kfiles - Alle Dateien zu pages2k Verzeichnis holen, download, fortschreiben
+ * Parameter ist fullname als directory und lisd
+ * Rückgabe ret.data als Array
+ */
+app.post('/getp2kfiles', function (req, res) {
+    if (checkSession(req, res)) return;
+    var rootdir = path.dirname(require.main.filename);
+    kla1490srv.getp2kfiles(db, rootdir, fs, async, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
+
 /**
  * getp2kfile - Datei lesen und Daten als Array bereitstellen
  * Parameter sind url, predirectory, directory, filename

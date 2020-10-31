@@ -1431,7 +1431,6 @@
                                     sqlSelect += " WHERE source ='PAGES2K'";
                                     sqlSelect += " AND stationid ='" + klirow.stationid + "'";
                                     uihelper.getOneRecord(sqlSelect, {}, "getonerecord", "KLIHYDE", function (ret1) {
-                                        debugger;
                                         if (ret1.error === false && ret1.record !== null) {
                                             var newdata = ret1.record;
                                             klipages2k = uihelper.cloneObject(newdata);
@@ -5468,13 +5467,14 @@
         // Transformation der Daten nach Variable, year, L1, L2, L3 in Struktur
         // Dasmit Tabelle mit Charts
         var hyderep = {}; // variable - year - level
-        debugger;
         var maintitle = " PAGES2K ";
 
         if (typeof klipages2k.data === "string" && klipages2k.data.length > 0) {
             klipages2k.data = JSON.parse(klipages2k.data);
         }
-
+        if (typeof klipages2k.metafields === "string" && klipages2k.metafields.length > 0) {
+            klipages2k.metafields = JSON.parse(klipages2k.metafields);
+        }
         // kla2100repconfig.selvars
         for (var year in klipages2k.data) {
             if (klipages2k.data.hasOwnProperty(year)) {
@@ -5536,6 +5536,15 @@
                 if (hcount % 2 === 1) {
                     floatdirection = "left";
                 }
+                //
+                var fielddescr = "";
+                for (var ifield = 0; ifield < klipages2k.metafields.length; ifield++) {
+                    if (variablename === klipages2k.metafields[ifield].fieldname) {
+                        fielddescr = klipages2k.metafields[ifield].fielddescr;
+                        break;
+                    }
+                }
+
                 $(cid)
                     .append($("<div/>", {
                             css: {
@@ -5545,7 +5554,7 @@
                             }
                         })
                         .append($("<h2/>", {
-                            html: variablename + " " + cfeCodes.getTitleKey("hydevariable", variablename),
+                            html: variablename + " " + fielddescr,  //  cfeCodes.getTitleKey("hydevariable", variablename),
                             class: "doprintthis",
                             css: {
                                 width: "100%"
@@ -5599,7 +5608,6 @@
                 var miny = null;
                 var maxy = null;
                 var L1vals = [];
-                debugger;
                 for (var year in hyderep[variablename]) {
                     if (hyderep[variablename].hasOwnProperty(year)) {
                         var yeardata = hyderep[variablename][year];

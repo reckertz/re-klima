@@ -2099,7 +2099,7 @@
                                                         css: {
                                                             "margin-left": "10px"
                                                         },
-                                                        html: "Download pages2k-Verzeichnis",
+                                                        html: "pages2k-Verzeichnis vom Server holen",
                                                     }))
                                                 );
 
@@ -2115,7 +2115,7 @@
                                                         css: {
                                                             "margin-left": "10px"
                                                         },
-                                                        html: "Download pages2k-Dateien",
+                                                        html: "alle pages2k-Dateien aktualisieren",
                                                     }))
                                                 );
                                         }
@@ -2327,7 +2327,7 @@
                                                         });
                                                         /**
                                                          * HYGRIS Grundwasserstand
-                                                        */
+                                                         */
                                                     } else if (kla1400raw.checkfragments(fullname, "opendata gw_wasserstand \.csv")) {
                                                         aktsource = "HYGRIS";
                                                         var jqxhr = $.ajax({
@@ -2532,14 +2532,15 @@
             // Ausgabe in Treeview oder Refresh aus KLIRAWFILES
             // in ret.linkliste steht ein Array von Dateinamen, sonst nichts.
             var node = $("#kla1400rawt0").jstree().get_selected(true)[0];
-            debugger;
             for (var ilist = 0; ilist < ret.linkliste.length; ilist++) {
-
+                if (!ret.linkliste[ilist].endsWith(".txt")) {
+                    continue;
+                }
                 var filenode = {
                     text: ret.linkliste[ilist],
                 };
                 filenode.li_attr = {
-                    fullname: directory + ret.linkliste[ilist]
+                    fullname: ret.linkliste[ilist]
                 };
                 filenode.icon = "jstree-file";
                 filenode.li_attr.what = "file";
@@ -2552,6 +2553,8 @@
                     console.log(err.stack);
                 }
             }
+            $('#kla1400rawt0').jstree().redraw_node(node, true, false, true);
+
         }).fail(function (err) {
             sysbase.putMessage(err, 1);
             return;
@@ -2562,24 +2565,40 @@
 
 
     /**
-     * click on actionp2k, Download vom Server
+     * kla1400rawActiongetp2k - Dateien bei Bedarf vom Server holen und dann Daten übernehmen
+     * gearbeitet wird aus dem Tree, der vorher per Button das logische Verzeichnis bekommt
      * https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/
      * in das Zielverzeichnis ?:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy
      * nur .txt-Dateien
      */
-    $(document).on("click", ".kla1400rawActionp2k", function (event) {
+    $(document).on("click", ".kla1400rawActiongetp2k", function (event) {
         event.preventDefault();
         event.stopPropagation();
-        debugger;
+
         var url = "https://www1.ncdc.noaa.gov/pub/data/paleo/pages2k/pages2k-temperature-v2-2017/data-current-version/";
         var directory = "g:\\Projekte\\klimadaten\\NOAA_pages2k_paleo_proxy";
+        var aktrecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
+        directory = klirecord.fsdata.fullname;
+        // Liste der Dateinamen holen
+        var filelist = [];
+        //var currentNode = $("#kla1400rawt0").jstree("get_selected");
+        var currentNode = $("#kla1400rawt0").jstree().get_selected(true)[0];
+        var childrens = $("#kla1400rawt0").jstree("get_children_dom", currentNode);
+        debugger;
+        for (var i = 0; i < childrens.length; i++) {
+            var childNodeid = childrens[i].id;
+            var childNode = $('#kla1400rawt0').jstree(true).get_node(childNodeid);
+            var fullname = childNode.li_attr.fullname;
+            filelist.push(fullname);
+        }
         var jqxhr = $.ajax({
-            method: "GET",
+            method: "POST",
             crossDomain: false,
-            url: sysbase.getServer("gethtmllinks"),
+            url: sysbase.getServer("getp2kfiles"),
             data: {
                 url: url,
-                directory: directory
+                directory: directory,
+                filelist: filelist
             }
         }).done(function (r1, textStatus, jqXHR) {
             sysbase.checkSessionLogin(r1);
@@ -2615,6 +2634,7 @@
             // nope
         });
     });
+
 
 
 

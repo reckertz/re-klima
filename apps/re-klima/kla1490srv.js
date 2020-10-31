@@ -16,6 +16,7 @@ const {
 
     var crg = crg || require('country-reverse-geocoding').country_reverse_geocoding();
     var path = path || require("path");
+    var download = download || require("download-file");
     var LineByLineReader = LineByLineReader || require('line-by-line');
     var uihelper = uihelper || require('re-frame/uihelper');
     var sys0000sys = sys0000sys || require('re-frame/sys0000sys');
@@ -37,6 +38,95 @@ const {
     var stationdata = [];
 
 
+    /**
+     * getp2kfiles - Steuerlogik für den Abruf aller Pages2k-Daten zu einer Liste von Stationen/Filenames
+     * @param {*} db
+     * @param {*} rootdir
+     * @param {*} fs
+     * @param {*} async
+     * @param {*} req
+     * @param {*} reqparm
+     * @param {*} res
+     * @param {*} callback295
+     * Übergabeparameter:
+     * url: url,
+     * directory: directory,
+     * filelist: filelist
+     * Returns ret
+     */
+    kla1490srv.getp2kfiles = function (db, rootdir, fs, async, req, reqparm, res, callback295) {
+        var url = "";
+        var directory = "";
+        var filelist = [];
+        if (typeof req !== "undefined" && req !== null) {
+            if (req.query && typeof req.body.url !== "undefined" && req.body.url.length > 0) {
+                url = req.body.url;
+            }
+            if (req.query && typeof req.body.directory !== "undefined" && req.body.directory.length > 0) {
+                directory = req.body.directory;
+            }
+            if (req.query && typeof req.body.filelist !== "undefined" && req.body.filelist.length > 0) {
+                if (typeof req.body.filelist === "string") {
+                    filelist = JSON.parse(req.body.filelist);
+                } else {
+                    filelist = req.body.filelist;
+                }
+            }
+        } else if (typeof reqparm !== "undefined" && reqparm !== null) {
+            if (reqparm && typeof reqparm.url !== "undefined" && reqparm.url.length > 0) {
+                url = reqparm.url;
+            }
+            if (reqparm && typeof reqparm.directory !== "undefined" && reqparm.directory.length > 0) {
+                directory = reqparm.directory;
+            }
+            if (reqparm && typeof reqparm.filelist !== "undefined" && reqparm.filelist.length > 0) {
+                if (typeof reqparm.filelist === "string") {
+                    filelist = JSON.parse(reqparm.filelist);
+                } else {
+                    filelist = reqparm.filelist;
+                }
+            }
+        }
+        /**
+         * Loop async
+         * skip first one - ist ein Directory-Verweis
+         */
+        var filecounter = 0;
+        async.eachSeries(filelist, function (file, nextfile) {
+            filecounter++;
+            if (filecounter === 1) {
+                nextfile();
+                return;
+            }
+            async.waterfall([
+                function (callback295a) {
+                    var reqparm = {};
+                    reqparm.fullname = path.join(directory, file);
+                    console.log("Download:" + file);
+                    reqparm.trule = false;
+                    kla1490srv.getp2kfile(db, rootdir, fs, async, null, reqparm, res, function (res, ret1) {
+                        // Post-Processing ein File nach callback
+                        callback295a("Finish", res, ret1);
+                        return;
+                    });
+                }
+            ], function (error, result) {
+                // Ende der async-sequenz
+                nextfile();
+                return;
+            });
+        }, function (error) {
+            // Endes des Loops eachSeries
+            callback295(res, {
+                error: false,
+                message: "Übernahme beendet:" + error
+            });
+            return;
+        });
+    };
+
+
+
 
     /**
      * kla1490srv.getp2kfile - EINE pages2k Datei aufbereiten
@@ -51,6 +141,7 @@ const {
      * @param {*} reqparm
      * @param {*} res
      * @param {*} supercallback3
+     *
      */
     kla1490srv.getp2kfile = function (db, rootdir, fs, async, req, reqparm, res, callback294) {
 
@@ -79,9 +170,8 @@ const {
         var check = sys0000sys.getPhysicalDirectory(fullname);
         if (check.error === false) {
             fullname = check.fullname;
-            ret.fullname = fullname;
-
         }
+        ret.fullname = fullname;
 
         var sortdata = [];
         var iraw = 0;
@@ -140,37 +230,37 @@ const {
                     /**
                      * KLISTATIONS löschen für pages2k
                      */
-                    var delStmt = "DELETE FROM KLISTATIONS ";
-                    delStmt += " WHERE source = 'PAGES2K'";
-                    db.run(delStmt, function (err) {
-                        console.log("KLISTATIONS-PAGES2K: deleted:" + this.changes);
-                        callback294a1a(null, res, ret);
+                    //var delStmt = "DELETE FROM KLISTATIONS ";
+                    //delStmt += " WHERE source = 'PAGES2K'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLISTATIONS-PAGES2K: deleted:" + this.changes);
+                    callback294a1a(null, res, ret);
                     return;
-                    });
+                    //});
                 },
                 function (res, ret, callback291a1b) {
                     /**
                      * KLIINVENTORY löschen für PAGES2K
                      */
-                    var delStmt = "DELETE FROM KLIINVENTORY ";
-                    delStmt += " WHERE source = 'PAGES2K'";
-                    db.run(delStmt, function (err) {
-                        console.log("KLIINVENTORY-PAGES2K: deleted:" + this.changes);
-                        callback291a1b(null, res, ret);
+                    //var delStmt = "DELETE FROM KLIINVENTORY ";
+                    //delStmt += " WHERE source = 'PAGES2K'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIINVENTORY-PAGES2K: deleted:" + this.changes);
+                    callback291a1b(null, res, ret);
                     return;
-                    });
+                    //});
                 },
                 function (res, ret, callback294a1c) {
                     /**
                      * KLIHYDE löschen für pages2k
                      */
-                    var delStmt = "DELETE FROM KLIHYDE ";
-                    delStmt += " WHERE source = 'PAGES2K'";
-                    db.run(delStmt, function (err) {
-                        console.log("KLIHYDE-PAGES2K: deleted:" + this.changes);
-                        callback294a1c(null, res, ret);
+                    //var delStmt = "DELETE FROM KLIHYDE ";
+                    //delStmt += " WHERE source = 'PAGES2K'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIHYDE-PAGES2K: deleted:" + this.changes);
+                    callback294a1c(null, res, ret);
                     return;
-                    });
+                    //});
                 },
 
                 function (res, ret, callback294a1d) {
@@ -190,6 +280,7 @@ const {
                         };
                         download(fileurl, options, function (err) {
                             if (err) {
+                                console.log(err.stack);
                                 callback294a1d("Error", res, {
                                     error: false,
                                     message: fullname + " " + err
@@ -283,6 +374,14 @@ const {
                     var datalinecounter = 0;
                     var data = {}; // Alle Wertesätze aus der Datei mit allen Variablen und Periode
                     var stationdata = {}; // alle Attribute/Parameter aus der Datei
+
+                    if (!fs.existsSync(fullname)) {
+                        console.log(fullname + " nicht vorhanden nach Download");
+                        ret.error = true;
+                        ret.message = fullname + " nicht vorhanden nach Download";
+                        callback294a2b("Error", res, ret);
+                        return;
+                    }
 
                     ret.filepath = fullname;
                     var readInterface = readline.createInterface({
@@ -435,7 +534,12 @@ const {
                         /**
                          * Konstruktion stationid
                          */
-                        ret.klistation.height = metadata.HGHT.trim();
+                        if (typeof metadata.HGHT === "string" && metadata.HGHT.length > 0) {
+                            ret.klistation.height = metadata.HGHT.trim();
+                        } else {
+                            ret.klistation.height = "0";
+                        }
+
                         var newstationid = ret.klistation.continent + (parseFloat(ret.klistation.longitude).toFixed(3)) + (parseFloat(ret.klistation.latitude).toFixed(3)) + ret.klistation.height;
                         newstationid = newstationid.replace(/-/g, "");
                         newstationid = newstationid.replace(/\./g, "");
@@ -455,8 +559,14 @@ const {
                         ret.klihyde.toyear = null;
                         ret.klihyde.anzyears = 0;
                         for (var idata = 0; idata < ret.data.length; idata++) {
-                            var year = ret.data[idata].year;
-                            year = year.replace(".0", "");
+                            var year = "9999";
+                            if (typeof ret.data[idata].year === "undefined") {
+                                console.log("no year found:" + JSON.stringify(ret.data[idata]));
+                                continue;
+                            } else {
+                                year = ret.data[idata].year;
+                                year = year.replace(".0", "");
+                            }
                             if (typeof ret.klihyde.data[year] === "undefined") {
                                 ret.klihyde.data[year] = {};
                                 if (ret.klihyde.fromyear === null) {
@@ -483,7 +593,7 @@ const {
                         ret.klihyde.anzyears = parseInt(ret.klihyde.toyear) - parseInt(ret.klihyde.fromyear) + 1;
                         /**
                          * Vererben auf KLIINVENTORY
-                        */
+                         */
                         ret.kliinventory.fromyear = ret.klihyde.fromyear;
                         ret.kliinventory.toyear = ret.klihyde.toyear;
                         ret.kliinventory.anzyears = ret.klihyde.anzyears;
