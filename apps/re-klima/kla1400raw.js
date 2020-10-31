@@ -2608,13 +2608,12 @@
             // in ret.linkliste steht ein Array von Dateinamen, sonst nichts.
             var node = $("#kla1400rawt0").jstree().get_selected(true)[0];
             debugger;
-            for (var ilist = 0; ilist < ret.linkliste.length; ilist++) {
-
+            for (var ilist = 0; ilist < ret.filelist.length; ilist++) {
                 var filenode = {
-                    text: ret.linkliste[ilist],
+                    text: ret.filelist[ilist],
                 };
                 filenode.li_attr = {
-                    fullname: directory + ret.linkliste[ilist]
+                    fullname: directory + ret.filelist[ilist]
                 };
                 filenode.icon = "jstree-file";
                 filenode.li_attr.what = "file";
