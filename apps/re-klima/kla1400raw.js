@@ -2635,13 +2635,7 @@
     });
 
 
-
-
-
-
-
     kla1400raw.setResizeObserver = function () {
-
         if (typeof ResizeObserver !== "undefined") {
             var resizeObserver = new ResizeObserver(function (entries, observer) {
                 for (var entry in entries) {

@@ -88,41 +88,102 @@ const {
             }
         }
         /**
-         * Loop async
-         * skip first one - ist ein Directory-Verweis
+         * Erst feststellen, ob schon alle Dateien vorhanden sind,
+         * wenn die filelist nicht vorgegeben ist, sonst die filelist abarbeiten
+         * sys0000sys.getdirectoryfiles = function (gbldb, rootdir, fs, async, req, reqparm, res, supercallback4) {
+         * holt die Fileliste von der Platte
          */
-        var filecounter = 0;
-        async.eachSeries(filelist, function (file, nextfile) {
-            filecounter++;
-            if (filecounter === 1) {
-                nextfile();
-                return;
-            }
-            async.waterfall([
-                function (callback295a) {
+        var ret =  {};
+        async.waterfall([
+            function (callback296a) {
+                // sys0000sys.getdirectoryfiles, wenn filelist nicht gegeben ist
+                if (filelist.length > 0) {
+                    callback296a(null, res, ret);
+                    return;
+                } else {
+                   /*
+                    * fileopcode: "show" und "prep"
+                    * predirectory: "/../klima1001/";
+                    * directory: Beispiel: "albedo"
+                    * root-Directory wird zugefügt
+                    * wenn doKLIFILES und doKLIRAWFILES === false, dann kein SQL-Abgleich, nur directories
+                    * var appDir = path.dirname(require.main.filename);
+                    */
                     var reqparm = {};
-                    reqparm.fullname = path.join(directory, file);
-                    console.log("Download:" + file);
-                    reqparm.trule = false;
-                    kla1490srv.getp2kfile(db, rootdir, fs, async, null, reqparm, res, function (res, ret1) {
-                        // Post-Processing ein File nach callback
-                        callback295a("Finish", res, ret1);
+                    reqparm.fileopcode = "list";
+                    reqparm.url = url;
+                    reqparm.predirectory = "";
+                    reqparm.directory = directory;
+                    reqparm.filterextensions = ".txt";
+                    reqparm.skipsubdirectories = "false";
+                    reqparm.doKLIFILES = "false";
+                    reqparm.doKLIRAWFILES = "true";
+
+                    sys0000sys.getdirectoryfiles (db, rootdir, fs, async, null, reqparm, res, function(res, ret) {
+                        var firstfullname = "";
+                        if (typeof ret.files !== "undefined" && ret.files.length > 0) {
+                            for (var ifile = 0; ifile < ret.files.length; ifile++) {
+                                filelist.push(ret.files[ifile].name);
+                                if (firstfullname.length === 0) {
+                                    firstfullname = ret.files[ifile].fullname;
+                                }
+                            }
+                        }
+                        callback296a(null, res, ret);
                         return;
                     });
                 }
-            ], function (error, result) {
-                // Ende der async-sequenz
-                nextfile();
-                return;
-            });
-        }, function (error) {
-            // Endes des Loops eachSeries
-            callback295(res, {
-                error: false,
-                message: "Übernahme beendet:" + error
-            });
-            return;
+            },
+            function (res, ret, callback296b) {
+                // LOOP
+                /**
+                 * Loop async
+                 * skip first one - ist ein Directory-Verweis
+                 */
+                var filecounter = 0;
+                async.eachSeries(filelist, function (file, nextfile) {
+                    filecounter++;
+                    /*
+                    if (filecounter === 1) {
+                        nextfile();
+                        return;
+                    }
+                    */
+                   if (file.startsWith(directory)) {
+                       file = path.basename(file);
+                   }
+                    async.waterfall([
+                        function (callback295a) {
+                            var reqparm = {};
+                            reqparm.fullname = path.join(directory, file);
+                            console.log("Verarbeitung:" + file);
+                            reqparm.trule = false;
+                            kla1490srv.getp2kfile(db, rootdir, fs, async, null, reqparm, res, function (res, ret1) {
+                                // Post-Processing ein File nach callback
+                                callback295a("Finish", res, ret1);
+                                return;
+                            });
+                        }
+                    ], function (error, result) {
+                        // Ende der async-sequenz
+                        nextfile();
+                        return;
+                    });
+                }, function (error) {
+                    // Endes des Loops eachSeries
+                    callback295(res, {
+                        error: false,
+                        message: "Übernahme beendet:" + error
+                    });
+                    return;
+                });
+
+            }
+        ], function (error, result) {
+            // Abschluss
         });
+
+
     };
 
 
@@ -234,8 +295,8 @@ const {
                     //delStmt += " WHERE source = 'PAGES2K'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLISTATIONS-PAGES2K: deleted:" + this.changes);
-                    callback294a1a(null, res, ret);
-                    return;
+                        callback294a1a(null, res, ret);
+                        return;
                     //});
                 },
                 function (res, ret, callback291a1b) {
@@ -246,8 +307,8 @@ const {
                     //delStmt += " WHERE source = 'PAGES2K'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLIINVENTORY-PAGES2K: deleted:" + this.changes);
-                    callback291a1b(null, res, ret);
-                    return;
+                        callback291a1b(null, res, ret);
+                        return;
                     //});
                 },
                 function (res, ret, callback294a1c) {
@@ -258,8 +319,8 @@ const {
                     //delStmt += " WHERE source = 'PAGES2K'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLIHYDE-PAGES2K: deleted:" + this.changes);
-                    callback294a1c(null, res, ret);
-                    return;
+                        callback294a1c(null, res, ret);
+                        return;
                     //});
                 },
 
@@ -280,6 +341,7 @@ const {
                         };
                         download(fileurl, options, function (err) {
                             if (err) {
+                                console.log("*** download " + targetdir + "=>" + filename + "=>" + err);
                                 console.log(err.stack);
                                 callback294a1d("Error", res, {
                                     error: false,
@@ -467,9 +529,14 @@ const {
                     readInterface.on('close', function () {
                         // Hier werden alle Daten ausgegeben
                         // KLISTATIONS, KLIHYDE
+                        ret.filename = path.basename(ret.filepath);
                         if (typeof metadata.sitename !== "undefined" && metadata.sitename.length > 0) {
                             ret.klihyde.name = metadata.sitename.trim();
                             ret.klistation.stationname = metadata.sitename.trim();
+                            if (typeof ret.filename !== "undefined") {
+                                ret.klihyde.name += " (" + ret.filename + ")";
+                                ret.klistation.stationname += " (" + ret.filename + ")";
+                            }
                         } else {
                             var filename = path.basename(ret.fullname);
                             ret.klihyde.name = ret.filename;
@@ -540,7 +607,11 @@ const {
                             ret.klistation.height = "0";
                         }
 
-                        var newstationid = ret.klistation.continent + (parseFloat(ret.klistation.longitude).toFixed(3)) + (parseFloat(ret.klistation.latitude).toFixed(3)) + ret.klistation.height;
+                        var newstationid = ret.klistation.continent;
+                        if (newstationid.length === 0) {
+                            newstationid = "PS";
+                        }
+                        newstationid  += (parseFloat(ret.klistation.longitude).toFixed(3)) + (parseFloat(ret.klistation.latitude).toFixed(3)) + ret.klistation.height;
                         newstationid = newstationid.replace(/-/g, "");
                         newstationid = newstationid.replace(/\./g, "");
 
@@ -560,12 +631,14 @@ const {
                         ret.klihyde.anzyears = 0;
                         for (var idata = 0; idata < ret.data.length; idata++) {
                             var year = "9999";
-                            if (typeof ret.data[idata].year === "undefined") {
-                                console.log("no year found:" + JSON.stringify(ret.data[idata]));
+                            if (typeof ret.data[idata].year === "undefined" || isNaN(ret.data[idata].year)) {
+                                console.log("no year found:" + idata + ". " + JSON.stringify(ret.data[idata]));
                                 continue;
                             } else {
                                 year = ret.data[idata].year;
-                                year = year.replace(".0", "");
+                                if (year.indexOf(".") >= 0) {
+                                    year = year.substring(0, year.indexOf("."));
+                                }
                             }
                             if (typeof ret.klihyde.data[year] === "undefined") {
                                 ret.klihyde.data[year] = {};
@@ -586,7 +659,11 @@ const {
                             var names = Object.keys(ret.data[idata]);
                             for (var iname = 0; iname < names.length; iname++) {
                                 if (names[iname] !== "year") {
-                                    ret.klihyde.data[year].L1[names[iname]] = ret.data[idata][names[iname]];
+                                    if (ret.data[idata][names[iname]] === "nan") {
+                                        ret.klihyde.data[year].L1[names[iname]] = "";
+                                    } else {
+                                        ret.klihyde.data[year].L1[names[iname]] = ret.data[idata][names[iname]];
+                                    }
                                 }
                             }
                         }

@@ -1446,7 +1446,7 @@
      * predirectory: "/../klima1001/";
      * directory: Beispiel: "albedo"
      * root-Directory wird zugefügt
-     * wen doKLIFILES und doKLIRAWFILES === false, dann kein SQL-Abgleich, nur directories
+     * wenn doKLIFILES und doKLIRAWFILES === false, dann kein SQL-Abgleich, nur directories
      * var appDir = path.dirname(require.main.filename);
      */
     sys0000sys.getdirectoryfiles = function (gbldb, rootdir, fs, async, req, reqparm, res, supercallback4) {
@@ -1769,7 +1769,6 @@
                             callback("Finish", saveret);
                             return;
                         }
-
                     );
                 }
             ],

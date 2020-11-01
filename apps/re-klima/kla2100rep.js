@@ -5705,6 +5705,13 @@
                                 bottom: 10
                             }
                         },
+                        elements: {
+                            point: {
+                                radius: 0,
+                                hitRadius: 10,
+                                hoverRadius: 8
+                            }
+                         },
                         plugins: {
                             colorschemes: {
                                 scheme: 'tableau.HueCircle19'
