@@ -2220,6 +2220,7 @@
                     /**
                      * leaflet
                      */
+
                     if (kla2100repconfig.leaflet === false) {
                         cb2100g02(null, ret);
                         return;
@@ -2995,6 +2996,7 @@
             var tableid;
             var bigchart = {};
             if (hoptions.cbuckets === true && typeof hoptions.cbucketdata === "object" && Object.keys(hoptions.cbucketdata).length > 0) {
+                debugger;
                 tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
 
                 if (kla2100repconfig.temptable === true) {
@@ -4459,6 +4461,13 @@
                     class: "kla2100rephideall",
                     dft: true,
                     init: false
+                },
+                solitsw: {
+                    label: "split s/w",
+                    title: "Split Summer/Winter",
+                    class: "kla2100repsplitsw",
+                    dft: false,
+                    init: false
                 }
 
             };
@@ -4704,136 +4713,11 @@
                 /*  kla2100repx10 - x/10 - x-Werte werden zu x/10-Intervallen verdichtet */
                 // spangaps: false,
                 /*  kla2100repspangaps - spanGaps - Linie zeigen oder ausblenden */
-                hideall: false /*  kla2 */
+                hideall: false, /*  kla2 */
+                splitsw: false
             };
             kla2100rep.putReportElement(cid, klirow, "Verlauf", "VERLAUF", mychartconfig, mytableconfig, myactionconfig);
-            if (1 === 1) {
-                cb2100k({
-                    error: false,
-                    message: "test"
-                });
-                return;
-            }
-            $(cid)
-                .append($("<br>"))
-                .append($("<br>"))
-                .append($("<span/>", {
-                        text: "Verlaufsgraphik " + klirow.titel,
-                        class: "doprintthis eckh3",
-                    })
-                    .append($("<br>"))
-                    .append($("<span/>", {
-                            text: "reverseY",
-                            css: {
-                                margin: "5px",
-                                "background-color": "lightsteelblue"
-                            }
-                        })
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            class: "kla2100repreverse",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                    )
-
-                    .append($("<span/>", {
-                            text: "logY",
-                            css: {
-                                margin: "5px",
-                                "background-color": "lightsteelblue"
-                            }
-                        })
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            /* checked: "checked", */
-                            class: "kla2100replogy",
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                    )
-
-                    .append($("<span/>", {
-                            text: "hide all",
-                            title: "Alle Datasets ausblenden",
-                            css: {
-                                margin: "5px",
-                                "background-color": "lightsteelblue"
-                            }
-                        })
-                        .append($("<input/>", {
-                            type: "checkbox",
-                            class: "kla2100rephideall",
-                            /* checked: "checked", */
-                            css: {
-                                margin: "5px"
-                            }
-                        }))
-                    )
-
-
-                )
-                .append($("<div/>", {
-                    id: ciddiv + "L1",
-                    css: {
-                        width: "55%",
-                        margin: "10px",
-                        float: "left",
-                        "background-color": "white",
-                        overflow: "hidden"
-                    }
-                }))
-                .append($("<div/>", {
-                        id: ciddiv + "R1",
-                        css: {
-                            width: "40%",
-                            float: "right",
-                            overflow: "hidden"
-                        }
-                    })
-                    .append($("<table/>", {
-                            id: tableid,
-                            class: "doprintthis tablesorter",
-                            border: "2",
-                            rules: "all",
-                            css: {
-                                width: "95%",
-                                float: "left",
-                                margin: "10px",
-                                "background-color": "white"
-                            }
-                        })
-                        .append($("<thead/>")
-                            .append($("<tr/>")
-                                .append($("<th/>", {
-                                    html: "Jahr"
-                                }))
-                                .append($("<th/>", {
-                                    html: "min"
-                                }))
-                                .append($("<th/>", {
-                                    html: "avg"
-                                }))
-                                .append($("<th/>", {
-                                    html: "max"
-                                }))
-                                .append($("<th/>", {
-                                    html: "kum"
-                                }))
-                                .append($("<th/>", {
-                                    html: "count"
-                                }))
-                            )
-                        )
-                        .append($("<tbody/>"))
-                    )
-                );
-
-            // checked: "checked",
-            // Loop über die Jahre
-            // hoptions.cbucketdata[year]
+            debugger;
             var minvals = [];
             var maxvals = [];
             var avgvals = [];
@@ -4843,56 +4727,8 @@
             var miny = null;
             var maxy = null;
 
-            kla2100rep.getBuckets(klirow, "VERLAUF", klirow.fromyear, 30, "fromto", "config");
-
             for (var ibucket = 0; ibucket < klirow.VERLAUF.data.length; ibucket++) {
-                if (klirow.VERLAUF.data[ibucket].min === null) {
-                    $("#" + tableid)
-                        .find("tbody")
-                        .append($("<tr/>")
-                            .append($("<td/>", {
-                                html: klirow.VERLAUF.data[ibucket].label
-                            }))
-                            .append($("<td/>", {
-                                html: "&nbsp;"
-                            }))
-                            .append($("<td/>", {
-                                html: "&nbsp;"
-                            }))
-                            .append($("<td/>", {
-                                html: "&nbsp;"
-                            }))
-                            .append($("<td/>", {
-                                html: "&nbsp;"
-                            }))
-                            .append($("<td/>", {
-                                html: "&nbsp;"
-                            }))
-                        );
-                } else {
-                    $("#" + tableid)
-                        .find("tbody")
-                        .append($("<tr/>")
-                            .append($("<td/>", {
-                                html: klirow.VERLAUF.data[ibucket].label
-                            }))
-                            .append($("<td/>", {
-                                html: klirow.VERLAUF.data[ibucket].min.toFixed(1)
-                            }))
-                            .append($("<td/>", {
-                                html: klirow.VERLAUF.data[ibucket].avg.toFixed(1)
-                            }))
-                            .append($("<td/>", {
-                                html: klirow.VERLAUF.data[ibucket].max.toFixed(1)
-                            }))
-                            .append($("<td/>", {
-                                html: klirow.VERLAUF.data[ibucket].sum.toFixed(1)
-                            }))
-                            .append($("<td/>", {
-                                html: klirow.VERLAUF.data[ibucket].count.toFixed(0)
-                            }))
-                        );
-
+                if (klirow.VERLAUF.data[ibucket].min !== null) {
                     minvals.push(klirow.VERLAUF.data[ibucket].min.toFixed(1));
                     avgvals.push(klirow.VERLAUF.data[ibucket].avg.toFixed(1));
                     maxvals.push(klirow.VERLAUF.data[ibucket].max.toFixed(1));
@@ -4900,7 +4736,6 @@
                     minregvals.push([ibucket, klirow.VERLAUF.data[ibucket].min + 273.15]);
                     avgregvals.push([ibucket, klirow.VERLAUF.data[ibucket].avg + 273.15]);
                     maxregvals.push([ibucket, klirow.VERLAUF.data[ibucket].max + 273.15]);
-
                     if (miny === null) {
                         miny = klirow.VERLAUF.data[ibucket].min;
                     } else if (miny > klirow.VERLAUF.data[ibucket].min) {
@@ -4914,28 +4749,6 @@
                 }
             }
 
-            $("#" + tableid)
-                .find("tbody")
-                .append($("<tr/>")
-                    .append($("<td/>", {
-                        html: klirow.VERLAUF.sumbucket.label
-                    }))
-                    .append($("<td/>", {
-                        html: klirow.VERLAUF.sumbucket.min.toFixed(1)
-                    }))
-                    .append($("<td/>", {
-                        html: klirow.VERLAUF.sumbucket.avg.toFixed(1)
-                    }))
-                    .append($("<td/>", {
-                        html: klirow.VERLAUF.sumbucket.max.toFixed(1)
-                    }))
-                    .append($("<td/>", {
-                        html: klirow.VERLAUF.sumbucket.sum.toFixed(1)
-                    }))
-                    .append($("<td/>", {
-                        html: klirow.VERLAUF.sumbucket.count.toFixed(0)
-                    }))
-                );
 
             /**
              * Regressionsanalyse minvals, avgvals und maxvals als Array
@@ -5040,6 +4853,7 @@
                     }))
                 );
 
+            /*
             $("#" + ciddiv + "L1")
                 .append($("<canvas/>", {
                     id: chartid,
@@ -5050,9 +4864,6 @@
                 }));
 
             var ctx = document.getElementById(chartid).getContext('2d');
-            //Chart.defaults.global.plugins.colorschemes.override = true;
-            //Chart.defaults.global.legend.display = true;
-            // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
             var xlabels = [];
             for (var ibuck = 0; ibuck < klirow.VERLAUF.data.length; ibuck++) {
                 xlabels.push(klirow.VERLAUF.data[ibuck].label);
@@ -5073,9 +4884,7 @@
                             label: "avg",
                             data: avgvals,
                             backgroundColor: "black",
-                            /* window.chartColors.black,*/
                             borderColor: "black",
-                            /* window.chartColors.black, */
                             fill: false,
                             borderWidth: 2
                         },
@@ -5102,10 +4911,7 @@
                     scales: {
                         yAxes: [{
                             ticks: {
-                                /* beginAtZero: true, */
                                 reverse: false
-                                /* min: 0,
-                                max: 500 */
                             }
                         }]
                     },
@@ -5118,6 +4924,7 @@
             };
             window.charts = window.charts || {};
             window.charts[chartid] = new Chart(ctx, config);
+            */
             cb2100k(ret);
             return;
         } catch (err) {

@@ -8228,3 +8228,948 @@ FERTIG PAGES2K
 Verarbeitung:SAm-QuelccayaIceCap.Thompson.2013.txt
 vorhanden:G:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy\pages\SAm-QuelccayaIceCap.Thompson.2013.txt
 FERTIG PAGES2K
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+temp_store = 2:null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+###exit 1
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+###exit 1
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+###exit 1
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: no such column: stationname
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+temp_store = 2:null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+temp_store = 2:null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+page_size:{"page_size":4096} null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+page_size:{"page_size":4096} null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+page_size:{"page_size":4096} null
+temp_store = 2:null
+journal_mode = TRUNCATE:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+HYDE-Files gefunden:171
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\conv_rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\cropland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.0784953196,"L2":165.0511307985,"L3":243.2131214132}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\grazing1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":99.0475275386,"L3":246.33097743756997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\pasture1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":99.0475275386,"L3":246.33097743756997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.0784953196,"L2":165.0511307985,"L3":243.2131214132}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_irri1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rainfed1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.0784953196,"L2":165.0511307985,"L3":243.2131214132}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":5971.47713296,"L2":44771.24514033,"L3":48865.43731485}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popd_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":111.210839219,"L2":834.1003840367999,"L3":913.5245625982}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\rurc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":5971.47713296,"L2":27893.22647318,"L3":48865.43731485}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\uopp_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":5.91149061561,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\urbc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":16878.01866715,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\conv_rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\cropland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":22.7250412133,"L2":176.4237939036,"L3":255.01726941839996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\grazing1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":101.4451854109,"L3":242.30590221304}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\pasture1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":101.4451854109,"L3":242.30590221304}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":22.7250412133,"L2":176.4237939036,"L3":255.01726941839996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_irri1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rainfed1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":22.7250412133,"L2":176.4237939036,"L3":255.01726941839996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":8028.14554101,"L2":60510.78866934999,"L3":59622.81531736}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popd_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":149.513559729,"L2":1127.4760751166,"L3":1114.8841913572999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\rurc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":8028.14554101,"L2":24890.92430152,"L3":59622.81531736}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\uopp_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":11.05224690113,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\urbc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":35619.86436783,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\conv_rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\cropland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.1819318104,"L2":195.1148623218,"L3":287.1369892463}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\grazing1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":95.5446155731,"L3":220.75397171705998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\pasture1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":95.5446155731,"L3":220.75397171705998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.1819318104,"L2":195.1148623218,"L3":287.1369892463}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_irri1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rainfed1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.1819318104,"L2":195.1148623218,"L3":287.1369892463}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":10480.8936996,"L2":80611.81027921998,"L3":71022.31292789}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popd_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":195.192740112,"L2":1502.1984825824002,"L3":1328.3655570361002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\rurc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":10480.8936996,"L2":28744.633837819998,"L3":71022.31292789}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\uopp_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":13.256585177309999,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\urbc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":51867.17644139999,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\conv_rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\cropland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":27.273947799,"L2":191.3356888624,"L3":296.21321284429996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\grazing1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":88.1825706487,"L3":212.0910902117}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\pasture1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":88.1825706487,"L3":212.0910902117}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":27.273947799,"L2":191.3356888624,"L3":296.21321284429996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_irri1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rainfed1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":27.273947799,"L2":191.3356888624,"L3":296.21321284429996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":15462.6227511,"L2":123136.35129124,"L3":96135.05054182999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popd_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":287.970834417,"L2":2294.9158669201997,"L3":1798.5230290651}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\rurc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":15462.6227511,"L2":37548.60236894,"L3":85537.34815201}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\uopp_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":15.82010473291,"L3":1.95888738572}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\urbc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":85587.7489223,"L3":10597.7023899}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\conv_rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\cropland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":32.4388526844,"L2":220.92577954479998,"L3":362.9343731022}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\grazing1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":75.4569688705,"L3":157.58936440371002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\pasture1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":75.4569688705,"L3":157.58936440371002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":32.4388526844,"L2":220.92577954479998,"L3":362.9343731022}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_irri1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rainfed1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":32.4388526844,"L2":220.92577954479998,"L3":362.9343731022}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":21433.5433606,"L2":179197.84160179,"L3":122959.03206345999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popd_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":399.171309125,"L2":3340.119367574,"L3":2300.9708912429996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\rurc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":46128.082020789996,"L3":76204.66232006}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\uopp_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":2.78048394867,"L2":17.262583434920003,"L3":6.06524886785}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\urbc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":21433.5433606,"L2":133069.759581,"L3":46754.3697434}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\conv_rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\cropland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":32.9996190128,"L2":231.53037402701,"L3":410.3812651409}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\grazing1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":57.12305184541,"L3":112.82772569933}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\pasture1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":57.12305184541,"L3":112.82772569933}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":32.9996190128,"L2":231.53037402701,"L3":410.3812651409}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_irri1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rainfed1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":32.9996190128,"L2":231.53037402701,"L3":410.3812651409}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":32540.8826486,"L2":289368.65971644997,"L3":173249.37420551997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popd_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":606.030767214,"L2":5394.183582435001,"L3":3242.9682681150002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\rurc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":37690.69158161,"L3":70137.91053372}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\uopp_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":3.6296776979,"L2":27.16745849727,"L3":11.50126701012}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\urbc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":32540.8826486,"L2":251677.96813482,"L3":103111.4636718}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\conv_rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\cropland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":31.5914974618,"L2":231.12302079226,"L3":414.9695767092}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\grazing1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":56.239013212850004,"L3":103.92269236335}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\pasture1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":56.239013212850004,"L3":103.92269236335}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":31.5914974618,"L2":231.12302079226,"L3":414.9695767092}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_irri1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rainfed1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":31.5914974618,"L2":231.12302079226,"L3":414.9695767092}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":42017.6533914,"L2":402191.69814247,"L3":208822.66019811}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popd_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":782.52304943,"L2":7498.049620469001,"L3":3909.9539479749997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\rurc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34867.79264067,"L3":62126.80702831}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\uopp_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":4.67481964755,"L2":40.8678941314,"L3":16.3211555444}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\urbc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":42017.6533914,"L2":367323.9055018,"L3":146695.85316980002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\conv_rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\cropland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.8847139338,"L2":180.87790753241998,"L3":327.46105374520005}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\grazing1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":37.846100946259995,"L3":111.45409519016}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\pasture1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":37.846100946259995,"L3":111.45409519016}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.8847139338,"L2":180.87790753241998,"L3":327.46105374520005}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_irri1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rainfed1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.8847139338,"L2":180.87790753241998,"L3":327.46105374520005}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":45159.7231136,"L2":470371.18378698995,"L3":210728.8140022}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popd_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":841.039929409,"L2":8769.862096801002,"L3":3946.7741884120005}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\rurc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":32481.29571089,"L3":57093.9069417}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\uopp_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":5.2250409873,"L2":50.66445175861,"L3":17.7757663494}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\urbc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":45159.7231136,"L2":437889.8880761,"L3":153634.90706050003}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\conv_rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\cropland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":22.8260334385,"L2":174.73698617557,"L3":320.8684150155}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\grazing1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":31.83961440572,"L3":93.79459246221}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\pasture1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":31.83961440572,"L3":93.79459246221}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":22.8260334385,"L2":174.73698617557,"L3":320.8684150155}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_irri1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rainfed1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":22.8260334385,"L2":174.73698617557,"L3":320.8684150155}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":41810.7332696,"L2":478498.71153356996,"L3":184239.31756395}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popd_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":778.669436682,"L2":8922.070473674,"L3":3451.6362033207}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\rurc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":26078.255716469997,"L3":45214.161966650005}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\uopp_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":5.15106106853,"L2":55.73796999788,"L3":17.127828443640002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\urbc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":41810.7332696,"L2":452420.4558171,"L3":139025.1555973}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\conv_rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\cropland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2217774201,"L2":168.83748640954002,"L3":313.20435525269994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\grazing2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":25.12969224682,"L3":73.2499336333}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+Falscher Dateityp, skipped:G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.zip
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\pasture2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":25.12969224682,"L3":73.2499336333}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2217774201,"L2":168.83748640954002,"L3":313.20435525269994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_irri2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rainfed2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2217774201,"L2":168.83748640954002,"L3":313.20435525269994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":41142.227953,"L2":509090.83401272993,"L3":174167.63979554002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popd_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":766.219412069,"L2":9492.983707804999,"L3":3263.6582646490997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\rurc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":23012.99117483,"L3":39478.37584194}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\uopp_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":5.40610847903,"L2":63.870861603170006,"L3":17.69823386148}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\urbc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":41142.227953,"L2":486077.8428378999,"L3":134689.26395360002}
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+vorhanden:G:\Projekte\klimadaten
+vorhanden:G:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy
+Start getDirectories:G:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy
+undefined getdirectoryfiles: finished
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+vorhanden:G:\Projekte\klimadaten
+vorhanden:G:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy\pages
+Start getDirectories:G:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy\pages
+undefined getdirectoryfiles: finished
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+vorhanden:G:\Projekte\klimadaten
+vorhanden:G:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy\pages2k
+Start getDirectories:G:\Projekte\klimadaten\NOAA_pages2k_paleo_proxy\pages2k
+undefined getdirectoryfiles: finished
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: near "AF1009830845355": syntax error
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: near "AF1009830845355": syntax error
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: near "LIMIT": syntax error
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GHCND ASN00066062 0 PRCP
+Daten-Root:G:\Projekte\klimadaten\IPCC-GHCN-Daily
+G:\Projekte\klimadaten\IPCC-GHCN-Daily\ghcnd_all.tar\ghcnd_all\ghcnd_all\ASN00066062.dly
+ ist auf dem Server vorhanden
+Row(s) deleted:0
+KLIDATA-setonerecord:ASN00066062 PRCP
+Total lines : 5814
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert

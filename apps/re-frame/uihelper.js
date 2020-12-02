@@ -3092,7 +3092,7 @@
         var docheck = false;
         var qmsg = "";
         var qerr = 0;
-        if (typeof qvariable === "string" && (qvariable === "TMIN" || qvariable === "TMAX" || qvariable === TAVG)) {
+        if (typeof qvariable === "string" && (qvariable === "TMIN" || qvariable === "TMAX" || qvariable === "TAVG" || qvariable === "PRCP")) {
             docheck = true;
         }
         for (var iqual = 0; iqual < iges; iqual++) {
@@ -3108,7 +3108,7 @@
                 }
                 continue;
             } else {
-                if (docheck === true) {
+                if (docheck === true && qvariable !== "PRCP") {
                     var qf = parseFloat(qvalue);
                     if (qf < -100 || qf > 80) {
                         qmsg += qvalue;

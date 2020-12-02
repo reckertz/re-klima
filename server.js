@@ -2278,8 +2278,6 @@ app.post('/getbackasfile', function (req, res) {
 });
 
 
-
-
 /**
  * sql2csv - Execute SQL Select and download csv-File
  */
@@ -2366,10 +2364,102 @@ app.post('/sql2csv', function (req, res) {
         res.end(smsg1);
         return;
         // res.download(fullpath, filename);
-
     });
-
 });
+
+/**
+ * sql2json - Execute SQL Select and download json-File
+ */
+app.post('/sql2json', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default, kann sehr lange dauern, je nach Filtert
+    //req.body.filename;
+    if (req.body && typeof req.body.timeout !== "undefined" && req.body.timeout.length > 0) {
+        timeout = req.body.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var sqlstmt = "";
+    if (req.body && typeof req.body.sqlstmt !== "undefined" && req.body.sqlstmt.length > 0) {
+        sqlstmt = req.body.sqlstmt;
+    }
+    var limit = 1000;
+    if (req.body && typeof req.body.limit !== "undefined" && req.body.limit.length > 0) {
+        limit = req.body.limit;
+    }
+    var filename = "sql.json";
+    if (req.body && typeof req.body.filename !== "undefined" && req.body.filename.length > 0) {
+        filename = req.body.filename;
+    }
+
+    var reqparm = {};
+    reqparm.sel = sqlstmt;
+    reqparm.limit = limit || 1000;
+    reqparm.offset = 0;
+
+    var fpath = "/temp/" + filename;
+    var fullpath = __dirname + "/static" + fpath;
+    var ws = fs.createWriteStream(fullpath);
+
+
+    /*
+    csvStream.pipe(ws).on('end', function() {
+        var ret = {
+            error: false,
+            message: "Datei zwischengespeichert",
+            path: fpath,
+        };
+        var smsg1 = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text'
+        });
+        res.end(smsg1);
+        return;
+    });
+    */
+    sys0000sys.getallsqlrecords(db, async, null, reqparm, res, function (res, ret1) {
+        // getbackasfile
+        for (var irec = 0; irec < ret1.records.length; irec++) {
+            /*
+            var vals = gravec.map(function (a) {
+                return a.year;
+            }),
+            */
+            var record = ret1.records[irec];
+            var flds = Object.keys(record);
+            for (var i = 0; i < flds.length; i++) {
+                var fieldname = flds[i];
+                if (typeof record[fieldname] === "string"  && record[fieldname].startsWith("{") || fieldname === "years") {
+                    record[fieldname] = JSON.parse(record[fieldname]);
+                }
+            }
+            ws.write(JSON.stringify(record) + "\n");
+            /*
+            csv.
+            write([csvrecord], {
+                    headers: false
+                })
+                .pipe(ws);
+            */
+
+        }
+        ws.end();
+        var ret = {
+            error: false,
+            message: "Datei zwischengespeichert",
+            path: fpath,
+        };
+        var smsg1 = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text'
+        });
+        res.end(smsg1);
+        return;
+        // res.download(fullpath, filename);
+    });
+});
+
+
 /**
  * sql2eliminate - Doppelte Sätze beseitigen
  * der unique index wird später aufgebaut

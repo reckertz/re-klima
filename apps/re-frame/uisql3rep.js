@@ -317,6 +317,58 @@
                         }));
 
 
+                        $("#uisql3repbutts")
+                        .append($("<button/>", {
+                            html: "JSON-Download",
+                            css: {
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+
+                                var sqlstmt = "";
+                                sqlstmt = $("#uisql3repselstmt").val();
+                                uisql3rep.parms.tablename = "KLISQL";
+                                uisql3rep.parms.sel = sqlstmt;
+                                uisql3rep.parms.skip = 0;
+                                uisql3rep.parms.limit = 1000;
+                                var filename = "sql.json";
+                                var jqxhr = $.ajax({
+                                    method: "POST",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("sql2json"),
+                                    data: {
+                                        sqlstmt: sqlstmt,
+                                        limit: 1000,
+                                        filename: filename
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    sysbase.checkSessionLogin(r1);
+                                    var j1 = JSON.parse(r1);
+                                    if (j1.error === false) {
+                                        var download_path = j1.path;
+                                        // Could also use the link-click method.
+                                        // window.location = download_path;
+                                        window.open(download_path, '_blank');
+                                        sysbase.putMessage(filename + " download erfolgt", 1);
+                                    } else {
+                                        sysbase.putMessage(filename + " download ERROR:" + j1.message, 3);
+                                    }
+                                    return;
+
+
+                                }).fail(function (err) {
+                                    sysbase.putMessage("getAllTables AJAX ERROR:" + err.message);
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
+
+                            }
+                        }));
+
+
+
                     $("#uisql3repbutts")
                         .append($("<button/>", {
                             html: "Doppel-Elimination",
