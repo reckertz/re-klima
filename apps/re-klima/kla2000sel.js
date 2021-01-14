@@ -339,10 +339,19 @@
                     .append($("<ul/>")
                         .append($("<li/>", {
                             class: "dropdown-menuepoint",
-                            html: "HTML-Tabelle download",
+                            html: "HTML-Tabelle download alle",
                             click: function (evt) {
                                 evt.preventDefault();
                                 uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt", true);
+                                return;
+                            }
+                        }))
+                        .append($("<li/>", {
+                            class: "dropdown-menuepoint",
+                            html: "HTML-Tabelle download selektiv",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                uihelper.downloadHtmlTable($(".tablesorter"), "html-extrakt", true, true);
                                 return;
                             }
                         }))
@@ -968,6 +977,14 @@
             }
         });
 
+        $(document).keydown(function (event) {
+            if (event.which === 13) {
+                // login code here
+                $("#kla2000selliste").click();
+            }
+        });
+
+
         $("#kla2000selbuttons").hide();
         kla2000sel.getStations(true, false, false, function (ret) {
             $("#kla2000selbuttons").show();
@@ -1400,6 +1417,12 @@
 
                             reprecord.station += " &nbsp;";
                             reprecord.station += "<img src='/images/icons-png/star-black.png'";
+                            reprecord.station += " title='New Config-Auswertung'";
+                            reprecord.station += " style='background-color:red;'";
+                            reprecord.station += " class='kla2000newconf'>";
+
+                            reprecord.station += " &nbsp;";
+                            reprecord.station += "<img src='/images/icons-png/star-black.png'";
                             reprecord.station += " title='Config-Auswertung'";
                             reprecord.station += " class='kla2000selconf'>";
 
@@ -1580,6 +1603,58 @@
 
 
         /**
+         * kla2000newconf - ganz neue Analyse
+         */
+        $(document).on("click", ".kla2000newconf", function (evt) {
+            evt.preventDefault();
+            evt.stopImmediatePropagation();
+            evt.stopPropagation();
+            var source = $(this).closest("tr").attr("source");
+            var stationid = $(this).closest("tr").attr("rowid");
+            var variablename = $(this).closest("tr").attr("variable");
+
+            var longitude = $(this).closest("tr").attr("longitude");
+            var latitude = $(this).closest("tr").attr("latitude");
+            var fromyear = $(this).closest("tr").attr("fromyear");
+            var toyear = $(this).closest("tr").attr("toyear");
+
+            window.parent.sysbase.setCache("onestation", JSON.stringify({
+                selstations: [],
+                stationid: stationid,
+                source: source,
+                variablename: variablename,
+                longitude: longitude,
+                latitude: latitude,
+                fromyear: fromyear,
+                toyear: toyear,
+                starecord: starecord,
+                stationsarray: stationarray
+            }));
+
+            var tourl = "klaheatmap.html";
+            var stationname = stationarray[stationid];
+            var tabname = stationname; // confrecord.stationid + " " + stationname;
+            if (source === "GHCND") {
+                var idc20 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+            } else if (source === "HYGRIS") {
+                var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+            } else if (source === "PAGES2K") {
+                var idc22 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc22 + "']").click();
+            } else {
+                sysbase.putMessage("keine Einzelauswertung vorgesehen", 3);
+            }
+            if (1 === 1) {
+                return;
+            }
+            selvariablename = variablename;
+            console.log("Station:" + stationid + " from:" + source + " " + variablename);
+            var username = uihelper.getUsername();
+        });
+
+        /**
          * kla2000selconf - neue Analyse
          */
         $(document).on("click", ".kla2000selconf", function (evt) {
@@ -1630,6 +1705,7 @@
             console.log("Station:" + stationid + " from:" + source + " " + variablename);
             var username = uihelper.getUsername();
         });
+
 
 
 

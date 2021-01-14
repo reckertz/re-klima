@@ -93,7 +93,7 @@ const {
          * sys0000sys.getdirectoryfiles = function (gbldb, rootdir, fs, async, req, reqparm, res, supercallback4) {
          * holt die Fileliste von der Platte
          */
-        var ret =  {};
+        var ret = {};
         async.waterfall([
             function (callback296a) {
                 // sys0000sys.getdirectoryfiles, wenn filelist nicht gegeben ist
@@ -101,14 +101,14 @@ const {
                     callback296a(null, res, ret);
                     return;
                 } else {
-                   /*
-                    * fileopcode: "show" und "prep"
-                    * predirectory: "/../klima1001/";
-                    * directory: Beispiel: "albedo"
-                    * root-Directory wird zugefügt
-                    * wenn doKLIFILES und doKLIRAWFILES === false, dann kein SQL-Abgleich, nur directories
-                    * var appDir = path.dirname(require.main.filename);
-                    */
+                    /*
+                     * fileopcode: "show" und "prep"
+                     * predirectory: "/../klima1001/";
+                     * directory: Beispiel: "albedo"
+                     * root-Directory wird zugefügt
+                     * wenn doKLIFILES und doKLIRAWFILES === false, dann kein SQL-Abgleich, nur directories
+                     * var appDir = path.dirname(require.main.filename);
+                     */
                     var reqparm = {};
                     reqparm.fileopcode = "list";
                     reqparm.url = url;
@@ -119,7 +119,7 @@ const {
                     reqparm.doKLIFILES = "false";
                     reqparm.doKLIRAWFILES = "true";
 
-                    sys0000sys.getdirectoryfiles (db, rootdir, fs, async, null, reqparm, res, function(res, ret) {
+                    sys0000sys.getdirectoryfiles(db, rootdir, fs, async, null, reqparm, res, function (res, ret) {
                         var firstfullname = "";
                         if (typeof ret.files !== "undefined" && ret.files.length > 0) {
                             for (var ifile = 0; ifile < ret.files.length; ifile++) {
@@ -149,9 +149,9 @@ const {
                         return;
                     }
                     */
-                   if (file.startsWith(directory)) {
-                       file = path.basename(file);
-                   }
+                    if (file.startsWith(directory)) {
+                        file = path.basename(file);
+                    }
                     async.waterfall([
                         function (callback295a) {
                             var reqparm = {};
@@ -295,8 +295,8 @@ const {
                     //delStmt += " WHERE source = 'PAGES2K'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLISTATIONS-PAGES2K: deleted:" + this.changes);
-                        callback294a1a(null, res, ret);
-                        return;
+                    callback294a1a(null, res, ret);
+                    return;
                     //});
                 },
                 function (res, ret, callback291a1b) {
@@ -307,8 +307,8 @@ const {
                     //delStmt += " WHERE source = 'PAGES2K'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLIINVENTORY-PAGES2K: deleted:" + this.changes);
-                        callback291a1b(null, res, ret);
-                        return;
+                    callback291a1b(null, res, ret);
+                    return;
                     //});
                 },
                 function (res, ret, callback294a1c) {
@@ -319,8 +319,8 @@ const {
                     //delStmt += " WHERE source = 'PAGES2K'";
                     //db.run(delStmt, function (err) {
                     //    console.log("KLIHYDE-PAGES2K: deleted:" + this.changes);
-                        callback294a1c(null, res, ret);
-                        return;
+                    callback294a1c(null, res, ret);
+                    return;
                     //});
                 },
 
@@ -611,7 +611,7 @@ const {
                         if (newstationid.length === 0) {
                             newstationid = "PS";
                         }
-                        newstationid  += (parseFloat(ret.klistation.longitude).toFixed(3)) + (parseFloat(ret.klistation.latitude).toFixed(3)) + ret.klistation.height;
+                        newstationid += (parseFloat(ret.klistation.longitude).toFixed(3)) + (parseFloat(ret.klistation.latitude).toFixed(3)) + ret.klistation.height;
                         newstationid = newstationid.replace(/-/g, "");
                         newstationid = newstationid.replace(/\./g, "");
 
@@ -3092,6 +3092,62 @@ const {
                 callback391a(null, res, ret);
                 return;
             },
+            function (res, ret, callback391a1) {
+                // KLIDATA muss schon vorhanden sein
+                var reqparm = {
+                    sel: {
+                        source: "GHCND",
+                        stationid: ret.stationid,
+                        variable: ret.variable
+                    },
+                    projection: {},
+                    table: "KLIDATA"
+                };
+                sys0000sys.getonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                    if (ret1.error === true) {
+                        ret.error = false;
+                        ret.message = "no KLIDATA/Error" + ret1.message;
+                        ret.stationinitialize = true;
+                        ret.stationrecord = {};
+                        callback391a1("Error", res, ret);
+                        return;
+                    } else if (typeof ret1.record !== "undefined" && ret1.record !== null && Object.keys(ret1.record).length > 0) {
+                        ret.error = false;
+                        ret.message = "KLIDATA found";
+                        ret.stationinitialize = false;
+                        ret.datarecord = Object.assign({}, ret1.record); // fullcopy
+                        // hier ist der Bereich des Nachladens zu definieren
+                        var years = JSON.parse(ret.datarecord.years);
+                        var yearkeys = Object.keys(years);
+                        var lastyear = "0000";
+                        var lastyearday = 0;
+                        for (var iyear = 0; iyear < yearkeys.length; iyear++) {
+                            var lastday = 0;
+                            for (var iday = 0; iday < years[yearkeys[iyear]].length; iday++) {
+                                if (years[yearkeys[iyear]][iday] !== null) {
+                                    lastday = iday;
+                                }
+                            }
+                            if (yearkeys[iyear] > lastyear) {
+                                lastyear = yearkeys[iyear];
+                                lastyearday = lastday;
+                            }
+                        }
+                        // wenn das letzte Jahr "voll" ist, dann wird das nächste Jahr abgerufen!
+                        // kommt später, tsserverupd hat 2020-04-04T14:55:14.631Z und kann geprüft werden
+                        ret.lastyear = lastyear;
+                        ret.lastyearday = lastyearday;
+                        callback391a1(null, res, ret);
+                        return;
+                    } else {
+                        ret.error = false;
+                        ret.message = "no old KLIDATA record";
+                        ret.datarecord = {};
+                        callback391a1("Error", res, ret);
+                        return;
+                    }
+                });
+            },
             function (res, ret, callback391b) {
                 /**
                  * API Aufrufen
@@ -3113,6 +3169,38 @@ const {
                  * TODO: den "echten" letzten Tag finden
                  */
                 ret.korrUpdated = ret.lastUpdated;
+                if (ret.lastyear > "0000") {
+                    var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    if (uihelper.isleapyear(ret.lastyear)) {
+                        // zero-based beachten
+                        mdtable[1] = 29;
+                    }
+                }
+                var mon = 0;
+                var kmon = 0;
+                var lmon = 0;
+                var xmon = 0;
+                var xday = 0;
+                for (var imon = 0; imon < 12; imon++) {
+                    kmon += mdtable[imon];
+                    if ((ret.lastyearday + 1) > kmon) {
+                        xmon = imon + 1;
+                        xday = ret.lastyearday - kmon;
+                        lmon = kmon;
+                    } else {
+                        break;
+                    }
+                }
+                if (xmon === 0) xmon = 1;
+                if (xday === 0) xday = 1;
+                var lastiso = ret.lastyear + "-" + ("00" + xmon).slice(-2) + "-" + ("00" + xday).slice(-2);
+                var lastday = new Date(lastiso);
+                //add a day to the date
+                lastday.setDate(lastday.getDate() + 1);
+                var nextday = lastday.toISOString().substr(0, 10);
+                url += "&startdate=" + nextday;
+                url += "&enddate=" + ret.lastyear + '-12-31';
+                /*
                 if (ret.lastUpdated.length === 4) {
                     ret.korrUpdated = ret.lastUpdated + "-01-01";
                 } else if (ret.lastUpdated.length >= 10) {
@@ -3120,6 +3208,7 @@ const {
                 }
                 url += "&startdate=" + ret.korrUpdated;
                 url += "&enddate=" + (new Date().getFullYear()) + '-12-31';
+                */
                 url += "&offset=0";
                 url += "&limit=1000";
                 console.log(url);

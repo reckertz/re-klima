@@ -1,12 +1,12 @@
-/*global $,this,screen,document,window,module,define,root,global,self,var,async,sysbase,uihelper,kla9020fun,regression */
+/*global $,this,screen,document,window,module,define,root,global,self,var,async,sysbase,uientry,uihelper,kla9020fun,regression */
 (function () {
     'use strict';
-    var kla2100rep = {};
+    var kla2150rep = {};
     var root = typeof self === 'object' && self.self === self && self ||
         typeof global === 'object' && global.global === global && global ||
         this;
     /**
-     * kla2100rep  Auswertung GHCND außer TMAX und TMIN, also PRCP, SNOW etc.!!!
+     * kla2150rep  Auswertung GHCND außer TMAX und TMIN, also PRCP, SNOW etc.!!!
      * Aufruf aus kla1610sta
      * bekommt über getCache pivotdata oder yearlats(?)
      * und erzeugt animierte Gifs mit der Option weiterer Zuordnungen
@@ -18,9 +18,6 @@
     var actprjname;
     var cid;
     var cidw;
-
-
-
     var selparms;
     var selstations = []; // die Massenabfrage kann je station unterschiedliche source haben!!!,
     // daher Strukur mit selstationid und selsource je Eintrag
@@ -28,16 +25,18 @@
     var selsource = null;
     var selvariablename = null;
     var starecord = null; // Selektionsparameter
-    var kla2100repconfig = {};
+    var kla2150repconfig = {};
     var stationrecord;
     var matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
-    var histo1 = {}; // Histogramm auf Wasserstand gerundet Ganzzahl
+    var histo1 = {}; // Histogramm insgesamt
+    var histosun = {}; // Histogramm Sommer insgesamt
+    var histowin = {}; // Histogramm Winter insgesamt
     var klirecords = [];
     var klirow = {}; // der aktuelle Datensatz, dynamisch aus klirecords[i] geholt
     var klihydes = {}; // Struktur für die gesammelten Hyde-Daten: source.stationid => klihyde in der Strukur
     var klihyde = {}; // Struktur für eine source.stationid Kombination
     var klipages2k = {}; // struktur für pages2k aus KLIHYDE für stationid
-    var kla2100repclock;
+    var kla2150repclock;
 
     var hmatrixL;
     var hoptionsL;
@@ -47,11 +46,11 @@
     var confschema = {
         entryschema: {
             props1: {
-                title: "Abrufparameter ",
+                title: "Abrufparameter-1 ",
                 description: "",
                 type: "object", // currency, integer, datum, text, key, object
                 class: "uiefieldset",
-                width: "33%",
+                width: "25%",
                 properties: {
                     stationid: {
                         title: "Stations-ID",
@@ -141,11 +140,11 @@
                 }
             },
             props2: {
-                title: "Abrufparameter ",
+                title: "Abrufparameter-2 ",
                 description: "",
                 type: "object", // currency, integer, datum, text, key, object
                 class: "uiefieldset",
-                width: "30%",
+                width: "25%",
                 properties: {
                     decimals: {
                         title: "Dezimalstelle",
@@ -267,14 +266,14 @@
     var confrecord = {};
 
     /**
-     * kla2100rep.show - Initialisierung der Anwendung
+     * kla2150rep.show - Initialisierung der Anwendung
      * Gerüst anzeigen und erste Funktionsaufrufe
      * @param {*} parameters
      * @param {*} navigatebucket
      */
-    kla2100rep.show = function (parameters, navigatebucket) {
+    kla2150rep.show = function (parameters, navigatebucket) {
         // if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {}
-        debugger;
+
         if (typeof parameters !== "undefined" && parameters.length > 0) {
             selstationid = parameters[0].stationid;
             selsource = parameters[0].source;
@@ -336,13 +335,11 @@
                 header: "Temperatur",
                 reverse: false,
                 cumulate: false
-
             },
             "TMAX,TMIN": {
                 header: "Temperatur",
                 reverse: false,
                 cumulate: false
-
             },
             PRCP: {
                 header: "Niederschlag",
@@ -371,8 +368,6 @@
             }
         };
 
-
-
         if (typeof navigatebucket === "object") {
             if (navigatebucket.navigate === "back") {
                 if (typeof navigatebucket.oldparameters === "object") {
@@ -399,17 +394,17 @@
 
         $(".content").empty();
         $(".headertitle").html("Heatmap für Station:" + selstationid + " Quelle:" + selsource);
-        $(".headertitle").attr("title", "kla2100rep");
-        $(".content").attr("pageid", "kla2100rep");
-        $(".content").attr("id", "kla2100rep");
+        $(".headertitle").attr("title", "kla2150rep");
+        $(".content").attr("pageid", "kla2150rep");
+        $(".content").attr("id", "kla2150rep");
         $(".content")
             .css({
                 overflow: "hidden"
             });
-        $("#kla2100rep")
+        $("#kla2150rep")
             .append($("<input/>", {
                 type: "hidden",
-                id: "kla2100rep_isdirty",
+                id: "kla2150rep_isdirty",
                 value: "false"
             }));
         $(".headerright").remove();
@@ -458,19 +453,17 @@
                 )
             );
         sysbase.initFooter();
-        $("#kla2100rep.content").empty();
-        $("#kla2100rep.content")
+        $("#kla2150rep.content").empty();
+        $("#kla2150rep.content")
             .append($("<div/>", {
-                id: "kla2100repbuttons",
+                id: "kla2150repbuttons",
                 css: {
                     width: "100%",
                     float: "left"
                 }
             }));
 
-        $("#kla2100repbuttons")
-
-
+        $("#kla2150repbuttons")
             .append($("<button/>", {
                 html: "Drucken",
                 css: {
@@ -479,44 +472,7 @@
                     margin: "10px"
                 },
                 click: function (evt) {
-                    // sysbase.printDivAll($("#kla2100repwrapper").html());
-                    // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
-                    // $("div.")  // leaflet-spezialbehandlung
-
-                    $('canvas').each(function (e) {
-                        var image = new Image();
-                        var that = this;
-                        image.src = this.toDataURL("image/png");
-                        var w = $(this).width();
-                        var h = $(this).height();
-                        $(image).width(w);
-                        $(image).height(h);
-                        // doprintthis, wenn die Klasse schon da war
-                        if ($(this).hasClass("doprintthis")) {
-                            $(image).addClass("doprintthis");
-                        }
-                        var parspan = $(this).parent();
-                        if ($(parspan).prop("tagName") === "SPAN") {
-                            $(parspan).css({
-                                width: w + "px",
-                                height: h + "px"
-                            });
-                        }
-                        $(this).replaceWith(image);
-                    });
-                    evt.preventDefault();
-                    // https://github.com/jasonday/printThis
-                    $('.doprintthis').printThis({
-                        canvas: true,
-                        afterPrint: function () {
-                            //var lsid = $("iframe").find("[name=printIframe]").attr("id");
-                            var lsid = $('iframe[name="printIframe"]').attr('id');
-                            var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
-                            uihelper.downloadfile("station.html", largestring, function (ret) {
-                                console.log("Downloaded");
-                            });
-                        }
-                    });
+                    kla2150rep.kliprint(evt);
                 }
             }))
 
@@ -527,388 +483,31 @@
                     margin: "10px"
                 },
                 click: function (evt) {
-                    evt.preventDefault();
-                    // evt.stopPropagation();
-                    // evt.stopImmediatePropagation();
-                    // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
-                    /**
-                     * Konvertieren svg zu image
-                     * http://bl.ocks.org/biovisualize/8187844
-                     */
-                    var tabtext = selstationid;
-                    if (typeof selstationid === "undefined" || selstationid.length === 0) {
-                        tabtext = "Sammel-HTML";
-                    }
-                    var tourl = "klaheatmap.html" + "?" + "stationid=" + selstationid + "&source=" + selsource + "&variablename=" + selvariablename;
-                    var idc21 = window.parent.sysbase.tabcreateiframe(tabtext, "", "re-klima", "kla1990htm", tourl);
-                    window.parent.$(".tablinks[idhash='#" + idc21 + "']").click(); // das legt erst den iFrame an
-                    setTimeout(function () {
-                        var old2newids = {};
-                        var actdiv = window.parent.$("#" + idc21);
-                        var actiFrame = $(actdiv).find("iframe").get(0);
-                        var actiFrameBody = $(actiFrame).contents();
-                        /**
-                         * Loop über alle doprintthis-Elemente
-                         */
-                        var aktwrapper = $(actiFrameBody).find(".kla1990htmwrapper");
-                        var domarray = $('.doprintthis').toArray();
-                        console.log("*** Start:" + domarray.length + " ***");
-                        var dcount = 0;
-                        async.eachSeries(domarray, function (printelement1, nextElement) {
-                            // $('.doprintthis').each(function (index, printelement1) {
-                            // hier ist printelement1 noch im alten Kontext
-                            var found = false;
-                            dcount++;
-                            var dmsg = "" + dcount + ". ";
-                            dmsg += "printelement1-tag:" + $(printelement1).prop("tagName");
-                            dmsg += " -id:" + $(printelement1).attr("id");
-                            console.log(dmsg);
-                            // Container für den neuen Inhalt bereitstellen
-                            var newcontainerid = "NCID" + Math.floor(Math.random() * 100000) + 1;
-                            var newcontainerhash = "#" + newcontainerid;
-                            $(aktwrapper)
-                                .append($("<div/>", {
-                                    id: newcontainerid,
-                                }));
-                            /*
-                            $(aktwrapper).find(newcontainerhash)
-                                .append($("<span/>", {
-                                    text: newcontainerid
-                                }));
-                            */
-                            /**
-                             * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
-                             * hier svg
-                             */
-                            if ($(printelement1).is('svg')) {
-                                console.log(dcount + " svg-direkt");
-                                found = true;
-                                var svgString = new XMLSerializer().serializeToString(printelement1);
-                                var canvas = document.createElement("canvas");
-                                var ctx = canvas.getContext("2d");
-                                var DOMURL = self.URL || self.webkitURL || self;
-                                var svg = new Blob([svgString], {
-                                    type: "image/svg+xml;charset=utf-8"
-                                });
-                                var url = DOMURL.createObjectURL(svg);
-                                var image = new Image();
-                                image.src = url;
-                                // noch weiter
-                                var image1 = document.createElement("img");
-                                var canvas1 = document.createElement("canvas");
-                                canvas1.width = image.width;
-                                canvas1.height = image.height;
-                                var ctx1 = canvas.getContext("2d");
-                                ctx1.drawImage(image, 0, 0);
-                                var base64 = canvas1.toDataURL("image/png");
-                                /*
-                                var w = $(printelement1).width();
-                                var h = $(printelement1).height();
-                                $(image).width(w);
-                                $(image).height(h);
-                                */
-                                $(aktwrapper).find(newcontainerhash)
-                                    .empty();
-                                $(aktwrapper).find(newcontainerhash)
-                                    .append(image);
-                                $(aktwrapper).find(newcontainerhash)
-                                    .append($("<div/>", {
-                                        html: "&nbsp;",
-                                        css: {
-                                            clear: "both"
-                                        }
-                                    }));
-                            }
-                            if (found === true) {
-                                nextElement();
-                                return;
-                            }
-                            /**
-                             * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
-                             * hier leaflet
-                             */
-                            if ($(printelement1).hasClass("leaflet-container")) {
-                                console.log(dcount + " leaflet-direkt");
-                                var mydivid = $(printelement1).attr("id");
-                                window.mymaps = window.mymaps || {};
-                                var mymap = window.mymaps[mydivid];
-                                if (typeof window.mymaps[mydivid] !== "undefined") {
-                                    found = true;
-                                    leafletImage(mymap, function (err, canvas) {
-                                        var img = document.createElement('img');
-                                        img.src = canvas.toDataURL();
-                                        var dimensions = mymap.getSize();
-                                        $(img).width(dimensions.x);
-                                        $(img).height(dimensions.y);
-                                        $(aktwrapper).find(newcontainerhash).append(img);
-                                        $(aktwrapper).find(newcontainerhash)
-                                            .append($("<div/>", {
-                                                html: "&nbsp;",
-                                                css: {
-                                                    clear: "both"
-                                                }
-                                            }));
-                                    });
-                                }
-                            }
-                            if (found === true) {
-                                nextElement();
-                                return;
-                            }
-
-                            /**
-                             * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
-                             * hier canvas
-                             */
-                            if ($(printelement1).is("canvas")) {
-                                console.log(dcount + " canvas-direkt");
-                                found = true;
-                                console.log("CANVAS:" + $(printelement1).attr("id"));
-                                var img = document.createElement('img');
-                                img.src = printelement1.toDataURL(); // png "image/jpg"
-                                $(aktwrapper).find(newcontainerhash).append(img);
-                                $(aktwrapper).find(newcontainerhash)
-                                    .append($("<div/>", {
-                                        html: "&nbsp;",
-                                        css: {
-                                            clear: "both"
-                                        }
-                                    }));
-                            }
-                            if (found === true) {
-                                nextElement();
-                                return;
-                            }
-                            /**
-                             * hier wird es schwieriger, weil die Sonderelemente eingebettet sind
-                             * es muss also erst ein CLONE erzeugt werden und dann kann darin gearbeitet werden
-                             */
-                            // Vorbereiten für untergeordnete Sonderfälle
-
-                            $(printelement1).find('canvas').each(function (index, printcanvas) {
-                                if (typeof $(printcanvas).attr("id") === "undefined") {
-                                    var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
-                                    $(printcanvas).attr("id", newid);
-                                }
-                            });
-                            $(printelement1).find('svg').each(function (index, printsvg) {
-                                if (typeof $(printsvg).attr("id") === "undefined") {
-                                    var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
-                                    $(printsvg).attr("id", newid);
-                                }
-                            });
-                            $(printelement1).find('.leaflet-container').each(function (index, printleaf) {
-                                if (typeof $(printleaf).attr("id") === "undefined") {
-                                    var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
-                                    $(printleaf).attr("id", newid);
-                                }
-                            });
-
-                            var printelement = $(printelement1).clone(true, true);
-                            console.log(dcount + " clone erzeugt");
-                            /**
-                             * erst mal die id's austauschen, id' haben Nebeneffekte
-                             */
-                            $(printelement).find("[id]").each(function () {
-                                var actid = this.id;
-                                if (typeof old2newids[actid] === "undefined") {
-                                    old2newids[actid] = "NID" + Math.floor(Math.random() * 100000) + 1;
-                                    this.id = old2newids[actid];
-                                } else {
-                                    this.id = old2newids[actid];
-                                }
-                            });
-                            $(aktwrapper)
-                                .find(newcontainerhash)
-                                .append($("<div/>", {
-                                    /* html: "&nbsp;", */ // $(printelement).prop("tagName") + "=>" + $(printelement).attr("id"),
-                                    css: {
-                                        height: "1px",
-                                        width: "100%",
-                                        "backgound-color": "red",
-                                        clear: "both"
-                                    }
-                                }));
-
-                            // Löschen Suchzeilen in Tabellen
-                            $(printelement).find("tr[role=search]").remove();
-
-                            // HIER WIRD ES INTERESSANT - es müssen die Sonderfälle im Original gesucht werden
-                            // und vom Original verarbeitet werden!!!
-
-                            /**
-                             * Konvertieren canvas-Unterelemente zu image setview
-                             * im loop - in das jeweilige Parent einbetten
-                             */
-                            $(printelement1).find('canvas').each(function (index, printcanvas) {
-                                // gesucht und gefunden im Original
-                                var img = document.createElement('img');
-                                img.src = printcanvas.toDataURL(); // png "image/jpg"
-                                // das Image kommt in den Clone!!!
-                                var oldid = $(printcanvas).attr("id");
-                                var newid = old2newids[oldid];
-                                $(printelement).find("#" + newid).replaceWith(img);
-                                console.log(dcount + " canvas iterativ");
-                            });
-                            var svgarray = $(printelement1).find('svg').toArray();
-                            if (svgarray.length === 1) {
-                                var svgelement = svgarray[0];
-                                found === true;
-                                var svgString = new XMLSerializer().serializeToString(svgelement);
-                                var canvas = document.createElement("canvas");
-                                var ctx = canvas.getContext("2d");
-                                var DOMURL = self.URL || self.webkitURL || self;
-                                var svg = new Blob([svgString], {
-                                    type: "image/svg+xml;charset=utf-8"
-                                });
-                                var url = DOMURL.createObjectURL(svg);
-                                var img = document.createElement("img"); // new Image();
-                                var w = $(svgelement).width();
-                                var h = $(svgelement).height();
-                                $(img).width(w);
-                                $(img).height(h);
-                                $(img).attr('crossorigin', 'anonymous');
-                                // img.src = url;
-                                /**
-                                 * asynchrone Aufbereitung
-                                 */
-                                blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
-                                    // success
-                                    var oldid = $(svgelement).attr("id");
-                                    var newid = old2newids[oldid];
-                                    img.src = dataURL;
-                                    // hier wird es tricky, dediziert mapael-container abfangen und umgehen
-                                    // $(printelement).find("#" + newid).replaceWith(img);
-                                    $(printelement).empty();
-                                    $(printelement)
-                                        .append($(img));
-                                    $(aktwrapper)
-                                        .find(newcontainerhash)
-                                        .append(printelement);
-                                    $(aktwrapper)
-                                        .find(newcontainerhash)
-                                        .append($("<div/>", {
-                                            html: "&nbsp;",
-                                            css: {
-                                                clear: "both"
-                                            }
-                                        }));
-                                    console.log(dcount + " *** svg iterativ=0, div-id:" + $(printelement).attr("id"));
-                                    nextElement();
-                                    return;
-                                }).catch(function (err) {
-                                    // error
-                                    console.log(dcount + " svg iterativ=0" + err.stack);
-                                    nextElement();
-                                    return;
-                                });
-                            } else {
-                                async.eachSeries(svgarray, function (svgelement, nextSvg) {
-                                        // $(printelement1).find('svg').each(function (index, svgelement) {
-                                        found === true;
-                                        var svgString = new XMLSerializer().serializeToString(svgelement);
-                                        var canvas = document.createElement("canvas");
-                                        var ctx = canvas.getContext("2d");
-                                        var DOMURL = self.URL || self.webkitURL || self;
-                                        var svg = new Blob([svgString], {
-                                            type: "image/svg+xml;charset=utf-8"
-                                        });
-                                        var url = DOMURL.createObjectURL(svg);
-                                        var img = document.createElement("img"); // new Image();
-                                        var w = $(svgelement).width();
-                                        var h = $(svgelement).height();
-                                        $(img).width(w);
-                                        $(img).height(h);
-                                        $(img).attr('crossorigin', 'anonymous');
-                                        img.src = url;
-                                        /**
-                                         * asynchrone Aufbereitung
-                                         */
-                                        blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
-                                            // success
-                                            var oldid = $(svgelement).attr("id");
-                                            var newid = old2newids[oldid];
-                                            img.src = dataURL;
-                                            // hier wird es tricky, dediziert mapael-container abfangen und umgehen
-                                            $(printelement).find("#" + newid).replaceWith(img);
-                                            console.log(dcount + " svg iterativ (async)");
-                                            nextSvg();
-                                            return;
-                                        }).catch(function (err) {
-                                            // error
-                                            console.log(dcount + " svg iterativ " + err.stack);
-                                            nextSvg();
-                                            return;
-                                        });
-                                    },
-                                    function (error) {
-                                        if (found === true) {
-                                            console.log(dcount + " canvas iterativ-beendet");
-                                            var msg = error;
-                                            console.log(msg);
-                                            nextElement();
-                                            return;
-                                        } else {
-                                            console.log(dcount + " canvas iterativ-nichts gefunden");
-                                            $(aktwrapper)
-                                                .find(newcontainerhash)
-                                                .append(printelement);
-                                            $(aktwrapper)
-                                                .find(newcontainerhash)
-                                                .append($("<div/>", {
-                                                    html: "&nbsp;",
-                                                    css: {
-                                                        clear: "both"
-                                                    }
-                                                }));
-                                            nextElement();
-                                            return;
-                                        }
-                                    });
-                            }
-                        });
-                        /**
-                         * Konvertieren svg zu Image
-                         */
-                        /*
-                        debugger;
-                        $(actiFrame).find('svg').each(function (index, svgelement) {
-                            var svgString = new XMLSerializer().serializeToString(svgelement);
-                            //var canvas = document.getElementById("canvas");
-                            var canvas = document.createElement("canvas");
-                            var ctx = canvas.getContext("2d");
-                            var DOMURL = self.URL || self.webkitURL || self;
-                            var svg = new Blob([svgString], {
-                                type: "image/svg+xml;charset=utf-8"
-                            });
-                            var url = DOMURL.createObjectURL(svg);
-                            var image = new Image();
-                            image.src = url;
-                            var w = $(svgelement).width();
-                            var h = $(svgelement).height();
-                            $(image).width(w);
-                            $(image).height(h);
-                            // doprintthis, wenn die Klasse schon da war
-                            if ($(svgelement).hasClass("doprintthis")) {
-                                $(svgelement).addClass("doprintthis");
-                            }
-                            var parspan = $(svgelement).parent();
-                            if ($(parspan).prop("tagName") === "SPAN") {
-                                $(parspan).css({
-                                    width: w + "px",
-                                    height: h + "px"
-                                });
-                            }
-                            $(svgelement).replaceWith(image);
-                        });
-                        */
-
-                    }, 2000);
-                    if (1 === 1) return;
-                    window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                    kla2150rep.klihtml(evt);
                 }
             }))
 
+            .append($("<button/>", {
+                html: "Neue Parameter",
+                css: {
+                    float: "left",
+                    margin: "10px"
+                },
+                click: function (evt) {
+                    evt.preventDefault();
+                    /*
+                    var newurl = $(this).attr("lurl");
+                    var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
+                    window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
+                    */
+                    $("#kla2150repwrapper").empty();
+                    kla2150rep.getConfigparameters(function (ret) {
+                        if (ret.error === false) {
+
+                        }
+                    });
+                }
+            }))
 
             .append($("<button/>", {
                 html: "Heatmap Colortest",
@@ -923,15 +522,15 @@
                     if ($("#kliheattable").is(":visible")) {
                         $("#kliheattable").hide();
                     } else {
-                        $("#kla2100repwrapper").empty();
+                        $("#kla2150repwrapper").empty();
                         var h = $("#heatmap").height();
-                        var w = $("#kla2100rep.content").width();
+                        var w = $("#kla2150rep.content").width();
                         w -= 0; // $("#heatmap").position().left;
                         w -= 0; // $("#heatmap").width();
                         w -= 0; // 40;
-                        $("#kla2100repwrapper")
+                        $("#kla2150repwrapper")
                             .append($("<div/>", {
-                                id: "kla2100repcolormap",
+                                id: "kla2150repcolormap",
                                 css: {
                                     "background-color": "yellow",
                                     height: h,
@@ -939,15 +538,15 @@
                                     overflow: "auto"
                                 }
                             }));
-                        $("#kla2100repcolormap").show();
-                        kla9020fun.getColorPaletteX1("kla2100repcolormap", 7);
+                        $("#kla2150repcolormap").show();
+                        kla9020fun.getColorPaletteX1("kla2150repcolormap", 7);
                     }
                     return false;
                 }
             }))
 
             .append($("<div/>", {
-                id: "kla2100repclock",
+                id: "kla2150repclock",
                 float: "left",
                 css: {
                     float: "left",
@@ -955,23 +554,23 @@
                 }
             }));
         /**
-         * Beginn des initialen Aufbaus kla2100repwrapper
+         * Beginn des initialen Aufbaus kla2150repwrapper
          */
-        $("#kla2100rep.content")
+        $("#kla2150rep.content")
             .append($("<div/>", {
-                    id: "kla2100repdiv",
-                    class: "kla2100repdiv"
+                    id: "kla2150repdiv",
+                    class: "kla2150repdiv"
                 })
                 .append($("<div/>", {
-                    id: "kla2100repwrapper",
-                    class: "kla2100repwrapper"
+                    id: "kla2150repwrapper",
+                    class: "kla2150repwrapper"
                 }))
             );
-        var h = $("#kla2100rep").height();
-        h -= $("#kla2100rep.header").height();
-        h -= $("#kla2100repbuttons").height();
-        h -= $("#kla2100rep.footer").height();
-        $("#kla2100repdiv")
+        var h = $("#kla2150rep").height();
+        h -= $("#kla2150rep.header").height();
+        h -= $("#kla2150repbuttons").height();
+        h -= $("#kla2150rep.footer").height();
+        $("#kla2150repdiv")
             .css({
                 "margin": "10px",
                 "background-color": "lime",
@@ -980,7 +579,7 @@
                 overflow: "auto",
                 float: "left"
             });
-        $("#kla2100repwrapper")
+        $("#kla2150repwrapper")
             .css({
                 "background-color": "lime",
                 height: h,
@@ -988,27 +587,25 @@
                 overflow: "auto",
                 float: "left"
             });
-        console.log("kla2100repwrapper initialisiert, leer");
+        console.log("kla2150repwrapper initialisiert, leer");
         $(window).on('resize', function () {
-            var h = $("#kla2100rep").height();
-            h -= $("#kla2100rep.header").height();
-            h -= $("#kla2100repbuttons").height();
-            h -= $("#kla2100rep.footer").height();
-            $("#kla2100repdiv").css({
+            var h = $("#kla2150rep").height();
+            h -= $("#kla2150rep.header").height();
+            h -= $("#kla2150repbuttons").height();
+            h -= $("#kla2150rep.footer").height();
+            $("#kla2150repdiv").css({
                 height: h
             });
         });
         /**
          * hier werden die Konfigurationsparameter inital aufgerufen
          */
-        kla2100rep.getConfigparameters(function (ret) {
+        kla2150rep.getConfigparameters(function (ret) {
             if (ret.error === false) {
 
             }
         });
     }; // Ende show
-
-
 
     /**
      * getConfigparameters - Popup für die Konfiguration der Auswertung
@@ -1016,9 +613,9 @@
      * confrecord und confschema
      * selparms kann Parameter überschreiben beim ersten Aufruf
      */
-    kla2100rep.getConfigparameters = function () {
+    kla2150rep.getConfigparameters = function () {
         if (Object.keys(confrecord).length === 0) {
-            kla2100repconfig = $.extend(true, {
+            kla2150repconfig = $.extend(true, {
                 comment: "",
                 decimals: true,
                 heatmaps: true,
@@ -1043,10 +640,10 @@
                 cropland: true,
                 tot_irri: true
             }, selparms.config);
-            confrecord = uihelper.cloneObject(kla2100repconfig);
+            confrecord = uihelper.cloneObject(kla2150repconfig);
         }
 
-        var anchorHash = "#kla2100rep";
+        var anchorHash = "#kla2150rep";
         var title = "Studien-Konfiguration";
         var pos = {
             left: $(anchorHash).width() * 0.15,
@@ -1066,36 +663,36 @@
             Object.assign(confrecord, JSON.parse(extraParam).props2);
             Object.assign(confrecord, JSON.parse(extraParam).props3);
 
-            kla2100repconfig = $.extend(true, kla2100repconfig, confrecord);
+            kla2150repconfig = $.extend(true, kla2150repconfig, confrecord);
 
             var selvars = "";
             var selarray = [];
-            if (kla2100repconfig.popc === true) {
+            if (kla2150repconfig.popc === true) {
                 selarray.push("popc");
             }
-            if (kla2100repconfig.rurc === true) {
+            if (kla2150repconfig.rurc === true) {
                 selarray.push("rurc");
             }
-            if (kla2100repconfig.urbc === true) {
+            if (kla2150repconfig.urbc === true) {
                 selarray.push("urbc");
             }
-            if (kla2100repconfig.uopp === true) {
+            if (kla2150repconfig.uopp === true) {
                 selarray.push("uopp");
             }
-            if (kla2100repconfig.cropland === true) {
+            if (kla2150repconfig.cropland === true) {
                 selarray.push("cropland");
             }
-            if (kla2100repconfig.tot_irri === true) {
+            if (kla2150repconfig.tot_irri === true) {
                 selarray.push("tot_irri");
             }
             selvars = selarray.join(",");
-            kla2100repconfig.selvars = selvars;
+            kla2150repconfig.selvars = selvars;
             if (confrecord.allin === false) {
                 /**
                  * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
                  */
-                kla2100rep.getmoredata(function (ret) {
-                    clearInterval(kla2100repclock);
+                kla2150rep.getmoredata(function (ret) {
+                    clearInterval(kla2150repclock);
                     $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
                     $(':button').prop('disabled', false); // Enable all the buttons
                     $("body").css("cursor", "default");
@@ -1105,8 +702,8 @@
                 /**
                  * Laden aller benötigten Daten, dann Ausgabe mit Formatieren
                  */
-                kla2100rep.getmoredata(function (ret) {
-                    clearInterval(kla2100repclock);
+                kla2150rep.getmoredata(function (ret) {
+                    clearInterval(kla2150repclock);
                     $("#kliclock").html("&nbsp;&nbsp;&nbsp;");
                     $(':button').prop('disabled', false); // Enable all the buttons
                     $("body").css("cursor", "default");
@@ -1123,12 +720,10 @@
         uientry.inputDialogX(anchorHash, pos, title, confschema, confrecord, function (ret) {
             if (ret.error === false) {
                 // Zufügen Button IPCC-Perioden
-
                 var auxid = $(anchorHash).find("div.uiepopup").attr("id");
                 //popupD75976fromyear
                 // var divname = $("#" + auxid + "fromyear").parent();
                 var divobj = $(anchorHash).find("div.uiepopup").find("button.optionCancel").parent();
-
                 $(divobj)
                     .append($("<button/>", {
                         html: "IPCC-Perioden",
@@ -1161,7 +756,7 @@
 
 
     /**
-     * getmoredata - kla2100repconfig.allin === true
+     * getmoredata - kla2150repconfig.allin === true
      * allin === true, dann selstations mit stationid und source als Array abfragen
      * im server:
      * - create temporary table
@@ -1170,7 +765,7 @@
      * - Rückgabe records - das eigentliche Ziel
      * tricky mit temporary table
      */
-    kla2100rep.getmoredata = function (cb2100n) {
+    kla2150rep.getmoredata = function (cb2100n) {
         var ttid = "STA" + Math.floor(Math.random() * 100000) + 1;
         async.waterfall([
                 function (cb2100n0) {
@@ -1181,7 +776,7 @@
                             variable: selvariablename
                         });
                     }
-                    kla2100repclock = kla2100rep.showclock("#kla2100repclock");
+                    kla2150repclock = kla2150rep.showclock("#kla2150repclock");
                     //$("button").hide();
                     $(':button').prop('disabled', true); // Disable all the buttons
                     $("body").css("cursor", "progress");
@@ -1209,7 +804,7 @@
                     sqlStmt += "lats, ";
                     sqlStmt += "longitude, ";
                     sqlStmt += "latitude, ";
-                    sqlStmt += ttid + ".variable, "; // wichtig, damit variable immer geladen wird, GHCN etc.
+                    sqlStmt += "variable, "; // wichtig, damit variable immer geladen wird, GHCN etc.
                     // können dann gezielt nachgeladen werden
                     sqlStmt += "anzyears, ";
                     sqlStmt += "realyears, ";
@@ -1218,6 +813,7 @@
                     sqlStmt += "lastUpdated, ";
                     sqlStmt += "height, ";
                     sqlStmt += "years ";
+                    /*
                     sqlStmt += " FROM " + ttid;
                     sqlStmt += " INNER JOIN KLISTATIONS ";
                     sqlStmt += " ON " + ttid + ".source = KLISTATIONS.source";
@@ -1225,62 +821,52 @@
                     sqlStmt += " LEFT JOIN KLIDATA ";
                     sqlStmt += " ON " + ttid + ".source = KLIDATA.source ";
                     sqlStmt += " AND " + ttid + ".stationid = KLIDATA.stationid ";
-                    sqlStmt += " AND " + ttid + ".variable = KLIDATA.variable ";
+                    //sqlStmt += " AND " + ttid + ".variable = KLIDATA.variable ";
+                    sqlStmt += " AND " + ttid + ".variable IN ('TMAX', 'TMIN')";
                     // sqlStmt += " WHERE KLIDATA.variable ='" + selvariablename + "' ";
+                    sqlStmt += " WHERE KLIDATA.variable ='" + selvariablename + "' ";
                     sqlStmt += " ORDER BY " + ttid + ".source, " + ttid + ".stationid, KLIDATA.variable";
+                    */
+                    sqlStmt += " FROM KLISTATIONS";
+                    sqlStmt += " LEFT JOIN KLIDATA ";
+                    sqlStmt += " ON KLISTATIONS.source = KLIDATA.source ";
+                    sqlStmt += " AND KLISTATIONS.stationid = KLIDATA.stationid ";
+                    sqlStmt += " AND KLIDATA.variable IN ('TMAX', 'TMIN')";
+                    sqlStmt += " WHERE KLISTATIONS.source = '" + selsource + "'";
+                    sqlStmt += " AND KLISTATIONS.stationid = '" + selstationid + "'";
+                    sqlStmt += " ORDER BY KLIDATA.source, KLIDATA.stationid, KLIDATA.variable";
                     var api = "getallsqlrecords";
                     var table = "KLISTATIONS";
-                    //uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
-                    var jqxhr = $.ajax({
-                        method: "POST",
-                        crossDomain: false,
-                        url: sysbase.getServer("getmoredata"),
-                        data: {
-                            timeout: 10 * 60 * 1000,
-                            crtsql: crtsql,
-                            selstations: selstations,
-                            sqlStmt: sqlStmt,
-                            temptable: ttid
-                        }
-                    }).done(function (r1, textStatus, jqXHR) {
-                        sysbase.checkSessionLogin(r1);
-                        var ret1 = JSON.parse(r1);
-                        sysbase.putMessage(ret1.message, 1);
+                    uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
                         if (ret1.error === true) {
+                            // sollte nicht passieren??? oder auch hier anlegen
+                            sysbase.putMessage("Error:" + ret1.message, 3);
                             cb2100n0("Error", {
-                                error: ret1.error,
-                                message: ret1.message,
-                                crtsql: crtsql,
-                                selstations: selstations,
-                                sqlStmt: sqlStmt,
-                                temptable: ttid
+                                error: true,
+                                message: ret1.message
                             });
                             return;
                         } else {
-                            cb2100n0(null, {
-                                error: ret1.error,
-                                message: ret1.message,
-                                records: ret1.records,
-                                crtsql: crtsql,
-                                selstations: selstations,
-                                sqlStmt: sqlStmt,
-                                temptable: ttid
-                            });
-                            return;
+                            if (ret1.records !== "undefined" && ret1.records !== null) {
+                                cb2100n0(null, {
+                                    error: ret1.error,
+                                    message: ret1.message,
+                                    records: ret1.records,
+                                    /* crtsql: crtsql, */
+                                    selstations: selstations,
+                                    sqlStmt: sqlStmt
+                                });
+                                return;
+                            } else {
+                                sysbase.putMessage("Error:" + ret1.message, 3);
+                                cb2100n0("Error", {
+                                    error: true,
+                                    message: ret1.message
+                                });
+                                return;
+                            }
                         }
-                    }).fail(function (err) {
-                        //$("#kli1400raw_rightwdata").empty();
-                        //document.getElementById("kli1400raw").style.cursor = "default";
-                        sysbase.putMessage("getmoredata:" + err, 3);
-                        cb2100n0("Error", {
-                            error: true,
-                            message: err.message || err
-                        });
-                        return;
-                    }).always(function () {
-                        // nope
                     });
-
                 },
                 function (ret1, cb2100n5) {
                     /**
@@ -1295,12 +881,24 @@
                          * mit Kontrollobjekten "jede Anwendung schützt sich selbst"
                          * Achtung: hier kann years  leer sein, genauso anzyears, fromyear, toyear und variable
                          * variable ist der kritische Punkt!!!
+                         * Achtung: process on TMIN und skip on TMAX - genauer
+                         * TMAX in Puffer tmaxrow
+                         * TMIN in die Verarbeitung schicken!!!
                          */
                         klirow = newklirow;
+                        // hier sind Work-Variablen neu zu initialisieren!!!
+                        matrix1 = {}; // aktive Datenmatrix, wenn gefüllt
+                        histo1 = {}; // Histogramm insgesamt
+                        histosun = {}; // Histogramm Sommer insgesamt
+                        histowin = {}; // Histogramm Winter insgesamt
+                        hmatrixL = {};
+                        hoptionsL = {};
                         async.waterfall([
                                 function (cb2100n50) {
                                     /**
                                      * Laden KLIDATA aus Urdaten, wenn erforderlich
+                                     * jetzt: TMAX-Satz und TMIN-Satz differenzieren und bereitstellen in
+                                     * tmaxrow und tminrow!!! - scheint am einfachsten
                                      */
                                     var ret = {};
                                     ret.record = klirow;
@@ -1317,9 +915,9 @@
                                     if (typeof klirow.years === "object") {
                                         var jahre = Object.keys(klirow.years);
                                         if (jahre === null || jahre.length === 0) {
-                                            if (kla2100repconfig.autoload === true) {
+                                            if (kla2150repconfig.autoload === true) {
                                                 // hier nachladen!
-                                                kla2100rep.execmoredata(klirow.source, klirow.stationid, klirow.variable, function (ret1) {
+                                                kla2150rep.execmoredata(klirow.source, klirow.stationid, klirow.variable, function (ret1) {
                                                     klirow = ret1.record;
                                                     ret.record = ret1.record;
                                                     cb2100n50(null, ret);
@@ -1330,7 +928,7 @@
                                                 ret.error = true;
                                                 ret.message = "Keine Daten vorhanden, autoload nicht gesetzt";
                                                 // wenn HYDE gesetzt, dann geht es weiter
-                                                if (kla2100repconfig.pages2k === true) {
+                                                if (kla2150repconfig.pages2k === true) {
                                                     cb2100n50(null, ret);
                                                     return;
                                                 } else {
@@ -1356,7 +954,7 @@
                                      * Prüfen und Holen der HYDE-Daten
                                      * HYDE geht in Cache, weil mehrere Variablen den gleichen Bezug haben können
                                      */
-                                    if (kla2100repconfig.hyde === false) {
+                                    if (kla2150repconfig.hyde === false) {
                                         cb2100n51(null, ret);
                                         return;
                                     }
@@ -1381,7 +979,7 @@
                                             name: klirow.stationname,
                                             globals: false,
                                             selyears: "",
-                                            selvars: kla2100rep.selvars
+                                            selvars: kla2150rep.selvars
                                         }
                                     }).done(function (r1, textStatus, jqXHR) {
                                         sysbase.checkSessionLogin(r1);
@@ -1413,7 +1011,7 @@
                                      * Prüfen und Holen der PAGES2K-Daten
                                      * PAGES2K geht in Cache, weil mehrere Variablen den gleichen Bezug haben können
                                      */
-                                    if (kla2100repconfig.pages2k === false) {
+                                    if (kla2150repconfig.pages2k === false) {
                                         cb2100n51a(null, ret);
                                         return;
                                     }
@@ -1450,8 +1048,9 @@
                                         if (typeof klirow.years === "string") {
                                             klirow.years = JSON.parse(klirow.years);
                                         }
+                                        // Letzte Qualitätskontrolle und falsche Daten eliminieren
                                         // Auswertung "alles"
-                                        kla2100rep.showall(klirow, function (ret1) {
+                                        kla2150rep.showall(klirow, function (ret1) {
                                             cb2100n52("Finish", ret);
                                             return;
                                         });
@@ -1465,7 +1064,7 @@
                                 if (error !== null && error === "Error") {
                                     var htmlmsg = klirow.source + " " + klirow.stationid + " " + klirow.variable + " " + error + " " + result.message;
                                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                                    $("#kla2100repwrapper")
+                                    $("#kla2150repwrapper")
                                         .append($("<div/>", {
                                             id: divid,
                                             class: "doprintthis",
@@ -1505,7 +1104,7 @@
      * @param {*} cbexec
      * returns klirow - years, fromyear, toyear, anzyears gezielt!!!
      */
-    kla2100rep.execmoredata = function (newsource, newstationid, newvariable, cb2100p) {
+    kla2150rep.execmoredata = function (newsource, newstationid, newvariable, cb2100p) {
         selsource = newsource;
         selstationid = newstationid;
         selvariablename = newvariable;
@@ -1604,16 +1203,16 @@
     };
 
     /**
-     * kla2100rep.getBucketYear
+     * kla2150rep.getBucketYear
      * @param {*} klirow
      * @param {*} byear
      * returns bucketyear
      */
-    kla2100rep.getBucketYear = function (klirow, byear, bstep, method) {
+    kla2150rep.getBucketYear = function (klirow, byear, bstep, method) {
         var buck0 = parseInt(byear);
         var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
         // oder 1661 als Basisjahr und damit rechnen
-        var steps = parseInt(kla2100repconfig.step || 30);
+        var steps = parseInt(kla2150repconfig.step || 30);
         var buck2 = Math.floor(buck1 / steps);
         var buck3 = 1661 + (buck2) * steps;
         var buckyear = "" + buck3;
@@ -1624,33 +1223,33 @@
     };
 
     /**
-     * kla2100rep.getBuckets
+     * kla2150rep.getBuckets
      * @param {*} klirow - aktueller Datensatz
      * @param {*} bucketname - Name unter dem die buckets abelegt werden in klirow
      * @param {*} yearbase - Basisjahr, ab dem Buckets berechnet werden
      * @param {*} yearstep - Anzahl Jahre in einem Bucket
      * @param {*} labelmethod - fromto setzt from-to; middle setzt (from + to) / 2
-     * @param {*} endmethod - config setzt kla2100repconfig.fromyear und .toyear; data nimmt klirow.fromyear und toyear
+     * @param {*} endmethod - config setzt kla2150repconfig.fromyear und .toyear; data nimmt klirow.fromyear und toyear
      *                 toyear wird gerundet
      * return - klirow wird direkt fortgeschrieben, return false wenn Probleme aufgetaucht sind
      */
-    kla2100rep.getBuckets = function (klirow, bucketname, yearbase, yearstep, labelmethod, endmethod) {
+    kla2150rep.getBuckets = function (klirow, bucketname, yearbase, yearstep, labelmethod, endmethod) {
         klirow[bucketname] = {};
         klirow[bucketname].yearbase = parseInt(yearbase);
         klirow[bucketname].yearstep = parseInt(yearstep);
 
         if (endmethod === "config") {
-            klirow[bucketname].fromyear = parseInt(kla2100repconfig.fromyear);
-            klirow[bucketname].toyear = parseInt(kla2100repconfig.toyear);
-            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+            klirow[bucketname].fromyear = parseInt(kla2150repconfig.fromyear);
+            klirow[bucketname].toyear = parseInt(kla2150repconfig.toyear);
+            klirow[bucketname].yearstep = parseInt(kla2150repconfig.step);
         } else if (endmethod === "ipcc") {
             klirow[bucketname].fromyear = 1841;
             klirow[bucketname].toyear = 2020;
-            klirow[bucketname].yearstep = 30; //parseInt(kla2100repconfig.step);
+            klirow[bucketname].yearstep = 30; //parseInt(kla2150repconfig.step);
         } else {
             klirow[bucketname].fromyear = parseInt(klirow.fromyear);
             klirow[bucketname].toyear = parseInt(klirow.toyear);
-            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+            klirow[bucketname].yearstep = parseInt(kla2150repconfig.step);
 
         }
         if (isNaN(klirow[bucketname].yearstep) || klirow[bucketname].yearstep === 0) {
@@ -1768,33 +1367,33 @@
 
 
     /**
-     * kla2100rep.getHBuckets
+     * kla2150rep.getHBuckets
      * @param {*} klirow - aktueller Datensatz
      * @param {*} bucketname - Name unter dem die buckets abelegt werden in klirow
      * @param {*} yearbase - Basisjahr, ab dem Buckets berechnet werden
      * @param {*} yearstep - Anzahl Jahre in einem Bucket
      * @param {*} labelmethod - fromto setzt from-to; middle setzt (from + to) / 2
-     * @param {*} endmethod - config setzt kla2100repconfig.fromyear und .toyear; data nimmt klirow.fromyear und toyear
+     * @param {*} endmethod - config setzt kla2150repconfig.fromyear und .toyear; data nimmt klirow.fromyear und toyear
      *                 toyear wird gerundet
      * @param {*} histmethod -
      * return - klirow wird direkt fortgeschrieben, return false wenn Probleme aufgetaucht sind
      */
-    kla2100rep.getHBuckets = function (klirow, bucketname, yearbase, yearstep, labelmethod, endmethod, histmethod) {
+    kla2150rep.getHBuckets = function (klirow, bucketname, yearbase, yearstep, labelmethod, endmethod, histmethod) {
         klirow[bucketname] = {};
         klirow[bucketname].yearbase = parseInt(yearbase);
         klirow[bucketname].yearstep = parseInt(yearstep);
         if (endmethod === "config") {
-            klirow[bucketname].fromyear = parseInt(kla2100repconfig.fromyear);
-            klirow[bucketname].toyear = parseInt(kla2100repconfig.toyear);
-            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+            klirow[bucketname].fromyear = parseInt(kla2150repconfig.fromyear);
+            klirow[bucketname].toyear = parseInt(kla2150repconfig.toyear);
+            klirow[bucketname].yearstep = parseInt(kla2150repconfig.step);
         } else if (endmethod === "ipcc") {
             klirow[bucketname].fromyear = 1841;
             klirow[bucketname].toyear = 2020;
-            klirow[bucketname].yearstep = 30; // parseInt(kla2100repconfig.step);
+            klirow[bucketname].yearstep = 30; // parseInt(kla2150repconfig.step);
         } else {
             klirow[bucketname].fromyear = parseInt(klirow.fromyear);
             klirow[bucketname].toyear = parseInt(klirow.toyear);
-            klirow[bucketname].yearstep = parseInt(kla2100repconfig.step);
+            klirow[bucketname].yearstep = parseInt(kla2150repconfig.step);
         }
         if (isNaN(klirow[bucketname].yearstep) || klirow[bucketname].yearstep === 0) {
             klirow[bucketname].yearstep = 30;
@@ -1908,12 +1507,12 @@
 
 
     /**
-     * kla2100rep.showall - Aufruf aller Funktionen für die Standardauswertung
+     * kla2150rep.showall - Aufruf aller Funktionen für die Standardauswertung
      * @param {*} ret
      */
-    kla2100rep.showall = function (klirow, cball) {
+    kla2150rep.showall = function (klirow, cball) {
         /**
-         * einbahnige Ausgabe nach kla2100repwrapper
+         * einbahnige Ausgabe nach kla2150repwrapper
          */
         var ret = {};
         hmatrixL = {};
@@ -1929,9 +1528,9 @@
         async.waterfall([
                 function (cb2100g0a) {
                     klirow.titel = klirow.variable + " " + klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")";
-                    if (kla2100repconfig.allin === true) {
+                    if (kla2150repconfig.allin === true) {
                         gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
-                        $("#kla2100repwrapper")
+                        $("#kla2150repwrapper")
                             .append($("<div/>", {
                                 class: "doprintthis page-break"
                             }))
@@ -1953,7 +1552,7 @@
                             );
                     } else {
                         gldivid = "div" + Math.floor(Math.random() * 100000) + 1;
-                        $("#kla2100repwrapper")
+                        $("#kla2150repwrapper")
                             .append($("<div/>", {
                                     id: gldivid,
                                     class: "doprintthis",
@@ -2042,12 +1641,12 @@
                     /**
                      * Stammdaten
                      */
-                    if (kla2100repconfig.master === false) {
+                    if (kla2150repconfig.master === false) {
                         cb2100g0a(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                             id: divid,
                             class: "doprintthis",
@@ -2115,18 +1714,18 @@
                     /**
                      * Worldmap
                      */
-                    if (kla2100repconfig.worldmap === false) {
+                    if (kla2150repconfig.worldmap === false) {
                         cb2100g01(null, ret);
                         return;
                     }
                     var divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                             id: divid1,
                             class: "doprintthis",
                             css: {
                                 float: "left",
-                                width: $("#kla2100rep").width() * .4,
+                                width: $("#kla2150rep").width() * .4,
                                 clear: "both",
                                 overflow: "auto"
                             }
@@ -2135,7 +1734,7 @@
                         .append($("<div/>", {
                                 class: "mapcontainer",
                                 css: {
-                                    width: $("#kla2100rep").width() * .4
+                                    width: $("#kla2150rep").width() * .4
                                 }
                             })
                             .append($("<div/>", {
@@ -2154,7 +1753,7 @@
                         latitude: klirow.latitude
                     }];
 
-                    var worldmaplinks = kla2100rep.getClimatezonelinks();
+                    var worldmaplinks = kla2150rep.getClimatezonelinks();
 
                     var worldmap = {
                         map: {
@@ -2214,22 +1813,22 @@
                      * leaflet
                      */
 
-                    if (kla2100repconfig.leaflet === false) {
+                    if (kla2150repconfig.leaflet === false) {
                         cb2100g02(null, ret);
                         return;
                     }
                     var divid1 = "D" + Math.floor(Math.random() * 100000) + 1;
-                    var hh = $("#kla2100rep").height() * .5;
+                    var hh = $("#kla2150rep").height() * .5;
                     // angleichen an worldmap, wenn diese vorhanden ist
-                    if ($("#kla2100rep").find(".mapcontainer").height() > 0) {
-                        hh = $("#kla2100rep").find(".mapcontainer").height();
-                        $("#kla2100rep").find(".mapcontainer").parent().css({
+                    if ($("#kla2150rep").find(".mapcontainer").height() > 0) {
+                        hh = $("#kla2150rep").find(".mapcontainer").height();
+                        $("#kla2150rep").find(".mapcontainer").parent().css({
                             "margin-right": "20px"
                         });
                     }
-                    var ww = $("#kla2100rep").width() * .5;
+                    var ww = $("#kla2150rep").width() * .5;
 
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                             id: divid1,
                             class: "doprintthis",
@@ -2269,12 +1868,12 @@
                     /**
                      * Datenqualität missing/bad data
                      */
-                    if (kla2100repconfig.qonly === false) {
+                    if (kla2150repconfig.qonly === false) {
                         cb2100g0(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                             id: divid,
                             class: "doprintthis",
@@ -2363,11 +1962,11 @@
                      * Verlauf Graphik und Tabelle
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    if (kla2100repconfig.tempchart === false) {
+                    if (kla2150repconfig.tempchart === false) {
                         cb2100g7(null, ret);
                         return;
                     }
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                                 css: {
                                     width: "100%",
@@ -2392,7 +1991,7 @@
                         hyde: true
                     };
                     hoptionsL.minmaxhistogram = true;
-                    kla2100rep.klitemp2("#" + divid + "L", "Verlauf ", klirow, function (ret) {
+                    kla2150rep.klitemp2("#" + divid + "L", "Verlauf ", klirow, function (ret) {
                         cb2100g7(null, ret);
                         return;
                     });
@@ -2406,8 +2005,8 @@
                      * Heatmap-1
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    if (kla2100repconfig.heatmaps === true || kla2100repconfig.heatmapsx === true) {
-                        $("#kla2100repwrapper")
+                    if (kla2150repconfig.heatmaps === true || kla2150repconfig.heatmapsx === true) {
+                        $("#kla2150repwrapper")
                             .append($("<div/>", {
                                     class: "",
                                     css: {
@@ -2431,7 +2030,7 @@
                                         css: {
                                             "text-align": "center",
                                             float: "left",
-                                            width: "49%"
+                                            width: "100%"
                                         }
                                     })
                                     .append($("<div/>", {
@@ -2448,9 +2047,9 @@
                         cbuckets: false,
                         hyde: true
                     };
-                    kla2100rep.kliheatmap2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
+                    kla2150rep.kliheatmap2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                         ret.divid = divid;
-                        if (kla2100repconfig.heatmaps === true) {
+                        if (kla2150repconfig.heatmaps === true) {
                             var nkorr = $("#" + divid + "L").find("canvas").height();
                             $("#" + divid + "L").css({
                                 "max-height": nkorr + 10,
@@ -2467,9 +2066,15 @@
                     /**
                      * Heatmap-3
                      */
-                    if (kla2100repconfig.heatmaps === true) {
+                    /*
+                    if (1 === 1) {
+                        cb2100g3(null, ret);
+                        return;
+                    }
+                    */
+                    if (kla2150repconfig.heatmaps === true) {
                         var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                        $("#kla2100repwrapper")
+                        $("#kla2150repwrapper")
                             .append($("<div/>", {
                                     css: {
                                         width: "100%",
@@ -2481,7 +2086,7 @@
                                         css: {
                                             "text-align": "center",
                                             float: "left",
-                                            width: "49%"
+                                            width: "100%"
                                         }
                                     })
                                     .append($("<div/>", {
@@ -2493,7 +2098,7 @@
                                         css: {
                                             "text-align": "center",
                                             float: "left",
-                                            width: "49%"
+                                            width: "100%"
                                         }
                                     })
                                     .append($("<div/>", {
@@ -2508,9 +2113,9 @@
                             cbuckets: true,
                             hyde: true
                         };
-                        kla2100rep.kliheatmap2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
+                        kla2150rep.kliheatmap2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, starecord, hmoptions, function (ret) {
                             ret.divid = divid;
-                            if (kla2100repconfig.heatmaps === true) {
+                            if (kla2150repconfig.heatmaps === true) {
                                 var nkorr = $("#" + divid + "L").find("canvas").height();
                                 $("#" + divid + "L").css({
                                     "max-height": nkorr + 10,
@@ -2533,19 +2138,19 @@
                     /**
                      * Heat-Distribution mit ChartJS WLVL
                      */
-                    if (kla2100repconfig.tempdistribution === false) {
+                    if (kla2150repconfig.tempdistribution === false) {
                         cb2100g5a(null, ret);
                         return;
                     }
                     /**
                      * Berechnen aller Werte für die Histogramm-Ausgabeoptimierung
                      */
-                    kla2100rep.getHBuckets(klirow, "HISTOGRAMM", klirow.fromyear, 30, "fromto", "config");
+                    kla2150rep.getHBuckets(klirow, "HISTOGRAMM", klirow.fromyear, 30, "fromto", "config");
                     var distrs = {};
                     var maxy = 0;
 
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                                 css: {
                                     width: "100%",
@@ -2572,7 +2177,7 @@
 
                         );
                     ret.distrs = distrs;
-                    kla2100rep.klidistr2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, ret, function (ret1) {
+                    kla2150rep.klidistr2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, ret, function (ret1) {
                         ret.divid = divid;
                         ret.distrs = distrs;
                         cb2100g5a(null, ret);
@@ -2587,7 +2192,7 @@
                      */
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
                     // hier wird eine Struktur links und rechts bereitgestellt, noch ohne Inhalt
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                                 css: {
                                     width: "100%",
@@ -2599,7 +2204,7 @@
                                     css: {
                                         "text-align": "center",
                                         float: "left",
-                                        width: "49%"
+                                        width: "100%"
                                     }
                                 })
                                 .append($("<div/>", {
@@ -2615,7 +2220,7 @@
                         hyde: true
                     };
                     hoptionsL.minmaxhistogram = true;
-                    kla2100rep.klihisto2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
+                    kla2150rep.klihisto2("#" + divid + "L", klirow, selvariablename, selsource, selstationid, starecord, hmatrixL, hoptionsL, function (ret) {
                         ret.divid = divid;
                         cb2100g5(null, ret);
                         return;
@@ -2623,12 +2228,12 @@
                 },
 
                 function (ret, cb2100g9) {
-                    if (kla2100repconfig.hyde === false) {
+                    if (kla2150repconfig.hyde === false) {
                         cb2100g9(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                             id: divid,
                             css: {
@@ -2638,19 +2243,19 @@
                             }
                         }));
                     var hmoptions = {};
-                    kla2100rep.klihyde2("#" + divid, selstationid, starecord, "hyde", function (ret) {
+                    kla2150rep.klihyde2("#" + divid, selstationid, starecord, "hyde", function (ret) {
                         cb2100g9(null, ret);
                         return;
                     });
                 },
 
                 function (ret, cb2100g91) {
-                    if (kla2100repconfig.pages2k === false) {
+                    if (kla2150repconfig.pages2k === false) {
                         cb2100g91(null, ret);
                         return;
                     }
                     var divid = "D" + Math.floor(Math.random() * 100000) + 1;
-                    $("#kla2100repwrapper")
+                    $("#kla2150repwrapper")
                         .append($("<div/>", {
                             id: divid,
                             css: {
@@ -2660,7 +2265,7 @@
                             }
                         }));
                     var hmoptions = {};
-                    kla2100rep.klipages2k2("#" + divid, selstationid, starecord, "pages2k", function (ret) {
+                    kla2150rep.klipages2k2("#" + divid, selstationid, starecord, "pages2k", function (ret) {
                         cb2100g91(null, ret);
                         return;
                     });
@@ -2679,7 +2284,7 @@
                         filter_ignoreCase: true
                     }
                 }); // so funktioniert es
-                $("#kla2100repwrapper")
+                $("#kla2150repwrapper")
                     .append($("<div/>", {
                             css: {
                                 width: "100%",
@@ -2703,6 +2308,39 @@
 
 
     /**
+     * selektive Sparklines auf Zeile
+     * kla2150repsplit
+     */
+    $(document).on("click", ".kla2150repsplit", function (evt) {
+
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        evt.stopPropagation();
+
+        var splstationid = $(this).closest("tr").attr("selstationid");
+        var splsource = $(this).closest("tr").attr("selsource");
+        var splvariable = $(this).closest("tr").attr("selvariable");
+        var splfromyear = $(this).closest("tr").attr("fromyear");
+        var spltoyear = $(this).closest("tr").attr("toyear");
+
+        var oldsparkid = $(this).closest("tr").find("span").attr("id");
+
+        window.parent.sysbase.setCache("regstation", JSON.stringify({
+            starecord: starecord,
+            klirecords: klirecords,
+            fromyear: splfromyear,
+            toyear: spltoyear,
+            selfromyear: splfromyear,
+            seltoyear: spltoyear
+        }));
+        var tourl = "klaheatmap.html" + "?" + "stationid=" + klirow.stationid + "&source=" + klirow.source + "&variablename=" + klirow.variable;
+        var tabname = klirecords[0].stationname;
+        var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1628reg", tourl);
+        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+    });
+
+
+    /**
      * kliheatmap2 - Heatmap berechnen und anzeigen
      * @param {*} cid
      * @param {*} selvariablename
@@ -2716,7 +2354,7 @@
      *              minval, maxval, sumval, countval werden berechnet und mit übergeben
      * @param {*} callbackh0
      */
-    kla2100rep.kliheatmap2 = function (cid, klirow, selvariablename, selsource, selstationid, starecord, hmoptions, callbackh0) {
+    kla2150rep.kliheatmap2 = function (cid, klirow, selvariablename, selsource, selstationid, starecord, hmoptions, callbackh0) {
 
         async.waterfall([
                 function (callbackshm2) {
@@ -2757,10 +2395,11 @@
                         mtitle += (klirow.stationname || "").length > 0 ? " " + klirow.stationname : "";
                         mtitle += (klirow.fromyear || "").length > 0 ? " von " + klirow.fromyear : "";
                         mtitle += (klirow.toyear || "").length > 0 ? " bis " + klirow.toyear : "";
-                        // klirow.fromyear = kla2100repconfig.fromyear;
-                        // klirow.toyear = kla2100repconfig.toyear;
+                        // klirow.fromyear = kla2150repconfig.fromyear;
+                        // klirow.toyear = kla2150repconfig.toyear;
                         mtitle += (klirow.fromyear || "").length > 0 ? " Filter von " + klirow.fromyear : "";
                         mtitle += (klirow.toyear || "").length > 0 ? " bis " + klirow.toyear : "";
+
                         // Aufruf Heatmap mit Container und Matrix
                         matrix1 = {
                             title: mtitle,
@@ -2776,7 +2415,7 @@
                         var numberhisto = new Array(10).fill(0);
                         for (var year in years) {
                             if (years.hasOwnProperty(year)) {
-                                if (parseInt(year) < kla2100repconfig.fromyear || parseInt(year) > kla2100repconfig.toyear) {
+                                if (parseInt(year) < kla2150repconfig.fromyear || parseInt(year) > kla2150repconfig.toyear) {
                                     continue;
                                 }
                                 matrix1.rowheaders.push(year);
@@ -2810,8 +2449,12 @@
                                                 } else if (hmoptions.maxval < hmval) {
                                                     hmoptions.maxval = hmval;
                                                 }
+                                                var hmval = 0;
                                                 if (hmoptions.minmaxhistogram === true) {
-                                                    hmvalstr = "" + Math.round(parseFloat(rowvalues[icol]));
+                                                    hmvalstr = "" + Math.ceil(parseFloat(rowvalues[icol]));
+                                                    hmval = Math.ceil(parseFloat(rowvalues[icol]));
+                                                    if (hmval > 50) hmvalstr = "50";
+                                                    if (hmval < -50) hmvalstr = "-50";
                                                     if (typeof histo1[hmvalstr] === "undefined") {
                                                         histo1[hmvalstr] = 0;
                                                     }
@@ -2824,7 +2467,7 @@
                                                     var buck0 = parseInt(year);
                                                     var buck1 = buck0 - 1661; // 65 * 30 = 1950 Rest 11
                                                     // oder 1661 als Basisjahr und damit rechnen
-                                                    var steps = parseInt(kla2100repconfig.step || 30);
+                                                    var steps = parseInt(kla2150repconfig.step || 30);
                                                     var buck2 = Math.floor(buck1 / steps);
                                                     var buck3 = 1661 + (buck2) * steps;
                                                     var buckyear = "" + buck3;
@@ -2836,7 +2479,9 @@
                                                             maxval: null,
                                                             valsum: 0,
                                                             valcount: 0,
-                                                            numberhisto: []
+                                                            numberhisto: [],
+                                                            histosun: {},
+                                                            histowin: {}
                                                         };
                                                         hmoptions.cbucketdata[buckyear].numberhisto = new Array(10).fill(0);
                                                     }
@@ -2863,6 +2508,30 @@
                                                         hmoptions.cbucketdata[buckyear].histo[hmvalstr] = 0;
                                                     }
                                                     hmoptions.cbucketdata[buckyear].histo[hmvalstr] += 1;
+
+                                                    // sun und win sommer und winter
+                                                    // true = Sommer, false = Winter
+                                                    if (uihelper.getSunWin(year, icol)) {
+                                                        if (typeof hmoptions.cbucketdata[buckyear].histosun[hmvalstr] === "undefined") {
+                                                            hmoptions.cbucketdata[buckyear].histosun[hmvalstr] = 0;
+                                                        }
+                                                        hmoptions.cbucketdata[buckyear].histosun[hmvalstr] += 1;
+
+                                                        if (typeof histosun[hmvalstr] === "undefined") {
+                                                            histosun[hmvalstr] = 0;
+                                                        }
+                                                        histosun[hmvalstr] += 1;
+                                                    } else {
+                                                        if (typeof hmoptions.cbucketdata[buckyear].histowin[hmvalstr] === "undefined") {
+                                                            hmoptions.cbucketdata[buckyear].histowin[hmvalstr] = 0;
+                                                        }
+                                                        hmoptions.cbucketdata[buckyear].histowin[hmvalstr] += 1;
+
+                                                        if (typeof histowin[hmvalstr] === "undefined") {
+                                                            histowin[hmvalstr] = 0;
+                                                        }
+                                                        histowin[hmvalstr] += 1;
+                                                    }
                                                 }
                                             } else {
                                                 matrix1.data[irow][icol] = null;
@@ -2878,8 +2547,10 @@
 
                         // hier ist das Layout nochmal zu kontrollieren
                         hmoptions.histo = histo1;
-                        if (kla2100repconfig.heatmaps === true && matrix1.data.length > 0) {
-                            var erg = kla9020fun.getHeatmap(cid, kla2100repconfig.heatmapsx, matrix1, hmoptions, function (ret) {
+                        hmoptions.histosun = histosun;
+                        hmoptions.histowin = histowin;
+                        if (kla2150repconfig.heatmaps === true && matrix1.data.length > 0) {
+                            var erg = kla9020fun.getHeatmap(cid, kla2150repconfig.heatmapsx, matrix1, 7, function (ret) {
                                 sysbase.putMessage("Heatmap ausgegeben", 1);
                                 callbackshm2(null, {
                                     error: false,
@@ -2889,6 +2560,8 @@
                                     hoptions: ret.hoptions,
                                     hcwrapperid: ret.hcwrapperid,
                                     histo: hmoptions.histo,
+                                    histosun: hmoptions.histosun,
+                                    histowin: hmoptions.histowin,
                                     temparray: ret.temparray
                                 });
                                 return;
@@ -2902,6 +2575,8 @@
                                 hoptions: ret.hoptions,
                                 hcwrapperid: ret.hcwrapperid,
                                 histo: hmoptions.histo,
+                                histosun: hmoptions.histosun,
+                                histowin: hmoptions.histowin,
                                 temparray: ret.temparray
                             });
                             return;
@@ -2917,9 +2592,38 @@
                         return;
                     }
                 },
+                function (hret, callbackshm3) {
+                    /**
+                     * Umrechnung der Matrix auf Differenzwerte und Ausgabe der Heatmap
+                     */
+                    var matrix2 = uihelper.cloneObject(hret.matrix);
+                    for (var irow = 0; irow < matrix2.data.length; irow++) {
+                        for (var icol = 0; icol < (matrix2.data[irow].length - 1); icol++) {
+                            var diff = parseFloat(matrix2.data[irow][icol + 1]) - parseFloat(matrix2.data[irow][icol]);
+                            matrix2.data[irow][icol] = diff.toFixed(1);
+                        }
+                        matrix2.data[irow][icol] = null;
+                    }
+                    var erg = kla9020fun.getHeatmap(cid, kla2150repconfig.heatmapsx, matrix2, 6, function (ret) {
+                        sysbase.putMessage("Heatmap ausgegeben", 1);
+                        callbackshm3(null, {
+                            error: false,
+                            message: "Heatmap ausgegeben",
+                            matrix: hret.matrix,
+                            options: hret.options,
+                            hoptions: hret.hoptions,
+                            hcwrapperid: hret.hcwrapperid,
+                            histo: hret.histo,
+                            histosun: hret.histosun,
+                            histowin: hret.histowin,
+                            temparray: hret.temparray
+                        });
+                        return;
+                    });
+                },
                 function (ret, callbackshm4) {
                     // hier muss die matrix1-Struktur übergeben werden
-                    // kla2100rep.paintT(selvariablename, selsource, selstationid, ret.matrix);
+                    // kla2150rep.paintT(selvariablename, selsource, selstationid, ret.matrix);
                     callbackshm4("Finish", ret);
                     return;
                 }
@@ -2931,7 +2635,7 @@
     };
 
 
-    kla2100rep.klihisto2 = function (cid, klirow, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb2100h) {
+    kla2150rep.klihisto2 = function (cid, klirow, selvariable, selsource, selstationid, starecord, hmatrix, hoptions, cb2100h) {
         var ret = {
             error: false,
             message: ""
@@ -2986,12 +2690,70 @@
                 sparkpoints.push([temparray[i].temp, temparray[i].count]);
 
             }
+            var sunsparkpoints = [];
+            if (Object.keys(histosun).length > 0) {
+                // Sommer-Sparkline
+                for (var ival = -50; ival <= 50; ival++) {
+                    if (typeof histosun[ival] === "undefined") {
+                        histosun[ival] = 0;
+                    }
+                }
+                var suntemparray = [];
+                var suntempvals = Object.keys(histosun);
+                for (var i = 0; i < suntempvals.length; i++) {
+                    suntemparray.push({
+                        temp: parseInt(suntempvals[i]),
+                        count: histosun[suntempvals[i]]
+                    });
+                }
+                suntemparray.sort(function (a, b) {
+                    if (parseInt(a.temp) < parseInt(b.temp))
+                        return -1;
+                    if (parseInt(a.temp) > parseInt(b.temp))
+                        return 1;
+                    return 0;
+                });
+                for (var i = 0; i < suntemparray.length; i++) {
+                    sunsparkpoints.push([suntemparray[i].temp, suntemparray[i].count]);
+                }
+            }
+
+            var winsparkpoints = [];
+            if (Object.keys(histowin).length > 0) {
+                // Winter-Sparkline
+                for (var ival = -50; ival <= 50; ival++) {
+                    if (typeof histowin[ival] === "undefined") {
+                        histowin[ival] = 0;
+                    }
+                }
+                var wintemparray = [];
+                var wintempvals = Object.keys(histowin);
+                for (var i = 0; i < wintempvals.length; i++) {
+                    wintemparray.push({
+                        temp: parseInt(wintempvals[i]),
+                        count: histowin[wintempvals[i]]
+                    });
+                }
+                wintemparray.sort(function (a, b) {
+                    if (parseInt(a.temp) < parseInt(b.temp))
+                        return -1;
+                    if (parseInt(a.temp) > parseInt(b.temp))
+                        return 1;
+                    return 0;
+                });
+                for (var i = 0; i < wintemparray.length; i++) {
+                    winsparkpoints.push([wintemparray[i].temp, wintemparray[i].count]);
+                }
+            }
+
+
+
             var tableid;
             var bigchart = {};
             if (hoptions.cbuckets === true && typeof hoptions.cbucketdata === "object" && Object.keys(hoptions.cbucketdata).length > 0) {
                 tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
 
-                if (kla2100repconfig.temptable === true) {
+                if (kla2150repconfig.temptable === true) {
                     $(cid)
                         .append($("<span/>", {
                                 text: "Histogramm " + varparms[selvariablename].header + "-Verteilung " + selvariable + " " + klirow.titel,
@@ -3039,24 +2801,20 @@
                                         html: "Histogramm"
                                     }))
                                     .append($("<th/>", {
-                                        width: "10%",
+                                        width: "8%",
                                         html: "Min"
                                     }))
                                     .append($("<th/>", {
-                                        width: "10%",
+                                        width: "8%",
                                         html: "Max"
                                     }))
                                     .append($("<th/>", {
-                                        width: "10%",
+                                        width: "8%",
                                         html: "Avg"
                                     }))
                                     .append($("<th/>", {
-                                        width: "10%",
-                                        html: "Kurtosis<br>Skewness"
-                                    }))
-                                    .append($("<th/>", {
-                                        width: "10%",
-                                        html: "Shapiro Wilk W/P"
+                                        width: "25%",
+                                        html: "Kurtosis/Skewness/Shapiro Wilk W/P"
                                     }))
                                 )
                             )
@@ -3071,7 +2829,7 @@
                  * sowie hmatrix.fromyear + "-" + hmatrix.toyear
                  */
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
-                if (kla2100repconfig.temptable === true) {
+                if (kla2150repconfig.temptable === true) {
                     $("#" + tableid + " tbody")
                         .append($("<tr/>")
                             .append($("<td/>", {
@@ -3102,21 +2860,56 @@
                                 align: "center",
                                 html: "&nbsp;"
                             }))
-                            .append($("<td/>", {
-                                align: "center",
-                                html: "&nbsp;<br>&nbsp;<br>&nbsp;<br>"
-                            }))
                         );
+
+                    maxcount = 0;
+
+                    sparkpoints.forEach(function (arrayItem) {
+                        if (parseInt(arrayItem[0]) > maxcount) maxcount = arrayItem[0];
+                    });
+                    sunsparkpoints.forEach(function (arrayItem) {
+                        if (parseInt(arrayItem[0]) > maxcount) maxcount = arrayItem[0];
+                    });
+                    winsparkpoints.forEach(function (arrayItem) {
+                        if (parseInt(arrayItem[0]) > maxcount) maxcount = arrayItem[0];
+                    });
                     $("#" + sparkid).sparkline(sparkpoints, {
                         type: 'line',
                         height: 60,
                         fillColor: "red",
                         defaultPixelsPerValue: 3,
-                        /* chartRangeMin: mincount,
-                        chartRangeMax: maxcount, */
+                        chartRangeMin: 0,
+                        chartRangeMax: maxcount,
                         lineColor: "red",
                         composite: false
                     });
+                    // Sommer
+                    if (sunsparkpoints.length > 0) {
+                        $("#" + sparkid).sparkline(sunsparkpoints, {
+                            type: 'line',
+                            height: 60,
+                            fillColor: false,
+                            defaultPixelsPerValue: 3,
+                            chartRangeMin: 0,
+                            chartRangeMax: maxcount,
+                            lineColor: "black",
+                            composite: true
+                        });
+                    }
+
+                    // Winter
+                    if (winsparkpoints.length > 0) {
+                        $("#" + sparkid).sparkline(winsparkpoints, {
+                            type: 'line',
+                            height: 60,
+                            fillColor: false,
+                            defaultPixelsPerValue: 3,
+                            chartRangeMin: 0,
+                            chartRangeMax: maxcount,
+                            lineColor: "blue",
+                            composite: true
+                        });
+                    }
                 }
             }
 
@@ -3167,29 +2960,100 @@
                 for (var i = 0; i < temparray.length; i++) {
                     sparkpoints.push(temparray[i].count);
                 }
-                // Kennziffern
+                var sunsparkpoints = [];
+                if (Object.keys(bucket.histosun).length > 0) {
+                    // Sommer-Sparkline
+                    for (var ival = -50; ival <= 50; ival++) {
+                        if (typeof bucket.histosun[ival] === "undefined") {
+                            bucket.histosun[ival] = 0;
+                        }
+                    }
+                    var suntemparray = [];
+                    var suntempvals = Object.keys(bucket.histosun);
+                    for (var i = 0; i < suntempvals.length; i++) {
+                        suntemparray.push({
+                            temp: parseInt(suntempvals[i]),
+                            count: bucket.histosun[suntempvals[i]]
+                        });
+                    }
+                    suntemparray.sort(function (a, b) {
+                        if (parseInt(a.temp) < parseInt(b.temp))
+                            return -1;
+                        if (parseInt(a.temp) > parseInt(b.temp))
+                            return 1;
+                        return 0;
+                    });
+                    for (var i = 0; i < suntemparray.length; i++) {
+                        sunsparkpoints.push([suntemparray[i].temp, suntemparray[i].count]);
+                    }
+                }
+
+                var winsparkpoints = [];
+                if (Object.keys(bucket.histowin).length > 0) {
+                    // Winter-Sparkline
+                    for (var ival = -50; ival <= 50; ival++) {
+                        if (typeof bucket.histowin[ival] === "undefined") {
+                            bucket.histowin[ival] = 0;
+                        }
+                    }
+                    var wintemparray = [];
+                    var wintempvals = Object.keys(bucket.histowin);
+                    for (var i = 0; i < wintempvals.length; i++) {
+                        wintemparray.push({
+                            temp: parseInt(wintempvals[i]),
+                            count: bucket.histowin[wintempvals[i]]
+                        });
+                    }
+                    wintemparray.sort(function (a, b) {
+                        if (parseInt(a.temp) < parseInt(b.temp))
+                            return -1;
+                        if (parseInt(a.temp) > parseInt(b.temp))
+                            return 1;
+                        return 0;
+                    });
+                    for (var i = 0; i < wintemparray.length; i++) {
+                        winsparkpoints.push([wintemparray[i].temp, wintemparray[i].count]);
+                    }
+                }
+
+                var disparms = kla2150rep.calcDistribution(sparkpoints);
+                var sunarray = [];
+                sunsparkpoints.forEach(function (arrayItem) {
+                    sunarray.push(arrayItem[1]);
+                });
+                var disparmss = kla2150rep.calcDistribution(sunarray);
+                var winarray = [];
+                winsparkpoints.forEach(function (arrayItem) {
+                    winarray.push(arrayItem[1]);
+                });
+                var disparmsw = kla2150rep.calcDistribution(winarray);
+                var distext = disparms.text;
+                distext += "<br>" + disparmss.text;
+                distext += "<br>" + disparmsw.text;
+                /*
                 var kur = ss.sampleKurtosis(sparkpoints);
                 var skew = ss.sampleSkewness(sparkpoints);
                 var calc1 = kur.toFixed(2) + "<br>" + skew.toFixed(2);
                 calc1 += "<br>" + (kur - skew ** 2).toFixed(2);
+                var w = new Vector(sparkpoints);
+                var wperg = new Normality.shapiroWilk(w);
+                var calc2 = "W: " + wperg.w.toFixed(4) + "<br>P: " + wperg.p.toFixed(4);
+                */
+                //var lm = new Regression.linear(l, w);
                 /*
                 calc1 += "<br>" + ss.standardDeviation(sparkpoints).toFixed(2);
                 calc1 += "<br>" + ss.sampleStandardDeviation(sparkpoints).toFixed(2);
                 calc1 += "<br>" + ss.medianAbsoluteDeviation(sparkpoints).toFixed(2);
                 */
-                var w = new Vector(sparkpoints);
-                var wperg = new Normality.shapiroWilk(w);
-                var calc2 = "W: " + wperg.w.toFixed(4) + "<br>P: " + wperg.p.toFixed(4);
-                //var lm = new Regression.linear(l, w);
 
 
                 // Ausgabe
                 var sparkid = "spark" + Math.floor(Math.random() * 100000) + 1;
 
-                if (kla2100repconfig.temptable === true) {
+                if (kla2150repconfig.temptable === true) {
                     $("#" + tableid + " tbody")
                         .append($("<tr/>", {
-                                class: "kla2100repsplit",
+                                class: "kla2150repsplit",
                                 fromyear: buckyears[ibuck],
                                 toyear: bucket.toyear,
                                 selvariable: selvariable,
@@ -3223,25 +3087,66 @@
                             }))
                             .append($("<td/>", {
                                 align: "center",
-                                html: calc1
-                            }))
-                            .append($("<td/>", {
-                                align: "center",
-                                html: calc2
+                                html: distext
                             }))
                         );
-                    $("#" + sparkid).sparkline(sparkpoints, {
-                        type: 'bar',
-                        height: 60,
-                        barColor: "red",
-                        negBarColor: "blue",
-                        barWidth: 3,
-                        barSpacing: 0,
-                        fillColor: false,
-                        /* chartRangeMin: mincount,
-                        chartRangeMax: maxcount, */
-                        defaultPixelsPerValue: 3
+
+
+                    maxcount = 0;
+                    sparkpoints.forEach(function (arrayItem) {
+                        if (parseInt(arrayItem) > maxcount) maxcount = arrayItem;
                     });
+                    sunsparkpoints.forEach(function (arrayItem) {
+                        if (parseInt(arrayItem[0]) > maxcount) maxcount = arrayItem[0];
+                    });
+                    winsparkpoints.forEach(function (arrayItem) {
+                        if (parseInt(arrayItem[0]) > maxcount) maxcount = arrayItem[0];
+                    });
+                    console.log(JSON.stringify(sparkpoints));
+                    console.log(JSON.stringify(sunsparkpoints));
+                    console.log(JSON.stringify(winsparkpoints));
+                    // Gesamt
+                    if (sunsparkpoints.length > 0) {
+                        $("#" + sparkid).sparkline(sparkpoints, {
+                            type: 'line',
+                            height: 60,
+                            fillColor: "pink",
+                            defaultPixelsPerValue: 3,
+                            chartRangeMin: 0,
+                            chartRangeMax: maxcount,
+                            lineColor: "pink",
+                            composite: false
+                        });
+                    }
+
+                    // Sommer
+                    if (sunsparkpoints.length > 0) {
+                        $("#" + sparkid).sparkline(sunsparkpoints, {
+                            type: 'line',
+                            height: 60,
+                            fillColor: false,
+                            defaultPixelsPerValue: 3,
+                            chartRangeMin: 0,
+                            chartRangeMax: maxcount,
+                            lineColor: "black",
+                            composite: true
+                        });
+                    }
+
+                    // Winter
+                    if (winsparkpoints.length > 0) {
+                        $("#" + sparkid).sparkline(winsparkpoints, {
+                            type: 'line',
+                            height: 60,
+                            fillColor: false,
+                            defaultPixelsPerValue: 3,
+                            chartRangeMin: 0,
+                            chartRangeMax: maxcount,
+                            lineColor: "blue",
+                            composite: true
+                        });
+                    }
+
                 }
             }
 
@@ -3250,7 +3155,7 @@
                 html: bucknumberprot
             }));
             */
-            if (kla2100repconfig.decimals === true) {
+            if (kla2150repconfig.decimals === true) {
                 var divid = "div" + Math.floor(Math.random() * 100000) + 1;
                 var chartid = divid + "c";
                 /* die tableid hat links oder rechts unterschieden, das muss bei cid nicht so sein?
@@ -3265,11 +3170,12 @@
                                 overflow: "hidden",
                                 "background-color": "white",
                                 margin: "10px",
-                                width: "90%"
+                                width: "50%"
                             }
                         })
                         .append($("<span/>", {
                             text: "Histogramm 1. Dezimalstelle " + klirow.titel,
+                            id: divid + "span",
                             class: "doprintthis eckh3"
                         }))
                         .append($("<canvas/>", {
@@ -3277,10 +3183,14 @@
                             class: "doprintthis",
                             selvariable: selvariable,
                             css: {
-                                "text-align": "center"
+                                "text-align": "center",
+                                height: "800px",
+                                width: "90%"
                             }
                         }))
                     );
+
+                kla2150rep.addBoxes(divid + "span");
 
                 var ctx = document.getElementById(chartid).getContext('2d');
                 //Chart.defaults.global.plugins.colorschemes.override = true;
@@ -3353,6 +3263,15 @@
                     });
                 }
 
+                // Annahme: 6 labels pro label-Zeile! kann auch 7 sein!
+                var anzlabels = config.data.datasets.length;
+                var newcanvasheight = 600;
+                if (anzlabels >= 12) {
+                    var canfact = Math.ceil(anzlabels / 6 - 2);
+                    newcanvasheight = newcanvasheight + canfact * 40;
+                }
+                $("#" + chartid).css("height", newcanvasheight + "px");
+
                 window.charts = window.charts || {};
                 window.charts[chartid] = new Chart(ctx, config);
                 /*
@@ -3378,13 +3297,61 @@
     };
 
 
+
     /**
-     * kla2100repsplit - Splitten Sommer/Winter Histogramm
+     * kla2150rep.calcDistribution - Berechnung von Kurtosis und Skewness
+     * für Verteilungen, Rückgabe Object mit verschiedenen Parametern
+     * bisher werden calc1 und calc2 vertikal ausgerichtet ausgegeben.
+     * @param {*} sparkpoints
+     */
+    kla2150rep.calcDistribution = function (csparkpoints) {
+        // var disparms = kla2150rep.calcDistribution(sparkpoints);
+        // Kennziffern
+        var resparms = {};
+        if (typeof csparkpoints === "undefined" || !Array.isArray(csparkpoints) || csparkpoints.length <= 4) {
+            resparms.skewness = "";
+            resparms.kurtosis = "";
+            resparms.WshapiroWilk = "";
+            resparms.PshapiroWilk = "";
+            resparms.text = "";
+            return resparms;
+        }
+        var resparms = {};
+        var kur = ss.sampleKurtosis(csparkpoints);
+        var skew = ss.sampleSkewness(csparkpoints);
+        var calc1 = kur.toFixed(2) + "<br>" + skew.toFixed(2);
+        calc1 += "<br>" + (kur - skew ** 2).toFixed(2);
+        resparms.kurtosis = kur.toFixed(2);
+        resparms.skewness = skew.toFixed(2);
+        resparms.kpi = (kur - skew ** 2).toFixed(2);
+
+        /*
+        calc1 += "<br>" + ss.standardDeviation(sparkpoints).toFixed(2);
+        calc1 += "<br>" + ss.sampleStandardDeviation(sparkpoints).toFixed(2);
+        calc1 += "<br>" + ss.medianAbsoluteDeviation(sparkpoints).toFixed(2);
+        */
+        var w = new Vector(csparkpoints);
+        var wperg = new Normality.shapiroWilk(w);
+        var calc2 = "W: " + wperg.w.toFixed(4) + "<br>P: " + wperg.p.toFixed(4);
+        resparms.WshapiroWilk = wperg.w.toFixed(4);
+        resparms.PshapiroWilk = wperg.p.toFixed(4);
+        //var lm = new Regression.linear(l, w);
+        resparms.text = "";
+        resparms.text += " K:" + resparms.kurtosis;
+        resparms.text += " S:" + resparms.skewness;
+        // resparms.text += " " +  resparms.kpi;
+        resparms.text += " W:" + resparms.WshapiroWilk;
+        //resparms.text += " P:" +  resparms.PshapiroWilk;
+        return resparms;
+    };
+
+    /**
+     * kla2150repsplit - Splitten Sommer/Winter Histogramm
      * in neue Zeilen der Zieltabelle
      * starecord hat source, stationid
      * klirow oder [1] mit variable
      */
-    $(document).on("click", ".kla2100repsplit", function (evt) {
+    $(document).on("click", ".kla2150repsplit1", function (evt) {
         evt.preventDefault();
         evt.stopImmediatePropagation();
         evt.stopPropagation();
@@ -3632,12 +3599,12 @@
     });
 
     /**
-     * kla2100rep.klidistr2 - tempdistribution
+     * kla2150rep.klidistr2 - tempdistribution
      * Separate Charts für Sommer und Winter für die Distribution
      * starecord hat source, stationid
      * klirow oder [1] mit variable
      */
-    kla2100rep.klidistr2 = function (cid, klirow, selvariable, selsource, selstationid, ret1, cb2100p) {
+    kla2150rep.klidistr2 = function (cid, klirow, selvariable, selsource, selstationid, ret1, cb2100p) {
         try {
             var divid = "div" + Math.floor(Math.random() * 100000) + 1;
             var chartidsun = divid + "sun";
@@ -3645,6 +3612,7 @@
             $(cid)
                 .append($("<div/>", {
                         id: divid,
+                        name: "Distribution" + klirow.titel.replace(/ /g, ""),
                         css: {
                             float: "left",
                             overflow: "hidden",
@@ -3654,135 +3622,11 @@
                         }
                     })
                     .append($("<span/>", {
-                            text: "Distribution " + " " + klirow.titel,
-                            class: "doprintthis eckh3"
-                        })
-                        .append($("<br>"))
-                        .append($("<span/>", {
-                                text: "reverseY",
-                                css: {
-                                    margin: "5px",
-                                    "background-color": "lightsteelblue"
-                                }
-                            })
-                            .append($("<input/>", {
-                                type: "checkbox",
-                                class: "kla2100repreverse",
-                                css: {
-                                    margin: "5px"
-                                }
-                            }))
-                        )
+                        id: divid + "span",
+                        text: "Distribution " + " " + klirow.titel,
+                        class: "doprintthis eckh3"
+                    }))
 
-                        .append($("<span/>", {
-                                text: "logY",
-                                css: {
-                                    margin: "5px",
-                                    "background-color": "lightsteelblue"
-                                }
-                            })
-                            .append($("<input/>", {
-                                type: "checkbox",
-                                /* checked: "checked", */
-                                class: "kla2100replogy",
-                                css: {
-                                    margin: "5px"
-                                }
-                            }))
-                        )
-
-                        .append($("<span/>", {
-                                text: "no x=0",
-                                css: {
-                                    margin: "5px",
-                                    "background-color": "lightsteelblue"
-                                }
-                            })
-                            .append($("<input/>", {
-                                type: "checkbox",
-                                class: "kla2100repnox0",
-                                /* checked: "checked", */
-                                css: {
-                                    margin: "5px"
-                                }
-                            }))
-                        )
-
-
-                        .append($("<span/>", {
-                                text: "X 0=null",
-                                title: "X Konvertieren 0 zu null",
-                                css: {
-                                    margin: "5px",
-                                    "background-color": "lightsteelblue"
-                                }
-                            })
-                            .append($("<input/>", {
-                                type: "checkbox",
-                                class: "kla2100repx0null",
-                                /* checked: "checked", */
-                                css: {
-                                    margin: "5px"
-                                }
-                            }))
-                        )
-
-                        .append($("<span/>", {
-                                text: "X/10",
-                                title: "x Aggregation auf 10-er Intervalle",
-                                css: {
-                                    margin: "5px",
-                                    "background-color": "lightsteelblue"
-                                }
-                            })
-                            .append($("<input/>", {
-                                type: "checkbox",
-                                class: "kla2100repx10",
-                                /* checked: "checked", */
-                                css: {
-                                    margin: "5px"
-                                }
-                            }))
-                        )
-
-                        .append($("<span/>", {
-                                text: "spanGaps",
-                                title: "Line unterbrechen, wenn kein signifikanter y-Wert vorhanden ist",
-                                css: {
-                                    margin: "5px",
-                                    "background-color": "lightsteelblue"
-                                }
-                            })
-                            .append($("<input/>", {
-                                type: "checkbox",
-                                class: "kla2100repspangaps",
-                                /* checked: "checked", */
-                                css: {
-                                    margin: "5px"
-                                },
-                            }))
-                        )
-
-                        .append($("<span/>", {
-                                text: "hide all",
-                                title: "Alle Datasets ausblenden",
-                                css: {
-                                    margin: "5px",
-                                    "background-color": "lightsteelblue"
-                                }
-                            })
-                            .append($("<input/>", {
-                                type: "checkbox",
-                                class: "kla2100rephideall",
-                                /* checked: "checked", */
-                                css: {
-                                    margin: "5px"
-                                }
-                            }))
-                        )
-
-
-                    )
                     .append($("<canvas/>", {
                         id: chartidsun,
                         class: "doprintthis",
@@ -3790,6 +3634,7 @@
                         css: {
                             "text-align": "center",
                             margin: "10px",
+                            height: "800px",
                             width: "90%"
                         }
                     }))
@@ -3803,6 +3648,9 @@
                         .append($("<br/>"))
                     )
                 );
+
+            kla2150rep.addBoxes(divid + "span");
+
             //Chart.defaults.global.plugins.colorschemes.override = true;
             //Chart.defaults.global.legend.display = true;
             // https://nagix.github.io/chartjs-plugin-colorschemes/colorchart.html
@@ -3881,7 +3729,18 @@
             }
             sunconfig.data.labels = larray;
             window.charts = window.charts || {};
+
+            // Annahme: 6 labels pro label-Zeile! kann auch 7 sein!
+            var anzlabels = sunconfig.data.datasets.length;
+            var newcanvasheight = 600;
+            if (anzlabels >= 12) {
+                var canfact = Math.ceil(anzlabels / 6 - 2);
+                newcanvasheight = newcanvasheight + canfact * 40;
+            }
+            $("#" + chartidsun).css("height", newcanvasheight + "px");
+
             window.charts[chartidsun] = new Chart(ctx1, sunconfig);
+
             cb2100p({
                 error: false,
                 message: "Distribution-Chart ausgegeben"
@@ -3916,8 +3775,167 @@
         */
     };
 
+    /**
+     * addboxes ergänzt Checkboxes in span-Container für die Gestaltung eines
+     * canvas mit chartJS-Graphik, holt die Daten dazu (divid + "span")
+     * @param {*} checkcontainer
+     */
+    kla2150rep.addBoxes = function (checkcontainer) {
+        var containerhash = checkcontainer;
+        if (!containerhash.startsWith("#")) {
+            containerhash = "#" + containerhash;
+        }
+        if ($(containerhash) === null) return;
+        // suchen canvas
+        var checkcanvas = $(containerhash).parent().find("canvas");
 
-    $(document).on("change", ".kla2100repreverse", function (evt) {
+        $(containerhash)
+            .append($("<br>"))
+            .append($("<span/>", {
+                    text: "reverseY",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    class: "kla2150repreverse",
+                    css: {
+                        margin: "5px"
+                    }
+                }))
+            )
+
+            .append($("<span/>", {
+                    text: "y=0 Line",
+                    title: "Wertereihe bei Y=0 ausgeben",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    class: "kla2150repybase0",
+                    css: {
+                        margin: "5px"
+                    }
+                }))
+            )
+
+            .append($("<span/>", {
+                    text: "logY",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    /* checked: "checked", */
+                    class: "kla2150replogy",
+                    css: {
+                        margin: "5px"
+                    }
+                }))
+            )
+
+            .append($("<span/>", {
+                    text: "no x=0",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    class: "kla2150repnox0",
+                    /* checked: "checked", */
+                    css: {
+                        margin: "5px"
+                    }
+                }))
+            )
+            .append($("<span/>", {
+                    text: "X 0=null",
+                    title: "X Konvertieren 0 zu null",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    class: "kla2150repx0null",
+                    /* checked: "checked", */
+                    css: {
+                        margin: "5px"
+                    }
+                }))
+            )
+
+            .append($("<span/>", {
+                    text: "X/10",
+                    title: "x Aggregation auf 10-er Intervalle",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    class: "kla2150repx10",
+                    /* checked: "checked", */
+                    css: {
+                        margin: "5px"
+                    }
+                }))
+            )
+
+            .append($("<span/>", {
+                    text: "spanGaps",
+                    title: "Line unterbrechen, wenn kein signifikanter y-Wert vorhanden ist",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    class: "kla2150repspangaps",
+                    /* checked: "checked", */
+                    css: {
+                        margin: "5px"
+                    },
+                }))
+            )
+
+            .append($("<span/>", {
+                    text: "hide all",
+                    title: "Alle Datasets ausblenden",
+                    css: {
+                        margin: "5px",
+                        "background-color": "lightsteelblue"
+                    }
+                })
+                .append($("<input/>", {
+                    type: "checkbox",
+                    class: "kla2150rephideall",
+                    /* checked: "checked", */
+                    css: {
+                        margin: "5px"
+                    }
+                }))
+            );
+
+
+
+
+    };
+
+
+    $(document).on("change", ".kla2150repreverse", function (evt) {
         evt.preventDefault();
         evt.stopImmediatePropagation();
         evt.stopPropagation();
@@ -3954,7 +3972,7 @@
         evt.stopPropagation();
     });
 
-    $(document).on("change", ".kla2100replogy", function (evt) {
+    $(document).on("change", ".kla2150replogy", function (evt) {
         // click: function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
@@ -3983,7 +4001,7 @@
     });
 
 
-    $(document).on("change", ".kla2100repybase0", function (evt) {
+    $(document).on("change", ".kla2150repybase0", function (evt) {
         // click: function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
@@ -4016,7 +4034,7 @@
 
 
 
-    $(document).on("change", ".kla2100repykelvin", function (evt) {
+    $(document).on("change", ".kla2150repykelvin", function (evt) {
         // click: function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
@@ -4055,7 +4073,7 @@
     });
 
 
-    $(document).on("change", ".kla2100repnox0", function (evt) {
+    $(document).on("change", ".kla2150repnox0", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
         if (typeof canvasid === "undefined" || canvasid === null) {
@@ -4097,7 +4115,7 @@
     });
 
 
-    $(document).on("change", ".kla2100rephideall", function (evt) {
+    $(document).on("change", ".kla2150rephideall", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
         if (typeof canvasid === "undefined" || canvasid === null) {
@@ -4137,7 +4155,7 @@
 
 
 
-    $(document).on("change", ".kla2100repsplitsw", function (evt) {
+    $(document).on("change", ".kla2150repsplitsw", function (evt) {
         /**
          * split auf Sommer und Winter - auf klirow bezogen wird dies berechnet
          * und übergeben
@@ -4207,7 +4225,7 @@
                         }));
 
                         klirow.years = summeryears;
-                        kla2100rep.klitemp2("#" + newcid, "Verlauf Sommer ", klirow, function (ret) {
+                        kla2150rep.klitemp2("#" + newcid, "Verlauf Sommer ", klirow, function (ret) {
                             cb2100s1(null, ret);
                             return;
                         });
@@ -4225,7 +4243,7 @@
                         }));
 
                         klirow.years = winteryears;
-                        kla2100rep.klitemp2("#" + newcid, "Verlauf Winter ", klirow, function (ret) {
+                        kla2150rep.klitemp2("#" + newcid, "Verlauf Winter ", klirow, function (ret) {
                             cb2100w1(null, ret);
                             return;
                         });
@@ -4241,7 +4259,7 @@
 
 
 
-    $(document).on("change", ".kla2100repx0null", function (evt) {
+    $(document).on("change", ".kla2150repx0null", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
         if (typeof canvasid === "undefined" || canvasid === null) {
@@ -4285,7 +4303,7 @@
         }
     });
 
-    $(document).on("change", ".kla2100repx10", function (evt) {
+    $(document).on("change", ".kla2150repx10", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
         if (typeof canvasid === "undefined" || canvasid === null) {
@@ -4332,7 +4350,7 @@
     });
 
 
-    $(document).on("change", ".kla2100repspangaps", function (evt) {
+    $(document).on("change", ".kla2150repspangaps", function (evt) {
         var state = $(this).prop("checked"); // neuer Status der Checkbox
         var canvasid = $(this).parent().find("canvas").attr("id");
         if (typeof canvasid === "undefined" || canvasid === null) {
@@ -4361,7 +4379,7 @@
     });
 
 
-    $(document).on("change", ".kla2100repxmiss", function (evt) {
+    $(document).on("change", ".kla2150repxmiss", function (evt) {
         /**
          * xmiss - Korrekturrechnung für missing values
          * für Histogramme akzeptabel
@@ -4426,16 +4444,16 @@
      *
      * @param {*} actionconfig - Konfiguration der checkboxen und der Actions-Icons in der Tabelle
      *                     es gibt intern ein Default-Objekt, das überschrieben wird
-     *  kla2100repreverse - reverseY - umkehren der y-Werte
-     *  kla2100replogy - logY - Toggle normale Werte und Log10-Werte, für einige Verteilungen sehr relevant
-     *  kla2100repnox0 - no x=0 - erste x-Spalte wird gesichert und gelöscht
-     *  kla2100repx0null - X 0=null - 0 wird nach "a" konvertiert, das ist kein missing value, sondern ein ignorierter Wert
-     *  kla2100repx10 - x/10 - x-Werte werden zu x/10-Intervallen verdichtet
-     *  kla2100repspangaps - spanGaps - Linie zeigen oder ausblenden
-     *  kla2100rephideall - hide all - alle Linien verstecken
+     *  kla2150repreverse - reverseY - umkehren der y-Werte
+     *  kla2150replogy - logY - Toggle normale Werte und Log10-Werte, für einige Verteilungen sehr relevant
+     *  kla2150repnox0 - no x=0 - erste x-Spalte wird gesichert und gelöscht
+     *  kla2150repx0null - X 0=null - 0 wird nach "a" konvertiert, das ist kein missing value, sondern ein ignorierter Wert
+     *  kla2150repx10 - x/10 - x-Werte werden zu x/10-Intervallen verdichtet
+     *  kla2150repspangaps - spanGaps - Linie zeigen oder ausblenden
+     *  kla2150rephideall - hide all - alle Linien verstecken
      *
      */
-    kla2100rep.putReportElement = function (cid, klirow, title, key, chartconfig, tableconfig, actionconfig) {
+    kla2150rep.putReportElement = function (cid, klirow, title, key, chartconfig, tableconfig, actionconfig) {
         try {
             /**
              * Default chartconfig
@@ -4502,66 +4520,66 @@
                 reverse: {
                     label: "ReverseY",
                     title: "Umkehr Y-Achse",
-                    class: "kla2100repreverse",
+                    class: "kla2150repreverse",
                     dft: true,
                     init: false
                 },
                 logy: {
                     label: "logY",
                     title: "Logarithmische Y-Achse",
-                    class: "kla2100replogy",
+                    class: "kla2150replogy",
                     dft: false,
                     init: false
                 },
                 ybase0: {
                     label: "Y=0 Line",
                     title: "Wertereihe bei Y=0 ausgeben",
-                    class: "kla2100repybase0",
+                    class: "kla2150repybase0",
                     dft: false,
                     init: false
                 },
                 ykelvin: {
                     label: "Y Kelvin",
                     title: "Wertereihe in Kelvin umrechnen",
-                    class: "kla2100repykelvin",
+                    class: "kla2150repykelvin",
                     dft: false,
                     init: false
                 },
                 nox0: {
                     label: "no x=0",
                     title: "erste Spalte sichern und löschen",
-                    class: "kla2100repnox0",
+                    class: "kla2150repnox0",
                     dft: false
                 },
                 x0null: {
                     label: "x 0=null",
                     title: "Wert 0 durch a ersetzen",
-                    class: "kla2100repx0null",
+                    class: "kla2150repx0null",
                     dft: false
                 },
                 x10: {
                     label: "x/10",
                     title: "Werte auf x/10 10-er Intervall addieren (Histogramme)",
-                    class: "kla2100repx10",
+                    class: "kla2150repx10",
                     dft: false
                 },
                 spangaps: {
                     label: "spanGaps",
                     title: "Punkte verbinden oder isolieren",
-                    class: "kla2100repspangaps",
+                    class: "kla2150repspangaps",
                     dft: false
                 },
                 hideall: {
                     label: "hide all",
                     title: "Alle Zeilen nicht anzeigen",
-                    class: "kla2100rephideall",
+                    class: "kla2150rephideall",
                     dft: true,
                     init: false
                 },
                 splitsw: {
                     label: "split s/w",
                     title: "Split Summer/Winter",
-                    class: "kla2100repsplitsw",
+                    class: "kla2150repsplitsw",
                     dft: false,
                     init: false
                 }
@@ -4732,14 +4750,14 @@
 
 
     /**
-     * kla2100rep.klitemp2 ChartJS mit min, max und avg sowie Tabelle dazu
+     * kla2150rep.klitemp2 ChartJS mit min, max und avg sowie Tabelle dazu
      * @param {*} cid
      * @param {*} title
      * @param {*} klirow
      * @param {*} cb2100k
      */
-    kla2100rep.klitemp2 = function (cid, title, klirow, cb2100k) {
-        // kla2100repconfig
+    kla2150rep.klitemp2 = function (cid, title, klirow, cb2100k) {
+        // kla2150repconfig
         try {
             var ret = {};
             var ciddiv = cid.substr(1) + "div";
@@ -4748,7 +4766,7 @@
             // cid + "grachart" ist das canvas
             var chartcanvas = cid + "grachart";
             // config, ipcc
-            kla2100rep.getBuckets(klirow, "VERLAUF", klirow.fromyear, 30, "fromto", "config");
+            kla2150rep.getBuckets(klirow, "VERLAUF", klirow.fromyear, 30, "fromto", "config");
             var mychartconfig = {};
             var mytableconfig = {
                 label: {
@@ -4794,24 +4812,24 @@
             };
             var myactionconfig = {
                 reverse: false,
-                /*  kla2100repreverse - reverseY - umkehren der y-Werte */
+                /*  kla2150repreverse - reverseY - umkehren der y-Werte */
                 logy: false,
-                /*  kla2100replogy - logY - Toggle normale Werte und Log10-Werte, für einige Verteilungen sehr relevant */
+                /*  kla2150replogy - logY - Toggle normale Werte und Log10-Werte, für einige Verteilungen sehr relevant */
                 ybase0: false,
                 ykelvin: false,
                 nox0: false,
-                /*  kla2100repnox0 - no x=0 - erste x-Spalte wird gesichert und gelöscht */
+                /*  kla2150repnox0 - no x=0 - erste x-Spalte wird gesichert und gelöscht */
                 x0null: false,
-                /*  kla2100repx0null - X 0=null - 0 wird nach "a" konvertiert, das ist kein missing value, sondern ein ignorierter Wert */
+                /*  kla2150repx0null - X 0=null - 0 wird nach "a" konvertiert, das ist kein missing value, sondern ein ignorierter Wert */
                 // x10: false,
-                /*  kla2100repx10 - x/10 - x-Werte werden zu x/10-Intervallen verdichtet */
+                /*  kla2150repx10 - x/10 - x-Werte werden zu x/10-Intervallen verdichtet */
                 // spangaps: false,
-                /*  kla2100repspangaps - spanGaps - Linie zeigen oder ausblenden */
+                /*  kla2150repspangaps - spanGaps - Linie zeigen oder ausblenden */
                 hideall: false,
                 /*  kla2 */
                 splitsw: false
             };
-            kla2100rep.putReportElement(cid, klirow, title, "VERLAUF", mychartconfig, mytableconfig, myactionconfig);
+            kla2150rep.putReportElement(cid, klirow, title, "VERLAUF", mychartconfig, mytableconfig, myactionconfig);
 
             var minvals = [];
             var maxvals = [];
@@ -4821,7 +4839,6 @@
             var avgregvals = [];
             var miny = null;
             var maxy = null;
-
             for (var ibucket = 0; ibucket < klirow.VERLAUF.data.length; ibucket++) {
                 if (klirow.VERLAUF.data[ibucket].min !== null) {
                     minvals.push(klirow.VERLAUF.data[ibucket].min.toFixed(1));
@@ -4829,7 +4846,7 @@
                     maxvals.push(klirow.VERLAUF.data[ibucket].max.toFixed(1));
                     // Umrechnung auf Kelvin  + 273.15, wieder entfernt
                     // ibucket wird ersetzt durch die Periodenmitte in relativen Jahren
-                    var relyear =  Math.floor((ibucket * klirow.VERLAUF.yearstep) +  klirow.VERLAUF.yearstep / 2);
+                    var relyear = Math.floor((ibucket * klirow.VERLAUF.yearstep) + klirow.VERLAUF.yearstep / 2);
                     minregvals.push([relyear, klirow.VERLAUF.data[ibucket].min]);
                     avgregvals.push([relyear, klirow.VERLAUF.data[ibucket].avg]);
                     maxregvals.push([relyear, klirow.VERLAUF.data[ibucket].max]);
@@ -4850,6 +4867,9 @@
             /**
              * Regressionsanalyse minvals, avgvals und maxvals als Array
              * https://tom-alexander.github.io/regression-js/
+             * Herausforderung: Werte von [0] bis [n] für vorhandene Jahre
+             * beim Ausgeben muss [0] wieder richtig gemapped werden!!!
+             * weil die Jahre nach Daten gefiltert werden
              */
 
             var minresult = regression.linear(minregvals, {
@@ -4861,10 +4881,11 @@
             var minr2 = Math.round(minresult.r2 * 100);
 
             var newminvals = [];
-            for (var idata = 0; idata < minregvals.length; idata++) {
-                var relyear =  Math.floor((idata * klirow.VERLAUF.yearstep) +  klirow.VERLAUF.yearstep / 2);
+            for (var ibucket = 0; ibucket < klirow.VERLAUF.data.length; ibucket++) {
+                var relyear = Math.floor((ibucket * klirow.VERLAUF.yearstep) + klirow.VERLAUF.yearstep / 2);
                 newminvals.push(minresult.predict(relyear)[1]);
             }
+
             graph.data.datasets.push({
                 label: "reg min",
                 data: newminvals,
@@ -4885,8 +4906,8 @@
             var avgr2 = Math.round(avgresult.r2 * 100);
 
             var newavgvals = [];
-            for (var idata = 0; idata < avgregvals.length; idata++) {
-                var relyear =  Math.floor((idata * klirow.VERLAUF.yearstep) +  klirow.VERLAUF.yearstep / 2);
+            for (var ibucket = 0; ibucket < klirow.VERLAUF.data.length; ibucket++) {
+                var relyear = Math.floor((ibucket * klirow.VERLAUF.yearstep) + klirow.VERLAUF.yearstep / 2);
                 newavgvals.push(avgresult.predict(relyear)[1]);
             }
             graph.data.datasets.push({
@@ -4911,8 +4932,8 @@
             var maxr2 = Math.round(maxresult.r2 * 100);
 
             var newmaxvals = [];
-            for (var idata = 0; idata < maxregvals.length; idata++) {
-                var relyear =  Math.floor((idata * klirow.VERLAUF.yearstep) +  klirow.VERLAUF.yearstep / 2);
+            for (var ibucket = 0; ibucket < klirow.VERLAUF.data.length; ibucket++) {
+                var relyear = Math.floor((ibucket * klirow.VERLAUF.yearstep) + klirow.VERLAUF.yearstep / 2);
                 newmaxvals.push(maxresult.predict(relyear)[1]);
             }
             graph.data.datasets.push({
@@ -5016,7 +5037,7 @@
 
 
     /**
-     * kla2100rep.klihyde2 - Ausgabe der HYDE-Daten
+     * kla2150rep.klihyde2 - Ausgabe der HYDE-Daten
      * Tabelle mit Spalten und Unterteilungen nach Variablen
      * Prüfen: Line-Chart je Variablen, 3 Linien L1, L2, L3 - in %-Egalisierung auf jeweiliges Maximum
      * oder height entsprechend erweitern
@@ -5031,7 +5052,7 @@
      * @param {*} open - hyde oder pages2k als Auswertungsdirektive
      * @param {*} cb2100j - Callback
      */
-    kla2100rep.klihyde2 = function (cid, selstationid, starecord, oper, cb2100j) {
+    kla2150rep.klihyde2 = function (cid, selstationid, starecord, oper, cb2100j) {
         // Transformation der Daten nach Variable, year, L1, L2, L3 in Struktur
         // Dasmit Tabelle mit Charts
         var hyderep = {}; // variable - year - level
@@ -5040,7 +5061,7 @@
         if (typeof klihyde.data === "string" && klihyde.data.length > 0) {
             klihyde.data = JSON.parse(klihyde.data);
         }
-        // kla2100repconfig.selvars
+        // kla2150repconfig.selvars
         for (var year in klihyde.data) {
             if (klihyde.data.hasOwnProperty(year)) {
                 var yeardata = klihyde.data[year];
@@ -5050,7 +5071,7 @@
                         for (var variablename in leveldata) {
                             if (leveldata.hasOwnProperty(variablename)) {
                                 if (oper === "hyde") {
-                                    if (kla2100repconfig.selvars.indexOf(variablename.replace("_", "")) >= 0) {
+                                    if (kla2150repconfig.selvars.indexOf(variablename.replace("_", "")) >= 0) {
                                         var wert = leveldata[variablename];
                                         // hier ist die finale Werteebene
                                         if (typeof hyderep[variablename] === "undefined") {
@@ -5330,7 +5351,7 @@
 
 
     /**
-     * kla2100rep.klipages2k2 - Ausgabe der PAGES2K-Daten
+     * kla2150rep.klipages2k2 - Ausgabe der PAGES2K-Daten
      * Tabelle mit Spalten und Unterteilungen nach Variablen
      * Prüfen: Line-Chart je Variablen, 1 Linie L1,  - in %-Egalisierung auf jeweiliges Maximum
      * oder height entsprechend erweitern
@@ -5345,7 +5366,7 @@
      * @param {*} open - hyde oder pages2k als Auswertungsdirektive
      * @param {*} cb2100j - Callback
      */
-    kla2100rep.klipages2k2 = function (cid, selstationid, starecord, oper, cb2100j) {
+    kla2150rep.klipages2k2 = function (cid, selstationid, starecord, oper, cb2100j) {
         // Transformation der Daten nach Variable, year, L1, L2, L3 in Struktur
         // Dasmit Tabelle mit Charts
         var hyderep = {}; // variable - year - level
@@ -5357,7 +5378,7 @@
         if (typeof klipages2k.metafields === "string" && klipages2k.metafields.length > 0) {
             klipages2k.metafields = JSON.parse(klipages2k.metafields);
         }
-        // kla2100repconfig.selvars
+        // kla2150repconfig.selvars
         for (var year in klipages2k.data) {
             if (klipages2k.data.hasOwnProperty(year)) {
                 var yeardata = klipages2k.data[year];
@@ -5621,7 +5642,7 @@
     /**
      * Einblendung Stopuhr wärend langer AJAX-Aufrufe
      */
-    kla2100rep.showclock = function (clockcontainer) {
+    kla2150rep.showclock = function (clockcontainer) {
         // Update the count down every 1 second
         if (typeof clockcontainer === "string") {
             if (!clockcontainer.startsWith("#")) clockcontainer = "#" + clockcontainer;
@@ -5661,7 +5682,7 @@
     /**
      * getClimatezonelinks - für worldmap-Einblendung
      */
-    kla2100rep.getClimatezonelinks = function () {
+    kla2150rep.getClimatezonelinks = function () {
         // 23,5 - 40 - 60
         var wl = {
             'link0': {
@@ -5802,6 +5823,414 @@
         return wl;
     };
 
+    /**
+     * kliprint - Ausdruck mit Konvertierung canvas
+     * @param {*} evt
+     */
+
+    kla2150rep.kliprint = function (evt) {
+        // sysbase.printDivAll($("#kla2150repwrapper").html());
+        // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
+        // $("div.")  // leaflet-spezialbehandlung
+        $('canvas').each(function (e) {
+            var image = new Image();
+            var that = this;
+            image.src = this.toDataURL("image/png");
+            var w = $(this).width();
+            var h = $(this).height();
+            $(image).width(w);
+            $(image).height(h);
+            // doprintthis, wenn die Klasse schon da war
+            if ($(this).hasClass("doprintthis")) {
+                $(image).addClass("doprintthis");
+            }
+            var parspan = $(this).parent();
+            if ($(parspan).prop("tagName") === "SPAN") {
+                $(parspan).css({
+                    width: w + "px",
+                    height: h + "px"
+                });
+            }
+            $(this).replaceWith(image);
+        });
+        evt.preventDefault();
+        // https://github.com/jasonday/printThis
+        $('.doprintthis').printThis({
+            canvas: true,
+            afterPrint: function () {
+                //var lsid = $("iframe").find("[name=printIframe]").attr("id");
+                var lsid = $('iframe[name="printIframe"]').attr('id');
+                var largestring = document.getElementById(lsid).contentWindow.document.body.innerHTML;
+                uihelper.downloadfile("station.html", largestring, function (ret) {
+                    console.log("Downloaded");
+                });
+            }
+        });
+
+    };
+
+
+    /**
+     * klihtml - Ausgabe als HTML-Anzeige, canvas und svg konvertiert zu images,
+     * alles untereinander statt nebeneinander
+     * @param {*} evt
+     */
+    kla2150rep.klihtml = function (evt) {
+        evt.preventDefault();
+        // evt.stopPropagation();
+        // evt.stopImmediatePropagation();
+        // https://georgebohnisch.com/dynamically-generate-replace-html5-canvas-elements-img-elements/
+        /**
+         * Konvertieren svg zu image
+         * http://bl.ocks.org/biovisualize/8187844
+         */
+        $("body").css("background-color", "");
+        $("#kla2150repdiv").css("background-color", "");
+        $("#kla2150repwrapper").css("background-color", "");
+
+
+        var tabtext = selstationid;
+        if (typeof selstationid === "undefined" || selstationid.length === 0) {
+            tabtext = "Sammel-HTML";
+        }
+        var tourl = "klaheatmap.html" + "?" + "stationid=" + selstationid + "&source=" + selsource + "&variablename=" + selvariablename;
+        var idc21 = window.parent.sysbase.tabcreateiframe(tabtext, "", "re-klima", "kla1990htm", tourl);
+        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click(); // das legt erst den iFrame an
+        setTimeout(function () {
+            var old2newids = {};
+            var actdiv = window.parent.$("#" + idc21);
+            var actiFrame = $(actdiv).find("iframe").get(0);
+            var actiFrameBody = $(actiFrame).contents();
+            /**
+             * Loop über alle doprintthis-Elemente
+             */
+            var aktwrapper = $(actiFrameBody).find(".kla1990htmwrapper");
+            var domarray = $('.doprintthis').toArray();
+            console.log("*** Start:" + domarray.length + " ***");
+            var dcount = 0;
+            async.eachSeries(domarray, function (printelement1, nextElement) {
+                // $('.doprintthis').each(function (index, printelement1) {
+                // hier ist printelement1 noch im alten Kontext
+                var found = false;
+                dcount++;
+                var dmsg = "" + dcount + ". ";
+                dmsg += "printelement1-tag:" + $(printelement1).prop("tagName");
+                dmsg += " -id:" + $(printelement1).attr("id");
+                console.log(dmsg);
+                // Container für den neuen Inhalt bereitstellen
+                var newcontainerid = "NCID" + Math.floor(Math.random() * 100000) + 1;
+                var newcontainerhash = "#" + newcontainerid;
+                $(aktwrapper)
+                    .append($("<div/>", {
+                        id: newcontainerid,
+                    }));
+                /*
+                $(aktwrapper).find(newcontainerhash)
+                    .append($("<span/>", {
+                        text: newcontainerid
+                    }));
+                */
+                /**
+                 * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                 * hier svg
+                 */
+                if ($(printelement1).is('svg')) {
+                    console.log(dcount + " svg-direkt");
+                    found = true;
+                    var svgString = new XMLSerializer().serializeToString(printelement1);
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    var DOMURL = self.URL || self.webkitURL || self;
+                    var svg = new Blob([svgString], {
+                        type: "image/svg+xml;charset=utf-8"
+                    });
+                    var url = DOMURL.createObjectURL(svg);
+                    var image = new Image();
+                    image.src = url;
+                    // noch weiter
+                    var image1 = document.createElement("img");
+                    var canvas1 = document.createElement("canvas");
+                    canvas1.width = image.width;
+                    canvas1.height = image.height;
+                    var ctx1 = canvas.getContext("2d");
+                    ctx1.drawImage(image, 0, 0);
+                    var base64 = canvas1.toDataURL("image/png");
+                    /*
+                    var w = $(printelement1).width();
+                    var h = $(printelement1).height();
+                    $(image).width(w);
+                    $(image).height(h);
+                    */
+                    $(aktwrapper).find(newcontainerhash)
+                        .empty();
+                    $(aktwrapper).find(newcontainerhash)
+                        .append(image);
+                    $(aktwrapper).find(newcontainerhash)
+                        .append($("<div/>", {
+                            html: "&nbsp;",
+                            css: {
+                                clear: "both"
+                            }
+                        }));
+                }
+                if (found === true) {
+                    nextElement();
+                    return;
+                }
+                /**
+                 * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                 * hier leaflet
+                 */
+                if ($(printelement1).hasClass("leaflet-container")) {
+                    console.log(dcount + " leaflet-direkt");
+                    var mydivid = $(printelement1).attr("id");
+                    window.mymaps = window.mymaps || {};
+                    var mymap = window.mymaps[mydivid];
+                    if (typeof window.mymaps[mydivid] !== "undefined") {
+                        found = true;
+                        leafletImage(mymap, function (err, canvas) {
+                            var img = document.createElement('img');
+                            img.src = canvas.toDataURL();
+                            var dimensions = mymap.getSize();
+                            $(img).width(dimensions.x);
+                            $(img).height(dimensions.y);
+                            $(aktwrapper).find(newcontainerhash).append(img);
+                            $(aktwrapper).find(newcontainerhash)
+                                .append($("<div/>", {
+                                    html: "&nbsp;",
+                                    css: {
+                                        clear: "both"
+                                    }
+                                }));
+                        });
+                    }
+                }
+                if (found === true) {
+                    nextElement();
+                    return;
+                }
+
+                /**
+                 * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                 * hier canvas
+                 */
+                if ($(printelement1).is("canvas")) {
+                    console.log(dcount + " canvas-direkt");
+                    found = true;
+                    console.log("CANVAS:" + $(printelement1).attr("id"));
+                    var img = document.createElement('img');
+                    img.src = printelement1.toDataURL(); // png "image/jpg"
+                    $(aktwrapper).find(newcontainerhash).append(img);
+                    $(aktwrapper).find(newcontainerhash)
+                        .append($("<div/>", {
+                            html: "&nbsp;",
+                            css: {
+                                clear: "both"
+                            }
+                        }));
+                }
+                if (found === true) {
+                    nextElement();
+                    return;
+                }
+                /**
+                 * hier wird es schwieriger, weil die Sonderelemente eingebettet sind
+                 * es muss also erst ein CLONE erzeugt werden und dann kann darin gearbeitet werden
+                 */
+                // Vorbereiten für untergeordnete Sonderfälle
+
+                $(printelement1).find('canvas').each(function (index, printcanvas) {
+                    if (typeof $(printcanvas).attr("id") === "undefined") {
+                        var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                        $(printcanvas).attr("id", newid);
+                    }
+                });
+                $(printelement1).find('svg').each(function (index, printsvg) {
+                    if (typeof $(printsvg).attr("id") === "undefined") {
+                        var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                        $(printsvg).attr("id", newid);
+                    }
+                });
+                $(printelement1).find('.leaflet-container').each(function (index, printleaf) {
+                    if (typeof $(printleaf).attr("id") === "undefined") {
+                        var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                        $(printleaf).attr("id", newid);
+                    }
+                });
+
+                var printelement = $(printelement1).clone(true, true);
+                console.log(dcount + " clone erzeugt");
+                /**
+                 * erst mal die id's austauschen, id' haben Nebeneffekte
+                 */
+                $(printelement).find("[id]").each(function () {
+                    var actid = this.id;
+                    if (typeof old2newids[actid] === "undefined") {
+                        old2newids[actid] = "NID" + Math.floor(Math.random() * 100000) + 1;
+                        this.id = old2newids[actid];
+                    } else {
+                        this.id = old2newids[actid];
+                    }
+                });
+                $(aktwrapper)
+                    .find(newcontainerhash)
+                    .append($("<div/>", {
+                        /* html: "&nbsp;", */ // $(printelement).prop("tagName") + "=>" + $(printelement).attr("id"),
+                        css: {
+                            height: "1px",
+                            width: "100%",
+                            "backgound-color": "red",
+                            clear: "both"
+                        }
+                    }));
+
+                // Löschen Suchzeilen in Tabellen
+                $(printelement).find("tr[role=search]").remove();
+
+                // HIER WIRD ES INTERESSANT - es müssen die Sonderfälle im Original gesucht werden
+                // und vom Original verarbeitet werden!!!
+
+                /**
+                 * Konvertieren canvas-Unterelemente zu image setview
+                 * im loop - in das jeweilige Parent einbetten
+                 */
+                $(printelement1).find('canvas').each(function (index, printcanvas) {
+                    // gesucht und gefunden im Original
+                    var img = document.createElement('img');
+                    img.src = printcanvas.toDataURL(); // png "image/jpg"
+                    // das Image kommt in den Clone!!!
+                    var oldid = $(printcanvas).attr("id");
+                    var newid = old2newids[oldid];
+                    $(printelement).find("#" + newid).replaceWith(img);
+                    console.log(dcount + " canvas iterativ");
+                });
+                var svgarray = $(printelement1).find('svg').toArray();
+                if (svgarray.length === 1) {
+                    var svgelement = svgarray[0];
+                    found === true;
+                    var svgString = new XMLSerializer().serializeToString(svgelement);
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    var DOMURL = self.URL || self.webkitURL || self;
+                    var svg = new Blob([svgString], {
+                        type: "image/svg+xml;charset=utf-8"
+                    });
+                    var url = DOMURL.createObjectURL(svg);
+                    var img = document.createElement("img"); // new Image();
+                    var w = $(svgelement).width();
+                    var h = $(svgelement).height();
+                    $(img).width(w);
+                    $(img).height(h);
+                    $(img).attr('crossorigin', 'anonymous');
+                    // img.src = url;
+                    /**
+                     * asynchrone Aufbereitung
+                     */
+                    blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
+                        // success
+                        var oldid = $(svgelement).attr("id");
+                        var newid = old2newids[oldid];
+                        img.src = dataURL;
+                        // hier wird es tricky, dediziert mapael-container abfangen und umgehen
+                        // $(printelement).find("#" + newid).replaceWith(img);
+                        $(printelement).empty();
+                        $(printelement)
+                            .append($(img));
+                        $(aktwrapper)
+                            .find(newcontainerhash)
+                            .append(printelement);
+                        $(aktwrapper)
+                            .find(newcontainerhash)
+                            .append($("<div/>", {
+                                html: "&nbsp;",
+                                css: {
+                                    clear: "both"
+                                }
+                            }));
+                        console.log(dcount + " *** svg iterativ=0, div-id:" + $(printelement).attr("id"));
+                        nextElement();
+                        return;
+                    }).catch(function (err) {
+                        // error
+                        console.log(dcount + " svg iterativ=0" + err.stack);
+                        nextElement();
+                        return;
+                    });
+                } else {
+                    async.eachSeries(svgarray, function (svgelement, nextSvg) {
+                            // $(printelement1).find('svg').each(function (index, svgelement) {
+                            found === true;
+                            var svgString = new XMLSerializer().serializeToString(svgelement);
+                            var canvas = document.createElement("canvas");
+                            var ctx = canvas.getContext("2d");
+                            var DOMURL = self.URL || self.webkitURL || self;
+                            var svg = new Blob([svgString], {
+                                type: "image/svg+xml;charset=utf-8"
+                            });
+                            var url = DOMURL.createObjectURL(svg);
+                            var img = document.createElement("img"); // new Image();
+                            var w = $(svgelement).width();
+                            var h = $(svgelement).height();
+                            $(img).width(w);
+                            $(img).height(h);
+                            $(img).attr('crossorigin', 'anonymous');
+                            img.src = url;
+                            /**
+                             * asynchrone Aufbereitung
+                             */
+                            blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
+                                // success
+                                var oldid = $(svgelement).attr("id");
+                                var newid = old2newids[oldid];
+                                img.src = dataURL;
+                                // hier wird es tricky, dediziert mapael-container abfangen und umgehen
+                                $(printelement).find("#" + newid).replaceWith(img);
+                                console.log(dcount + " svg iterativ (async)");
+                                nextSvg();
+                                return;
+                            }).catch(function (err) {
+                                // error
+                                console.log(dcount + " svg iterativ " + err.stack);
+                                nextSvg();
+                                return;
+                            });
+                        },
+                        function (error) {
+                            if (found === true) {
+                                console.log(dcount + " canvas iterativ-beendet");
+                                var msg = error;
+                                console.log(msg);
+                                nextElement();
+                                return;
+                            } else {
+                                console.log(dcount + " canvas iterativ-nichts gefunden");
+                                $(aktwrapper)
+                                    .find(newcontainerhash)
+                                    .append(printelement);
+                                $(aktwrapper)
+                                    .find(newcontainerhash)
+                                    .append($("<div/>", {
+                                        html: "&nbsp;",
+                                        css: {
+                                            clear: "both"
+                                        }
+                                    }));
+                                nextElement();
+                                return;
+                            }
+                        });
+                }
+            },
+            function(err) {
+                // Enderoutine, Rücksetzen der background-color
+                $("body").css("background-color", "lightsteelblue");
+                $("#kla2150repdiv").css("background-color", "lime");
+                $("#kla2150repwrapper").css("background-color", "lime");
+            });  // async.eachSeries
+        }, 2000);
+        if (1 === 1) return;
+        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+    };
 
 
     /**
@@ -5809,14 +6238,14 @@
      */
     if (typeof module === 'object' && module.exports) {
         // Node.js
-        module.exports = kla2100rep;
+        module.exports = kla2150rep;
     } else if (typeof define === 'function' && define.amd) {
         // AMD / RequireJS
         define([], function () {
-            return kla2100rep;
+            return kla2150rep;
         });
     } else {
         // included directly via <script> tag
-        root.kla2100rep = kla2100rep;
+        root.kla2150rep = kla2150rep;
     }
 }());

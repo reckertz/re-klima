@@ -44,6 +44,24 @@
         }
     ];
 
+    // Farbskala für Differenzen von Temperaturen
+    var tempint6 = [{
+            text: "blue-cyan",
+            vont: -50,
+            bist: 0,
+            voncolor: [0, 0, 1],
+            biscolor: [0, 1, 1]
+        },
+        {
+            text: "yellow-red",
+            vont: 0,
+            bist: 50,
+            voncolor: [1, 1, 0],
+            biscolor: [1, 0, 0]
+        }
+    ];
+
+
 
     var tempint7 = [{
             text: "black-blue",
@@ -130,6 +148,28 @@
             hccanvasid = hcontainerid;
         } else if (hctagname === "DIV") {
             hcwrapperid = hcontainerid;
+            // wenn schon ein canvas da ist, dann neues Div daneben setzen
+            if ($("#" + hcontainerid).find("canvas").length > 0) {
+                var newrnd = "x" + Math.floor(Math.random() * 100000) + 1;
+                $("#" + hcontainerid)
+                    .css("float", "left");
+                $("#" + hcontainerid)
+                    .parent()
+                    .append($("<div/>", {
+                        id: hcontainerid + newrnd,
+                        css: {
+                            float: "left",
+                            width: $("#" + hcontainerid).width(),
+                            height: $("#" + hcontainerid).height()
+                            /*
+                            maxHeight: $("#" + hcontainerid).maxHeight(),
+                            maxWidth: $("#" + hcontainerid).maxWidth()
+                            */
+                        }
+                    }));
+                hcwrapperid = hcontainerid + newrnd;
+            }
+
             hccanvasid = "hcan" + Math.floor(Math.random() * 100000) + 1;
             $("#" + hcwrapperid)
                 .append($("<canvas/>", {
@@ -333,6 +373,7 @@
             coptions.minmax = false;
         } else {
             coptions.minmax = coptions.minmax || false;
+            method = coptions.hmethod || 7;
         }
         method = parseInt(method) || 7;
         if (coptions.minmax === true) {
@@ -358,6 +399,9 @@
             }
         } else if (method === 5) {
             tempint = tempint5;
+        } else if (method === 6) {
+            tempint = tempint6;
+
         } else {
             tempint = tempint7;
         }

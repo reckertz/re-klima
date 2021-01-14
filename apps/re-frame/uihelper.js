@@ -1869,10 +1869,13 @@
      * Download einer HTML-Tabelle
      * @param {*} jQhtmltable entweder mit # als Verweis auf HTML-Table oder String als HTML-Table
      * oder jquery-Object
-     * @param {*} filename
+     * @param {*} filename - Dateinahme, unter dem der Download zurückgegeben wird
+     * @param {*} strip - spezielle Aufbreitung des HTML-Codes
+     * @param {*} visibleonly - nur Ausgabe von sichtbaren Zeilen, wenn strip = true
      */
-    uihelper.downloadHtmlTable = function (jQhtmltable, filename, strip) {
+    uihelper.downloadHtmlTable = function (jQhtmltable, filename, strip, visibleonly) {
         var dostrip = strip || false;
+        var dovisibleonly = visibleonly || false;
         var newtable;
         if (dostrip === true) {
             var trows = 0;
@@ -1890,6 +1893,10 @@
                 oldtableid = jQhtmltable;
             }
             // Iteration; verfeinern: visible rows und head-Row
+            var seltr = "tr";
+            if (dovisibleonly === true) {
+                seltr += ":visible";
+            }
             $(oldtableid).find("tr").each(function (trindex, trelem) {
                 console.log(trindex + ": " + $(this).text());
                 newrow = newtable.appendChild(document.createElement("tr"));
@@ -1906,11 +1913,8 @@
                     tdhtml = tdhtml.replace(/<\/?[^>]+(>|$)/g, "");
                     tdhtml = tdhtml.replace(/#br#/g, "<br>");
                     newtd.innerHTML = tdhtml;
-
                     newrow.appendChild(newtd);
                 });
-
-
                 /*
                 $(trelem).find("td").each(function (tdindex, tdelem) {
                     newrow.appendChild(document.createElement("td").setAttribute("text", tdelem.text));
@@ -2999,6 +3003,51 @@
         return isleapy;
     };
 
+
+    /**
+     * uihelper.getSunWin - holen Summer/Winter mit
+     * return true = Summer, false = winter
+     * aus
+     * @param {*} syear Jahr, 4-stellig,
+     * @param {*} sday  Tag, als Index zu 0, also laufender Tag im Jahr!!!
+     */
+    uihelper.getSunWin = function (syear, sday) {
+        var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (typeof syear !== "undefined") {
+            if (uihelper.isleapyear(parseInt(syear))) {
+                mdtable[1] = 29;
+            } else {
+                mdtable[1] = 28;
+            }
+            /**
+             * Loop über die 12 Monate
+             * je Monat Zuweisung des "richtigen" Objekts sun oder win als work
+             */
+            var endmon = 0;
+            for (var imon = 0; imon < 12; imon++) {
+                endmon += mdtable[imon];
+                if (sday < endmon) {
+                    if (imon >= 0 && imon <= 2 || imon >= 9 && imon <= 11) {
+                        return false; //Winter
+                    } else {
+                        return true; // Sommer
+                    }
+                }
+            }
+            // hier nur falls nix gefunden
+            console.log("Sommer/Winter:" + syear + "-" + sday);
+            return false;
+        } else {
+            console.log("Sommer/Winter:" + syear + "-" + sday);
+            return true;
+        }
+    };
+
+
+
+
+
+
     /**
      *
      * calyear - kann number oder string sein
@@ -3122,14 +3171,14 @@
             }
         }
         if (ibad / iges * 100 >= 20 || qerr > 0) {
-           if (docheck === true) {
+            if (docheck === true) {
                 return {
                     error: true,
                     message: qmsg
                 };
-           } else {
+            } else {
                 return false;
-           }
+            }
         }
         if (istarter > 30 || iender > 30) {
             if (docheck === true) {
@@ -3137,18 +3186,18 @@
                     error: true,
                     message: qmsg
                 };
-           } else {
+            } else {
                 return false;
-           }
+            }
         }
         if (docheck === true) {
             return {
                 error: false,
                 message: "OK"
             };
-       } else {
+        } else {
             return true;
-       }
+        }
     };
 
     /**

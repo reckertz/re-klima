@@ -621,10 +621,12 @@
                             // alert(msg);
 
                             window.parent.sysbase.setCache("onestation", JSON.stringify({
+                                selstations: [],
                                 stationid: stationid,
                                 source: starecord.source,
                                 variablename: starecord.variablename,
-                                starecord: starecord
+                                starecord: starecord,
+                                stationsarray: stationarray
                             }));
                             /*
                             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
@@ -636,15 +638,40 @@
 
                             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" +
                                 source + "&variablename=" + selvariablename + "&starecord=" + JSON.stringify(starecord);
-                            var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima",
-                                "kla2100rep", tourl);
-                            window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
+                            // var idc20 = window.parent.sysbase.tabcreateiframe(stationname, "", "re-klima",
+                            //    "kla2150rep", tourl);
+                            // window.parent.$(".tablinks[idhash='#" + idc20 + "']").click();
 
 
                             var tourl = "klaheatmap.html" + "?" + "stationid=" + stationid + "&source=" + source + "&variablename=" + selvariablename;
                             var stationname = stationarray[stationid];
-                            var tabname = selvariablename + " " + stationname;
-                            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+
+                            var tabname = stationname;
+                            if (typeof stationname === "undefined") {
+                                if (typeof stationarray === "object" && Array.isArray(stationarray) && stationarray.length > 0) {
+                                    for (var ista = 0; ista < stationarray.length; ista++) {
+                                        if (stationarray[ista].stationid === stationid) {
+                                            tabname = stationarray[ista].sitename;
+                                            var dis1 = tabname.indexOf("<b>") + 3;
+                                            var dis2 = tabname.indexOf("</b>");
+                                            if (dis1 > 0 && dis2 > 0 && dis2 > dis1) {
+                                                tabname = tabname.substring(dis1, dis2);
+                                                sitename = tabname;
+                                            }
+                                            break;
+                                        }
+                                    }
+
+                                }
+                            } else if (typeof stationname === "object") {
+                                tabname = stationname.sitename;
+                                var dis1 = tabname.indexOf("<b>");
+                                var dis2 = tabname.indexOf("</b>");
+                                if (dis1 > 0 && dis2 > 0 && dis2 > dis1) {
+                                    tabname = tabname.substring(dis1, dis2);
+                                }
+                            }
+                            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
                             window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
 
 

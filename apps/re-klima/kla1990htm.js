@@ -7,11 +7,9 @@
         typeof global === 'object' && global.global === global && global ||
         this;
     /**
-     * kla1990htm  bekommt über getCache pivotdata oder yearlats(?)
-     * und erzeugt animierte Gifs mit der Option weiterer Zuordnungen
-     * nach latitude und
-     * nach temperatur, grundet auf Ganzzahlen
-     * mit Sekundärdaten aus HYDE
+     * rekursiver Zugriff auf die Struktur einer aufrufenden Seite
+     * zur Darstellung als downloadbare HTML-Seite
+     * Konvertierung svg und canvas zu image
      */
     var actprjname;
     var fullname;

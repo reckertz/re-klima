@@ -9173,3 +9173,2538 @@ GET-session:Climate-Expert
 GET-session:Climate-Expert
 GET-session:Climate-Expert
 GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+HYDE-Files gefunden:171
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\conv_rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\cropland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\grazing1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\pasture1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_irri1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rainfed1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":13.7330413912,"L2":54.46894248409999,"L3":70.09730858770001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popd_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\rurc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":13.7330413912,"L2":54.46894248409999,"L3":70.09730858770001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\uopp_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\urbc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\conv_rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\cropland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\grazing1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\pasture1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_irri1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rainfed1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":16.8132780472,"L2":53.61108413711,"L3":65.13949954955001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popd_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\rurc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":16.8132780472,"L2":53.61108413711,"L3":65.13949954955001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\uopp_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\urbc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\conv_rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\cropland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\grazing1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\pasture1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_irri1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rainfed1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":20.082501551,"L2":51.931238220640004,"L3":59.29052948638}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popd_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\rurc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":20.082501551,"L2":51.931238220640004,"L3":59.29052948638}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\uopp_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\urbc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\conv_rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":1.56224270181,"L2":9.16637584519,"L3":15.621164207949999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\cropland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":2.27490847716,"L2":9.315028601729999,"L3":7.33707571394}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\grazing1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":1.56224270181,"L2":9.16637584519,"L3":15.621164207949999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\pasture1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":2.27490847716,"L2":9.315028601729999,"L3":7.33707571394}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_irri1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rainfed1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":2.27490847716,"L2":9.315028601729999,"L3":7.33707571394}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":163.78482569,"L2":346.30513399089995,"L3":369.9355763747}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popd_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":2.36659334591,"L2":2.33242703569,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\rurc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":346.30513399089995,"L3":369.9355763747}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\uopp_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\urbc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":163.78482569,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\conv_rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":24.223222224070003,"L3":48.05446466473}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\cropland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.31334314436,"L2":45.951389810929996,"L3":44.13618610327}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\grazing1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":4.27636471065,"L2":32.13491904522,"L3":48.05446466473}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\pasture1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":4.27636471065,"L2":7.9116968211500005,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.31334314436,"L2":45.951389810929996,"L3":44.13618610327}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_irri1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rainfed1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.31334314436,"L2":45.951389810929996,"L3":44.13618610327}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":919.34943709,"L2":1601.6843707524,"L3":1594.8112884155}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popd_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":13.2840527272,"L2":21.391081269239997,"L3":22.177921055930003}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\rurc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":1601.6843707524,"L3":1594.8112884155}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\uopp_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\urbc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":919.34943709,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\conv_rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":16.7791513691,"L3":102.82418244966}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\cropland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":33.6862070986,"L2":184.4432219343,"L3":174.96991646297}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\grazing1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":15.5704041717,"L2":116.99910683479,"L3":176.25020637789}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\pasture1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":15.5704041717,"L2":100.21995546569,"L3":73.42602392823}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":33.6862070986,"L2":184.4432219343,"L3":174.96991646297}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_irri1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rainfed1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":33.6862070986,"L2":184.4432219343,"L3":174.96991646297}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":2764.27308644,"L2":3996.6462107239995,"L3":3697.006067631}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popd_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":39.9421024815,"L2":57.739842698139995,"L3":53.53550806279001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\rurc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":2774.922205234,"L3":3697.006067631}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\uopp_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":1.16092994197,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\urbc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":2764.27308644,"L2":1221.72400549,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\conv_rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":21.4427459353,"L3":131.5046238254}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\cropland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":39.4298894812,"L2":269.614940243,"L3":256.87096978531997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\grazing1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":19.9116017121,"L2":149.61292046609998,"L3":225.39969998696003}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":52.2923249948,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":42.6668528801,"L3":91.24385848829999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\pasture1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":19.9116017121,"L2":128.17017453079998,"L3":93.89507616156}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":39.4298894812,"L2":174.6557623681,"L3":165.62711129702}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_irri1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":94.9591778749,"L3":91.24385848829999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rainfed1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":39.4298894812,"L2":174.6557623681,"L3":165.62711129702}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":42.6668528801,"L3":91.24385848829999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":4232.10072766,"L2":5111.773571240999,"L3":4380.207367553}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popd_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":61.1513391371,"L2":73.84786331678,"L3":63.4286632321}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\rurc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":3426.862445581,"L3":4380.207367553}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\uopp_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":1.77286389232,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\urbc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":4232.10072766,"L2":1684.91112566,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\conv_rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":63.8132631675,"L3":179.36401215444997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\cropland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":33.8292056362,"L2":240.5408390843,"L3":228.22431617774}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\grazing1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.8319652987,"L2":201.6023694376,"L3":303.75050397664995}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":121.5002649667,"L3":83.110600762}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\pasture1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.8319652987,"L2":137.7891062701,"L3":124.38649182220001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":33.8292056362,"L2":119.04057411759999,"L3":145.11371541574}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_irri1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":121.5002649667,"L3":83.110600762}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rainfed1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":33.8292056362,"L2":119.04057411759999,"L3":145.11371541574}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":121.5002649667,"L3":83.110600762}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":4480.74692999,"L2":4549.167165649901,"L3":3602.007916695}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popd_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":64.7441289174,"L2":65.71797426061,"L3":52.15952908558}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\rurc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":2942.2249563299006,"L3":3602.007916695}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\uopp_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":1.95197917359,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\urbc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":4480.74692999,"L2":1606.94220932,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\conv_rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":26.0681155706,"L3":160.1174746596}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\cropland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":37.5773110371,"L2":293.8347429322,"L3":281.68896062749}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\grazing1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.2395946196,"L2":182.1160830009,"L3":274.41453999647}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":68.8031241178}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":149.3164940548,"L3":104.2697298924}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\pasture1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.2395946196,"L2":156.0479674303,"L3":114.29706533687002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":37.5773110371,"L2":144.51824887740003,"L3":108.60294864679}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_irri1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":149.3164940548,"L3":173.0728540102}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rainfed1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":37.5773110371,"L2":144.51824887740003,"L3":108.60294864679}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":149.3164940548,"L3":104.2697298924}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":6000.96837907,"L2":5150.223025185401,"L3":3760.1743555788994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popd_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":86.7104249436,"L2":74.39847080324,"L3":54.44953164742}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\rurc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":3211.5702946754004,"L3":3760.1743555788994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\uopp_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":2.78366254263,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\urbc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":6000.96837907,"L2":1938.65273051,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\conv_rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":27.6187544628,"L3":169.7308895154}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\cropland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":30.3221516145,"L2":246.451759424,"L3":237.02461759054}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\grazing2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":25.6933524529,"L2":193.03272206690002,"L3":290.88031173672}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":58.507132989599995}
+Falscher Dateityp, skipped:G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.zip
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":126.7623288496,"L3":88.82533602160001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\pasture2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":25.6933524529,"L2":165.4139676041,"L3":121.14942222132}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":30.3221516145,"L2":119.6894305744,"L3":89.69214857934003}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_irri2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":126.7623288496,"L3":147.3324690112}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rainfed2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":30.3221516145,"L2":119.6894305744,"L3":89.69214857934003}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":126.7623288496,"L3":88.82533602160001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":7944.16934814,"L2":6015.1335317329,"L3":4121.7605623452}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popd_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":114.788523533,"L2":86.89049074903,"L3":59.68513244961}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\rurc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":2013.3298184729001,"L3":4121.7605623452}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\uopp_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":3.93035497651,"L2":1.17199538954,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\urbc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":7944.16934814,"L2":4001.80371326,"L3":0}
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: no such column: STA326401.variable
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: no such column: STA538791.variable
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: no such column: STA110691.variable
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+HYDE-Files gefunden:171
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\conv_rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\cropland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\grazing1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.05507790765}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\pasture1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.05507790765}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_irri1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rainfed1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":16377.3890897,"L2":97171.612963,"L3":113761.31344475}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popd_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":302.813939237,"L2":1796.700272107,"L3":2106.971799994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\rurc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":20866.116624100003,"L3":77334.98514095}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\uopp_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":5.7361461568,"L2":26.72583994739,"L3":12.75824503906}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\urbc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":16377.3890897,"L2":76305.4963389,"L3":36426.3283038}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\conv_rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\cropland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\grazing1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.29488446329}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\pasture1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.29488446329}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_irri1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rainfed1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":23220.8000122,"L2":125559.0758474,"L3":140650.3808633}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popd_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":429.34694202,"L2":2321.5859574680003,"L3":2605.010006166}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\rurc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":25634.318570900003,"L3":93379.7821896}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\uopp_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":7.20502504801,"L2":31.004977378630002,"L3":14.66727448234}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\urbc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":23220.8000122,"L2":99924.75727650001,"L3":47270.5986737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\conv_rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\cropland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\grazing1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":13.43639328021}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\pasture1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":13.43639328021}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_irri1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rainfed1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":31912.9368447,"L2":157509.3345662,"L3":168832.1900532}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popd_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":590.062437036,"L2":2912.349452751,"L3":3127.002488364}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\rurc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":48586.216644700005,"L3":109358.823494}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\uopp_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":8.1565374205,"L2":27.83935216015,"L3":15.200629833099999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\urbc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":31912.9368447,"L2":108923.1179215,"L3":59473.366559199996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\conv_rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\cropland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\grazing1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.291721182060002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\pasture1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.291721182060002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_irri1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rainfed1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":49491.520741,"L2":223327.10205420002,"L3":229065.60734430002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popd_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":915.086175967,"L2":4129.326562629,"L3":4242.652397463}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\rurc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":65908.285154,"L3":170577.1123544}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\uopp_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.14805040876,"L2":29.097414076790002,"L3":10.811057985049999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\urbc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":49491.520741,"L2":157418.81690019998,"L3":58488.4949899}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\conv_rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\cropland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\grazing1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.16999114606}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\pasture1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.16999114606}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_irri1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rainfed1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":72047.3705602,"L2":297722.35642669996,"L3":292217.96658779995}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popd_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":1332.13835072,"L2":5504.906235766,"L3":5412.390698477}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\rurc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":51767.2087877,"L3":150661.7060274}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\uopp_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.3464040927,"L2":31.90673275983,"L3":18.36350171786}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\urbc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":72047.3705602,"L2":245955.14763899997,"L3":141556.2605604}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\conv_rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\cropland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\grazing1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":11.56346308755}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\pasture1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":11.56346308755}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_irri1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rainfed1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":114842.082628,"L2":435307.87655610003,"L3":408855.74303499993}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popd_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":2123.40216382,"L2":8048.885271394,"L3":7572.809410807001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\rurc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\uopp_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":12.8097246346,"L2":48.555145486280004,"L3":45.604619523560004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\urbc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":114842.082628,"L2":435307.87655610003,"L3":408855.74303499993}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\conv_rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\cropland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\grazing1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":15.510291036889999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\pasture1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":15.510291036889999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_irri1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rainfed1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":155751.699154,"L2":542446.0302207,"L3":487531.2065835}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popd_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":2879.81101905,"L2":10029.898105962,"L3":9030.131000924}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\rurc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\uopp_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":17.328695074,"L2":60.3517130332,"L3":54.24197401269001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\urbc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":155751.699154,"L2":542446.0302207,"L3":487531.2065835}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\conv_rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\cropland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\grazing1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.75085631694}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\pasture1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.75085631694}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_irri1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rainfed1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":229528.16812,"L2":735731.6623113999,"L3":632738.8849198001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popd_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":4243.91997855,"L2":13603.799880657,"L3":11719.817189020001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\rurc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\uopp_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.5567192064,"L2":85.12514750264998,"L3":73.20874398735}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\urbc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":229528.16812,"L2":735731.6623113999,"L3":632738.8849198001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\conv_rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\cropland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\grazing1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.14626744248}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\pasture1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.14626744248}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_irri1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rainfed1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":280659.747627,"L2":829389.7103436,"L3":682499.2519598}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popd_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":5189.33044204,"L2":15335.581545861003,"L3":12641.631257088}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\rurc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\uopp_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":34.5771381283,"L2":102.18039038083,"L3":84.08356063534}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\urbc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":280659.747627,"L2":829389.7103436,"L3":682499.2519598}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\conv_rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\cropland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\grazing2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":2.47826625737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+Falscher Dateityp, skipped:G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.zip
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\pasture2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":2.47826625737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_irri2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rainfed2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":320391.729442,"L2":890619.6089193001,"L3":708477.9614897}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popd_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":5923.96511801,"L2":16467.75853043,"L3":13122.928837498}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\rurc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\uopp_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":42.0996268634,"L2":117.02784362749,"L3":93.09434382577001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\urbc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":320391.729442,"L2":890619.6089193001,"L3":708477.9614897}
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+HYDE-Files gefunden:342
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\conv_rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\conv_rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\cropland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\cropland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\grazing1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.05507790765}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\grazing1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.05507790765}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\ir_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\pasture1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.05507790765}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\pasture1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.05507790765}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rangeland1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_norice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\rf_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_irri1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_irri1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rainfed1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rainfed1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":24.7583940336,"L2":220.8403767232,"L3":306.2811316370999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_lu\tot_rice1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":16377.3890897,"L2":97171.612963,"L3":113761.31344475}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":16377.3890897,"L2":97171.612963,"L3":113761.31344475}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popd_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":302.813939237,"L2":1796.700272107,"L3":2106.971799994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\popd_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":302.813939237,"L2":1796.700272107,"L3":2106.971799994}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\rurc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":20866.116624100003,"L3":77334.98514095}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\rurc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":20866.116624100003,"L3":77334.98514095}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\uopp_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":5.7361461568,"L2":26.72583994739,"L3":12.75824503906}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\uopp_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":5.7361461568,"L2":26.72583994739,"L3":12.75824503906}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\urbc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":16377.3890897,"L2":76305.4963389,"L3":36426.3283038}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1750AD_pop\urbc_1750AD.asc Started
+Finished:0
+Hydeerg:{"L1":16377.3890897,"L2":76305.4963389,"L3":36426.3283038}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\conv_rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\conv_rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\cropland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\cropland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\grazing1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.29488446329}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\grazing1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.29488446329}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\ir_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\pasture1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.29488446329}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\pasture1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":14.29488446329}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rangeland1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_norice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\rf_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_irri1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_irri1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rainfed1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rainfed1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":21.2321596809,"L2":199.8758420505,"L3":289.4909246554}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_lu\tot_rice1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":23220.8000122,"L2":125559.0758474,"L3":140650.3808633}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":23220.8000122,"L2":125559.0758474,"L3":140650.3808633}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popd_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":429.34694202,"L2":2321.5859574680003,"L3":2605.010006166}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\popd_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":429.34694202,"L2":2321.5859574680003,"L3":2605.010006166}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\rurc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":25634.318570900003,"L3":93379.7821896}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\rurc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":25634.318570900003,"L3":93379.7821896}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\uopp_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":7.20502504801,"L2":31.004977378630002,"L3":14.66727448234}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\uopp_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":7.20502504801,"L2":31.004977378630002,"L3":14.66727448234}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\urbc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":23220.8000122,"L2":99924.75727650001,"L3":47270.5986737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1780AD_pop\urbc_1780AD.asc Started
+Finished:0
+Hydeerg:{"L1":23220.8000122,"L2":99924.75727650001,"L3":47270.5986737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\conv_rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\conv_rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\cropland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\cropland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\grazing1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":13.43639328021}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\grazing1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":13.43639328021}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\ir_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\pasture1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":13.43639328021}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\pasture1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":13.43639328021}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rangeland1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_norice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\rf_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_irri1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_irri1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rainfed1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rainfed1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":181.6521227596,"L3":278.23304006840004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_lu\tot_rice1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":31912.9368447,"L2":157509.3345662,"L3":168832.1900532}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":31912.9368447,"L2":157509.3345662,"L3":168832.1900532}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popd_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":590.062437036,"L2":2912.349452751,"L3":3127.002488364}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\popd_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":590.062437036,"L2":2912.349452751,"L3":3127.002488364}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\rurc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":48586.216644700005,"L3":109358.823494}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\rurc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":48586.216644700005,"L3":109358.823494}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\uopp_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":8.1565374205,"L2":27.83935216015,"L3":15.200629833099999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\uopp_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":8.1565374205,"L2":27.83935216015,"L3":15.200629833099999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\urbc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":31912.9368447,"L2":108923.1179215,"L3":59473.366559199996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1810AD_pop\urbc_1810AD.asc Started
+Finished:0
+Hydeerg:{"L1":31912.9368447,"L2":108923.1179215,"L3":59473.366559199996}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\conv_rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\conv_rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\cropland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\cropland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\grazing1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.291721182060002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\grazing1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.291721182060002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\ir_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\pasture1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.291721182060002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\pasture1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.291721182060002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rangeland1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_norice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\rf_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_irri1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_irri1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rainfed1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rainfed1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":159.4681598252,"L3":255.3731333085}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_lu\tot_rice1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":49491.520741,"L2":223327.10205420002,"L3":229065.60734430002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":49491.520741,"L2":223327.10205420002,"L3":229065.60734430002}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popd_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":915.086175967,"L2":4129.326562629,"L3":4242.652397463}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\popd_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":915.086175967,"L2":4129.326562629,"L3":4242.652397463}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\rurc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":65908.285154,"L3":170577.1123544}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\rurc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":65908.285154,"L3":170577.1123544}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\uopp_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.14805040876,"L2":29.097414076790002,"L3":10.811057985049999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\uopp_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.14805040876,"L2":29.097414076790002,"L3":10.811057985049999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\urbc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":49491.520741,"L2":157418.81690019998,"L3":58488.4949899}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1840AD_pop\urbc_1840AD.asc Started
+Finished:0
+Hydeerg:{"L1":49491.520741,"L2":157418.81690019998,"L3":58488.4949899}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\conv_rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\conv_rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\cropland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\cropland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\grazing1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.16999114606}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\grazing1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.16999114606}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\ir_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\pasture1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.16999114606}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\pasture1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":12.16999114606}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rangeland1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_norice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\rf_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_irri1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_irri1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rainfed1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rainfed1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":141.6007418737,"L3":248.28577111259997}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_lu\tot_rice1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":72047.3705602,"L2":297722.35642669996,"L3":292217.96658779995}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":72047.3705602,"L2":297722.35642669996,"L3":292217.96658779995}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popd_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":1332.13835072,"L2":5504.906235766,"L3":5412.390698477}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\popd_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":1332.13835072,"L2":5504.906235766,"L3":5412.390698477}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\rurc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":51767.2087877,"L3":150661.7060274}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\rurc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":51767.2087877,"L3":150661.7060274}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\uopp_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.3464040927,"L2":31.90673275983,"L3":18.36350171786}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\uopp_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":9.3464040927,"L2":31.90673275983,"L3":18.36350171786}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\urbc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":72047.3705602,"L2":245955.14763899997,"L3":141556.2605604}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1870AD_pop\urbc_1870AD.asc Started
+Finished:0
+Hydeerg:{"L1":72047.3705602,"L2":245955.14763899997,"L3":141556.2605604}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\conv_rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\conv_rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\cropland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\cropland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\grazing1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":11.56346308755}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\grazing1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":11.56346308755}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\ir_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\pasture1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":11.56346308755}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\pasture1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":11.56346308755}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rangeland1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_norice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\rf_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_irri1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_irri1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rainfed1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rainfed1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":120.1775070323,"L3":228.5542715771}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_lu\tot_rice1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":114842.082628,"L2":435307.87655610003,"L3":408855.74303499993}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":114842.082628,"L2":435307.87655610003,"L3":408855.74303499993}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popd_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":2123.40216382,"L2":8048.885271394,"L3":7572.809410807001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\popd_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":2123.40216382,"L2":8048.885271394,"L3":7572.809410807001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\rurc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\rurc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\uopp_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":12.8097246346,"L2":48.555145486280004,"L3":45.604619523560004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\uopp_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":12.8097246346,"L2":48.555145486280004,"L3":45.604619523560004}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\urbc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":114842.082628,"L2":435307.87655610003,"L3":408855.74303499993}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1900AD_pop\urbc_1900AD.asc Started
+Finished:0
+Hydeerg:{"L1":114842.082628,"L2":435307.87655610003,"L3":408855.74303499993}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\conv_rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\conv_rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\cropland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\cropland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\grazing1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":15.510291036889999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\grazing1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":15.510291036889999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\ir_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\pasture1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":15.510291036889999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\pasture1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":15.510291036889999}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rangeland1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_norice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\rf_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_irri1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_irri1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rainfed1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rainfed1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":91.66171973082999,"L3":202.07083643017}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_lu\tot_rice1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":155751.699154,"L2":542446.0302207,"L3":487531.2065835}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":155751.699154,"L2":542446.0302207,"L3":487531.2065835}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popd_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":2879.81101905,"L2":10029.898105962,"L3":9030.131000924}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\popd_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":2879.81101905,"L2":10029.898105962,"L3":9030.131000924}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\rurc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\rurc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\uopp_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":17.328695074,"L2":60.3517130332,"L3":54.24197401269001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\uopp_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":17.328695074,"L2":60.3517130332,"L3":54.24197401269001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\urbc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":155751.699154,"L2":542446.0302207,"L3":487531.2065835}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1930AD_pop\urbc_1930AD.asc Started
+Finished:0
+Hydeerg:{"L1":155751.699154,"L2":542446.0302207,"L3":487531.2065835}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\conv_rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\conv_rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\cropland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\cropland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\grazing1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.75085631694}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\grazing1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.75085631694}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\ir_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\pasture1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.75085631694}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\pasture1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.75085631694}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rangeland1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_norice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\rf_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_irri1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_irri1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rainfed1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rainfed1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":59.540601404099995,"L3":150.14252783665998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_lu\tot_rice1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":229528.16812,"L2":735731.6623113999,"L3":632738.8849198001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":229528.16812,"L2":735731.6623113999,"L3":632738.8849198001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popd_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":4243.91997855,"L2":13603.799880657,"L3":11719.817189020001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\popd_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":4243.91997855,"L2":13603.799880657,"L3":11719.817189020001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\rurc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\rurc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\uopp_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.5567192064,"L2":85.12514750264998,"L3":73.20874398735}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\uopp_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":26.5567192064,"L2":85.12514750264998,"L3":73.20874398735}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\urbc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":229528.16812,"L2":735731.6623113999,"L3":632738.8849198001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1960AD_pop\urbc_1960AD.asc Started
+Finished:0
+Hydeerg:{"L1":229528.16812,"L2":735731.6623113999,"L3":632738.8849198001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\conv_rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\conv_rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\cropland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\cropland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\grazing1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.14626744248}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\grazing1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.14626744248}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\ir_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\pasture1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.14626744248}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\pasture1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":3.14626744248}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rangeland1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_norice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\rf_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_irri1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_irri1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rainfed1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rainfed1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":44.34112316412,"L3":120.05952944435998}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_lu\tot_rice1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":280659.747627,"L2":829389.7103436,"L3":682499.2519598}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":280659.747627,"L2":829389.7103436,"L3":682499.2519598}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popd_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":5189.33044204,"L2":15335.581545861003,"L3":12641.631257088}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\popd_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":5189.33044204,"L2":15335.581545861003,"L3":12641.631257088}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\rurc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\rurc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\uopp_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":34.5771381283,"L2":102.18039038083,"L3":84.08356063534}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\uopp_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":34.5771381283,"L2":102.18039038083,"L3":84.08356063534}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\urbc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":280659.747627,"L2":829389.7103436,"L3":682499.2519598}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\1990AD_pop\urbc_1990AD.asc Started
+Finished:0
+Hydeerg:{"L1":280659.747627,"L2":829389.7103436,"L3":682499.2519598}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\conv_rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\conv_rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\cropland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\cropland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\grazing2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":2.47826625737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\grazing2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":2.47826625737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+Falscher Dateityp, skipped:G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.zip
+Falscher Dateityp, skipped:G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_norice2017AD.zip
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\ir_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\pasture2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":2.47826625737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\pasture2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":2.47826625737}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rangeland2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_norice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\rf_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_irri2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_irri2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rainfed2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rainfed2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":34.30692269318,"L3":104.02709972182}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_lu\tot_rice2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":320391.729442,"L2":890619.6089193001,"L3":708477.9614897}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":320391.729442,"L2":890619.6089193001,"L3":708477.9614897}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popd_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":5923.96511801,"L2":16467.75853043,"L3":13122.928837498}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\popd_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":5923.96511801,"L2":16467.75853043,"L3":13122.928837498}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\rurc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\rurc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":0,"L2":0,"L3":0}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\uopp_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":42.0996268634,"L2":117.02784362749,"L3":93.09434382577001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\uopp_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":42.0996268634,"L2":117.02784362749,"L3":93.09434382577001}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\urbc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":320391.729442,"L2":890619.6089193001,"L3":708477.9614897}
+G:\Projekte\klimadaten\HYDE_lu_pop_proxy\baseline\asc\2017AD_pop\urbc_2017AD.asc Started
+Finished:0
+Hydeerg:{"L1":320391.729442,"L2":890619.6089193001,"L3":708477.9614897}
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GHCND GME00102244 TMAX 2020-01-01
+https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&datatypeid=TMAX&stationid=GHCND:GME00102244&startdate=2020-01-01&enddate=2021-12-31&offset=0&limit=1000
+statusCode-end: 400
+statusCode-callback: 400
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GHCND GME00102244 TMAX 2020-01-01
+https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&datatypeid=TMAX&stationid=GHCND:GME00102244&startdate=2020-01-01&enddate=2021-12-31&offset=0&limit=1000
+statusCode-end: 400
+statusCode-callback: 400
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: ambiguous column name: tsserverupd
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: near "GME00102244": syntax error
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+getallsqlrecords-2:Error: SQLITE_ERROR: ambiguous column name: tsserverupd
+GET-session:Climate-Expert
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GHCND GME00121042 TMAX 2020-01-01
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+temp_store = 2:null
+journal_mode = TRUNCATE:null
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GET-session:Climate-Expert
+GHCND GME00121042 TMAX 2020-01-01
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GHCND GME00125302 TMAX 2020-01-01
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+page_size:{"page_size":4096} null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+GET-session:Climate-Expert
+GHCND GME00125302 TMAX 2020-01-01
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+temp_store = 2:null
+page_size:{"page_size":4096} null
+GET-session:Climate-Expert
+GHCND GME00125302 TMAX 2020-01-01
+https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&datatypeid=TMAX&stationid=GHCND:GME00125302&startdate=2020-01-01&enddate=2020-12-31&offset=0&limit=1000
+*START*
+250
+7
+*EXIT*
+Example app listening on port 3001!
+Create Index KLISTATIONS:null
+Create Index KLIDATA:null
+Create Index KLIINVENTORY01:null
+index_list KLICONFIG:{"seq":0,"name":"indT401961_KLICONFIG","unique":0,"origin":"c","partial":0} null
+Fertig mit Indexerstellung
+index_info indT401961_KLICONFIG:[{"seqno":0,"cid":0,"name":"username"},{"seqno":1,"cid":1,"name":"configname"}] null
+synchronous = OFF:null
+journal_mode = TRUNCATE:null
+page_size:{"page_size":4096} null
+temp_store = 2:null
+GET-session:Climate-Expert
+GHCND GME00125302 TMAX 2020-01-01
+https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=GHCND&datatypeid=TMAX&stationid=GHCND:GME00125302&startdate=2020-01-01&enddate=2020-12-31&offset=0&limit=1000
+statusCode-end: 200
+{"metadata":{"resultset":{"offset":1,"count":305,"limit":1000}},"results":[{"date":"2020-01-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":39},{"date":"2020-01-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":57},{"date":"2020-01-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":107},{"date":"2020-01-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":74},{"date":"2020-01-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":77},{"date":"2020-01-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":76},{"date":"2020-01-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":95},{"date":"2020-01-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":114},{"date":"2020-01-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":133},{"date":"2020-01-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":109},{"date":"2020-01-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":76},{"date":"2020-01-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":83},{"date":"2020-01-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":95},{"date":"2020-01-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":126},{"date":"2020-01-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":141},{"date":"2020-01-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":126},{"date":"2020-01-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":106},{"date":"2020-01-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":74},{"date":"2020-01-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":61},{"date":"2020-01-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":62},{"date":"2020-01-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":57},{"date":"2020-01-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":21},{"date":"2020-01-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":36},{"date":"2020-01-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":18},{"date":"2020-01-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":38},{"date":"2020-01-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":102},{"date":"2020-01-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":97},{"date":"2020-01-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":79},{"date":"2020-01-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":71},{"date":"2020-01-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":132},{"date":"2020-01-31T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":158},{"date":"2020-02-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":127},{"date":"2020-02-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":137},{"date":"2020-02-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":116},{"date":"2020-02-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":72},{"date":"2020-02-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":78},{"date":"2020-02-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":69},{"date":"2020-02-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":84},{"date":"2020-02-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":91},{"date":"2020-02-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":140},{"date":"2020-02-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":109},{"date":"2020-02-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":84},{"date":"2020-02-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":84},{"date":"2020-02-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":76},{"date":"2020-02-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":84},{"date":"2020-02-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":132},{"date":"2020-02-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":186},{"date":"2020-02-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":128},{"date":"2020-02-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":90},{"date":"2020-02-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":81},{"date":"2020-02-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":106},{"date":"2020-02-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":102},{"date":"2020-02-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":125},{"date":"2020-02-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":135},{"date":"2020-02-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":128},{"date":"2020-02-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":115},{"date":"2020-02-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":48},{"date":"2020-02-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":52},{"date":"2020-02-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":81},{"date":"2020-02-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":143},{"date":"2020-03-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":116},{"date":"2020-03-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":104},{"date":"2020-03-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":98},{"date":"2020-03-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":115},{"date":"2020-03-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":90},{"date":"2020-03-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":74},{"date":"2020-03-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":106},{"date":"2020-03-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":135},{"date":"2020-03-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":108},{"date":"2020-03-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":139},{"date":"2020-03-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":144},{"date":"2020-03-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":143},{"date":"2020-03-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":114},{"date":"2020-03-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":120},{"date":"2020-03-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":153},{"date":"2020-03-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":180},{"date":"2020-03-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":162},{"date":"2020-03-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":185},{"date":"2020-03-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":183},{"date":"2020-03-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":122},{"date":"2020-03-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":111},{"date":"2020-03-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":114},{"date":"2020-03-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":104},{"date":"2020-03-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":109},{"date":"2020-03-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":144},{"date":"2020-03-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":126},{"date":"2020-03-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":174},{"date":"2020-03-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":163},{"date":"2020-03-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":69},{"date":"2020-03-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":89},{"date":"2020-03-31T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":109},{"date":"2020-04-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":114},{"date":"2020-04-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":116},{"date":"2020-04-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":128},{"date":"2020-04-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":152},{"date":"2020-04-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":200},{"date":"2020-04-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":237},{"date":"2020-04-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":220},{"date":"2020-04-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":255},{"date":"2020-04-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":237},{"date":"2020-04-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":219},{"date":"2020-04-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":244},{"date":"2020-04-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":245},{"date":"2020-04-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":122},{"date":"2020-04-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":113},{"date":"2020-04-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":192},{"date":"2020-04-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":249},{"date":"2020-04-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":237},{"date":"2020-04-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":212},{"date":"2020-04-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":196},{"date":"2020-04-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":209},{"date":"2020-04-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":224},{"date":"2020-04-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":240},{"date":"2020-04-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":241},{"date":"2020-04-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":221},{"date":"2020-04-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":171},{"date":"2020-04-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":206},{"date":"2020-04-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":236},{"date":"2020-04-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":204},{"date":"2020-04-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":185},{"date":"2020-04-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":171},{"date":"2020-05-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":159},{"date":"2020-05-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":143},{"date":"2020-05-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":172},{"date":"2020-05-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":168},{"date":"2020-05-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":167},{"date":"2020-05-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":192},{"date":"2020-05-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":226},{"date":"2020-05-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":237},{"date":"2020-05-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":254},{"date":"2020-05-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":206},{"date":"2020-05-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":139},{"date":"2020-05-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":140},{"date":"2020-05-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":153},{"date":"2020-05-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":162},{"date":"2020-05-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":177},{"date":"2020-05-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":190},{"date":"2020-05-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":200},{"date":"2020-05-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":243},{"date":"2020-05-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":247},{"date":"2020-05-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":225},{"date":"2020-05-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":285},{"date":"2020-05-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":275},{"date":"2020-05-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":204},{"date":"2020-05-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":187},{"date":"2020-05-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":210},{"date":"2020-05-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":235},{"date":"2020-05-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":255},{"date":"2020-05-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":228},{"date":"2020-05-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":247},{"date":"2020-05-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":252},{"date":"2020-05-31T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":239},{"date":"2020-06-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":287},{"date":"2020-06-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":298},{"date":"2020-06-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":257},{"date":"2020-06-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":179},{"date":"2020-06-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":141},{"date":"2020-06-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":191},{"date":"2020-06-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":203},{"date":"2020-06-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":213},{"date":"2020-06-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":203},{"date":"2020-06-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":196},{"date":"2020-06-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":217},{"date":"2020-06-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":288},{"date":"2020-06-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":270},{"date":"2020-06-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":218},{"date":"2020-06-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":225},{"date":"2020-06-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":221},{"date":"2020-06-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":251},{"date":"2020-06-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":232},{"date":"2020-06-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":255},{"date":"2020-06-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":247},{"date":"2020-06-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":270},{"date":"2020-06-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":247},{"date":"2020-06-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":290},{"date":"2020-06-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":321},{"date":"2020-06-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":302},{"date":"2020-06-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":326},{"date":"2020-06-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":298},{"date":"2020-06-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":233},{"date":"2020-06-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":221},{"date":"2020-06-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":223},{"date":"2020-07-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":233},{"date":"2020-07-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":219},{"date":"2020-07-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":235},{"date":"2020-07-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":234},{"date":"2020-07-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":244},{"date":"2020-07-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":199},{"date":"2020-07-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":225},{"date":"2020-07-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":165},{"date":"2020-07-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":242},{"date":"2020-07-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":215},{"date":"2020-07-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":216},{"date":"2020-07-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":241},{"date":"2020-07-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":269},{"date":"2020-07-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":247},{"date":"2020-07-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":215},{"date":"2020-07-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":197},{"date":"2020-07-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":231},{"date":"2020-07-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":272},{"date":"2020-07-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":297},{"date":"2020-07-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":235},{"date":"2020-07-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":235},{"date":"2020-07-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":239},{"date":"2020-07-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":272},{"date":"2020-07-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":270},{"date":"2020-07-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":251},{"date":"2020-07-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":250},{"date":"2020-07-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":293},{"date":"2020-07-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":251},{"date":"2020-07-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":243},{"date":"2020-07-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":289},{"date":"2020-07-31T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":360},{"date":"2020-08-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":319},{"date":"2020-08-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":256},{"date":"2020-08-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":250},{"date":"2020-08-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":245},{"date":"2020-08-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":304},{"date":"2020-08-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":326},{"date":"2020-08-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":357},{"date":"2020-08-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":374},{"date":"2020-08-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":353},{"date":"2020-08-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":348},{"date":"2020-08-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":336},{"date":"2020-08-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":326},{"date":"2020-08-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":321},{"date":"2020-08-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":289},{"date":"2020-08-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":282},{"date":"2020-08-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":313},{"date":"2020-08-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":274},{"date":"2020-08-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":267},{"date":"2020-08-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":279},{"date":"2020-08-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":303},{"date":"2020-08-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":301},{"date":"2020-08-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":266},{"date":"2020-08-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":217},{"date":"2020-08-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":224},{"date":"2020-08-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":224},{"date":"2020-08-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":202},{"date":"2020-08-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":235},{"date":"2020-08-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":216},{"date":"2020-08-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":219},{"date":"2020-08-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":220},{"date":"2020-08-31T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":209},{"date":"2020-09-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":214},{"date":"2020-09-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":241},{"date":"2020-09-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":203},{"date":"2020-09-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":220},{"date":"2020-09-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":209},{"date":"2020-09-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":214},{"date":"2020-09-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":226},{"date":"2020-09-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":235},{"date":"2020-09-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":256},{"date":"2020-09-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":223},{"date":"2020-09-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":242},{"date":"2020-09-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":236},{"date":"2020-09-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":267},{"date":"2020-09-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":312},{"date":"2020-09-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":342},{"date":"2020-09-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":302},{"date":"2020-09-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":232},{"date":"2020-09-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":248},{"date":"2020-09-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":275},{"date":"2020-09-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":261},{"date":"2020-09-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":270},{"date":"2020-09-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":269},{"date":"2020-09-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":252},{"date":"2020-09-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":201},{"date":"2020-09-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":166},{"date":"2020-09-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":124},{"date":"2020-09-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":149},{"date":"2020-09-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":154},{"date":"2020-09-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":140},{"date":"2020-09-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":192},{"date":"2020-10-01T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":169},{"date":"2020-10-02T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":192},{"date":"2020-10-03T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":183},{"date":"2020-10-04T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":151},{"date":"2020-10-05T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":146},{"date":"2020-10-06T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":161},{"date":"2020-10-07T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":153},{"date":"2020-10-08T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":183},{"date":"2020-10-09T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":152},{"date":"2020-10-10T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":137},{"date":"2020-10-11T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":143},{"date":"2020-10-12T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":144},{"date":"2020-10-13T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":132},{"date":"2020-10-14T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":121},{"date":"2020-10-15T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":107},{"date":"2020-10-16T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":120},{"date":"2020-10-17T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":110},{"date":"2020-10-18T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":119},{"date":"2020-10-19T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":142},{"date":"2020-10-20T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":130},{"date":"2020-10-21T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":219},{"date":"2020-10-22T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":212},{"date":"2020-10-23T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":168},{"date":"2020-10-24T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":161},{"date":"2020-10-25T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":158},{"date":"2020-10-26T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":132},{"date":"2020-10-27T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":134},{"date":"2020-10-28T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":157},{"date":"2020-10-29T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":134},{"date":"2020-10-30T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":162},{"date":"2020-10-31T00:00:00","datatype":"TMAX","station":"GHCND:GME00125302","attributes":",,E,","value":169}]}
+KLIDATA-setonerecord:GME00125302 TMAX
+KLIINVENTORY-setonerecord:GME00125302 TMAX
+GET-session:Climate-Expert

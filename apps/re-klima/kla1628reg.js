@@ -74,7 +74,6 @@
                 toyear: klirecords[0].fromyear + 29
             }));
             */
-
             selparms = window.parent.sysbase.getCache("regstation");
             selparms = JSON.parse(selparms);
             klirecords = selparms.klirecords;
@@ -639,10 +638,10 @@
                                     html: "min"
                                 }))
                                 .append($("<th/>", {
-                                    html: "max"
+                                    html: "avg"
                                 }))
                                 .append($("<th/>", {
-                                    html: "avg"
+                                    html: "max"
                                 }))
                             )
                         )
@@ -672,18 +671,28 @@
                 variablename: klirecords[0].variable,
                 years: yeardata
             });
+
             fromyear = parseInt(klirecords[0].fromyear);
             toyear = parseInt(klirecords[0].toyear);
-            if (klirecords.length > 1) {
+            // klirecords ist Object, daher ist length unsinnig!!!
+            // stattdessen wird dediziert TMAX und TMIN abgefragt
+            // if (klirecords.length > 1) {
+            if (klirecords[0].variable === "TMAX" && typeof klirecords[1].variable !== "undefined" && klirecords[1].variable === "TMIN") {
+                if (typeof klirecords[1].years === "string") {
+                    yeardata = JSON.parse(klirecords[1].years);
+                } else {
+                    yeardata = klirecords[1].years;
+                }
                 varyears.push({
                     variablename: klirecords[1].variable,
-                    years: JSON.parse(klirecords[1].years)
+                    years: yeardata
                 });
                 var fromyear1 = parseInt(klirecords[1].fromyear);
                 var toyear1 = parseInt(klirecords[1].toyear);
                 if (fromyear1 < fromyear) fromyear = fromyear1;
                 if (toyear1 > toyear) toyear = toyear1;
             }
+
             /**
              * Vorlauf: Loop über alle möglichen Jahre
              * totmin und totmax bestimmen die Dimensionierung der Sparklines!!!
@@ -876,7 +885,6 @@
                     filter_ignoreCase: true
                 }
             }); // so funktioniert es
-            debugger;
             var hc = $("#kla1628reg").height();
             var hb = $("#kla1628regbuttons").height();
             $("#kla1628regdiv").height(hc - hb);
@@ -957,6 +965,7 @@
      * @param {*} superParam
      */
     kla1628reg.paintXtr = function (trcontainer, rkat, iyear, pcount, rowdata, superParam) {
+        var rowheight = 60;
         /**
          * Vorlauf: regressionsrechnung
          */
@@ -977,6 +986,9 @@
                 if (cval !== null) cval = parseFloat(cval);
                 return cval !== null;
             });
+            if (typeof cleanarray === "undefined" || cleanarray.length === 0) {
+                continue;
+            }
             rowrecord.tmin = cleanarray.reduce(function (min, p) {
                 return p < min ? p : min;
             }).toFixed(1);
@@ -1015,6 +1027,9 @@
          */
         // hier wird eine Tabellenzeile für TMIN und TMAX ausgegeben
         var rowtit = iyear.toFixed(0);
+        if (rowdata.length > 1) {
+            rowheight = 120;
+        }
         if (rowdata.length > 0) {
             /**
              * neue eine Variable = eine einfache Zeile
@@ -1080,8 +1095,8 @@
                     )
                     .append($("<td/>")
                         .append($("<span/>", {
-                            id: 'max' + pcount,
-                            html: rowdata[0].tmax,
+                            id: 'avg' + pcount,
+                            html: rowdata[0].tavg,
                             css: {
                                 margin: "5px",
                                 float: "right"
@@ -1090,8 +1105,8 @@
                     )
                     .append($("<td/>")
                         .append($("<span/>", {
-                            id: 'avg' + pcount,
-                            html: rowdata[0].tavg,
+                            id: 'max' + pcount,
+                            html: rowdata[0].tmax,
                             css: {
                                 margin: "5px",
                                 float: "right"
@@ -1106,7 +1121,7 @@
             var sparkid = "#spark" + pcount;
             $(sparkid).sparkline(rowdata[0].pearls, {
                 type: 'line',
-                height: 60,
+                height: rowheight,
                 fillColor: false,
                 defaultPixelsPerValue: defaultpixel,
                 chartRangeMin: totmin,
@@ -1122,7 +1137,7 @@
                 }
                 $(sparkid).sparkline(sparkpoints, {
                     type: 'line',
-                    height: 60,
+                    height: rowheight,
                     fillColor: false,
                     defaultPixelsPerValue: defaultpixel,
                     chartRangeMin: totmin,
@@ -1160,20 +1175,20 @@
                 html += "<br>" + rowdata[1].tmin;
                 $("#min" + pcount).html(html);
 
-                html = $("#max" + pcount).html();
-                html += "<br>" + rowdata[1].tmax;
-                $("#max" + pcount).html(html);
-
                 html = $("#avg" + pcount).html();
                 html += "<br>" + rowdata[1].tavg;
                 $("#avg" + pcount).html(html);
+
+                html = $("#max" + pcount).html();
+                html += "<br>" + rowdata[1].tmax;
+                $("#max" + pcount).html(html);
 
                 var defaultpixel = 3;
                 if (rowdata[0].pearls.length > 350) defaultpixel = 2;
                 var sparkid = "#spark" + pcount;
                 $(sparkid).sparkline(rowdata[1].pearls, {
                     type: 'line',
-                    height: 60,
+                    height: rowheight,
                     fillColor: false,
                     defaultPixelsPerValue: defaultpixel,
                     chartRangeMin: totmin,
@@ -1181,6 +1196,25 @@
                     lineColor: "blue",
                     composite: true
                 });
+
+
+                if (typeof rowdata[1].points !== "undefined") {
+                    var sparkpoints = [];
+                    for (var i = 0; i < rowdata[1].points.length; i++) {
+                        sparkpoints.push(rowdata[1].points[i][1]);
+                    }
+                    $(sparkid).sparkline(sparkpoints, {
+                        type: 'line',
+                        height: rowheight,
+                        fillColor: false,
+                        defaultPixelsPerValue: defaultpixel,
+                        chartRangeMin: totmin,
+                        chartRangeMax: totmax,
+                        lineColor: "black",
+                        composite: true
+                    });
+                }
+
             } catch (err) {
 
             }
