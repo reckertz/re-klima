@@ -525,7 +525,7 @@
                             }
                         }))
 
-                        /*
+
                         .append($("<button/>", {
                             css: {
                                 float: "left",
@@ -568,7 +568,7 @@
                                 }
                             }
                         }))
-                        */
+
 
                         .append($("<button/>", {
                             html: "Leaflet-Pins (Liste)",

@@ -2620,7 +2620,7 @@
                 tableid = "tbl" + Math.floor(Math.random() * 100000) + 1;
 
                 if (kla1625shmconfig.temptable === true) {
-                    debugger;
+
                     $(cid)
                         .append($("<h3/>", {
                             text: "Histogramm " + varparms[selvariable].header + "verteilung " + selvariable + " " + klirecords[0].titel,
@@ -3666,7 +3666,7 @@
         var ret = {};
         var ciddiv = cid.substr(1) + "div";
         var tableid = cid.substr(1) + "tbl";
-        debugger;
+
         $(cid)
             .append($("<h3/>", {
                 text: varparms[selvariable].header + "verlauf " + selvariable + " " + klirecords[0].titel,

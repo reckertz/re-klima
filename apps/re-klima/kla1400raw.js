@@ -2361,7 +2361,6 @@
                                                             // nope
                                                         });
 
-
                                                     } else if (kla1400raw.checkfragments(fullname, "nao dat \.txt")) {
                                                         // NAO-Daten North Atlantic Oscillation
                                                         aktsource = "NAO";
@@ -2395,7 +2394,77 @@
                                                         }).always(function () {
                                                             // nope
                                                         });
+
+                                                    } else if (kla1400raw.checkfragments(fullname, "allCountries \.txt")) {
+                                                        // NAO-Daten North Atlantic Oscillation
+                                                        aktsource = "GEONAMES";
+                                                        var jqxhr = $.ajax({
+                                                            method: "GET",
+                                                            crossDomain: false,
+                                                            url: sysbase.getServer("loadgeonames"),
+                                                            data: {
+                                                                fullname: fullname,
+                                                                targettable: klirecord.metadata.targettable,
+                                                                primarykey: klirecord.metadata.primarykey,
+                                                                separator: klirecord.metadata.separator,
+                                                                timeout: 10 * 60 * 1000
+                                                            }
+                                                        }).done(function (r1, textStatus, jqXHR) {
+                                                            clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            sysbase.checkSessionLogin(r1);
+                                                            var ret = JSON.parse(r1);
+                                                            sysbase.putMessage(ret.message, 1);
+                                                            return;
+                                                        }).fail(function (err) {
+                                                            clearInterval(ghcnclock);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            sysbase.putMessage(err, 1);
+                                                            return;
+                                                        }).always(function () {
+                                                            // nope
+                                                        });
+
+                                                    } else if (kla1400raw.checkfragments(fullname, "_seaice_extent_daily \.csv")) {
+                                                        // NAO-Daten North Atlantic Oscillation
+                                                        debugger;
+                                                        aktsource = "NOAAICE";
+                                                        var jqxhr = $.ajax({
+                                                            method: "GET",
+                                                            crossDomain: false,
+                                                            url: sysbase.getServer("loadice"),
+                                                            data: {
+                                                                fullname: fullname,
+                                                                targettable: klirecord.metadata.targettable,
+                                                                primarykey: klirecord.metadata.primarykey,
+                                                                separator: klirecord.metadata.separator,
+                                                                timeout: 10 * 60 * 1000
+                                                            }
+                                                        }).done(function (r1, textStatus, jqXHR) {
+                                                            clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            sysbase.checkSessionLogin(r1);
+                                                            var ret = JSON.parse(r1);
+                                                            sysbase.putMessage(ret.message, 1);
+                                                            return;
+                                                        }).fail(function (err) {
+                                                            clearInterval(ghcnclock);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            sysbase.putMessage(err, 1);
+                                                            return;
+                                                        }).always(function () {
+                                                            // nope
+                                                        });
                                                     } else {
+                                                        debugger;
                                                         $(".kla1400rawActionLoad").prop('disabled', true);
                                                         var jqxhr = $.ajax({
                                                             method: "POST",

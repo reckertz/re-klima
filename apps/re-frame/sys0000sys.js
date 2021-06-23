@@ -299,6 +299,7 @@
                         ret.error = true;
                         ret.message = "getallsqlrecords-2:" + err;
                         console.log(ret.message);
+                        console.log(sqlStmt);
                         callbackgsr(res, ret);
                         return;
                     } else if (rows.length === 0) {
@@ -2955,7 +2956,7 @@
                 // hier ausweichverzeichnis prüfen
                 callbackh1(res, {
                     error: true,
-                    message: "keine HYDE-Datenverzeichnis vorgegeben"
+                    message: "kein HYDE-Datenverzeichnis vorgegeben"
                 });
                 return;
             }
@@ -2964,7 +2965,7 @@
                 // hier ausweichverzeichnis prüfen
                 callbackh1(res, {
                     error: true,
-                    message: "keine HYDE-Datenverzeichnis vorgegeben"
+                    message: "kein HYDE-Datenverzeichnis vorgegeben"
                 });
                 return;
             }

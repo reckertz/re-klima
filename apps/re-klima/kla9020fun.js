@@ -568,6 +568,7 @@
      *   container muss ein div o.ä. sein
      */
     kla9020fun.getColorPaletteX1 = function (container, method) {
+        debugger;
         if (typeof method === "undefined") {
             method = 5;
         }

@@ -1,10 +1,5 @@
 /*jshint evil: true */
 /*global $,window,module,define,root,global,self,this,document,alert */
-
-const {
-    isleapyear
-} = require('../re-frame/uihelper');
-
 /*global sysbase,uihelper */
 (function () {
     'use strict';
@@ -36,6 +31,7 @@ const {
     var sql3inserts = 0;
     var sql3errors = 0;
     var stationdata = [];
+    var stationflagdata = {};
 
 
     /**
@@ -1184,6 +1180,624 @@ const {
             ],
             function (error, res, ret) {
                 console.log("FERTIG NAO");
+                callback292(res, ret);
+                return;
+            });
+    };
+
+
+    /**
+     * loadgeonames  - Länder und Orte
+     * https://download.geonames.org/export/dump/
+     *
+     * @param {*} gblInfo
+     * @param {*} db
+     * @param {*} fs
+     * @param {*} path
+     * @param {*} rootname
+     * @param {*} async
+     * @param {*} stream
+     * @param {*} csv
+     * @param {*} readline
+     * @param {*} sys0000sys
+     * @param {*} kla9020fun
+     * @param {*} req
+     * @param {*} res
+     * @param {*} callback291
+     * returns function (res, ret)
+     *
+     */
+     kla1490srv.loadgeonames = function (gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, callback298) {
+        var sortdata = [];
+        var iraw = 0;
+        var inscount = 0;
+        async.waterfall([
+                function (callback298a) {
+                    /**
+                     * Dateinamen bereitstellen fullname, source, selyears,
+                     * selyears wird nicht genutzt
+                     */
+                    var fullname = "";
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    var source = "GEONAMES";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    var selyears = "";
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+                    if (!fs.existsSync(fullname)) {
+                        callback298a("Error", res, {
+                            error: false,
+                            message: fullname + " nicht auf dem Server vorhanden"
+                        });
+                        return;
+                    }
+                    var stationfilter = "";
+                    if (req.query && typeof req.query.extraParam !== "undefined" && req.query.extraParam.length > 0) {
+                        stationfilter = JSON.parse(req.query.extraParam).stationfilter;
+                    }
+                    var ret = {};
+                    ret.fullname = fullname;
+                    ret.fullnamestations = fullname;
+                    ret.dirname = path.dirname(fullname);
+                    ret.source = source;
+                    ret.selyears = selyears;
+                    ret.stationfilter = stationfilter;
+                    callback298a(null, res, ret);
+                    return;
+                },
+                function (res, ret, callback298a1) {
+                    /**
+                     * KLICOUNTRYCODES laden nach countries
+                     */
+                    var reqparm = {};
+                    reqparm.table = "KLICOUNTRYCODES";
+                    reqparm.sel = {};
+                    reqparm.projection = {};
+                    sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+                        if (ret1.error === true) {
+                            ret.message += " keine KLICOUNTRYCODES:" + ret1.message;
+                            countries = {};
+                            callback298a1(null, res, ret);
+                            return;
+                        } else {
+                            if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                                countries = {};
+                                for (var recordind in ret1.records) {
+                                    var record = ret1.records[recordind];
+                                    var alpha3 = record.alpha3;
+                                    delete record.history;
+                                    var countryname = record.name;
+                                    delete record.name;
+                                    record.countryname = countryname;
+                                    countries[alpha3] = record;
+                                }
+                                callback298a1(null, res, ret);
+                                return;
+                            } else {
+                                ret.message += " keine KLICOUNTRYCODES";
+                                countries = {};
+                                callback298a1(null, res, ret);
+                                return;
+                            }
+                        }
+                    });
+                },
+                function (res, ret, callback298a1a) {
+                    /**
+                     * GEONAMES vorbereiten zum Überschreiben
+                     */
+                    var delStmt = "DELETE FROM GEONAMES ";
+                    db.run(delStmt, function (err) {
+                        if (err === null) {
+                            console.log("GEONAMES: deleted:" + this.changes);
+                        } else {
+                            console.log("GEONAMES not deleted:" + err);
+                        }
+                        callback298a1a(null, res, ret);
+                        return;
+                    });
+                },
+                function (res, ret, callback298a2a) {
+                    /**
+                     * GEONAMES
+                     */
+                    var geotemplate = {
+                        geonameid: "",
+                        name: "",
+                        asciiname: "",
+                        alternatenames: "",
+                        latitude: "",
+                        longitude: "",
+                        feature_class: "",
+                        feature_code: "",
+                        country_code: "",
+                        cc2: "",
+                        admin1_code: "",
+                        admin2_code: "",
+                        admin3_code: "",
+                        admin4_code: "",
+                        population: 0,
+                        elevation: 0,
+                        dem: "",
+                        timezone: "",
+                        modification_date: "*"
+                    };
+                    var geokeys = Object.keys(geotemplate);
+                    try {
+                        var readInterface = readline.createInterface({
+                            input: fs.createReadStream(ret.fullname),
+                            console: false
+                        });
+                        readInterface.on('line', function (data) {
+                            // fs.createReadStream(ret.fullname)
+                            /*
+                            .pipe(iconv.decodeStream('iso-8859-15'))
+                            .pipe(iconv.encodeStream('utf8'))
+                            */
+                            // .on("data", function (data) {
+                            var that = this;
+                            that.pause();
+                            iraw++;
+
+                            var geofields = data.trim().split('\n').map(function (line) {
+                                return line.split('\t');
+                            });
+                            // Merge mit den Feldnamen
+                            var georec = {};
+                            geokeys.forEach(function(item, ind) {
+                                if (geotemplate[item] !== "*") {
+                                    georec[item] = geofields[0][ind].trim();
+                                }
+                            });
+                            // Aufbereitung zum Ausgeben
+                            var actcountry = georec["cc2"];
+                            if (actcountry.length === 0) {
+                                actcountry = georec["country_code"];
+                            }
+                            if (actcountry.length > 0 && "DE,AT,CH".indexOf(actcountry) >= 0 && georec["feature_code"].startsWith("PP")) {
+                                var reqparm = {};
+                                reqparm.selfields = {
+                                    geonameid: georec["geonameid"]
+                                };
+                                var updgeonames = Object.assign({}, georec, true);
+                                delete updgeonames.geonameid;
+
+                                reqparm.updfields = {};
+                                reqparm.updfields["$setOnInsert"] = {
+                                    geonameid: georec["geonameid"]
+                                };
+                                reqparm.updfields["$set"] = updgeonames;
+                                reqparm.table = "GEONAMES";
+                                sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                    inscount++;
+                                    if (inscount < 10) {
+                                        console.log(georec);
+                                    }
+                                    that.resume();
+                                });
+                            } else {
+                                that.resume();
+                            }
+                      });
+                        readInterface.on("close", function (err) {
+                            // KLISTATIONS, KLIINVENTORY, KLIDATA: 1 Datensatz
+                            var reqparm = {};
+                            ret.error = false;
+                            ret.message = "GEONAMES: " + inscount;
+                            callback298a2a("Error", res, ret);
+                            return;
+                        });
+                    } catch (err) {
+                        console.log(err.stack);
+                        ret.error = true;
+                        ret.message = err;
+                        callback298a2a("Error", res, ret);
+                        return;
+                    }
+                }
+            ],
+            function (error, res, ret) {
+                console.log("FERTIG GEONAMES");
+                callback298(res, ret);
+                return;
+            });
+    };
+
+
+    /**
+     * loadice  - North- and Southpole Ice Coverage
+     * ftp://sidads.colorado.edu/DATASETS/NOAA/G02135/south/daily/data/
+     * Pseudostationen N Northpole, S Southpole
+     *
+     * @param {*} gblInfo
+     * @param {*} db
+     * @param {*} fs
+     * @param {*} path
+     * @param {*} rootname
+     * @param {*} async
+     * @param {*} stream
+     * @param {*} csv
+     * @param {*} readline
+     * @param {*} sys0000sys
+     * @param {*} kla9020fun
+     * @param {*} req
+     * @param {*} res
+     * @param {*} callback291
+     * returns function (res, ret)
+     *
+     */
+    kla1490srv.loadice = function (gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, callback292) {
+        var sortdata = [];
+        var iraw = 0;
+        async.waterfall([
+                function (callback292a) {
+                    /**
+                     * Dateinamen bereitstellen fullname, source, selyears,
+                     * selyears wird nicht genutzt
+                     */
+                    var fullname = "";
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+
+
+                    var source = "NOAAICE";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    if (!fs.existsSync(fullname)) {
+                        callback292a("Error", res, {
+                            error: false,
+                            message: fullname + " nicht auf dem Server vorhanden"
+                        });
+                        return;
+                    }
+                    var ret = {};
+                    ret.fullname = fullname;
+                    ret.fullnamestations = fullname;
+                    ret.dirname = path.dirname(fullname);
+                    ret.source = source;
+                    ret.northsouth = path.basename(fullname).substr(0, 1);
+                    callback292a(null, res, ret);
+                    return;
+                },
+                function (res, ret, callback292a1) {
+                    /**
+                     * KLICOUNTRYCODES laden nach countries
+                     */
+                    var reqparm = {};
+                    reqparm.table = "KLICOUNTRYCODES";
+                    reqparm.sel = {};
+                    reqparm.projection = {};
+                    sys0000sys.getallrecords(db, async, null, reqparm, res, function (res, ret1) {
+                        if (ret1.error === true) {
+                            ret.message += " keine KLICOUNTRYCODES:" + ret1.message;
+                            countries = {};
+                            callback292a1(null, res, ret);
+                            return;
+                        } else {
+                            if (ret1.records !== "undefined" && ret1.records !== null && ret1.records.length > 0) {
+                                countries = {};
+                                for (var recordind in ret1.records) {
+                                    var record = ret1.records[recordind];
+                                    var alpha3 = record.alpha3;
+                                    delete record.history;
+                                    var countryname = record.name;
+                                    delete record.name;
+                                    record.countryname = countryname;
+                                    countries[alpha3] = record;
+                                }
+                                callback292a1(null, res, ret);
+                                return;
+                            } else {
+                                ret.message += " keine KLICOUNTRYCODES";
+                                countries = {};
+                                callback292a1(null, res, ret);
+                                return;
+                            }
+                        }
+                    });
+                },
+                function (res, ret, callback292a1a) {
+                    /**
+                     * KLISTATIONS löschen für NOAAICE
+                     */
+                    //var delStmt = "DELETE FROM KLISTATIONS ";
+                    //delStmt += " WHERE source = 'NOAAICE'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLISTATIONS: deleted:" + this.changes);
+                        callback292a1a(null, res, ret);
+                        return;
+                    //});
+                },
+                function (res, ret, callback292a1b) {
+                    /**
+                     * KLIINVENTORY löschen für NOAAICE
+                     */
+                    //var delStmt = "DELETE FROM KLIINVENTORY ";
+                    //delStmt += " WHERE source = 'NOAAICE'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIINVENTORY: deleted:" + this.changes);
+                        callback292a1b(null, res, ret);
+                        return;
+                    //});
+                },
+                function (res, ret, callback292a1c) {
+                    /**
+                     * KLIDATA löschen für NOAAICE
+                     */
+                    //var delStmt = "DELETE FROM KLIDATA ";
+                    //delStmt += " WHERE source = 'NOAAICE'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIDATA: deleted:" + this.changes);
+                        callback292a1c(null, res, ret);
+                        return;
+                    //});
+                },
+                function (res, ret, callback292a2a) {
+                    /**
+                     * KLISTATIONS und KLIINVENTORY: 1 Datensatz
+                     * KLIDATA: 1 Datensatz, Monatswerte auf Tage des jeweiligen Monats roh verteilt
+                     * "" als missing value in der stringified-Speicherung
+                     */
+                    sortdata = [];
+                    var source = "NOAAICE";
+                    var stationid = "";
+                    var stationname = "";
+                    var variable = "";
+                    var latitude = 0;
+                    var longitude = 0;
+                    if (ret.northsouth === "N") {
+                        stationid = "NP000000000";
+                        stationname = "Northpole";
+                        variable = "ICEEXT";
+                        latitude = 90;
+                        longitude = 0;
+                    } else {
+                        stationid = "SP000000000";
+                        stationname = "Southpole";
+                        variable = "ICEEXT";
+                        latitude = -90;
+                        longitude = 0;
+                    }
+                    var klistationrec = {
+                        source: "NOAAICE",
+                        stationid: stationid,
+                        stationname: stationname,
+                        latitude: latitude,
+                        longitude: longitude,
+                        climatezone: ret.northsouth + "0",
+                        continent: stationid,
+                        continentname: stationname,
+                        alpha2: "",
+                        alpha3: "",
+                        countrycode: "",
+                        region: stationname,
+                        subregion: "",
+                        intermediateregion: "",
+                        temperature: variable,
+                        height: 0,
+                        state: "",
+                    };
+                    var kliinventoryrec = {
+                        source: "NOAAICE",
+                        stationid: stationid,
+                        variable: variable,
+                        fromyear: 0,
+                        toyear: 0,
+                        latitude: latitude,
+                        longitude: longitude,
+                    };
+                    var klidatarec = {
+                        source: "NOAAICE",
+                        stationid: stationid,
+                        variable: variable,
+                        fromyear: null,
+                        toyear: null,
+                        anzyears: 0,
+                        realyears: 0,
+                        missing: 0,
+                        years: {}
+                    };
+
+                    var cont = uihelper.getContinent(klistationrec.longitude, klistationrec.latitude);
+                    if (cont.error === false) {
+                        klistationrec.continent = cont.continentcode;
+                        klistationrec.continentname = cont.continentname;
+                    }
+                    var climatezone = uihelper.getClimateZone(klistationrec.latitude);
+                    klistationrec.climatezone = climatezone.value;
+                    /*
+                    if (crg === null) {
+                        crg = require('country-reverse-geocoding').country_reverse_geocoding();
+                    }
+                    */
+                    /**
+                     * Land aufgrund latitude/longitude bestimmen
+                     */
+                    var country = crg.get_country(klistationrec.latitude, klistationrec.longitude);
+                    if (typeof country !== "undefined" && country !== null) {
+                        klistationrec.alpha3 = country.code;
+                        klistationrec.countryname = country.name;
+                        var countrydata = countries[country.code];
+                        if (typeof countrydata !== "undefined" && countrydata !== null) {
+                            delete countrydata.history;
+                            delete countrydata.tsserverupd;
+                            delete countrydata.iostatus;
+                            delete countrydata._id;
+                            klistationrec = Object.assign(klistationrec, countrydata);
+                        }
+                    }
+                    var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    var counter = 0;
+                    var fileschema = "";
+                    var fieldarray = [];
+                    try {
+                        fs.createReadStream(ret.fullname)
+                            .pipe(csv.parse({
+                                headers: true,
+                                delimiter: ",",
+                                trim: true,
+                                /* '\t',  */
+                                ignoreEmpty: true
+                            }))
+                            .on("data", function (data) {
+                                var that = this;
+                                that.pause();
+                                counter++;
+                                if (counter === 1) { // Skip Satz
+                                    that.resume(); // holt den nächsten Satz, auch aus waterfall
+                                    return;
+                                }
+                                // 1825  -0.23   0.21   0.33  -0.28   0.13   0.41  -0.92   1.43  -0.95   1.98   1.06  -1.31    0.16
+                                var record = uihelper.cloneObject(data);
+
+                                var haserror = false;
+                                var year = record["Year"];
+                                if (haserror === false) {
+                                    // var yearvalue = darray[13]; prüfen, ob vorhanden, azoren etc. ohne!!!
+                                    if (typeof klidatarec.years["" + year] === "undefined") {
+                                        if (uihelper.isleapyear(year)) {
+                                            klidatarec.years[year] = new Array(366).fill("");
+                                        } else {
+                                            klidatarec.years[year] = new Array(365).fill("");
+                                        }
+                                        if (klidatarec.fromyear === null) {
+                                            klidatarec.fromyear = year;
+                                        } else if (year < klidatarec.fromyear) {
+                                            klidatarec.fromyear = year;
+                                        }
+                                        if (klidatarec.toyear === null) {
+                                            klidatarec.toyear = year;
+                                        } else if (year > klidatarec.toyear) {
+                                            klidatarec.toyear = year;
+                                        }
+                                    }
+                                    // jetzt muss der einzelne Tag ausgewertet werden
+                                    // es gibt nur jeweils einen Datensatz am Schluss
+                                    if (uihelper.isleapyear(year)) {
+                                        mdtable[1] = 29;
+                                    } else {
+                                        mdtable[1] = 28;
+                                    }
+                                    var baseday = 0;
+                                    var amon = parseInt(record["Month"]);
+                                    var aday = parseInt(record["Day"]);
+                                    for (var imon = 0; imon < (amon - 1); imon++) {
+                                        baseday += mdtable[imon];
+                                    }
+                                    var tind = baseday + parseInt(aday) - 1;
+                                    let ival = record["Extent"];
+                                    if (ival.trim() === "") ival = null;
+                                    klidatarec.years[year][tind] = ival;
+                                }
+                                that.resume();
+                            })
+                            .on("close", function (err) {
+                                // KLISTATIONS, KLIINVENTORY, KLIDATA: 1 Datensatz
+                                var reqparm = {};
+                                async.waterfall([
+                                        function (callback293a) {
+                                            // Ausgabe KLISTATIONS
+                                            reqparm.selfields = {
+                                                source: source,
+                                                stationid: stationid
+                                            };
+                                            var updstation = Object.assign({}, klistationrec, true);
+                                            delete updstation.source;
+                                            delete updstation.stationid;
+
+                                            reqparm.updfields = {};
+                                            reqparm.updfields["$setOnInsert"] = {
+                                                source: source,
+                                                stationid: stationid
+                                            };
+                                            reqparm.updfields["$set"] = updstation;
+                                            reqparm.table = "KLISTATIONS";
+                                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                callback293a(null, res, ret);
+                                                return;
+                                            });
+                                        },
+                                        function (res, ret, callback293b) {
+                                            // Ausgabe KLIINVENTORY
+                                            kliinventoryrec.fromyear = klidatarec.fromyear;
+                                            kliinventoryrec.toyear = klidatarec.toyear;
+                                            kliinventoryrec.anzyears = parseInt(kliinventoryrec.toyear) - parseInt(kliinventoryrec.fromyear) + 1;
+                                            reqparm.selfields = {
+                                                source: source,
+                                                stationid: stationid,
+                                                variable: variable
+                                            };
+                                            var updstation = Object.assign({}, kliinventoryrec, true);
+                                            delete updstation.source;
+                                            delete updstation.stationid;
+                                            delete updstation.variable;
+
+                                            reqparm.updfields = {};
+                                            reqparm.updfields["$setOnInsert"] = {
+                                                source: source,
+                                                stationid: stationid,
+                                                variable: variable
+                                            };
+                                            reqparm.updfields["$set"] = updstation;
+                                            reqparm.table = "KLIINVENTORY";
+                                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                callback293b(null, res, ret);
+                                                return;
+                                            });
+                                        },
+                                        function (res, ret, callback293c) {
+                                            // Ausgabe KLIDATA
+                                            klidatarec.years = JSON.stringify(klidatarec.years);
+                                            klidatarec.anzyears = parseInt(klidatarec.toyear) - parseInt(klidatarec.fromyear) + 1;
+                                            reqparm.selfields = {
+                                                source: source,
+                                                stationid: stationid,
+                                                variable: variable
+                                            };
+                                            var updstation = Object.assign({}, klidatarec, true);
+                                            delete updstation.source;
+                                            delete updstation.stationid;
+                                            delete updstation.variable;
+
+                                            reqparm.updfields = {};
+                                            reqparm.updfields["$setOnInsert"] = {
+                                                source: source,
+                                                stationid: stationid,
+                                                variable: variable
+                                            };
+                                            reqparm.updfields["$set"] = updstation;
+                                            reqparm.table = "KLIDATA";
+                                            sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                                callback293c("Finish", res, ret);
+                                                return;
+                                            });
+                                        }
+                                    ],
+                                    function (error, res, ret) {
+                                        ret.error = true;
+                                        ret.message = err;
+                                        callback292a2a("Finish", res, ret);
+                                        return;
+                                    });
+                            });
+                    } catch (err) {
+                        console.log(err.stack);
+                        ret.error = true;
+                        ret.message = err;
+                        callback292a2a("Error", res, ret);
+                        return;
+                    }
+                }
+            ],
+            function (error, res, ret) {
+                console.log("FERTIG NOAAICE");
                 callback292(res, ret);
                 return;
             });
@@ -2706,6 +3320,9 @@ const {
         }
     ];
 
+
+
+
     /**
      * ghcnddata - GHCN daily-Aufbereitung Tagesdaten
      * Vorgabe ist fullname von ghcnd-stations.txt, ist dies nicht vorgegeben,
@@ -2730,8 +3347,389 @@ const {
      * @param {*} res
      * returns function (res, ret)
      */
-    var actsource = "";
+    let actsource = "";
     kla1490srv.ghcnddata = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, reqparm, res, callback390) {
+        let vglstationid = "";
+        stationdata = [];
+        stationflagdata = {};
+        actsource = "GHCND";
+        async.waterfall([
+            function (callback390a) {
+                /**
+                 * Dateinamen bereitstellen
+                 */
+                let fullname = "";
+                let source = "";
+                let stationid = "";
+                let stationids = "";
+                let selyears = "";
+                let selvariablename = "";
+                if (req !== null) {
+                    source = "GHCND";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    actsource = source;
+                    if (req.query && typeof req.query.stationid !== "undefined" && req.query.stationid.length > 0) {
+                        stationid = req.query.stationid;
+                    }
+                    if (req.query && typeof req.query.stationids !== "undefined" && req.query.stationids.length > 0) {
+                        stationids = req.query.stationids;
+                    }
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+                    if (req.query && typeof req.query.variable !== "undefined" && req.query.variable.length > 0) {
+                        selvariablename = req.query.variable;
+                    }
+                } else {
+                    fullname = reqparm.fullname || "";
+                    source = reqparm.source || "GHCND";
+                    stationid = reqparm.stationid || "";
+                    stationids = reqparm.stationids || [];
+                    selyears = reqparm.selyears || "";
+                    selvariablename = reqparm.selvariablename || "";
+                }
+                let ret = {};
+                ret.source = source;
+                ret.selyears = selyears;
+                ret.stationid = stationid;
+                ret.stationids = stationids;
+                ret.selvariablename = selvariablename;
+                console.log(ret.source + " " + ret.stationid + " " + ret.stationids.length + " " + ret.selvariablename);
+                if (typeof stationids === "undefined" ||
+                    typeof stationids === "string" && stationids.length === 0 ||
+                    Array.isArray(stationids) && stationids.length === 0) {
+                    ret.stationids = [];
+                    ret.stationids.push(stationid);
+                }
+                if (typeof fullname === "undefined" || fullname === null || fullname.length === 0) {
+                    fullname = path.join("G:", "Projekte");
+                    fullname = path.join(fullname, "klimadaten");
+                    fullname = path.join(fullname, "IPCC-GHCN-Daily");
+                    ret.fullname = fullname;
+                    ret.dirname = fullname;
+                } else {
+                    ret.fullname = fullname;
+                    ret.dirname = path.dirname(fullname);
+                }
+                /**
+                 * TODO: Verzeichnisexistenz prüfen, wenn nicht vorhanden,
+                 * dann Suchen in __dirname als root evtl. Daten mit
+                 * __dirname, data, IPCC-GHCN-Daily suchen
+                 */
+                callback390a(null, res, ret);
+                return;
+            },
+            function (res, ret, callback390d) {
+                /**
+                 * TODO: Suchverfahren für <stationid>.dly auf jeder Ebene und in ret.dirname als
+                 * root der hier erfolgenden Suchen
+                 */
+                console.log("Daten-Root:" + ret.dirname);
+                let datapath = path.join(ret.dirname, "ghcnd_all.tar", "ghcnd_all", "ghcnd_all");
+                for (var istation = ret.stationids.length - 1; istation > 0; istation--) {
+                    if (ret.stationids[istation] === ret.stationids[istation - 1]) {
+                        ret.stationids.splice(istation, 1);
+                    }
+                }
+                /**
+                 * Start Loop über stationsid's
+                 */
+                let stationids = ret.stationids;
+                let selvariablename = ret.selvariablename;
+                let rootpath = datapath;
+                async.eachSeries(stationids, function (station, nextstation) {
+                        if (typeof station === "undefined" || station === null || station.trim().length === 0) {
+                            nextstation();
+                            return;
+                        }
+                        ret.stationid = station;
+                        let datapath = path.join(rootpath, station + ".dly");
+                        console.log(datapath);
+                        async.waterfall([
+                                function (callback360) {
+                                    let found = true;
+                                    try {
+                                        if (!fs.existsSync(datapath)) {
+                                            found = false;
+                                            console.log("Keine Datei für:" + ret.stationid);
+                                            kla1490srv.markstation(ret.source, ret.stationid, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                                //nextstation();
+                                                callback360("Error");
+                                                return;
+                                            });
+                                        } else {
+                                            callback360(null);
+                                            return;
+                                        }
+                                    } catch (err) {
+                                        found = false;
+                                        console.log("Keine Datei für:" + ret.stationid + " " + err);
+                                        console.log(err.stack);
+                                        kla1490srv.markstation(ret.source, ret.stationid, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                            //nextstation();
+                                            callback360("Error");
+                                            return;
+                                        });
+                                    }
+                                },
+                                function (callback361) {
+                                    console.log(" ist auf dem Server vorhanden");
+                                    let counter = 0;
+                                    let dayrecord = {};
+                                    let linestartts = new Date();
+                                    let lineendts = 0;
+                                    let html = "";
+                                    let rl;
+                                    try {
+                                        rl = new LineByLineReader(datapath);
+                                    } catch (err) {
+                                        console.log("Keine Datei für:" + ret.stationid);
+                                        kla1490srv.markstation(ret.source, ret.stationid, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                            //nextstation();
+                                            callback361("Error");
+                                            return;
+                                        });
+                                    }
+                                    let stationnr = 0;
+                                    // event is emitted after each line
+                                    rl.on('line', function (line) {
+                                        let that = this;
+                                        rl.pause();
+                                        async.waterfall([
+                                                function (callback392a) {
+                                                    counter++;
+                                                    dayrecord = {};
+                                                    // rootschema
+                                                    for (let i = 0; i < dayschema1.length; i++) {
+                                                        var val1 = line.substring(dayschema1[i].von - 1, dayschema1[i].bis).trim();
+                                                        var fld1 = dayschema1[i].name;
+                                                        dayrecord[fld1] = val1;
+                                                    }
+                                                    // Ergänzen Überlebenswerte
+                                                    dayrecord.source = actsource;
+                                                    var ret1 = {
+                                                        error: false,
+                                                        message: "OK",
+                                                        line: line,
+                                                        dayrecord: dayrecord
+                                                    };
+                                                    callback392a(null, res, ret1);
+                                                    return;
+                                                },
+                                                function (res, ret1, callback392b) {
+                                                    if (vglstationid !== dayrecord.stationid) {
+                                                        /**
+                                                         * Ausgabe aller monatsbezogenen Tagesdaten der stationid aus stationdata
+                                                         */
+                                                        if (vglstationid.length > 0 && stationdata.length > 0) {
+                                                            kla1490srv.putstationdata(stationdata, db, async, sys0000sys, res, ret1, function (res, ret1) {
+                                                                stationdata = [];
+                                                                stationflagdata = {};
+                                                                callback392b(null, res, ret1);
+                                                                return;
+                                                            });
+                                                        } else {
+                                                            callback392b(null, res, ret1);
+                                                            return;
+                                                        }
+                                                    } else {
+                                                        callback392b(null, res, ret1);
+                                                        return;
+                                                    }
+                                                },
+                                                function (res, ret1, callback392c) {
+                                                    vglstationid = dayrecord.stationid;
+                                                    //if (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN" || dayrecord.variable ==="PRCP") {
+                                                    /*
+                                                    if ((selvariablename === "TMAX" || selvariablename === "TMIN") && (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN") ||
+                                                        dayrecord.variable === selvariablename) {
+                                                    */
+                                                    if ("TMAX,TMIN,PRCP,SNOW".indexOf(dayrecord.variable) >= 0) {
+                                                        // ab 22 kommen 31 Felder für Tageswerte
+                                                        var dayarray = [];
+                                                        var lastbis = 0;
+                                                        /**
+                                                         * eigene Satzart für die Daten, wechselnd mit Stationsdaten
+                                                         *  10010 709   87   10 Jan Mayen            NORWAY        19212011  541921    1  287
+                                                         *1921  -44  -71  -68  -43   -8   22   47   58   27  -20  -21  -40
+                                                         *1922   -9  -17  -62  -37  -16   29   48   63   27   -2  -38  -26
+                                                         * Erkennungsregel: 4 Stellen numerisch vorne => Datensatz dat4schema
+                                                         */
+                                                        // console.log(JSON.stringify(dayrecord));
+                                                        dayrecord.days = [];
+                                                        // Tage holen 8 = 5 + 1 + 1 + 1
+                                                        let ivon = 22 - 1;
+                                                        for (let iday = 0; iday < 31; iday++) {
+                                                            let idis = ivon + iday * 8; // startet mit 0!
+                                                            if ((idis + 8) <= line.length) {
+                                                                // console.log(line.substr(idis, 8).replace(/ /g,"."));
+                                                                let value = line.substr(idis, 5).trim();
+                                                                // Value-Qualifier
+                                                                let MFLAG = line.substr(idis + 5, 1).trim();
+                                                                let QFLAG = line.substr(idis + 5 + 1, 1).trim();
+                                                                let SFLAG = line.substr(idis + 5 + 2, 1).trim();
+                                                                if (MFLAG !== "" || QFLAG !== "" || SFLAG !== "") {
+                                                                    let flagdata = {};
+                                                                    if (typeof stationflagdata[dayrecord.variable] === "undefined") {
+                                                                        stationflagdata[dayrecord.variable] = {};
+                                                                        flagdata = stationflagdata[dayrecord.variable];
+                                                                    } else {
+                                                                        flagdata = stationflagdata[dayrecord.variable];
+                                                                    }
+                                                                    if (MFLAG !== "") {
+                                                                        if (typeof flagdata["MFLAG"] === "undefined") {
+                                                                            flagdata["MFLAG"] = {};
+                                                                        }
+                                                                        if (typeof flagdata["MFLAG"][MFLAG] === "undefined") {
+                                                                            flagdata["MFLAG"][MFLAG] = 0;
+                                                                        }
+                                                                        flagdata["MFLAG"][MFLAG] += 1;
+                                                                    }
+                                                                    if (QFLAG !== "") {
+                                                                        if (typeof flagdata["QFLAG"] === "undefined") {
+                                                                            flagdata["QFLAG"] = {};
+                                                                        }
+                                                                        if (typeof flagdata["QFLAG"][QFLAG] === "undefined") {
+                                                                            flagdata["QFLAG"][QFLAG] = {
+                                                                                count: 0,
+                                                                                values: ""
+                                                                            };
+                                                                        }
+                                                                        flagdata["QFLAG"][QFLAG].count += 1;
+                                                                        if (flagdata["QFLAG"][QFLAG].values.indexOf(">" + value + "<;") < 0) {
+                                                                            flagdata["QFLAG"][QFLAG].values += ">" + value + "<;" ;
+                                                                        }
+                                                                        if (QFLAG === "X") {
+                                                                            value = "";   // RESET des value, hier: X - failed bounds check
+                                                                        }
+                                                                    }
+                                                                    if (SFLAG !== "") {
+                                                                        if (typeof flagdata["SFLAG"] === "undefined") {
+                                                                            flagdata["SFLAG"] = {};
+                                                                        }
+                                                                        if (typeof flagdata["SFLAG"][SFLAG] === "undefined") {
+                                                                            flagdata["SFLAG"][SFLAG] = 0;
+                                                                        }
+                                                                        flagdata["SFLAG"][SFLAG] += 1;
+                                                                    }
+                                                                }
+                                                                if (value === "9999" || value === "-9999" || value === "") {
+                                                                    value = null;
+                                                                } else {
+                                                                    let len = value.length;
+                                                                    value = value.substr(0, len - 1) + "." + value.substr(len - 1, 1);
+                                                                }
+                                                                dayrecord.days[iday] = value;
+                                                            }
+                                                        }
+                                                        stationdata.push(dayrecord);
+                                                    }
+                                                    // callback390d("Finish", res, ret);
+                                                    callback392c("Finish", res, ret);
+                                                    //rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                                                    return;
+                                                }
+                                            ],
+                                            function (error, res, ret) {
+                                                rl.resume(); // holt den nächsten Satz, auch aus waterfall
+                                            });
+                                    });
+                                    // end - line-by-line davor war es close
+                                    rl.on('end', function (line) {
+                                        /**
+                                         * Letzter Gruppenwechsel
+                                         * Ausgabe aller Tagesdaten der stationid aus stationdata
+                                         */
+                                        if (stationdata.length > 0) {
+                                            kla1490srv.putstationdata(stationdata, stationflagdata, db, async, sys0000sys, res, ret, function (res, ret1) {
+                                                console.log('Total lines : ' + counter);
+                                                var varcount = Object.keys(ret1.outrecs.variables).length;
+                                                if (varcount === 0) {
+                                                    ret.error = true;
+                                                    ret.message += " KLISTATION:" + ret1.outrecs.stationid + " " + selvariablename;
+                                                } else {
+                                                    ret.error = false;
+                                                    ret.message += " KLISTATION:" + counter;
+                                                }
+                                                stationdata = [];
+                                                callback361("Finish");
+                                                //nextstation();
+                                                return;
+                                            });
+                                        } else {
+                                            ret.error = true;
+                                            ret.message += " KLISTATION:" + station + " hat kein >" + selvariablename + "<";
+                                            console.log("KLISTATION:" + station + " hat kein " + selvariablename);
+                                            kla1490srv.markstation(actsource, station, "*NODATA", db, async, sys0000sys, function (ret1) {
+                                                stationdata = [];
+                                                callback361("Error");
+                                                //nextstation();
+                                                return;
+                                            });
+                                        }
+                                    });
+                                }
+                            ],
+                            function (error, result) {
+                                /**
+                                 * Ende Async über eine Datei
+                                 */
+                                nextstation();
+                                return;
+                            }
+                        );
+                    },
+                    function (error) {
+                        /**
+                         * Ende Loop über stationsid's
+                         */
+                        callback390d("Finish", res, {
+                            error: false,
+                            message: "Alle stationids abgearbeitet"
+                        });
+                        return;
+                    });
+            },
+        ], function (error, res, ret) {
+            callback390(res, ret);
+            return;
+        });
+    };
+
+
+
+    /**
+     * ghcnddata - GHCN daily-Aufbereitung Tagesdaten
+     * Vorgabe ist fullname von ghcnd-stations.txt, ist dies nicht vorgegeben,
+     * dann wird die u.a. Verzeichnishierarchie genutzt für das finden der *.dly-Files
+     * *.dly-Files sind abgeleitet aus stationid und Suffix .dly
+     * Mit diesen Daten wird KLIDATA fortgeschrieben,
+     * anschliessend werden die entpackten Dateien bearbeitet:
+     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\
+     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\ghcnd-stations.txt
+     * G:\Projekte\klimadaten\IPCC-GHCN-Daily\ => ghcnd_all.tar\ghcnd_all\ghcnd_all => *.dly-Files
+     * @param {*} gblInfo
+     * @param {*} db
+     * @param {*} fs
+     * @param {*} path
+     * @param {*} rootname
+     * @param {*} async
+     * @param {*} stream
+     * @param {*} StreamZip
+     * @param {*} readline
+     * @param {*} sys0000sys
+     * @param {*} req
+     * @param {*} res
+     * returns function (res, ret)
+     */
+
+    kla1490srv.ghcnddataold = function (gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, reqparm, res, callback390) {
+        actsource = "";
         var vglstationid = "";
         stationdata = [];
 
@@ -3152,6 +4150,7 @@ const {
                 /**
                  * API Aufrufen
                  * https://www.ncdc.noaa.gov/cdo-web/api/v2/data?datasetid=YOUR_DATASETID
+                 * https://www.ncdc.noaa.gov/cdo-web/ ist die Root-Seite mit Doku => Using Web-Services
                  * https://nodejs.org/api/https.html#https_https_get_url_options_callback
                  */
                 var https = require("https");
@@ -3481,7 +4480,7 @@ const {
      * @param {*} callback394
      * return mit Callback res und ret
      */
-    kla1490srv.putstationdata = function (stationdata, db, async, sys0000sys, res, ret1, callback394) {
+    kla1490srv.putstationdata = function (stationdata, stationflagdata, db, async, sys0000sys, res, ret1, callback394) {
         /**
          * Sortieren der Daten in stationdata
          * Loop1 Gruppenwechsel mit Konsolidierung je variable, years, year, days[j] in year
@@ -3492,6 +4491,7 @@ const {
                 function (callback394a) {
                     var ret = uihelper.cloneObject(ret1);
                     ret.stationdata = stationdata;
+                    ret.stationflagdata = stationflagdata;
                     callback394a(null, res, ret);
                     return;
                 },
@@ -3560,6 +4560,7 @@ const {
                             outrecs.variables[rec.variable].years[rec.year][tind] = value;
                         }
                     }
+                    outrecs.stationflagdata = uihelper.cloneObject(ret.stationflagdata);
                     ret.outrecs = outrecs;
                     callback394e(null, res, ret);
                     return;
@@ -3646,6 +4647,10 @@ const {
                                 stationid: ret.outrecs.stationid,
                                 variable: variable
                             };
+                            let flagdata = JSON.stringify({});
+                            if (typeof ret.outrecs.stationflagdata !== "undefined" && typeof ret.outrecs.stationflagdata[variable] !== "undefined") {
+                                flagdata = JSON.stringify(ret.outrecs.stationflagdata[variable]);
+                            }
                             reqparm.updfields["$set"] = {
                                 firstyear: firstyear,
                                 firstyearok: firstyear,
@@ -3657,7 +4662,8 @@ const {
                                 imissing: imissing,
                                 icount: icount,
                                 goodyears: goodyears,
-                                years: JSON.stringify(ret.outrecs.variables[variable].years)
+                                years: JSON.stringify(ret.outrecs.variables[variable].years),
+                                flagdata: flagdata
                             };
                             reqparm.table = "KLIDATA";
                             sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {

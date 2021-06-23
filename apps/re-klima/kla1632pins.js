@@ -32,6 +32,8 @@
     var stationarray = [];
     var worldmap;
 
+    var mymap;
+
     kla1632pins.show = function (parameters, navigatebucket) {
 
         if (typeof parameters === "undefined" && typeof navigatebucket === "undefined") {
@@ -260,7 +262,7 @@
             overflow: "auto"
         });
 
-        var mymap;
+
 
         // Köln, Nabel der Welt als Bezug (später die erste Station)
         var latitude = 50.941278;
@@ -316,6 +318,7 @@
             }
 
         }
+
         // Event-Testung
         var oneCorner;
         var TwoCroner;
@@ -334,15 +337,18 @@
             if (e.originalEvent.ctrlKey) {
                 twoCorner = e.latlng;
                 var bounds = [oneCorner, twoCorner];
-                L.rectangle(bounds, {color:"#ff7800", weight:1}).addTo(mymap);
+                L.rectangle(bounds, {
+                    color: "#ff7800",
+                    weight: 1
+                }).addTo(mymap);
             }
             mymap.dragging.enable();
         }
 
     };
 
-    var onMarkerClick = function(e){
-        alert("You clicked on marker with customId: " + this.options.stationid + ", variable:" + this.options.variables);
+    var onMarkerClick = function (e) {
+        // alert("You clicked on marker with customId: " + this.options.stationid + ", variable:" + this.options.variables);
         var stationdata = this.options;
         window.parent.sysbase.setCache("onestation", JSON.stringify({
             stationid: stationdata.stationid,
@@ -358,21 +364,134 @@
             }
         }));
 
-        // Aufruf der Auswertung in neuem Reiter für die stationid
-
-        var tourl = "klaheatmap.html" + "?" + "stationid=" + stationdata.stationid + "&source=" + stationdata.source + "&variablename=" + stationdata.variable;
-        var stationname = stationdata.sitename;
-        var tabname = stationdata.variable + " " + stationname;
-        if (stationdata.variable === "WLVL") {
-            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-        } else if (stationdata.variable === "TMAX" || stationdata.variable === "TMIN") {
-            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
-        } else {
-            var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1629ghc", tourl);
-            window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+        if ($("#protwrapper").length > 0) {
+            $("#protwrapper").children().remove();
         }
+        $("#protwrapper")
+            .append($("<div/>", {
+                id: "kla1632data"
+            }));
+
+        // Aufruf der Auswertung in neuem Reiter für die stationid
+        $("#kla1632data")
+            .append($("<button/>", {
+                html: "Aufruf wie bisher:" + stationdata.stationid + " " + stationdata.sitename,
+                stationdata: JSON.stringify(stationdata),
+                click: function (evt) {
+                    evt.preventDefault();
+                    var stationdata = JSON.parse($(this).attr("stationdata"));
+                    var tourl = "klaheatmap.html" + "?" + "stationid=" + stationdata.stationid + "&source=" + stationdata.source + "&variablename=" + stationdata.variable;
+                    var stationname = stationdata.sitename;
+                    var tabname = stationdata.variable + " " + stationname;
+                    if (stationdata.variable === "WLVL") {
+                        var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1626gwa", tourl);
+                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                    } else if (stationdata.variable === "TMAX" || stationdata.variable === "TMIN") {
+                        var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1625shm", tourl);
+                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                    } else {
+                        var idc21 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla1629ghc", tourl);
+                        window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();
+                    }
+                }
+            }));
+
+
+        // Aufruf der Auswertung in neuem Reiter für die stationid
+        $("#kla1632data")
+            .append($("<button/>", {
+                html: "Windparks in der Nähe von:" + stationdata.stationid + " " + stationdata.sitename,
+                stationdata: JSON.stringify(stationdata),
+                click: function (evt) {
+                    evt.preventDefault();
+                    var stationdata = JSON.parse($(this).attr("stationdata"));
+                    var stationname = stationdata.sitename;
+                    var latitude = parseFloat(stationdata.latitude);
+                    var longitude = parseFloat(stationdata.longitude);
+
+                    // Berechnung der Umkreiskoordinaten in Radius - Rechtecknäherung zum Kreis!
+                    // grobe Berücksichtigung der Verjüngung der Breitengrade
+                    var selcoordinates = uihelper.lincoordinates(latitude, longitude, 60);
+                    if (selcoordinates.error === false) {
+                        // hier muss eine neue Selektion erfolgen - tricky mit hidden values
+                        // latN, latS, lonW, lonE
+                        /*
+                        $("#kla1610stalatN").val(selcoordinates.latN);
+                        $("#kla1610stalatS").val(selcoordinates.latS);
+                        $("#kla1610stalonW").val(selcoordinates.lonW);
+                        $("#kla1610stalonE").val(selcoordinates.lonE);
+                        */
+                        var sqlStmt = "";
+                        sqlStmt += "SELECT * FROM KLIWIND";
+                        var where1 = "";
+                        var latN = selcoordinates.latN;
+                        var latS = parseFloat(selcoordinates.latS);
+                        var lonW = parseFloat(selcoordinates.lonW);
+                        var lonE = parseFloat(selcoordinates.lonE);
+                        // Y = latitude, X = longitude
+                        if (latN > latS) {
+                            if (where1.length > 0) where1 += " AND ";
+                            // CAST(Width AS DECIMAL(10,2))
+                            where1 += " CAST(KLIWIND.Y as DECIMAL(4,5)) <= " + latN;
+                            where1 += " AND CAST(KLIWIND.Y as DECIMAL(4,5)) >= " + latS;
+                        } else {
+                            if (where1.length > 0) where1 += " AND ";
+                            where1 += " CAST(KLIWIND.Y as DECIMAL(4,5)) >= " + latN;
+                            where1 += " AND CAST(KLIWIND.Y as DECIMAL(4,5)) <= " + latS;
+                        }
+                        if (lonW > lonE) {
+                            if (where1.length > 0) where1 += " AND ";
+                            where1 += " CAST(KLIWIND.X as DECIMAL(4,5)) <= " + lonW;
+                            where1 += " AND CAST(KLIWIND.X as DECIMAL(4,5)) >= " + lonE;
+                        } else {
+                            if (where1.length > 0) where1 += " AND ";
+                            where1 += " CAST(KLIWIND.X as DECIMAL(4,5)) >= " + lonW;
+                            where1 += " AND CAST(KLIWIND.X as DECIMAL(4,5)) <= " + lonE;
+                        }
+                        if (where1.length > 0) {
+                            sqlStmt += " WHERE " + where1;
+                        }
+                        var api = "getallsqlrecords";
+                        var table = "KLIWIND";
+                        uihelper.getAllRecords(sqlStmt, {}, [], 0, 2, api, table, function (ret1) {
+                            if (ret1.error === false && ret1.records !== null) {
+                                /*
+                                intern wird getallsqlrecords gerufen und es werden zwei Sätze erwartet,
+                                wenn die Station komplette Daten geliefert hat
+                                */
+                                if (Object.keys(ret1.records).length > 0) {
+                                    for (var irec = 0; irec < Object.keys(ret1.records).length; irec++) {
+                                        var record = ret1.records["" + irec];
+                                        $("#kla1632data")
+                                        .append($("<span/>", {
+                                            html: record.X + " " + record.Y + " " + record.Name
+                                        }));
+
+                                        var station = {};
+                                        station.stationid = record.stationid;
+                                        if (typeof station.stationid === "undefined" || station.stationid.length === 0) {
+                                            station.stationid = 'plot-' + Math.round(Math.random() * 10000);
+                                        }
+                                        var sitename = record.sitename || "unknown";
+                                        var longitude = Number(record.X);
+                                        var latitude = Number(record.Y);
+                                        var marker2 = L.marker([latitude, longitude], station); // station ist das Objekt mit den Daten
+                                        marker2.bindTooltip(sitename, {
+                                            permanent: false,
+                                            direction: 'right'
+                                        });
+                                        marker2.addTo(mymap);
+                                        marker2.valueOf()._icon.style.filter = 'hue-rotate(120deg)';
+                                    }
+                                }
+                            }
+                        });
+
+
+
+                    }
+                }
+            }));
 
 
     };

@@ -1615,69 +1615,6 @@
                             }
                         }))
 
-
-                    $("#" + gldivid)
-                        .append($("<button/>", {
-                            html: "Download Rawdata",
-                            gurl: gurl,
-                            css: {
-                                float: "left",
-                                margin: "10px"
-                            },
-                            click: function (evt) {
-                                evt.preventDefault();
-                                //var gurl = "https://www.google.com/maps/dir/";
-                                var wname = "wmap" + Math.floor(Math.random() * 100000) + 1;
-                                var newurl = "/download?filename=" + klirow.stationid + ".dly";
-                                window.open(newurl, wname, 'height=' + screen.height + ', width=' + screen.width);
-
-                                // klirow.stationid + " " + klirow.stationname + " (" + klirow.source + ")",
-                                // G:\Projekte\klimadaten\IPCC-GHCN-Daily\ghcnd_all.tar\ghcnd_all
-                                // Download
-
-                                /*
-                                var jqxhr = $.ajax({
-                                    method: "GET",
-                                    crossDomain: false,
-                                    url: sysbase.getServer("getfileasstring"),
-                                    data: {
-                                        fullname: fullname
-                                    }
-                                }).done(function (r1, textStatus, jqXHR) {
-                                    sysbase.checkSessionLogin(r1);
-                                    sysbase.putMessage(r1, 1);
-                                    var ret = JSON.parse(r1);
-                                    // Ausgabe in Graphik rechts
-                                    sysbase.putMessage(ret.message, 1);
-                                    if (ret.error === true || typeof ret.filestring === "undefined" || ret.filestring.length === 0) {
-                                        callbackh1("error", {
-                                            error: true,
-                                            message: ret.message
-                                        });
-                                        return;
-                                    } else {
-                                        var dataobject = JSON.parse(ret.filestring);
-                                        callbackh1(null, {
-                                            error: false,
-                                            message: "OK",
-                                            dataobject: dataobject
-                                        });
-                                        return;
-                                    }
-                                }).fail(function (err) {
-                                    document.getElementById("kla1680gra").style.cursor = "default";
-                                    sysbase.putMessage(err, 1);
-                                    callbackg({
-                                        error: true,
-                                        message: err
-                                    });
-                                    return;
-                                }).always(function () {
-                                    // nope
-                                });
-                                */
-                            }
-                        }))
                         .append($("<button/>", {
                             html: "Alle Sparklines",
                             css: {
@@ -5972,324 +5909,324 @@
             console.log("*** Start:" + domarray.length + " ***");
             var dcount = 0;
             async.eachSeries(domarray, function (printelement1, nextElement) {
-                    // $('.doprintthis').each(function (index, printelement1) {
-                    // hier ist printelement1 noch im alten Kontext
-                    var found = false;
-                    dcount++;
-                    var dmsg = "" + dcount + ". ";
-                    dmsg += "printelement1-tag:" + $(printelement1).prop("tagName");
-                    dmsg += " -id:" + $(printelement1).attr("id");
-                    console.log(dmsg);
-                    // Container für den neuen Inhalt bereitstellen
-                    var newcontainerid = "NCID" + Math.floor(Math.random() * 100000) + 1;
-                    var newcontainerhash = "#" + newcontainerid;
-                    $(aktwrapper)
-                        .append($("<div/>", {
-                            id: newcontainerid,
-                        }));
+                // $('.doprintthis').each(function (index, printelement1) {
+                // hier ist printelement1 noch im alten Kontext
+                var found = false;
+                dcount++;
+                var dmsg = "" + dcount + ". ";
+                dmsg += "printelement1-tag:" + $(printelement1).prop("tagName");
+                dmsg += " -id:" + $(printelement1).attr("id");
+                console.log(dmsg);
+                // Container für den neuen Inhalt bereitstellen
+                var newcontainerid = "NCID" + Math.floor(Math.random() * 100000) + 1;
+                var newcontainerhash = "#" + newcontainerid;
+                $(aktwrapper)
+                    .append($("<div/>", {
+                        id: newcontainerid,
+                    }));
+                /*
+                $(aktwrapper).find(newcontainerhash)
+                    .append($("<span/>", {
+                        text: newcontainerid
+                    }));
+                */
+                /**
+                 * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                 * hier svg
+                 */
+                if ($(printelement1).is('svg')) {
+                    console.log(dcount + " svg-direkt");
+                    found = true;
+                    var svgString = new XMLSerializer().serializeToString(printelement1);
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    var DOMURL = self.URL || self.webkitURL || self;
+                    var svg = new Blob([svgString], {
+                        type: "image/svg+xml;charset=utf-8"
+                    });
+                    var url = DOMURL.createObjectURL(svg);
+                    var image = new Image();
+                    image.src = url;
+                    // noch weiter
+                    var image1 = document.createElement("img");
+                    var canvas1 = document.createElement("canvas");
+                    canvas1.width = image.width;
+                    canvas1.height = image.height;
+                    var ctx1 = canvas.getContext("2d");
+                    ctx1.drawImage(image, 0, 0);
+                    var base64 = canvas1.toDataURL("image/png");
                     /*
-                    $(aktwrapper).find(newcontainerhash)
-                        .append($("<span/>", {
-                            text: newcontainerid
-                        }));
+                    var w = $(printelement1).width();
+                    var h = $(printelement1).height();
+                    $(image).width(w);
+                    $(image).height(h);
                     */
-                    /**
-                     * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
-                     * hier svg
-                     */
-                    if ($(printelement1).is('svg')) {
-                        console.log(dcount + " svg-direkt");
-                        found = true;
-                        var svgString = new XMLSerializer().serializeToString(printelement1);
-                        var canvas = document.createElement("canvas");
-                        var ctx = canvas.getContext("2d");
-                        var DOMURL = self.URL || self.webkitURL || self;
-                        var svg = new Blob([svgString], {
-                            type: "image/svg+xml;charset=utf-8"
-                        });
-                        var url = DOMURL.createObjectURL(svg);
-                        var image = new Image();
-                        image.src = url;
-                        // noch weiter
-                        var image1 = document.createElement("img");
-                        var canvas1 = document.createElement("canvas");
-                        canvas1.width = image.width;
-                        canvas1.height = image.height;
-                        var ctx1 = canvas.getContext("2d");
-                        ctx1.drawImage(image, 0, 0);
-                        var base64 = canvas1.toDataURL("image/png");
-                        /*
-                        var w = $(printelement1).width();
-                        var h = $(printelement1).height();
-                        $(image).width(w);
-                        $(image).height(h);
-                        */
-                        $(aktwrapper).find(newcontainerhash)
-                            .empty();
-                        $(aktwrapper).find(newcontainerhash)
-                            .append(image);
-                        $(aktwrapper).find(newcontainerhash)
-                            .append($("<div/>", {
-                                html: "&nbsp;",
-                                css: {
-                                    clear: "both"
-                                }
-                            }));
-                    }
-                    if (found === true) {
-                        nextElement();
-                        return;
-                    }
-                    /**
-                     * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
-                     * hier leaflet
-                     */
-                    if ($(printelement1).hasClass("leaflet-container")) {
-                        console.log(dcount + " leaflet-direkt");
-                        var mydivid = $(printelement1).attr("id");
-                        window.mymaps = window.mymaps || {};
-                        var mymap = window.mymaps[mydivid];
-                        if (typeof window.mymaps[mydivid] !== "undefined") {
-                            found = true;
-                            leafletImage(mymap, function (err, canvas) {
-                                var img = document.createElement('img');
-                                img.src = canvas.toDataURL();
-                                var dimensions = mymap.getSize();
-                                $(img).width(dimensions.x);
-                                $(img).height(dimensions.y);
-                                $(aktwrapper).find(newcontainerhash).append(img);
-                                $(aktwrapper).find(newcontainerhash)
-                                    .append($("<div/>", {
-                                        html: "&nbsp;",
-                                        css: {
-                                            clear: "both"
-                                        }
-                                    }));
-                            });
-                        }
-                    }
-                    if (found === true) {
-                        nextElement();
-                        return;
-                    }
-
-                    /**
-                     * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
-                     * hier canvas
-                     */
-                    if ($(printelement1).is("canvas")) {
-                        console.log(dcount + " canvas-direkt");
-                        found = true;
-                        console.log("CANVAS:" + $(printelement1).attr("id"));
-                        var img = document.createElement('img');
-                        img.src = printelement1.toDataURL(); // png "image/jpg"
-                        $(aktwrapper).find(newcontainerhash).append(img);
-                        $(aktwrapper).find(newcontainerhash)
-                            .append($("<div/>", {
-                                html: "&nbsp;",
-                                css: {
-                                    clear: "both"
-                                }
-                            }));
-                    }
-                    if (found === true) {
-                        nextElement();
-                        return;
-                    }
-                    /**
-                     * hier wird es schwieriger, weil die Sonderelemente eingebettet sind
-                     * es muss also erst ein CLONE erzeugt werden und dann kann darin gearbeitet werden
-                     */
-                    // Vorbereiten für untergeordnete Sonderfälle
-
-                    $(printelement1).find('canvas').each(function (index, printcanvas) {
-                        if (typeof $(printcanvas).attr("id") === "undefined") {
-                            var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
-                            $(printcanvas).attr("id", newid);
-                        }
-                    });
-                    $(printelement1).find('svg').each(function (index, printsvg) {
-                        if (typeof $(printsvg).attr("id") === "undefined") {
-                            var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
-                            $(printsvg).attr("id", newid);
-                        }
-                    });
-                    $(printelement1).find('.leaflet-container').each(function (index, printleaf) {
-                        if (typeof $(printleaf).attr("id") === "undefined") {
-                            var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
-                            $(printleaf).attr("id", newid);
-                        }
-                    });
-
-                    var printelement = $(printelement1).clone(true, true);
-                    console.log(dcount + " clone erzeugt");
-                    /**
-                     * erst mal die id's austauschen, id' haben Nebeneffekte
-                     */
-                    $(printelement).find("[id]").each(function () {
-                        var actid = this.id;
-                        if (typeof old2newids[actid] === "undefined") {
-                            old2newids[actid] = "NID" + Math.floor(Math.random() * 100000) + 1;
-                            this.id = old2newids[actid];
-                        } else {
-                            this.id = old2newids[actid];
-                        }
-                    });
-                    $(aktwrapper)
-                        .find(newcontainerhash)
+                    $(aktwrapper).find(newcontainerhash)
+                        .empty();
+                    $(aktwrapper).find(newcontainerhash)
+                        .append(image);
+                    $(aktwrapper).find(newcontainerhash)
                         .append($("<div/>", {
-                            /* html: "&nbsp;", */ // $(printelement).prop("tagName") + "=>" + $(printelement).attr("id"),
+                            html: "&nbsp;",
                             css: {
-                                height: "1px",
-                                width: "100%",
-                                "backgound-color": "red",
                                 clear: "both"
                             }
                         }));
-
-                    // Löschen Suchzeilen in Tabellen
-                    $(printelement).find("tr[role=search]").remove();
-
-                    // HIER WIRD ES INTERESSANT - es müssen die Sonderfälle im Original gesucht werden
-                    // und vom Original verarbeitet werden!!!
-
-                    /**
-                     * Konvertieren canvas-Unterelemente zu image setview
-                     * im loop - in das jeweilige Parent einbetten
-                     */
-                    $(printelement1).find('canvas').each(function (index, printcanvas) {
-                        // gesucht und gefunden im Original
-                        var img = document.createElement('img');
-                        img.src = printcanvas.toDataURL(); // png "image/jpg"
-                        // das Image kommt in den Clone!!!
-                        var oldid = $(printcanvas).attr("id");
-                        var newid = old2newids[oldid];
-                        $(printelement).find("#" + newid).replaceWith(img);
-                        console.log(dcount + " canvas iterativ");
-                    });
-                    var svgarray = $(printelement1).find('svg').toArray();
-                    if (svgarray.length === 1) {
-                        var svgelement = svgarray[0];
-                        found === true;
-                        var svgString = new XMLSerializer().serializeToString(svgelement);
-                        var canvas = document.createElement("canvas");
-                        var ctx = canvas.getContext("2d");
-                        var DOMURL = self.URL || self.webkitURL || self;
-                        var svg = new Blob([svgString], {
-                            type: "image/svg+xml;charset=utf-8"
-                        });
-                        var url = DOMURL.createObjectURL(svg);
-                        var img = document.createElement("img"); // new Image();
-                        var w = $(svgelement).width();
-                        var h = $(svgelement).height();
-                        $(img).width(w);
-                        $(img).height(h);
-                        $(img).attr('crossorigin', 'anonymous');
-                        // img.src = url;
-                        /**
-                         * asynchrone Aufbereitung
-                         */
-                        blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
-                            // success
-                            var oldid = $(svgelement).attr("id");
-                            var newid = old2newids[oldid];
-                            img.src = dataURL;
-                            // hier wird es tricky, dediziert mapael-container abfangen und umgehen
-                            // $(printelement).find("#" + newid).replaceWith(img);
-                            $(printelement).empty();
-                            $(printelement)
-                                .append($(img));
-                            $(aktwrapper)
-                                .find(newcontainerhash)
-                                .append(printelement);
-                            $(aktwrapper)
-                                .find(newcontainerhash)
+                }
+                if (found === true) {
+                    nextElement();
+                    return;
+                }
+                /**
+                 * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                 * hier leaflet
+                 */
+                if ($(printelement1).hasClass("leaflet-container")) {
+                    console.log(dcount + " leaflet-direkt");
+                    var mydivid = $(printelement1).attr("id");
+                    window.mymaps = window.mymaps || {};
+                    var mymap = window.mymaps[mydivid];
+                    if (typeof window.mymaps[mydivid] !== "undefined") {
+                        found = true;
+                        leafletImage(mymap, function (err, canvas) {
+                            var img = document.createElement('img');
+                            img.src = canvas.toDataURL();
+                            var dimensions = mymap.getSize();
+                            $(img).width(dimensions.x);
+                            $(img).height(dimensions.y);
+                            $(aktwrapper).find(newcontainerhash).append(img);
+                            $(aktwrapper).find(newcontainerhash)
                                 .append($("<div/>", {
                                     html: "&nbsp;",
                                     css: {
                                         clear: "both"
                                     }
                                 }));
-                            console.log(dcount + " *** svg iterativ=0, div-id:" + $(printelement).attr("id"));
-                            nextElement();
-                            return;
-                        }).catch(function (err) {
-                            // error
-                            console.log(dcount + " svg iterativ=0" + err.stack);
-                            nextElement();
-                            return;
                         });
-                    } else {
-                        async.eachSeries(svgarray, function (svgelement, nextSvg) {
-                                // $(printelement1).find('svg').each(function (index, svgelement) {
-                                found === true;
-                                var svgString = new XMLSerializer().serializeToString(svgelement);
-                                var canvas = document.createElement("canvas");
-                                var ctx = canvas.getContext("2d");
-                                var DOMURL = self.URL || self.webkitURL || self;
-                                var svg = new Blob([svgString], {
-                                    type: "image/svg+xml;charset=utf-8"
-                                });
-                                var url = DOMURL.createObjectURL(svg);
-                                var img = document.createElement("img"); // new Image();
-                                var w = $(svgelement).width();
-                                var h = $(svgelement).height();
-                                $(img).width(w);
-                                $(img).height(h);
-                                $(img).attr('crossorigin', 'anonymous');
-                                img.src = url;
-                                /**
-                                 * asynchrone Aufbereitung
-                                 */
-                                blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
-                                    // success
-                                    var oldid = $(svgelement).attr("id");
-                                    var newid = old2newids[oldid];
-                                    img.src = dataURL;
-                                    // hier wird es tricky, dediziert mapael-container abfangen und umgehen
-                                    $(printelement).find("#" + newid).replaceWith(img);
-                                    console.log(dcount + " svg iterativ (async)");
-                                    nextSvg();
-                                    return;
-                                }).catch(function (err) {
-                                    // error
-                                    console.log(dcount + " svg iterativ " + err.stack);
-                                    nextSvg();
-                                    return;
-                                });
-                            },
-                            function (error) {
-                                if (found === true) {
-                                    console.log(dcount + " canvas iterativ-beendet");
-                                    var msg = error;
-                                    console.log(msg);
-                                    nextElement();
-                                    return;
-                                } else {
-                                    console.log(dcount + " canvas iterativ-nichts gefunden");
-                                    $(aktwrapper)
-                                        .find(newcontainerhash)
-                                        .append(printelement);
-                                    $(aktwrapper)
-                                        .find(newcontainerhash)
-                                        .append($("<div/>", {
-                                            html: "&nbsp;",
-                                            css: {
-                                                clear: "both"
-                                            }
-                                        }));
-                                    nextElement();
-                                    return;
-                                }
-                            });
                     }
-                },
-                function (err) {
-                    // Enderoutine, Rücksetzen der background-color
-                    $("body").css("background-color", "lightsteelblue");
-                    $("#kla2150repdiv").css("background-color", "lime");
-                    $("#kla2150repwrapper").css("background-color", "lime");
-                }); // async.eachSeries
+                }
+                if (found === true) {
+                    nextElement();
+                    return;
+                }
+
+                /**
+                 * direkte Elemente mit Sonderbehandlung svg, canvas und leaflet
+                 * hier canvas
+                 */
+                if ($(printelement1).is("canvas")) {
+                    console.log(dcount + " canvas-direkt");
+                    found = true;
+                    console.log("CANVAS:" + $(printelement1).attr("id"));
+                    var img = document.createElement('img');
+                    img.src = printelement1.toDataURL(); // png "image/jpg"
+                    $(aktwrapper).find(newcontainerhash).append(img);
+                    $(aktwrapper).find(newcontainerhash)
+                        .append($("<div/>", {
+                            html: "&nbsp;",
+                            css: {
+                                clear: "both"
+                            }
+                        }));
+                }
+                if (found === true) {
+                    nextElement();
+                    return;
+                }
+                /**
+                 * hier wird es schwieriger, weil die Sonderelemente eingebettet sind
+                 * es muss also erst ein CLONE erzeugt werden und dann kann darin gearbeitet werden
+                 */
+                // Vorbereiten für untergeordnete Sonderfälle
+
+                $(printelement1).find('canvas').each(function (index, printcanvas) {
+                    if (typeof $(printcanvas).attr("id") === "undefined") {
+                        var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                        $(printcanvas).attr("id", newid);
+                    }
+                });
+                $(printelement1).find('svg').each(function (index, printsvg) {
+                    if (typeof $(printsvg).attr("id") === "undefined") {
+                        var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                        $(printsvg).attr("id", newid);
+                    }
+                });
+                $(printelement1).find('.leaflet-container').each(function (index, printleaf) {
+                    if (typeof $(printleaf).attr("id") === "undefined") {
+                        var newid = "NEW" + Math.floor(Math.random() * 100000) + 1;
+                        $(printleaf).attr("id", newid);
+                    }
+                });
+
+                var printelement = $(printelement1).clone(true, true);
+                console.log(dcount + " clone erzeugt");
+                /**
+                 * erst mal die id's austauschen, id' haben Nebeneffekte
+                 */
+                $(printelement).find("[id]").each(function () {
+                    var actid = this.id;
+                    if (typeof old2newids[actid] === "undefined") {
+                        old2newids[actid] = "NID" + Math.floor(Math.random() * 100000) + 1;
+                        this.id = old2newids[actid];
+                    } else {
+                        this.id = old2newids[actid];
+                    }
+                });
+                $(aktwrapper)
+                    .find(newcontainerhash)
+                    .append($("<div/>", {
+                        /* html: "&nbsp;", */ // $(printelement).prop("tagName") + "=>" + $(printelement).attr("id"),
+                        css: {
+                            height: "1px",
+                            width: "100%",
+                            "backgound-color": "red",
+                            clear: "both"
+                        }
+                    }));
+
+                // Löschen Suchzeilen in Tabellen
+                $(printelement).find("tr[role=search]").remove();
+
+                // HIER WIRD ES INTERESSANT - es müssen die Sonderfälle im Original gesucht werden
+                // und vom Original verarbeitet werden!!!
+
+                /**
+                 * Konvertieren canvas-Unterelemente zu image setview
+                 * im loop - in das jeweilige Parent einbetten
+                 */
+                $(printelement1).find('canvas').each(function (index, printcanvas) {
+                    // gesucht und gefunden im Original
+                    var img = document.createElement('img');
+                    img.src = printcanvas.toDataURL(); // png "image/jpg"
+                    // das Image kommt in den Clone!!!
+                    var oldid = $(printcanvas).attr("id");
+                    var newid = old2newids[oldid];
+                    $(printelement).find("#" + newid).replaceWith(img);
+                    console.log(dcount + " canvas iterativ");
+                });
+                var svgarray = $(printelement1).find('svg').toArray();
+                if (svgarray.length === 1) {
+                    var svgelement = svgarray[0];
+                    found === true;
+                    var svgString = new XMLSerializer().serializeToString(svgelement);
+                    var canvas = document.createElement("canvas");
+                    var ctx = canvas.getContext("2d");
+                    var DOMURL = self.URL || self.webkitURL || self;
+                    var svg = new Blob([svgString], {
+                        type: "image/svg+xml;charset=utf-8"
+                    });
+                    var url = DOMURL.createObjectURL(svg);
+                    var img = document.createElement("img"); // new Image();
+                    var w = $(svgelement).width();
+                    var h = $(svgelement).height();
+                    $(img).width(w);
+                    $(img).height(h);
+                    $(img).attr('crossorigin', 'anonymous');
+                    // img.src = url;
+                    /**
+                     * asynchrone Aufbereitung
+                     */
+                    blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
+                        // success
+                        var oldid = $(svgelement).attr("id");
+                        var newid = old2newids[oldid];
+                        img.src = dataURL;
+                        // hier wird es tricky, dediziert mapael-container abfangen und umgehen
+                        // $(printelement).find("#" + newid).replaceWith(img);
+                        $(printelement).empty();
+                        $(printelement)
+                            .append($(img));
+                        $(aktwrapper)
+                            .find(newcontainerhash)
+                            .append(printelement);
+                        $(aktwrapper)
+                            .find(newcontainerhash)
+                            .append($("<div/>", {
+                                html: "&nbsp;",
+                                css: {
+                                    clear: "both"
+                                }
+                            }));
+                        console.log(dcount + " *** svg iterativ=0, div-id:" + $(printelement).attr("id"));
+                        nextElement();
+                        return;
+                    }).catch(function (err) {
+                        // error
+                        console.log(dcount + " svg iterativ=0" + err.stack);
+                        nextElement();
+                        return;
+                    });
+                } else {
+                    async.eachSeries(svgarray, function (svgelement, nextSvg) {
+                            // $(printelement1).find('svg').each(function (index, svgelement) {
+                            found === true;
+                            var svgString = new XMLSerializer().serializeToString(svgelement);
+                            var canvas = document.createElement("canvas");
+                            var ctx = canvas.getContext("2d");
+                            var DOMURL = self.URL || self.webkitURL || self;
+                            var svg = new Blob([svgString], {
+                                type: "image/svg+xml;charset=utf-8"
+                            });
+                            var url = DOMURL.createObjectURL(svg);
+                            var img = document.createElement("img"); // new Image();
+                            var w = $(svgelement).width();
+                            var h = $(svgelement).height();
+                            $(img).width(w);
+                            $(img).height(h);
+                            $(img).attr('crossorigin', 'anonymous');
+                            img.src = url;
+                            /**
+                             * asynchrone Aufbereitung
+                             */
+                            blobUtil.imgSrcToDataURL(url).then(function (dataURL) {
+                                // success
+                                var oldid = $(svgelement).attr("id");
+                                var newid = old2newids[oldid];
+                                img.src = dataURL;
+                                // hier wird es tricky, dediziert mapael-container abfangen und umgehen
+                                $(printelement).find("#" + newid).replaceWith(img);
+                                console.log(dcount + " svg iterativ (async)");
+                                nextSvg();
+                                return;
+                            }).catch(function (err) {
+                                // error
+                                console.log(dcount + " svg iterativ " + err.stack);
+                                nextSvg();
+                                return;
+                            });
+                        },
+                        function (error) {
+                            if (found === true) {
+                                console.log(dcount + " canvas iterativ-beendet");
+                                var msg = error;
+                                console.log(msg);
+                                nextElement();
+                                return;
+                            } else {
+                                console.log(dcount + " canvas iterativ-nichts gefunden");
+                                $(aktwrapper)
+                                    .find(newcontainerhash)
+                                    .append(printelement);
+                                $(aktwrapper)
+                                    .find(newcontainerhash)
+                                    .append($("<div/>", {
+                                        html: "&nbsp;",
+                                        css: {
+                                            clear: "both"
+                                        }
+                                    }));
+                                nextElement();
+                                return;
+                            }
+                        });
+                }
+            },
+            function(err) {
+                // Enderoutine, Rücksetzen der background-color
+                $("body").css("background-color", "lightsteelblue");
+                $("#kla2150repdiv").css("background-color", "lime");
+                $("#kla2150repwrapper").css("background-color", "lime");
+            });  // async.eachSeries
         }, 2000);
         if (1 === 1) return;
         window.parent.$(".tablinks[idhash='#" + idc21 + "']").click();

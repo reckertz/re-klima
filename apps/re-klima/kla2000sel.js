@@ -49,6 +49,7 @@
                 io: "i",
                 enum: [
                     "GHCND",
+                    "NOAAICE",
                     "PAGES2K",
                     "HYGRIS",
                     "NAO",
@@ -75,6 +76,7 @@
                     "SNOW",
                     "NAO",
                     "PAGES2K",
+                    "ICEEXT",
                     ""
                 ]
             },
@@ -577,7 +579,7 @@
                         }))
 
 
-                        /*
+
                         .append($("<button/>", {
                             css: {
                                 float: "left",
@@ -620,7 +622,7 @@
                                 }
                             }
                         }))
-                        */
+
 
                         .append($("<button/>", {
                             html: "Leaflet-Pins (Liste)",
@@ -743,7 +745,7 @@
                                     var jqxhr = $.ajax({
                                         method: "GET",
                                         crossDomain: false,
-                                        url: sysbase.getServer("ghcnddata"),
+                                        url: sysbase.getServer("ghcnddataold"),
                                         data: {
                                             timeout: 10 * 60 * 1000,
                                             source: source,
@@ -771,6 +773,68 @@
                         }))
 
 
+                        .append($("<button/>", {
+                            css: {
+                                float: "left",
+                                "margin": "10px"
+                            },
+                            html: "Neue Übernahme (Liste)",
+                            click: function (evt) {
+                                evt.preventDefault();
+                                //window.parent.sysbase.setCache("yearlats", JSON.stringify(yearlats));
+                                var stationarray = [];
+                                var stationids = [];
+                                var test = $("#kla2000sel").find(".col2of2").find("tbody tr:visible");
+                                $("#kla2000sel").find(".col2of2").find("tbody tr:visible").each(function (index, row) {
+                                    var stationid = $(row).attr("rowid");
+                                    var sitename = $(row).find("td:nth-child(2)").html(); //
+                                    var longitude = $(row).find("td:nth-child(8)").text();
+                                    var latitude = $(row).find("td:nth-child(9)").text();
+                                    stationids.push(stationid);
+                                    stationarray.push({
+                                        stationid: stationid,
+                                        sitename: sitename,
+                                        longitude: parseFloat(longitude),
+                                        latitude: parseFloat(latitude)
+                                    });
+                                });
+                                if (stationarray.length === 0) {
+                                    sysbase.putMessage("Bitte erst die Liste aufrufen", 3);
+                                    return;
+                                } else {
+                                    var source = $("#kla2000selsource").val(); //   $(this).closest("tr").find('td:first-child').text();
+                                    var ghcnclock = kla2000sel.showclock("#kla2000sellock");
+                                    var that = this;
+                                    $(that).attr("disabled", true);
+                                    var jqxhr = $.ajax({
+                                        method: "GET",
+                                        crossDomain: false,
+                                        url: sysbase.getServer("ghcnddata"),
+                                        data: {
+                                            timeout: 10 * 60 * 1000,
+                                            source: source,
+                                            stationids: stationids  // array
+                                        }
+                                    }).done(function (r1, textStatus, jqXHR) {
+                                        clearInterval(ghcnclock);
+                                        sysbase.checkSessionLogin(r1);
+                                        var ret = JSON.parse(r1);
+                                        sysbase.putMessage(ret.message, 1);
+                                        $("#kla2000selliste").click();
+                                        return;
+                                    }).fail(function (err) {
+                                        clearInterval(ghcnclock);
+                                        //$("#kli1400raw_rightwdata").empty();
+                                        //document.getElementById("kli1400raw").style.cursor = "default";
+                                        sysbase.putMessage("ghcnddata:" + err, 3);
+                                        return;
+                                    }).always(function () {
+                                        // nope
+                                        $(that).attr("disabled", false);
+                                    });
+                                }
+                            }
+                        }))
 
                         .append($("<button/>", {
                             css: {
@@ -1643,6 +1707,9 @@
             } else if (source === "PAGES2K") {
                 var idc22 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc22 + "']").click();
+            } else if (source === "NOAAICE") {
+                var idc23 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc23 + "']").click();
             } else {
                 sysbase.putMessage("keine Einzelauswertung vorgesehen", 3);
             }
@@ -1695,6 +1762,9 @@
             } else if (source === "PAGES2K") {
                 var idc22 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc22 + "']").click();
+            } else if (source === "NOAAICE") {
+                var idc23 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2100rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc23 + "']").click();
             } else {
                 sysbase.putMessage("keine Einzelauswertung vorgesehen", 3);
             }

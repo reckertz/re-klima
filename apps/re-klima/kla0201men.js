@@ -138,6 +138,13 @@
                 app: "re-klima",
                 module: "kla1400raw"
             },
+
+            {
+                id: "admin0015",
+                text: "Extrakt GHCN-D",
+                app: "re-klima",
+                module: "kla1800ext"
+            },
             {
                 id: "admin0020",
                 text: "Statistik",

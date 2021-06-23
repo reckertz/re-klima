@@ -14,9 +14,10 @@
     var resmsg = "";
     /**
      * init aktiviert die klassenbezogenen Events
+     * G:\magentaCloud\MagentaCLOUD\Documents\Kassenbuch\MeineBeiträge\20190123 Cheat Sheet V0108.odt
+     * technisches Handbuch für die Programmierung
      */
     uientry.init = function () {
-
         //mytransliste = kabu2.getbctransliste();
         /**
          * text

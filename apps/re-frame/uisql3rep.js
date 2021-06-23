@@ -317,7 +317,7 @@
                         }));
 
 
-                        $("#uisql3repbutts")
+                    $("#uisql3repbutts")
                         .append($("<button/>", {
                             html: "JSON-Download",
                             css: {
@@ -478,7 +478,7 @@
                                         // Die Felder als Children aufbereiten
                                         var irec = 0;
                                         var selfields = selnodes[0].children; // holt die id's der Children!!!
-                                        $.each(selfields, function(nr, field) {
+                                        $.each(selfields, function (nr, field) {
                                             var fieldnode = $('#uisql3repc1b1').jstree(true).get_node(field);
                                             var fielddata = {};
                                             fielddata.name = fieldnode.a_attr.name;
@@ -513,6 +513,42 @@
                             click: function (evt) {
                                 evt.preventDefault();
                                 uihelper.downloadHtmlTable($("#uisql3repdata").find("table"), "html-extrakt");
+                            }
+                        }));
+
+                    $("#uisql3repbutts")
+                        .append($("<button/>", {
+                            html: "Speicherbedarf",
+                            css: {
+                                margin: "10px"
+                            },
+                            click: function (evt) {
+                                evt.preventDefault();
+                                // uisql3repselstmt . textarea mit dem SQL-Statement, das kann genommen werden
+                                // wird im Server berechnet
+                                var jqxhr = $.ajax({
+                                    method: "GET",
+                                    crossDomain: false,
+                                    url: sysbase.getServer("getsql3storage"),
+                                    data: {
+                                        username: uihelper.getUsername(),
+                                        sqlStmt: $("#uisql3repselstmt").val()
+                                    }
+                                }).done(function (r1, textStatus, jqXHR) {
+                                    sysbase.checkSessionLogin(r1);
+                                    var ret = {};
+                                    var j1 = JSON.parse(r1);
+                                    uihelper.checkSessionLogin(j1);
+                                    if (j1.record && j1.record !== null) {
+                                        alert(JSON.stringify(j1.record));
+                                    }
+                                    return;
+                                }).fail(function (err) {
+                                    sysbase.putMessage("getsql3storage AJAX ERROR:" + err.message);
+                                    return;
+                                }).always(function () {
+                                    // nope
+                                });
                             }
                         }));
                 }

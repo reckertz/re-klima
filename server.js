@@ -8,7 +8,6 @@ var app = express();
 var fs = require("fs");
 var async = require("async");
 
-var express = require("express");
 var bodyParser = require("body-parser");
 
 var session = require('express-session');
@@ -95,8 +94,16 @@ db.serialize(function () {
                 return;
             });
         },
+        function (callbackdb4) {
+            var sqlstmt = "CREATE INDEX IF NOT EXISTS KLIDATA03";
+            sqlstmt += " ON KLIDATA(source, stationid, variable, fromyear, toyear, anzyears, realyears, goodyears, missing, imissing)";
+            db.run(sqlstmt, function (err) {
+                console.log("Create Index KLIDATA03:" + err);
+                callbackdb4(null);
+                return;
+            });
+        },
         function (callbackdb9) {
-
             db.get("PRAGMA index_list('KLICONFIG')", function (err, indexlist) {
                 console.log("index_list KLICONFIG:" + JSON.stringify(indexlist) + " " + err);
                 if (typeof indexlist === "object") {
@@ -143,8 +150,8 @@ db.serialize(function () {
                 if (ms > 0) console.log(ms);
             });
             */
-           callbackdb10(null);
-           return;
+            callbackdb10(null);
+            return;
         },
 
         /*
@@ -158,17 +165,17 @@ db.serialize(function () {
             });
         },
         */
-       /*
-        function (callbackdb5) {
-            var sqlstmt = "ALTER TABLE KLIINVENTORY ";
-            sqlstmt += " ADD COLUMN lastUpdated TEXT";
-            db.run(sqlstmt, function (err) {
-                console.log("add column KLIINVENTORY:" + err);
-                callbackdb5(null);
-                return;
-            });
-        }
-        */
+        /*
+         function (callbackdb5) {
+             var sqlstmt = "ALTER TABLE KLIINVENTORY ";
+             sqlstmt += " ADD COLUMN lastUpdated TEXT";
+             db.run(sqlstmt, function (err) {
+                 console.log("add column KLIINVENTORY:" + err);
+                 callbackdb5(null);
+                 return;
+             });
+         }
+         */
     ], function (error, result) {
         console.log("Fertig mit Indexerstellung");
     }); // async.waterfall
@@ -382,6 +389,21 @@ app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, 'static'))); // __dirname is always root verzeichnis #denglisch
 
+
+
+
+app.get('/download', function (req, res) {
+    // http://expressjs.com/en/api.html#res.download
+    // http://localhost:3001/ghcnd/RSM00021432.dly
+    var filename = "";
+    if (req.query && typeof req.query.filename !== "undefined" && req.query.filename.length > 0) {
+        filename = req.query.filename;
+    }
+    var fullname = path.join("G:\\Projekte\\klimadaten\\IPCC-GHCN-Daily\\ghcnd_all.tar\\ghcnd_all\\ghcnd_all", filename);
+    res.download(fullname); // Set disposition and send it.
+});
+
+
 /**
  * createtemptable - API - Erstellen temporary table sqlite3
  */
@@ -425,6 +447,66 @@ app.get('/createtemptable', function (req, res) {
         return;
     }
 });
+
+
+/**
+ * getsql3storage - API - Speicherbedarf zum Ergebnis einer SQL-Abfrage
+ * bestimmen, Ergebnis in record zurückgeben
+ */
+app.get('/getsql3storage', function (req, res) {
+    if (checkSession(req, res)) return;
+    // var cousername = req.query.username;
+    var sqlStmt = "";
+    if (req.query && typeof req.query.sqlStmt !== "undefined" && req.query.sqlStmt.length > 0) {
+        sqlStmt = req.query.sqlStmt;
+    }
+    var count = 0;
+    var size = 0;
+    try {
+        db.serialize(function () {
+            //db.all(sqlStmt, function (err, rows) {
+            db.each(sqlStmt, {}, function (err, row) {
+                if (err !== null) {
+
+                }
+                if (row !== null) {
+                    count++;
+                    size += JSON.stringify(row).length;
+                }
+            },
+            function(err) {
+                var ret = {};
+                ret.error = false;
+                ret.message = "Daten gefunden:" + size + " " + err;
+                ret.record = {
+                    count: count,
+                    size: size,
+                    sqlStmt: sqlStmt
+                };
+                var smsg = JSON.stringify(ret);
+                res.writeHead(200, {
+                    'Content-Type': 'application/text',
+                    "Access-Control-Allow-Origin": "*"
+                });
+                res.end(smsg);
+                return;
+            });
+        });
+    } catch (err) {
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: err.message,
+            records: null
+        }));
+        return;
+    }
+});
+
+
 
 /**
  * getsql3tables - API - Sammlung der Tabellen einer Datenbank,
@@ -913,6 +995,7 @@ app.get('/textanalysis', function (req, res) {
 });
 
 
+
 /**
  * getfileasstring: fullname
  * gibt filestring zurück in ret!
@@ -1252,6 +1335,32 @@ app.get('/loadnao', function (req, res) {
 });
 
 
+/**
+ * loadgeonames - Orte in Ländern
+ * https://download.geonames.org/export/dump/
+ */
+app.get('/loadgeonames', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.loadgeonames(gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
+
 
 
 
@@ -1386,6 +1495,32 @@ app.get('/ghcnddata', function (req, res) {
         return;
     });
 });
+
+
+/**
+ * ghcnddataold - ghcnd *.dly Dateien aus dem Unterverzeichnis laden
+ */
+app.get('/ghcnddataold', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.ghcnddataold(gblInfo, db, fs, path, rootname, async, stream, StreamZip, readline, sys0000sys, kla9020fun, req, null, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
+
 
 /**
  * ghcndonline - Online-Update GHCND mit stationid und variable
@@ -1739,6 +1874,155 @@ app.get('/batchreg', function (req, res) {
         res.end(smsg);
         return;
     });
+});
+
+
+/**
+ * loadice csv-Datei nach MongoDB laden gemäß Vorgabe
+ * hier: NOAA ICE North- or Southpole
+ * fullname, filetype, targettable
+ */
+app.get('/loadice', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.loadice(gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+
+
+    /*
+    var fullname = "";
+    if (req.body && typeof req.body.fullname !== "undefined" && req.body.fullname.length > 0) {
+        fullname = req.body.fullname;
+    }
+    var filetype = "";
+    if (req.body && typeof req.body.filetype !== "undefined" && req.body.filetype.length > 0) {
+        filetype = req.body.filetype;
+    }
+    var separator = "";
+    if (req.body && typeof req.body.separator !== "undefined" && req.body.separator.length > 0) {
+        separator = req.body.separator;
+        if (separator === "Tab") separator = "\t";
+    }
+    var targettable = "";
+    if (req.body && typeof req.body.targettable !== "undefined" && req.body.targettable.length > 0) {
+        targettable = req.body.targettable;
+    }
+
+    var primarykey = "";
+    if (req.body && typeof req.body.primarykey !== "undefined" && req.body.primarykey.length > 0) {
+        primarykey = req.body.primarykey;
+    }
+
+    //var dir = gblInfo.gblUpdatePath;
+    var dir = fullname;
+    var filename = path.basename(fullname);
+    var northsouth = filename.substr(0,1);
+
+    console.log("loadice:" + dir);
+    if (!fs.existsSync(dir)) {
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: "Datei nicht gefunden:" + dir
+        }));
+        return;
+    }
+    var counter = 0;
+    var fileschema = "";
+    var fieldarray = [];
+    try {
+        fs.createReadStream(dir)
+            .pipe(csv.parse({
+                headers: true,
+                delimiter: separator,
+                trim: true,
+                ignoreEmpty: true
+            }))
+            .on("data", function (data) {
+                var that = this;
+                that.pause();
+                // data ist ein array der Felder, hier kein Header!!!
+                counter++;
+                if (counter === 1) { // Skip Satz
+                    that.resume(); // holt den nächsten Satz, auch aus waterfall
+                    return;
+                }
+                var record = uihelper.cloneObject(data);
+                var reqparm = {};
+                reqparm.selfields = {};
+
+                reqparm.selfields["northsouth"] = northsouth;
+                reqparm.selfields["isoday"] = "" + record["Year"].trim() + "-" + record["Month"].trim() + "-" + record["Day"].trim();
+
+                reqparm.updfields = {};
+                reqparm.updfields["$setOnInsert"] = {};
+                // Year, Month, Day
+                reqparm.updfields["$setOnInsert"]["northsouth"] = northsouth;
+                reqparm.updfields["$setOnInsert"]["isoday"] = "" + record["Year"].trim() + "-" + record["Month"].trim() + "-" + record["Day"].trim();
+
+                delete record["Year"];
+                delete record["Month"];
+                delete record["Day"];
+
+                // ['/ecs/DP1/PM/NSIDC-0051.001/1978.10.26/nt_19781026_n07_v1.1_n.bin']
+                //"['/ecs/DP1/PM/NSIDC-0081.001/2021.02.04/nt_20210204_f18_nrt_n.bin',
+                //  '/ecs/DP1/PM/NSIDC-0081.001/2021.02.05/nt_20210205_f18_nrt_n.bin',
+                //  '/ecs/DP1/PM/NSIDC-0081.001/2021.02.06/nt_20210206_f18_nrt_n.bin']"
+                delete record["Source Data"];
+
+                record["Extent"] = record["Extent"].trim();
+
+                reqparm.updfields["$set"] = record;
+                reqparm.table = targettable;
+                sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret) {
+                    //console.log("setonerecord-returned:" + JSON.stringify(ret));
+                    that.resume(); // holt den nächsten Satz, auch aus waterfall
+                    return;
+                });
+            })
+            .on("end", function () {
+                console.log(">>>done Stream<<<");
+                var ret = {};
+                ret.error = false;
+                ret.message = "Importiert";
+                ret.filename = dir;
+                ret.counter = counter;
+                res.writeHead(200, {
+                    'Content-Type': 'application/text',
+                    "Access-Control-Allow-Origin": "*"
+                });
+                res.end(JSON.stringify(ret));
+                return;
+            });
+    } catch (err) {
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(JSON.stringify({
+            error: true,
+            message: "Error:" + dir + " " + err
+        }));
+        return;
+    }
+    */
 });
 
 
@@ -2430,7 +2714,7 @@ app.post('/sql2json', function (req, res) {
             var flds = Object.keys(record);
             for (var i = 0; i < flds.length; i++) {
                 var fieldname = flds[i];
-                if (typeof record[fieldname] === "string"  && record[fieldname].startsWith("{") || fieldname === "years") {
+                if (typeof record[fieldname] === "string" && record[fieldname].startsWith("{") || fieldname === "years") {
                     record[fieldname] = JSON.parse(record[fieldname]);
                 }
             }
