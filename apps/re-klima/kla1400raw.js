@@ -2258,10 +2258,45 @@
                                                     var klirecord = uientry.fromUI2Record("#kla1400raw", klirecord, klischema);
                                                     fullname = klirecord.fsdata.fullname;
                                                     /**
-                                                     * IPCC GHCN-Daily
+                                                     * sunspots http://www.sidc.be/silso/datafiles
                                                      */
                                                     debugger;
-                                                    if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily inventory \.txt")) {
+                                                    if (kla1400raw.checkfragments(fullname, "sunspots SN_d_tot_V2.0 \.csv")) {
+                                                        aktsource = "SUNSPOTS";
+                                                        var jqxhr = $.ajax({
+                                                            method: "GET",
+                                                            crossDomain: false,
+                                                            url: sysbase.getServer("loadsunspots"),
+                                                            data: {
+                                                                fullname: fullname,
+                                                                targettable: klirecord.metadata.targettable,
+                                                                primarykey: klirecord.metadata.primarykey,
+                                                                separator: klirecord.metadata.separator,
+                                                                timeout: 10 * 60 * 1000
+                                                            }
+                                                        }).done(function (r1, textStatus, jqXHR) {
+                                                            clearInterval(ghcnclock);
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            sysbase.checkSessionLogin(r1);
+                                                            var ret = JSON.parse(r1);
+                                                            sysbase.putMessage(ret.message, 1);
+                                                            return;
+                                                        }).fail(function (err) {
+                                                            clearInterval(ghcnclock);
+                                                            $("#kla1400raw_rightw").empty();
+                                                            document.getElementById("kla1400raw").style.cursor = "default";
+                                                            $(".kla1400rawActionLoad").prop('disabled', false);
+                                                            sysbase.putMessage(err, 1);
+                                                            return;
+                                                        }).always(function () {
+                                                            // nope
+                                                        });
+                                                    /**
+                                                     * IPCC GHCN-Daily
+                                                     */
+                                                    } else if (kla1400raw.checkfragments(fullname, "IPCC GHCN Daily inventory \.txt")) {
                                                         aktsource = "GHCND";
                                                         var jqxhr = $.ajax({
                                                             method: "GET",

@@ -771,6 +771,362 @@ const {
             });
     };
 
+    /**
+     * loadsunspots  - http://www.sidc.be/silso/datafiles 
+     *
+     * @param {*} gblInfo
+     * @param {*} db
+     * @param {*} fs
+     * @param {*} path
+     * @param {*} rootname
+     * @param {*} async
+     * @param {*} stream
+     * @param {*} csv
+     * @param {*} readline
+     * @param {*} sys0000sys
+     * @param {*} kla9020fun
+     * @param {*} req
+     * @param {*} res
+     * @param {*} callback291
+     * returns function (res, ret)
+     *
+     */
+     kla1490srv.loadsunspots = function (gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, callback292) {
+        var sortdata = [];
+        var iraw = 0;
+        async.waterfall([
+                function (callback292a) {
+                    /**
+                     * Dateinamen bereitstellen fullname, source, selyears,
+                     * selyears wird nicht genutzt
+                     */
+                    var fullname = "";
+                    if (req.query && typeof req.query.fullname !== "undefined" && req.query.fullname.length > 0) {
+                        fullname = req.query.fullname;
+                    }
+                    var source = "SUNSPOTS";
+                    if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
+                        source = req.query.source;
+                    }
+                    var selyears = "";
+                    if (req.query && typeof req.query.selyears !== "undefined" && req.query.selyears.length > 0) {
+                        selyears = req.query.selyears;
+                    }
+                    if (!fs.existsSync(fullname)) {
+                        callback292a("Error", res, {
+                            error: false,
+                            message: fullname + " nicht auf dem Server vorhanden"
+                        });
+                        return;
+                    }
+                    var stationfilter = "";
+                    if (req.query && typeof req.query.extraParam !== "undefined" && req.query.extraParam.length > 0) {
+                        stationfilter = JSON.parse(req.query.extraParam).stationfilter;
+                    }
+                    var ret = {};
+                    ret.fullname = fullname;
+                    ret.fullnamestations = fullname;
+                    ret.dirname = path.dirname(fullname);
+                    ret.source = source;
+                    ret.selyears = selyears;
+                    ret.stationfilter = stationfilter;
+                    callback292a(null, res, ret);
+                    return;
+                },
+                function (res, ret, callback292a1a) {
+                    /**
+                     * KLISTATIONS löschen für SUNSPOTS
+                     */
+                    // var delStmt = "DELETE FROM KLISTATIONS ";
+                    //delStmt += " WHERE source = 'SUNSPOTS'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLISTATIONS: deleted:" + this.changes);
+                    callback292a1a(null, res, ret);
+                    return;
+                    //});
+                },
+                function (res, ret, callback292a1b) {
+                    /**
+                     * KLIINVENTORY löschen für SUNSPOTS
+                     */
+                    //var delStmt = "DELETE FROM KLIINVENTORY ";
+                    //delStmt += " WHERE source = 'SUNSPOTS'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIINVENTORY: deleted:" + this.changes);
+                    callback292a1b(null, res, ret);
+                    return;
+                    //});
+                },
+                function (res, ret, callback292a1c) {
+                    /**
+                     * KLIDATA löschen für SUNSPOTS
+                     */
+                    //var delStmt = "DELETE FROM KLIDATA ";
+                    //delStmt += " WHERE source = 'SUNSPOTS'";
+                    //db.run(delStmt, function (err) {
+                    //    console.log("KLIDATA: deleted:" + this.changes);
+                    callback292a1c(null, res, ret);
+                    return;
+                    //});
+                },
+                function (res, ret, callback292a2a) {
+                    /**
+                     * KLISTATIONS und KLIINVENTORY: 1 Datensatz
+                     * KLIDATA: 1 Datensatz, Monatswerte auf Tage des jeweiligen Monats roh verteilt
+                     * "" als missing value in der stringified-Speicherung
+                     */
+                    sortdata = [];
+                    var stationid = "";
+                    var stationname = "";
+                    var variable = "";
+                    var latitude = 0;
+                    var longitude = 0;
+                    
+                    stationid = "Sunspots";
+                    stationname = "SILS - Sunspot Index and Long-term Solar Observations";
+                    variable = "SUNSPOTS";
+                    latitude = 0.0;
+                    longitude = 0.0;
+                
+                    var klistationrec = {
+                        source: "SUNSPOTS",
+                        stationid: stationid,
+                        stationname: stationname,
+                        latitude: latitude,
+                        longitude: longitude,
+                        climatezone: "",
+                        continent: "",
+                        continentname: "",
+                        alpha2: "",
+                        alpha3: "",
+                        countrycode: "",
+                        region: "",
+                        subregion: "",
+                        intermediateregion: "",
+                        temperatur: "SUNSPOTS",
+                        height: 0,
+                        state: "",
+                    };
+                    var kliinventoryrec = {
+                        source: "SUNSPOTS",
+                        stationid: stationid,
+                        variable: variable,
+                        fromyear: 0,
+                        toyear: 0,
+                        latitude: latitude,
+                        longitude: longitude,
+                    };
+                    var klidatarec = {
+                        source: "SUNSPOTS",
+                        stationid: stationid,
+                        variable: variable,
+                        fromyear: null,
+                        toyear: null,
+                        anzyears: 0,
+                        realyears: 0,
+                        missing: 0,
+                        years: {}
+                    };
+                   
+                    
+                    var mdtable = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+                    var fieldnames = "year,month,day,currday,total,stddev,obs,defprov".split(",");
+                    try {
+                        var readInterface = readline.createInterface({
+                            input: fs.createReadStream(ret.fullname),
+                            console: false
+                        });
+                        readInterface.on('line', function (data) {
+                            // fs.createReadStream(ret.fullname)
+                            /*
+                            .pipe(iconv.decodeStream('iso-8859-15'))
+                            .pipe(iconv.encodeStream('utf8'))
+                            */
+                            // .on("data", function (data) {
+                            var that = this;
+
+                            that.pause();
+                            iraw++;
+                            // 1825  -0.23   0.21   0.33  -0.28   0.13   0.41  -0.92   1.43  -0.95   1.98   1.06  -1.31    0.16
+
+                            var haserror = false;
+                            var darray = data.trim().split(";"); // Trenner Semikolon
+                            if (darray.length < (fieldnames.length - 1)) {
+                                haserror = true;
+                            }
+                            var record = {};
+                            for (var i = 0; i < fieldnames.length; i++) {
+                                record[fieldnames[i]] = darray[i];
+                            }
+                            
+                            if (haserror === false) {
+                                // var yearvalue = darray[13]; prüfen, ob vorhanden, azoren etc. ohne!!!
+                                var year = record.year;
+                                if (typeof klidatarec.years["" + year] === "undefined") {
+                                    if (uihelper.isleapyear(year)) {
+                                        klidatarec.years[year] = new Array(366).fill("");
+                                    } else {
+                                        klidatarec.years[year] = new Array(365).fill("");
+                                    }
+                                    if (klidatarec.fromyear === null) {
+                                        klidatarec.fromyear = year;
+                                    } else if (year < klidatarec.fromyear) {
+                                        klidatarec.fromyear = year;
+                                    }
+                                    if (klidatarec.toyear === null) {
+                                        klidatarec.toyear = year;
+                                    } else if (year > klidatarec.toyear) {
+                                        klidatarec.toyear = year;
+                                    }
+                                }
+
+                                // klidatarec.years[year] füllen
+                                // currday 1818.001 ist leider NICHT der laufende Tag im Jahr
+                                // kla6190.fromMMTT2TTT(actyear, actmonth, actday);
+                                var dayind = kla1490srv.fromMMTT2TTT (record.year, record.month, record.day);
+                                if (dayind < klidatarec.years[year].length && record.total.trim() !== "-1") {
+                                    if (klidatarec.years[year][dayind] === "") {
+                                        klidatarec.years[year][dayind] = record.total.trim();
+                                    } else {
+                                        // hier würden zwei Werte für einen Tag kommen, das darf nicht sein
+                                        console.log("***" + dayind + ":" + JSON.stringify(record, null, " "));
+                                    }
+                                }                    
+                            }
+                            that.resume();
+                        });
+                        readInterface.on("close", function (err) {
+                            // KLISTATIONS, KLIINVENTORY, KLIDATA: 1 Datensatz
+                            var reqparm = {};
+                            async.waterfall([
+                                    function (callback293a) {
+                                        // Ausgabe KLISTATIONS
+                                        reqparm.selfields = {
+                                            source: "SUNSPOTS",
+                                            stationid: stationid
+                                        };
+                                        var updstation = Object.assign({}, klistationrec, true);
+                                        delete updstation.source;
+                                        delete updstation.stationid;
+
+                                        reqparm.updfields = {};
+                                        reqparm.updfields["$setOnInsert"] = {
+                                            source: "SUNSPOTS",
+                                            stationid: stationid
+                                        };
+                                        reqparm.updfields["$set"] = updstation;
+                                        reqparm.table = "KLISTATIONS";
+                                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                            callback293a(null, res, ret);
+                                            return;
+                                        });
+                                    },
+                                    function (res, ret, callback293b) {
+                                        // Ausgabe KLIINVENTORY
+                                        kliinventoryrec.fromyear = klidatarec.fromyear;
+                                        kliinventoryrec.toyear = klidatarec.toyear;
+                                        kliinventoryrec.anzyears = parseInt(kliinventoryrec.toyear) - parseInt(kliinventoryrec.fromyear) + 1;
+                                        reqparm.selfields = {
+                                            source: "SUNSPOTS",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        var updstation = Object.assign({}, kliinventoryrec, true);
+                                        delete updstation.source;
+                                        delete updstation.stationid;
+                                        delete updstation.variable;
+
+                                        reqparm.updfields = {};
+                                        reqparm.updfields["$setOnInsert"] = {
+                                            source: "SUNSPOTS",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        reqparm.updfields["$set"] = updstation;
+                                        reqparm.table = "KLIINVENTORY";
+                                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                            callback293b(null, res, ret);
+                                            return;
+                                        });
+                                    },
+                                    function (res, ret, callback293c) {
+                                        // Ausgabe KLIDATA
+                                        klidatarec.years = JSON.stringify(klidatarec.years);
+                                        klidatarec.anzyears = parseInt(klidatarec.toyear) - parseInt(klidatarec.fromyear) + 1;
+                                        reqparm.selfields = {
+                                            source: "SUNSPOTS",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        var updstation = Object.assign({}, klidatarec, true);
+                                        delete updstation.source;
+                                        delete updstation.stationid;
+                                        delete updstation.variable;
+
+                                        reqparm.updfields = {};
+                                        reqparm.updfields["$setOnInsert"] = {
+                                            source: "SUNSPOTS",
+                                            stationid: stationid,
+                                            variable: variable
+                                        };
+                                        reqparm.updfields["$set"] = updstation;
+                                        reqparm.table = "KLIDATA";
+                                        sys0000sys.setonerecord(db, async, null, reqparm, res, function (res, ret1) {
+                                            callback293c("Finish", res, ret);
+                                            return;
+                                        });
+                                    }
+                                ],
+                                function (error, res, ret) {
+                                    ret.error = true;
+                                    ret.message = err;
+                                    callback292a2a("Finish", res, ret);
+                                    return;
+                                });
+                        });
+                    } catch (err) {
+                        console.log(err.stack);
+                        ret.error = true;
+                        ret.message = err;
+                        callback292a2a("Error", res, ret);
+                        return;
+                    }
+                }
+            ],
+            function (error, res, ret) {
+                console.log("FERTIG SUNSPOTS");
+                callback292(res, ret);
+                return;
+            });
+    };
+
+
+
+    /**
+     * fromMMTT2TTT - Konvertiert Monat und Tag in dem Jahr zu laufendem Kalendertag
+     * @param {*} tyear - Jahr JJJJ
+     * @param {*} tmonth - Monat 1 bis 12
+     * @param {*} tday - Tag 1 bis 31
+     * returns
+     *    tindex - zero-based "Tagesindex" im betreffenden Jahr
+     */
+     kla1490srv.fromMMTT2TTT = function (tyear, tmonth, tday) {
+        var uihelpermd = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+        if (uihelper.isleapyear(tyear)) {
+            uihelpermd[1] = 29;
+        } else {
+            uihelpermd[1] = 28;
+        }
+        var baseday = 0;
+        for (var itmon = 1; itmon < tmonth; itmon++) {
+            baseday += uihelpermd[itmon - 1];
+        }
+        // in baseday steht die Anzahl der Tage in den Vormonaten, kann auch 0 sein
+        // hier steht der vorgegebene Monat an
+        var tindex = baseday + tday - 1; // laufender Tag, basierend auf 1
+        return tindex;
+    };
+
 
     /**
      * loadnao  - North Atlantic Oscillation
@@ -1882,8 +2238,7 @@ const {
         });
         // console.log(counter + JSON.stringify(data));
     };
-
-
+   
 
 
     /**
