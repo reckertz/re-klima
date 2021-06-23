@@ -50,6 +50,7 @@
                 enum: [
                     "GHCND",
                     "NOAAICE",
+                    "SUNSPOTS",
                     "PAGES2K",
                     "HYGRIS",
                     "NAO",
@@ -77,6 +78,7 @@
                     "NAO",
                     "PAGES2K",
                     "ICEEXT",
+                    "SUNSPOTS",
                     ""
                 ]
             },
@@ -1708,6 +1710,9 @@
                 var idc22 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc22 + "']").click();
             } else if (source === "NOAAICE") {
+                var idc23 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
+                window.parent.$(".tablinks[idhash='#" + idc23 + "']").click();
+            } else if (source === "SUNSPOTS") {
                 var idc23 = window.parent.sysbase.tabcreateiframe(tabname, "", "re-klima", "kla2150rep", tourl);
                 window.parent.$(".tablinks[idhash='#" + idc23 + "']").click();
             } else {

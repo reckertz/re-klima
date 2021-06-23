@@ -1334,6 +1334,7 @@ app.get('/loadnao', function (req, res) {
     });
 });
 
+// kla1490srv.loadsunspots
 
 /**
  * loadgeonames - Orte in Ländern
@@ -1362,6 +1363,32 @@ app.get('/loadgeonames', function (req, res) {
 
 
 
+
+
+/**
+ * loadsunspots - Sunspots
+ 
+ */
+ app.get('/loadsunspots', function (req, res) {
+    if (checkSession(req, res)) return;
+
+    var timeout = 10 * 60 * 1000; // hier: gesetzter Default
+    if (req.query && typeof req.query.timeout !== "undefined" && req.query.timeout.length > 0) {
+        timeout = req.query.timeout;
+        req.setTimeout(parseInt(timeout));
+    }
+    var rootname = __dirname;
+    kla1490srv.loadsunspots(gblInfo, db, fs, path, rootname, async, stream, csv, readline, sys0000sys, kla9020fun, req, res, function (res, ret) {
+        // in ret liegen error, message und record
+        var smsg = JSON.stringify(ret);
+        res.writeHead(200, {
+            'Content-Type': 'application/text',
+            "Access-Control-Allow-Origin": "*"
+        });
+        res.end(smsg);
+        return;
+    });
+});
 
 
 
