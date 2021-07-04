@@ -290,7 +290,6 @@
                 $("#slider640").prop("step", "1");
                 $("#slider640").prop("value", fromyear);
 
-
                 $(document).on("change slide", ".slider640", function (evt) {
                     evt.preventDefault();
                     var newValue = $(this).val();

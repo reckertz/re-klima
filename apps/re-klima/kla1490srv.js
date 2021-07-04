@@ -2632,7 +2632,6 @@
                     });
                 },
 
-
                 function (res, ret, callback290c) {
                     /**
                      * Lesen countrycodes für die Zuordnung, return in ret1.data

@@ -22,7 +22,6 @@ var ba64 = require("ba64");
 var StreamZip = require("node-stream-zip");
 
 var csv = require("fast-csv");
-
 var csvformat = require('@fast-csv/format');
 
 
@@ -1367,7 +1366,7 @@ app.get('/loadgeonames', function (req, res) {
 
 /**
  * loadsunspots - Sunspots
- 
+
  */
  app.get('/loadsunspots', function (req, res) {
     if (checkSession(req, res)) return;
