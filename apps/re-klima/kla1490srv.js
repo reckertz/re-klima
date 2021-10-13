@@ -2544,8 +2544,19 @@
                         return;
                     }
                     var stationfilter = "";
+                    var variablefilter = "";
                     if (req.query && typeof req.query.extraParam !== "undefined" && req.query.extraParam.length > 0) {
-                        stationfilter = JSON.parse(req.query.extraParam).stationfilter;
+                        var extraParm = JSON.parse(req.query.extraParam);
+                        stationfilter = extraParm.stationfilter;
+                        if (typeof extraParm.filter1 !== "undefined" && extraParm.filter1 === true) {
+                        variablefilter += ",TMAX,TMIN,PRCP,SNOW";
+                        }
+                        if (typeof extraParm.filter2 !== "undefined" && extraParm.filter2 === true) {
+                            variablefilter += ",ACMC,ACMH,ACSC,ACSH";
+                        }
+                        if (typeof extraParm.filter3 !== "undefined" && extraParm.filter3 === true) {
+                            variablefilter += ",TSUN,PSUN";
+                        }
                     }
                     var ret = {};
                     ret.fullname = fullname;
@@ -2554,6 +2565,7 @@
                     ret.source = source;
                     ret.selyears = selyears;
                     ret.stationfilter = stationfilter;
+                    ret.variablefilter = variablefilter;
                     callback290a(null, res, ret);
                     return;
                 },
@@ -3363,6 +3375,7 @@
                 let stationids = "";
                 let selyears = "";
                 let selvariablename = "";
+                let variables = "TMIN,TMAX,PRCP,SNOW";
                 if (req !== null) {
                     source = "GHCND";
                     if (req.query && typeof req.query.source !== "undefined" && req.query.source.length > 0) {
@@ -3384,6 +3397,9 @@
                     if (req.query && typeof req.query.variable !== "undefined" && req.query.variable.length > 0) {
                         selvariablename = req.query.variable;
                     }
+                    if (req.query && typeof req.query.variables !== "undefined" && req.query.variables.length > 0) {
+                        variables = req.query.variables;
+                    }
                 } else {
                     fullname = reqparm.fullname || "";
                     source = reqparm.source || "GHCND";
@@ -3398,6 +3414,7 @@
                 ret.stationid = stationid;
                 ret.stationids = stationids;
                 ret.selvariablename = selvariablename;
+                ret.variables = variables;
                 console.log(ret.source + " " + ret.stationid + " " + ret.stationids.length + " " + ret.selvariablename);
                 if (typeof stationids === "undefined" ||
                     typeof stationids === "string" && stationids.length === 0 ||
@@ -3440,6 +3457,7 @@
                  */
                 let stationids = ret.stationids;
                 let selvariablename = ret.selvariablename;
+                let variables = ret.variables;
                 let rootpath = datapath;
                 async.eachSeries(stationids, function (station, nextstation) {
                         if (typeof station === "undefined" || station === null || station.trim().length === 0) {
@@ -3548,7 +3566,8 @@
                                                     if ((selvariablename === "TMAX" || selvariablename === "TMIN") && (dayrecord.variable === "TMAX" || dayrecord.variable === "TMIN") ||
                                                         dayrecord.variable === selvariablename) {
                                                     */
-                                                    if ("TMAX,TMIN,PRCP,SNOW".indexOf(dayrecord.variable) >= 0) {
+
+                                                    if (variables.indexOf(dayrecord.variable) >= 0) {
                                                         // ab 22 kommen 31 Felder für Tageswerte
                                                         var dayarray = [];
                                                         var lastbis = 0;

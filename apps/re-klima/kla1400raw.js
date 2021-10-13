@@ -1060,6 +1060,30 @@
                                             width: "100px",
                                             io: "i"
                                         },
+                                        filter1: {
+                                            title: "TMAX,TMIN,PRCP,SNOW",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            default: "",
+                                            width: "100px",
+                                            io: "i"
+                                        },
+                                        filter2: {
+                                            title: "AC* cloudiness %",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            default: "",
+                                            width: "100px",
+                                            io: "i"
+                                        },
+                                        filter3: {
+                                            title: "TSUN,PSUN sunshine Min",
+                                            type: "string", // currency, integer, datum, text, key
+                                            class: "uiecheckbox",
+                                            default: "",
+                                            width: "100px",
+                                            io: "i"
+                                        },
                                         comment: {
                                             title: "Kommentar",
                                             type: "string", // currency, integer, datum, text, key
@@ -1077,11 +1101,15 @@
                                     left: $("#kla1400raw_rightw").offset().left,
                                     top: screen.height / 2
                                 };
+                                pos = {
+                                    height: "80%"
+                                };
                                 //Math.ceil($(this).offset().top + $(this).height() + 20)
                                 $(document).on('popupok', function (evt, extraParam) {
                                     evt.preventDefault();
                                     evt.stopPropagation();
                                     evt.stopImmediatePropagation();
+
                                     kla1400raw.loadghcnall($("#kla1400rawfullname").text(), extraParam);
                                 });
 
@@ -1429,6 +1457,7 @@
      * loadghcnall - GHCN-Daily nur stations laden
      */
     kla1400raw.loadghcnall = function (fullname, extraParam) {
+        debugger;
         $("#kla1400rawb4").prop("disabled", true);
         $("#kla1400rawb5").prop("disabled", true);
         var target = "";

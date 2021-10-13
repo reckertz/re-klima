@@ -75,6 +75,10 @@
                     "TSUN",
                     "PSUN",
                     "SNOW",
+                    "ACMC",
+                    "ACMH",
+                    "ACSC",
+                    "ACSH",
                     "NAO",
                     "PAGES2K",
                     "ICEEXT",
@@ -1309,6 +1313,7 @@
                 sqlStmt += " ON KLIINVENTORY.source = KLIDATA.source";
                 sqlStmt += " AND KLIINVENTORY.stationid = KLIDATA.stationid";
                 sqlStmt += " AND KLIINVENTORY.variable = KLIDATA.variable";
+                debugger;
                 if (where3.length > 0) {
                     sqlStmt += " AND " + where3;
                 }
@@ -1475,6 +1480,16 @@
                             reprecord.station += "<img src='/images/icons-png/arrow-u-black.png'";
                             reprecord.station += " title='Upload *.dly'";
                             reprecord.station += " class='kla2000selupl'>";
+
+                            reprecord.station += " &nbsp;";
+                            //reprecord.station += "<img src='/images/icons-png/arrow-u-black.png'";
+                            reprecord.station += "<span ";
+                            reprecord.station += " title='AC*,*SUN *.dly'";
+                            reprecord.station += " style='background-color:yellow;font-weight:bolder;'";
+                            reprecord.station += " class='kla2000selupl1'>";
+                            // UPWARDS WHITE ARROW U+21E7
+                            reprecord.station += "&#x21E7;";
+                            reprecord.station += "</span>";
 
                             reprecord.station += " &nbsp;";
                             reprecord.station += "<img src='/images/icons-png/gear-black.png'";
@@ -1931,6 +1946,49 @@
                     source: source,
                     stationid: stationid,
                     fullname: fullname
+                }
+            }).done(function (r1, textStatus, jqXHR) {
+                clearInterval(ghcnclock);
+                sysbase.checkSessionLogin(r1);
+                var ret = JSON.parse(r1);
+                sysbase.putMessage(ret.message, 1);
+
+                $("#kla2000selliste").click();
+
+                return;
+            }).fail(function (err) {
+                clearInterval(ghcnclock);
+                //$("#kli1400raw_rightwdata").empty();
+                //document.getElementById("kli1400raw").style.cursor = "default";
+                sysbase.putMessage("ghcnddata:" + err, 3);
+                return;
+            }).always(function () {
+                // nope
+                $(that).attr("disabled", false);
+            });
+        });
+
+
+
+        $(document).on("click", ".kla2000selupl1", function (evt) {
+            evt.preventDefault();
+            evt.stopImmediatePropagation();
+            evt.stopPropagation();
+            var stationid = $(this).closest("tr").attr("rowid");
+            var source = $(this).closest("tr").find('td:first-child').text();
+            var ghcnclock = kla2000sel.showclock("#kla2000sellock");
+            var that = this;
+            $(that).attr("disabled", true);
+            var jqxhr = $.ajax({
+                method: "GET",
+                crossDomain: false,
+                url: sysbase.getServer("ghcnddata"),
+                data: {
+                    timeout: 10 * 60 * 1000,
+                    source: source,
+                    stationid: stationid,
+                    fullname: fullname,
+                    variables: "ACMC,ACMH,ACSC,ACSH,TSUN,PSUN"
                 }
             }).done(function (r1, textStatus, jqXHR) {
                 clearInterval(ghcnclock);
