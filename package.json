@@ -27,7 +27,7 @@
   "homepage": "https://github.com/reckertz/re-klima#readme",
   "dependencies": {
     "app-module-path": "^2.2.0",
-    "async": "^3.2.0",
+    "async": "^3.2.2",
     "ba64": "^3.0.9",
     "compression": "^1.7.4",
     "cookie-parser": "^1.4.5",
